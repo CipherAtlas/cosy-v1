@@ -19,6 +19,10 @@ export class PeacefulMusicEngine {
     await this.engine.start();
   }
 
+  public async prepareAudio(): Promise<boolean> {
+    return this.engine.prepareAudio();
+  }
+
   public pause(): void {
     this.engine.pause();
   }

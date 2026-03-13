@@ -268,8 +268,20 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
       return;
     }
 
-    await engine.start();
-    setMusicPlaying(true);
+    try {
+      await engine.start();
+      setMusicPlaying(true);
+    } catch {
+      setMusicPlaying(engine.isPlaying());
+    }
+  };
+
+  const primeAudio = () => {
+    if (!engine) {
+      return;
+    }
+
+    void engine.prepareAudio();
   };
 
   const toggleRain = () => {
@@ -443,7 +455,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
 
             <div className="rounded-[1.5rem] border p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}2A` }}>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <button type="button" className={focusControlClassName} style={musicSoftStyle} onClick={toggleMusicPlayback}>
+                <button type="button" className={focusControlClassName} style={musicSoftStyle} onPointerDown={primeAudio} onClick={toggleMusicPlayback}>
                   {musicPlaying ? t.focus.pauseMusic : t.focus.playMusic}
                 </button>
                 <div className="flex flex-wrap gap-2">
@@ -606,7 +618,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2.5">
-                <button type="button" className={focusControlClassName} style={musicSoftStyle} onClick={toggleMusicPlayback}>
+                <button type="button" className={focusControlClassName} style={musicSoftStyle} onPointerDown={primeAudio} onClick={toggleMusicPlayback}>
                   {musicPlaying ? t.focus.pauseMusic : t.focus.playMusic}
                 </button>
                 <button type="button" className={focusControlClassName} style={musicSoftStyle} onClick={nextTrack}>
@@ -664,8 +676,16 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
   }, [engine]);
 
   const handlePlay = async () => {
-    await engine.start();
-    setIsPlaying(true);
+    try {
+      await engine.start();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(engine.isPlaying());
+    }
+  };
+
+  const primeAudio = () => {
+    void engine.prepareAudio();
   };
 
   const handlePause = () => {
@@ -748,7 +768,7 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
               {t.music.pause}
             </button>
           ) : (
-            <button type="button" className={controlClassName} style={activeControlStyle} onClick={handlePlay}>
+            <button type="button" className={controlClassName} style={activeControlStyle} onPointerDown={primeAudio} onClick={handlePlay}>
               {t.music.play}
             </button>
           )}

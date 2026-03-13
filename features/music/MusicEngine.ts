@@ -203,7 +203,10 @@ export class MusicEngine {
   }
 
   public async start(): Promise<void> {
-    await Tone.start();
+    const unlocked = await this.ensureAudioContextRunning();
+    if (!unlocked) {
+      throw new Error("Audio context is not available.");
+    }
 
     if (!this.transportStarted) {
       this.barLoop.start(0);
@@ -211,7 +214,7 @@ export class MusicEngine {
     }
 
     if (Tone.Transport.state !== "started") {
-      Tone.Transport.start();
+      Tone.Transport.start("+0.02");
     }
   }
 
@@ -348,9 +351,56 @@ export class MusicEngine {
     this.limiter.dispose();
   }
 
+  public async prepareAudio(): Promise<boolean> {
+    return this.ensureAudioContextRunning();
+  }
+
   private emitInfo(): void {
     const info = this.getTrackInfo();
     this.listeners.forEach((listener) => listener(info));
+  }
+
+  private async ensureAudioContextRunning(): Promise<boolean> {
+    const rawContext = Tone.getContext().rawContext;
+    const isRunning = (): boolean => Tone.getContext().rawContext.state === "running";
+
+    if (isRunning()) {
+      Tone.Destination.mute = false;
+      return true;
+    }
+
+    try {
+      await Tone.start();
+    } catch {
+      // Continue with explicit resume fallbacks for mobile browsers.
+    }
+
+    if (!isRunning()) {
+      try {
+        await rawContext.resume();
+      } catch {
+        // Continue with silent-buffer unlock fallback.
+      }
+    }
+
+    if (!isRunning()) {
+      try {
+        const unlockSource = rawContext.createBufferSource();
+        const unlockGain = rawContext.createGain();
+        unlockGain.gain.value = 0;
+        unlockSource.buffer = rawContext.createBuffer(1, 1, rawContext.sampleRate || 22050);
+        unlockSource.connect(unlockGain);
+        unlockGain.connect(rawContext.destination);
+        unlockSource.start(0);
+        unlockSource.stop(0.02);
+        await rawContext.resume();
+      } catch {
+        // If this fails, caller can ask for another explicit tap gesture.
+      }
+    }
+
+    Tone.Destination.mute = false;
+    return isRunning();
   }
 
   private createTrack(vibe: VibeId): GeneratedTrack {

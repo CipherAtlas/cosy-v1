@@ -45,8 +45,12 @@ export default function MusicPage() {
       return;
     }
 
-    await engineRef.current.start();
-    setIsPlaying(true);
+    try {
+      await engineRef.current.start();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
   };
 
   return (
