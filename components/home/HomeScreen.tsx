@@ -1089,15 +1089,19 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
   };
 
   return (
-    <PanelShell title={t.gratitude.title} subtitle={t.gratitude.subtitle}>
+    <PanelShell
+      title={t.gratitude.title}
+      subtitle={t.gratitude.subtitle}
+      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-visible px-1 pr-0 sm:mt-8 sm:px-1.5 sm:pr-1"
+    >
       <div className="space-y-7">
-        <form onSubmit={onSave} className="space-y-3 px-px">
+        <form onSubmit={onSave} className="space-y-3">
           <label htmlFor="gratitude-text" className="sr-only">
             {t.gratitude.entryLabel}
           </label>
           <textarea
             id="gratitude-text"
-            className="block min-h-32 w-full rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
+            className="block min-h-32 w-full appearance-none rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
             style={{ ...SURFACE_STYLE, color: COLOR_THEME.textPrimary }}
             placeholder={t.gratitude.placeholder}
             value={value}
@@ -1119,7 +1123,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
               {t.gratitude.emptyState}
             </p>
           ) : (
-            <ul className="space-y-3 px-px">
+            <ul className="space-y-3">
               {entries.map((entry) => (
                 <li
                   key={entry.id}
