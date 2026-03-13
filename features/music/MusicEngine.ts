@@ -163,6 +163,8 @@ export class MusicEngine {
   private transportStarted = false;
   private pianoArpeggioPattern: number[] = PIANO_ARPEGGIO_PATTERNS[0];
   private pianoPatternBarsRemaining = 0;
+  private audioPrepared = false;
+  private prepareAudioPromise: Promise<boolean> | null = null;
 
   constructor(initialVibe: VibeId = "lofi") {
     this.limiter = new Tone.Limiter(-1).toDestination();
@@ -203,7 +205,7 @@ export class MusicEngine {
   }
 
   public async start(): Promise<void> {
-    const unlocked = await this.ensureAudioContextRunning();
+    const unlocked = await this.prepareAudio();
     if (!unlocked) {
       throw new Error("Audio context is not available.");
     }
@@ -214,7 +216,7 @@ export class MusicEngine {
     }
 
     if (Tone.Transport.state !== "started") {
-      Tone.Transport.start("+0.02");
+      Tone.Transport.start();
     }
   }
 
@@ -352,7 +354,28 @@ export class MusicEngine {
   }
 
   public async prepareAudio(): Promise<boolean> {
-    return this.ensureAudioContextRunning();
+    const isContextRunning = Tone.getContext().rawContext.state === "running";
+    if (this.audioPrepared && isContextRunning) {
+      Tone.Destination.mute = false;
+      return true;
+    }
+
+    if (!this.prepareAudioPromise) {
+      this.prepareAudioPromise = (async () => {
+        const unlocked = await this.ensureAudioContextRunning();
+        if (!unlocked) {
+          return false;
+        }
+
+        await this.warmOutputPath();
+        this.audioPrepared = true;
+        return true;
+      })().finally(() => {
+        this.prepareAudioPromise = null;
+      });
+    }
+
+    return this.prepareAudioPromise;
   }
 
   private emitInfo(): void {
@@ -369,21 +392,31 @@ export class MusicEngine {
       return true;
     }
 
-    try {
-      await Tone.start();
-    } catch {
-      // Continue with explicit resume fallbacks for mobile browsers.
-    }
+    const pause = (ms: number) => new Promise<void>((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
 
-    if (!isRunning()) {
+    for (let attempt = 0; attempt < 3 && !isRunning(); attempt += 1) {
+      try {
+        await Tone.start();
+      } catch {
+        // Continue with explicit resume fallbacks for mobile browsers.
+      }
+
+      if (isRunning()) {
+        break;
+      }
+
       try {
         await rawContext.resume();
       } catch {
         // Continue with silent-buffer unlock fallback.
       }
-    }
 
-    if (!isRunning()) {
+      if (isRunning()) {
+        break;
+      }
+
       try {
         const unlockSource = rawContext.createBufferSource();
         const unlockGain = rawContext.createGain();
@@ -397,10 +430,33 @@ export class MusicEngine {
       } catch {
         // If this fails, caller can ask for another explicit tap gesture.
       }
+
+      if (!isRunning()) {
+        await pause(16);
+      }
     }
 
     Tone.Destination.mute = false;
     return isRunning();
+  }
+
+  private async warmOutputPath(): Promise<void> {
+    try {
+      const warmup = new Tone.Synth({
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.001, decay: 0.01, sustain: 0, release: 0.01 },
+        volume: -86
+      }).connect(this.musicBus);
+
+      const now = Tone.now();
+      warmup.triggerAttackRelease("C5", 0.02, now, 0.0015);
+      await new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 32);
+      });
+      warmup.dispose();
+    } catch {
+      // Warmup is best effort for mobile compatibility.
+    }
   }
 
   private createTrack(vibe: VibeId): GeneratedTrack {

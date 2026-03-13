@@ -34,6 +34,49 @@ export default function MusicPage() {
     engineRef.current?.setCrackle(crackleEnabled);
   }, [crackleEnabled]);
 
+  useEffect(() => {
+    let listenersAttached = true;
+
+    const handleUnlockAttempt = () => {
+      const engine = engineRef.current;
+      if (!engine) {
+        return;
+      }
+
+      void engine.prepareAudio().then((ready) => {
+        if (!ready || !listenersAttached) {
+          return;
+        }
+
+        listenersAttached = false;
+        window.removeEventListener("pointerdown", handleUnlockAttempt);
+        window.removeEventListener("touchstart", handleUnlockAttempt);
+        window.removeEventListener("touchend", handleUnlockAttempt);
+        window.removeEventListener("mousedown", handleUnlockAttempt);
+        window.removeEventListener("keydown", handleUnlockAttempt);
+      });
+    };
+
+    window.addEventListener("pointerdown", handleUnlockAttempt);
+    window.addEventListener("touchstart", handleUnlockAttempt, { passive: true });
+    window.addEventListener("touchend", handleUnlockAttempt, { passive: true });
+    window.addEventListener("mousedown", handleUnlockAttempt);
+    window.addEventListener("keydown", handleUnlockAttempt);
+
+    return () => {
+      listenersAttached = false;
+      window.removeEventListener("pointerdown", handleUnlockAttempt);
+      window.removeEventListener("touchstart", handleUnlockAttempt);
+      window.removeEventListener("touchend", handleUnlockAttempt);
+      window.removeEventListener("mousedown", handleUnlockAttempt);
+      window.removeEventListener("keydown", handleUnlockAttempt);
+    };
+  }, []);
+
+  const primeAudio = () => {
+    void engineRef.current?.prepareAudio();
+  };
+
   const togglePlayback = async () => {
     if (!engineRef.current) {
       return;
@@ -61,7 +104,15 @@ export default function MusicPage() {
     >
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="control text-sm" onClick={togglePlayback}>
+          <button
+            type="button"
+            className="control text-sm"
+            onPointerDown={primeAudio}
+            onTouchStart={primeAudio}
+            onMouseDown={primeAudio}
+            onKeyDown={primeAudio}
+            onClick={togglePlayback}
+          >
             {isPlaying ? "Pause" : "Play"}
           </button>
         </div>
