@@ -63,9 +63,3 @@ The app uses a cozy pastel interface with six sections you can switch between fr
 npm install
 npm run dev
 ```
-
-## Deployment (GitHub Pages)
-
-- Static export is enabled.
-- Push to `main` to trigger `.github/workflows/deploy-pages.yml`.
-- For project pages, base path is handled automatically in CI.
