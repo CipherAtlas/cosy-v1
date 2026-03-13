@@ -160,7 +160,7 @@ const PanelShell = ({ title, subtitle, children, contentClassName }: PanelShellP
       </p>
     </header>
 
-    <div className={contentClassName ?? "mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:mt-8 sm:pr-1"}>{children}</div>
+    <div className={contentClassName ?? "mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-px pr-0 sm:mt-8 sm:pl-px sm:pr-1"}>{children}</div>
   </div>
 );
 
@@ -391,7 +391,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
     <PanelShell
       title={t.focus.title}
       subtitle={isFocusMode ? t.focus.subtitleFocusMode : t.focus.subtitle}
-      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:pr-1 lg:overflow-hidden"
+      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-px pr-0 sm:pl-px sm:pr-1 lg:overflow-hidden"
     >
       {isFocusMode ? (
         <div className="flex h-full min-h-0 flex-col justify-between gap-3 overflow-y-auto rounded-[1.8rem] border p-4 sm:rounded-[2rem] sm:p-6 lg:overflow-hidden lg:p-8" style={{ ...SURFACE_STYLE, background: `${modeTint}30` }}>
@@ -1091,13 +1091,13 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
   return (
     <PanelShell title={t.gratitude.title} subtitle={t.gratitude.subtitle}>
       <div className="space-y-7">
-        <form onSubmit={onSave} className="space-y-3">
+        <form onSubmit={onSave} className="space-y-3 px-px">
           <label htmlFor="gratitude-text" className="sr-only">
             {t.gratitude.entryLabel}
           </label>
           <textarea
             id="gratitude-text"
-            className="min-h-32 w-full rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
+            className="block min-h-32 w-full rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
             style={{ ...SURFACE_STYLE, color: COLOR_THEME.textPrimary }}
             placeholder={t.gratitude.placeholder}
             value={value}
@@ -1119,7 +1119,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
               {t.gratitude.emptyState}
             </p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-3 px-px">
               {entries.map((entry) => (
                 <li
                   key={entry.id}

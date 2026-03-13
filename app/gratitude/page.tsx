@@ -37,7 +37,7 @@ export default function GratitudePage() {
       atmosphereClassName="bg-[radial-gradient(circle_at_18%_25%,rgba(214,173,130,0.14),transparent_45%),radial-gradient(circle_at_80%_76%,rgba(149,173,142,0.14),transparent_45%)]"
     >
       <div className="space-y-6">
-        <form className="space-y-3" onSubmit={onSave}>
+        <form className="space-y-3 px-px" onSubmit={onSave}>
           <label className="sr-only" htmlFor="gratitude-note">
             Gratitude note
           </label>
@@ -45,7 +45,7 @@ export default function GratitudePage() {
             id="gratitude-note"
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            className="min-h-24 w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-sm text-room-text placeholder:text-room-muted/70"
+            className="block min-h-24 w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-sm text-room-text placeholder:text-room-muted/70"
             placeholder="A warm drink, a message, a quiet sunset..."
           />
           <button type="submit" className="control text-sm">
@@ -58,7 +58,7 @@ export default function GratitudePage() {
           {entries.length === 0 ? (
             <p className="text-sm text-room-muted">Your notes stay here, on this device.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2 px-px">
               {entries.map((entry) => (
                 <li key={entry.id} className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
                   <p className="text-sm text-room-text">{entry.text}</p>
