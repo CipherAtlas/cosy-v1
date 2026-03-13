@@ -1,6 +1,6 @@
 {
   "stressed": [
-    { "text": "You could try a slower breath by the fireplace.", "href": "/breathe" },
+    { "text": "You could try a slower breathing cycle for a minute.", "href": "/breathe" },
     { "text": "Maybe head to a softer music layer for a few minutes.", "href": "/music" }
   ],
   "tired": [

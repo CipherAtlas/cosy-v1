@@ -10,8 +10,8 @@ export const ROOM_ASSETS = {
   window: {
     main: withBasePath("/assets/anime-room/window/main.svg")
   },
-  fireplace: {
-    main: withBasePath("/assets/anime-room/fireplace/main.svg")
+  breathe: {
+    main: withBasePath("/assets/anime-room/breathe/main.svg")
   },
   desk: {
     main: withBasePath("/assets/anime-room/desk/main.svg"),

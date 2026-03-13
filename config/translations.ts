@@ -292,7 +292,7 @@ const EN: TranslationShape = {
     },
     suggestions: {
       stressed: [
-        { text: "You could try a slower breath by the fireplace.", href: "/breathe" },
+        { text: "You could try a slower breathing cycle for a minute.", href: "/breathe" },
         { text: "Maybe head to a softer music layer for a few minutes.", href: "/music" }
       ],
       tired: [
@@ -496,7 +496,7 @@ const JA: TranslationShape = {
     },
     suggestions: {
       stressed: [
-        { text: "暖炉のように、ゆっくりした呼吸を試してみませんか。", href: "/breathe" },
+        { text: "1分だけ、ゆっくり呼吸してみませんか。", href: "/breathe" },
         { text: "数分だけ、やさしい音楽に身をゆだねるのもおすすめです。", href: "/music" }
       ],
       tired: [

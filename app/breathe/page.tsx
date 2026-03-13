@@ -32,7 +32,7 @@ export default function BreathePage() {
   return (
     <FeatureFrame
       title="Breathe"
-      subtitle="Slow and warm, with the fireplace."
+      subtitle="Slow and steady, at your own pace."
       atmosphereClassName="bg-[radial-gradient(circle_at_25%_20%,rgba(239,184,123,0.25),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(133,115,102,0.18),transparent_44%)]"
     >
       <div className="space-y-6">
@@ -77,8 +77,8 @@ export default function BreathePage() {
           <button type="button" className="control text-sm" onClick={reset}>
             Reset cycle
           </button>
-          <button type="button" className="control text-sm" aria-label="Fireplace ambience placeholder">
-            Fireplace ambience
+          <button type="button" className="control text-sm" aria-label="Warm ambience placeholder">
+            Warm ambience
           </button>
         </div>
       </div>

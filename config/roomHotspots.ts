@@ -2,8 +2,8 @@ import { RoomHotspot } from "@/types/room";
 
 export const ROOM_HOTSPOTS: RoomHotspot[] = [
   {
-    id: "fireplace",
-    label: "Fireplace",
+    id: "breathe",
+    label: "Breathe",
     href: "/breathe",
     position: { top: "56%", left: "18%", width: "20%", height: "30%" },
     transitionOrigin: "28% 74%"
