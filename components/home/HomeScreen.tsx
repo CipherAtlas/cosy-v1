@@ -120,10 +120,10 @@ const createActiveControlStyle = (tint: string) => ({
 });
 
 const controlClassName =
-  "rounded-2xl border px-6 py-3.5 text-[16px] font-medium tracking-[0.01em] shadow-[0_2px_8px_rgba(188,149,129,0.08)] transition-all duration-150 ease-out hover:-translate-y-[1px] hover:brightness-[1.03] active:translate-y-0 active:brightness-95";
+  "min-h-11 rounded-2xl border px-4 py-2.5 text-[15px] font-medium tracking-[0.01em] shadow-[0_2px_8px_rgba(188,149,129,0.08)] transition-all duration-150 ease-out hover:-translate-y-[1px] hover:brightness-[1.03] active:translate-y-0 active:brightness-95 sm:px-6 sm:py-3.5 sm:text-[16px]";
 
 const inputClassName =
-  "mt-1.5 w-full rounded-2xl border bg-transparent px-4 py-3 text-[16px] font-medium outline-none transition-colors";
+  "mt-1.5 min-h-11 w-full rounded-2xl border bg-transparent px-4 py-3 text-[15px] font-medium outline-none transition-colors sm:text-[16px]";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60)
@@ -150,17 +150,17 @@ type PanelShellProps = {
 };
 
 const PanelShell = ({ title, subtitle, children, contentClassName }: PanelShellProps) => (
-  <div className="flex h-full min-h-0 flex-col rounded-[2.2rem] border p-7 sm:p-10" style={PANEL_STYLE}>
+  <div className="flex h-full min-h-0 flex-col rounded-[2rem] border p-4 sm:rounded-[2.2rem] sm:p-7 lg:p-10" style={PANEL_STYLE}>
     <header>
-      <h1 className="text-[clamp(2rem,4.2vw,3rem)] font-medium tracking-[0.01em]" style={{ color: COLOR_THEME.textPrimary }}>
+      <h1 className="text-[clamp(1.75rem,6vw,3rem)] font-medium tracking-[0.01em]" style={{ color: COLOR_THEME.textPrimary }}>
         {title}
       </h1>
-      <p className="mt-2 text-[17px] font-normal" style={{ color: MUTED_COLOR }}>
+      <p className="mt-2 text-[15px] font-normal sm:text-[17px]" style={{ color: MUTED_COLOR }}>
         {subtitle}
       </p>
     </header>
 
-    <div className={contentClassName ?? "mt-8 min-h-0 flex-1 overflow-y-auto pr-1"}>{children}</div>
+    <div className={contentClassName ?? "mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:mt-8 sm:pr-1"}>{children}</div>
   </div>
 );
 
@@ -186,7 +186,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
   const softControlStyle = createSoftControlStyle(COLOR_THEME.accentPeach);
   const activeControlStyle = createActiveControlStyle(COLOR_THEME.accentPeach);
   const musicSoftStyle = createSoftControlStyle(COLOR_THEME.accentLavender);
-  const focusControlClassName = `${controlClassName} px-4 py-2.5 text-[15px]`;
+  const focusControlClassName = `${controlClassName} px-4 sm:px-5`;
   const modeTint = mode === "focus" ? COLOR_THEME.accentPeach : COLOR_THEME.accentBlue;
   const presetId =
     settings.focusMinutes === 25 && settings.breakMinutes === 5 ? "light" : settings.focusMinutes === 50 && settings.breakMinutes === 10 ? "deep" : "custom";
@@ -379,10 +379,10 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
     <PanelShell
       title={t.focus.title}
       subtitle={isFocusMode ? t.focus.subtitleFocusMode : t.focus.subtitle}
-      contentClassName="mt-6 min-h-0 flex-1 overflow-hidden"
+      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:pr-1 lg:overflow-hidden"
     >
       {isFocusMode ? (
-        <div className="flex h-full min-h-0 flex-col justify-between rounded-[2rem] border p-6 sm:p-8" style={{ ...SURFACE_STYLE, background: `${modeTint}30` }}>
+        <div className="flex h-full min-h-0 flex-col justify-between gap-3 overflow-y-auto rounded-[1.8rem] border p-4 sm:rounded-[2rem] sm:p-6 lg:overflow-hidden lg:p-8" style={{ ...SURFACE_STYLE, background: `${modeTint}30` }}>
           <div className="flex items-center justify-between gap-3">
             <p className="text-[13px] font-medium uppercase tracking-[0.12em]" style={{ color: MUTED_COLOR }}>
               {t.focus.modeLabel}
@@ -392,9 +392,9 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
             </button>
           </div>
 
-          <div className="grid place-items-center py-4">
+          <div className="grid place-items-center py-2 sm:py-4">
             <motion.div
-              className="relative w-full max-w-[640px] overflow-hidden rounded-[2.2rem] border px-6 py-10 text-center"
+              className="relative w-full max-w-[640px] overflow-hidden rounded-[1.8rem] border px-4 py-7 text-center sm:rounded-[2.2rem] sm:px-6 sm:py-10"
               style={{ borderColor: COLOR_THEME.border, background: `${modeTint}44` }}
               animate={{ scale: isRunning ? 1.015 : 1 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
@@ -413,7 +413,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 <p className="text-[13px] uppercase tracking-[0.14em]" style={{ color: MUTED_COLOR }}>
                   {modeLabel}
                 </p>
-                <p className="mt-4 text-[clamp(3.8rem,11vw,7rem)] font-medium leading-none tracking-[0.08em]" style={{ color: COLOR_THEME.textPrimary }}>
+                <p className="mt-4 text-[clamp(3.1rem,16vw,7rem)] font-medium leading-none tracking-[0.08em]" style={{ color: COLOR_THEME.textPrimary }}>
                   {formatTime(remainingSeconds)}
                 </p>
                 <p className="mt-4 text-[16px] font-medium" style={{ color: MUTED_COLOR }}>
@@ -425,7 +425,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
 
           {completionCard}
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex flex-wrap justify-center gap-2.5">
                 {isRunning ? (
                   <button type="button" className={focusControlClassName} style={activeControlStyle} onClick={pause}>
@@ -464,9 +464,56 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
           </div>
         </div>
       ) : (
-        <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[1.2fr_1fr]">
-          <div className="flex min-h-0 flex-col gap-4">
-            <div className="rounded-[1.8rem] border p-4 sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentPeach}20` }}>
+        <div className="grid min-h-0 gap-3 sm:gap-4 lg:h-full lg:grid-cols-[1.2fr_1fr]">
+          <div className="flex min-h-0 flex-col gap-3 sm:gap-4">
+            <motion.div
+              className="order-1 relative flex min-h-0 flex-col justify-between overflow-hidden rounded-[1.8rem] border px-4 py-6 text-center sm:rounded-[2rem] sm:px-6 sm:py-7 lg:min-h-0 lg:flex-1"
+              style={{ borderColor: COLOR_THEME.border, background: `${modeTint}3D` }}
+              animate={{ scale: isRunning ? 1.01 : 1 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              {isRunning ? (
+                <motion.div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background: `radial-gradient(circle at 50% 44%, ${modeTint}57 0%, ${modeTint}26 34%, transparent 74%)`
+                  }}
+                  animate={{ opacity: [0.24, 0.46, 0.24], scale: [0.985, 1.015, 0.985] }}
+                  transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+                />
+              ) : null}
+              <div className="relative">
+                <p className="text-[13px] uppercase tracking-[0.14em]" style={{ color: MUTED_COLOR }}>
+                  {modeLabel}
+                </p>
+                <p className="mt-4 text-[clamp(2.9rem,15vw,5.4rem)] font-medium leading-none tracking-[0.08em]" style={{ color: COLOR_THEME.textPrimary }}>
+                  {formatTime(remainingSeconds)}
+                </p>
+                <p className="mt-3 text-[15px] font-medium sm:text-[16px]" style={{ color: MUTED_COLOR }}>
+                  {statusLine}
+                </p>
+              </div>
+
+              <div className="mt-5 flex flex-wrap justify-center gap-2.5">
+                {isRunning ? (
+                  <button type="button" className={focusControlClassName} style={activeControlStyle} onClick={pause}>
+                    {t.common.pause}
+                  </button>
+                ) : (
+                  <button type="button" className={focusControlClassName} style={activeControlStyle} onClick={start}>
+                    {t.common.start}
+                  </button>
+                )}
+                <button type="button" className={focusControlClassName} style={softControlStyle} onClick={reset}>
+                  {t.common.reset}
+                </button>
+                <button type="button" className={focusControlClassName} style={softControlStyle} onClick={enterFocusMode}>
+                  {t.focus.focusModeButton}
+                </button>
+              </div>
+            </motion.div>
+
+            <div className="order-2 rounded-[1.8rem] border p-4 sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentPeach}20` }}>
               <p className="text-[13px] font-medium uppercase tracking-[0.12em]" style={{ color: MUTED_COLOR }}>
                 {t.focus.sessionPresets}
               </p>
@@ -529,56 +576,9 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 />
               </label>
             </div>
-
-            <motion.div
-              className="relative flex min-h-0 flex-1 flex-col justify-between overflow-hidden rounded-[2rem] border px-6 py-7 text-center"
-              style={{ borderColor: COLOR_THEME.border, background: `${modeTint}3D` }}
-              animate={{ scale: isRunning ? 1.01 : 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              {isRunning ? (
-                <motion.div
-                  className="pointer-events-none absolute inset-0"
-                  style={{
-                    background: `radial-gradient(circle at 50% 44%, ${modeTint}57 0%, ${modeTint}26 34%, transparent 74%)`
-                  }}
-                  animate={{ opacity: [0.24, 0.46, 0.24], scale: [0.985, 1.015, 0.985] }}
-                  transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
-                />
-              ) : null}
-              <div className="relative">
-                <p className="text-[13px] uppercase tracking-[0.14em]" style={{ color: MUTED_COLOR }}>
-                  {modeLabel}
-                </p>
-                <p className="mt-4 text-[clamp(3rem,8.4vw,5.4rem)] font-medium leading-none tracking-[0.08em]" style={{ color: COLOR_THEME.textPrimary }}>
-                  {formatTime(remainingSeconds)}
-                </p>
-                <p className="mt-3 text-[16px] font-medium" style={{ color: MUTED_COLOR }}>
-                  {statusLine}
-                </p>
-              </div>
-
-              <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-                {isRunning ? (
-                  <button type="button" className={focusControlClassName} style={activeControlStyle} onClick={pause}>
-                    {t.common.pause}
-                  </button>
-                ) : (
-                  <button type="button" className={focusControlClassName} style={activeControlStyle} onClick={start}>
-                    {t.common.start}
-                  </button>
-                )}
-                <button type="button" className={focusControlClassName} style={softControlStyle} onClick={reset}>
-                  {t.common.reset}
-                </button>
-                <button type="button" className={focusControlClassName} style={softControlStyle} onClick={enterFocusMode}>
-                  {t.focus.focusModeButton}
-                </button>
-              </div>
-            </motion.div>
           </div>
 
-          <div className="flex min-h-0 flex-col gap-4">
+          <div className="flex min-h-0 flex-col gap-3 sm:gap-4">
             <div className="rounded-[1.5rem] border p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentBlue}1B` }}>
               <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: MUTED_COLOR }}>
                 {t.focus.sessionStatusTitle}
@@ -813,7 +813,7 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
                           value={value}
                           onChange={(event) => handleMixChange(item.layer, event.target.value)}
                           disabled={isDisabled}
-                          className="h-2 w-full cursor-pointer"
+                          className="h-3 w-full cursor-pointer touch-pan-x"
                           style={{ accentColor: "#5E4A42", opacity: isDisabled ? 0.45 : 1 }}
                           aria-label={`${t.music.layers[item.layer]} ${t.common.volume}`}
                         />
@@ -890,7 +890,7 @@ const BreathePanel = ({ language }: BreathePanelProps) => {
 
         <div className="grid place-items-center py-3">
           <motion.div
-            className="grid h-52 w-52 place-items-center rounded-full border"
+            className="grid h-44 w-44 place-items-center rounded-full border sm:h-52 sm:w-52"
             style={{
               borderColor: COLOR_THEME.border,
               background: `${COLOR_THEME.accentMint}59`
@@ -1093,7 +1093,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
                       {confirmDeleteId === entry.id ? (
                         <button
                           type="button"
-                          className="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+                          className="min-h-11 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
                           style={{
                             borderColor: COLOR_THEME.border,
                             background: `${COLOR_THEME.accentPink}4A`,
@@ -1106,7 +1106,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
                       ) : (
                         <button
                           type="button"
-                          className="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+                          className="min-h-11 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
                           style={{
                             borderColor: COLOR_THEME.border,
                             background: `${COLOR_THEME.accentPink}33`,
@@ -1120,7 +1120,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
                       {confirmDeleteId === entry.id ? (
                         <button
                           type="button"
-                          className="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+                          className="min-h-11 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
                           style={{
                             borderColor: COLOR_THEME.border,
                             background: "rgba(255,255,255,0.55)",
@@ -1252,6 +1252,7 @@ export const HomeScreen = () => {
   const [activePanel, setActivePanel] = useState<PanelId>("focus");
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isSidebarCollapsed = activePanel === "focus" && isFocusModeActive;
   const t = TRANSLATIONS[language];
   const panelItems = useMemo(
@@ -1294,6 +1295,15 @@ export const HomeScreen = () => {
     }
   }, [activePanel]);
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [activePanel]);
+
+  const handleSelectPanel = (nextPanel: PanelId) => {
+    setActivePanel(nextPanel);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <section
       className="fixed inset-0 overflow-hidden"
@@ -1305,10 +1315,69 @@ export const HomeScreen = () => {
     >
       <GoldenDust />
 
-      <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-10">
+      {!isSidebarCollapsed ? (
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="fixed left-3 top-3 z-40 grid h-11 w-11 place-items-center rounded-full border sm:hidden"
+          style={{
+            borderColor: COLOR_THEME.border,
+            background: "rgba(255, 253, 251, 0.92)",
+            color: COLOR_THEME.textPrimary,
+            boxShadow: "0 6px 14px rgba(188, 149, 129, 0.14)"
+          }}
+          aria-label={t.sidebar.navAriaLabel}
+        >
+          <span aria-hidden className="text-[18px] leading-none">
+            ☰
+          </span>
+        </button>
+      ) : null}
+
+      <AnimatePresence>
+        {isMobileMenuOpen && !isSidebarCollapsed ? (
+          <>
+            <motion.button
+              type="button"
+              aria-label={t.common.cancel}
+              className="fixed inset-0 z-40 sm:hidden"
+              style={{ background: "rgba(34, 24, 20, 0.36)" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <motion.div
+              className="fixed inset-y-0 left-0 z-50 w-[min(86vw,340px)] p-3 sm:hidden"
+              initial={{ x: "-100%", opacity: 0.85 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0.88 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <FeatureMenu
+                className="h-full overflow-y-auto"
+                items={panelItems}
+                activePanel={activePanel}
+                onSelect={handleSelectPanel}
+                language={language}
+                onLanguageChange={setLanguage}
+                brandLabel={t.sidebar.brand}
+                navAriaLabel={t.sidebar.navAriaLabel}
+                languageLabel={t.sidebar.languageLabel}
+                languageAriaLabel={t.sidebar.languageAriaLabel}
+                englishLabel={t.sidebar.english}
+                japaneseLabel={t.sidebar.japanese}
+              />
+            </motion.div>
+          </>
+        ) : null}
+      </AnimatePresence>
+
+      <div className={`relative z-10 h-full w-full p-3 sm:p-6 sm:pt-6 lg:p-10 ${!isSidebarCollapsed ? "pt-16" : "pt-3"}`}>
         <div
-          className={`mx-auto grid h-full w-full max-w-[1420px] grid-rows-[auto_minmax(0,1fr)] gap-5 md:grid-rows-1 ${
-            isSidebarCollapsed ? "md:grid-cols-[minmax(0,1fr)]" : "md:grid-cols-[300px_minmax(0,1fr)]"
+          className={`mx-auto grid h-full w-full max-w-[1420px] grid-cols-1 gap-4 sm:gap-5 ${
+            isSidebarCollapsed ? "sm:grid-cols-[minmax(0,1fr)]" : "sm:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[300px_minmax(0,1fr)]"
           }`}
         >
           <AnimatePresence initial={false}>
@@ -1319,12 +1388,13 @@ export const HomeScreen = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -18 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="min-h-0"
+                className="hidden min-h-0 sm:block"
               >
                 <FeatureMenu
+                  className="h-full"
                   items={panelItems}
                   activePanel={activePanel}
-                  onSelect={setActivePanel}
+                  onSelect={handleSelectPanel}
                   language={language}
                   onLanguageChange={setLanguage}
                   brandLabel={t.sidebar.brand}
@@ -1338,7 +1408,7 @@ export const HomeScreen = () => {
             ) : null}
           </AnimatePresence>
 
-          <div className="min-h-0">
+          <div className="min-h-0 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activePanel}
@@ -1348,7 +1418,7 @@ export const HomeScreen = () => {
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                {renderActivePanel(activePanel, language, setActivePanel, setIsFocusModeActive)}
+                {renderActivePanel(activePanel, language, handleSelectPanel, setIsFocusModeActive)}
               </motion.div>
             </AnimatePresence>
           </div>

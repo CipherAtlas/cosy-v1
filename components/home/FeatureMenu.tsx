@@ -19,6 +19,7 @@ type FeatureMenuProps = {
   languageAriaLabel: string;
   englishLabel: string;
   japaneseLabel: string;
+  className?: string;
 };
 
 export const FeatureMenu = ({
@@ -32,11 +33,12 @@ export const FeatureMenu = ({
   languageLabel,
   languageAriaLabel,
   englishLabel,
-  japaneseLabel
+  japaneseLabel,
+  className
 }: FeatureMenuProps) => {
   return (
     <aside
-      className="rounded-[2rem] border p-5 md:flex md:h-full md:min-h-0 md:flex-col md:p-7"
+      className={`rounded-[2rem] border p-4 sm:p-5 md:flex md:h-full md:min-h-0 md:flex-col md:p-7 ${className ?? ""}`}
       style={{
         borderColor: "rgba(232, 196, 180, 0.45)",
         background: "rgba(255, 255, 255, 0.72)"
@@ -46,7 +48,7 @@ export const FeatureMenu = ({
         {brandLabel}
       </p>
 
-      <nav className="mt-5 flex gap-2.5 md:mt-8 md:flex-1 md:flex-col" aria-label={navAriaLabel}>
+      <nav className="mt-5 flex flex-col gap-2.5 md:mt-8 md:flex-1" aria-label={navAriaLabel}>
         {items.map((item) => {
           const isActive = item.id === activePanel;
 
@@ -55,7 +57,7 @@ export const FeatureMenu = ({
               key={item.id}
               type="button"
               onClick={() => onSelect(item.id)}
-              className="rounded-full border px-5 py-3 text-left text-[18px] font-medium tracking-[0.01em] transition-colors duration-200 md:w-full"
+              className="min-h-11 rounded-full border px-5 py-3 text-left text-[17px] font-medium tracking-[0.01em] transition-colors duration-200 md:w-full"
               style={{
                 borderColor: isActive ? "rgba(232, 196, 180, 0.8)" : "rgba(232, 196, 180, 0.45)",
                 color: "#5E4A42",
@@ -96,7 +98,7 @@ export const FeatureMenu = ({
                 key={item.id}
                 type="button"
                 onClick={() => onLanguageChange(item.id)}
-                className="rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183]"
+                className="min-h-11 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183]"
                 style={{
                   color: "#5E4A42",
                   background: isActive ? "rgba(246, 199, 184, 0.72)" : "transparent",
