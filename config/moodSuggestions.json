@@ -1,0 +1,30 @@
+{
+  "stressed": [
+    { "text": "You could try a slower breath by the fireplace.", "href": "/breathe" },
+    { "text": "Maybe head to a softer music layer for a few minutes.", "href": "/music" }
+  ],
+  "tired": [
+    { "text": "It might help to rest with quiet night music.", "href": "/music" },
+    { "text": "You could keep things simple and write one gratitude line.", "href": "/gratitude" }
+  ],
+  "restless": [
+    { "text": "You could try one short focus block to settle in.", "href": "/focus" },
+    { "text": "Maybe head to a calm breathing cycle first.", "href": "/breathe" }
+  ],
+  "lonely": [
+    { "text": "It might help to receive a gentle compliment.", "href": "/compliment" },
+    { "text": "Maybe stay with soft music for a little while.", "href": "/music" }
+  ],
+  "overwhelmed": [
+    { "text": "You could take one 4-4-6 breath cycle first.", "href": "/breathe" },
+    { "text": "Maybe keep it small with one gratitude note.", "href": "/gratitude" }
+  ],
+  "okay": [
+    { "text": "You could keep the mood and drift with soft dawn.", "href": "/music" },
+    { "text": "Maybe turn this calm into one focus session.", "href": "/focus" }
+  ],
+  "peaceful": [
+    { "text": "You could stay here and enjoy a gentle track.", "href": "/music" },
+    { "text": "Maybe carry this feeling into a gratitude note.", "href": "/gratitude" }
+  ]
+}

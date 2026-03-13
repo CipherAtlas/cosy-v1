@@ -1,0 +1,10 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1000" fill="url(#mist)"/>
+  <defs>
+    <linearGradient id="mist" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="rgba(255,255,255,0.06)"/>
+      <stop offset="0.45" stop-color="rgba(255,255,255,0.02)"/>
+      <stop offset="1" stop-color="rgba(163,191,214,0.08)"/>
+    </linearGradient>
+  </defs>
+</svg>
