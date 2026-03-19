@@ -10,8 +10,12 @@ type TranslationShape = {
     navAriaLabel: string;
     languageLabel: string;
     languageAriaLabel: string;
+    themeLabel: string;
+    themeAriaLabel: string;
     english: string;
     japanese: string;
+    light: string;
+    dark: string;
   };
   nav: Record<PanelId, string>;
   common: {
@@ -141,8 +145,12 @@ const EN: TranslationShape = {
     navAriaLabel: "Feature menu",
     languageLabel: "Language",
     languageAriaLabel: "Choose language",
+    themeLabel: "Theme",
+    themeAriaLabel: "Choose theme",
     english: "English",
-    japanese: "日本語"
+    japanese: "日本語",
+    light: "Light",
+    dark: "Dark"
   },
   nav: {
     focus: "Focus",
@@ -151,7 +159,8 @@ const EN: TranslationShape = {
     mood: "Mood",
     gratitude: "Gratitude",
     compliment: "Compliment",
-    reader: "Reader"
+    reader: "Reader",
+    books: "Books"
   },
   common: {
     start: "Start",
@@ -346,8 +355,12 @@ const JA: TranslationShape = {
     navAriaLabel: "機能メニュー",
     languageLabel: "言語",
     languageAriaLabel: "言語を選択",
+    themeLabel: "テーマ",
+    themeAriaLabel: "テーマを選択",
     english: "English",
-    japanese: "日本語"
+    japanese: "日本語",
+    light: "ライト",
+    dark: "ダーク"
   },
   nav: {
     focus: "集中",
@@ -356,7 +369,8 @@ const JA: TranslationShape = {
     mood: "気分",
     gratitude: "感謝",
     compliment: "ひとこと",
-    reader: "リーダー"
+    reader: "リーダー",
+    books: "本"
   },
   common: {
     start: "開始",

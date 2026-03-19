@@ -3,7 +3,17 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+  --cozy-outline-soft: rgba(255, 255, 255, 0.46);
+  --cozy-outline-strong: rgba(232, 196, 180, 0.72);
+  --cozy-focus-outline: rgba(213, 154, 104, 0.85);
+}
+
+html[data-theme="dark"] {
   color-scheme: dark;
+  --cozy-outline-soft: rgba(255, 239, 208, 0.2);
+  --cozy-outline-strong: rgba(255, 226, 179, 0.46);
+  --cozy-focus-outline: rgba(244, 206, 148, 0.9);
 }
 
 * {
@@ -15,12 +25,20 @@ body {
   margin: 0;
   min-height: 100%;
   background:
+    radial-gradient(circle at 18% 12%, rgba(246, 199, 184, 0.24), transparent 30%),
+    radial-gradient(circle at 86% 78%, rgba(207, 229, 255, 0.22), transparent 34%),
+    #fff8f3;
+  color: #5e4a42;
+  font-family: var(--font-raleway), sans-serif;
+  font-weight: 300;
+}
+
+html[data-theme="dark"] body {
+  background:
     radial-gradient(circle at 20% 10%, rgba(213, 154, 104, 0.11), transparent 28%),
     radial-gradient(circle at 85% 80%, rgba(104, 124, 150, 0.18), transparent 35%),
     #1b1716;
   color: #f1e7db;
-  font-family: var(--font-raleway), sans-serif;
-  font-weight: 300;
 }
 
 a {
@@ -36,7 +54,21 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid rgba(213, 154, 104, 0.85);
+  outline: 2px solid var(--cozy-focus-outline);
+  outline-offset: 2px;
+}
+
+.cozy-outline {
+  outline: 1px solid var(--cozy-outline-soft);
+  outline-offset: -2px;
+}
+
+.cozy-outline:hover {
+  outline-color: var(--cozy-outline-strong);
+}
+
+.cozy-outline:focus-visible {
+  outline: 2px solid var(--cozy-focus-outline);
   outline-offset: 2px;
 }
 
@@ -67,6 +99,8 @@ select {
   color: #fff5e6;
   font-weight: 500;
   padding: 0.62rem 1.15rem;
+  outline: 1px solid var(--cozy-outline-soft);
+  outline-offset: -2px;
   transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, filter 0.16s ease;
 }
 

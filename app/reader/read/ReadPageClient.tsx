@@ -5,13 +5,21 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ChapterReader } from "@/features/reader/components/ChapterReader";
 import { ReaderFrame } from "@/features/reader/components/ReaderFrame";
-import { READER_THEME, readerCardStyle, readerControlClassName } from "@/features/reader/components/readerTheme";
+import {
+  READER_THEME,
+  getReaderShellBackground,
+  getReaderThemeCssVars,
+  readerCardStyle,
+  readerControlClassName
+} from "@/features/reader/components/readerTheme";
+import { useAppTheme } from "@/lib/theme";
 
 export const ReadPageClient = () => {
   const searchParams = useSearchParams();
   const seriesId = searchParams.get("seriesId")?.trim() ?? "";
   const chapterId = searchParams.get("chapterId")?.trim() ?? "";
   const [isImmersive, setIsImmersive] = useState(false);
+  const { theme } = useAppTheme();
 
   useEffect(() => {
     setIsImmersive(false);
@@ -55,7 +63,14 @@ export const ReadPageClient = () => {
 
   if (isImmersive) {
     return (
-      <section className="fixed inset-0 z-50" style={{ background: READER_THEME.background }}>
+      <section
+        className="fixed inset-0 z-50"
+        style={{
+          ...getReaderThemeCssVars(theme),
+          background: getReaderShellBackground(theme),
+          color: READER_THEME.textPrimary
+        }}
+      >
         <ChapterReader
           seriesId={seriesId}
           chapterId={chapterId}

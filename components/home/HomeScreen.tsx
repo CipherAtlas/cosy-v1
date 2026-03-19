@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import compliments from "@/data/compliments.json";
 import complimentsJa from "@/data/complimentsJa.json";
@@ -16,6 +16,7 @@ import { MoodId, MoodSuggestion } from "@/features/mood/types";
 import { readLocalStorage, writeLocalStorage } from "@/lib/storage";
 import { FeatureMenu, PanelId } from "@/components/home/FeatureMenu";
 import { GoldenDust } from "@/components/home/GoldenDust";
+import { useAppTheme } from "@/lib/theme";
 
 const PANEL_TINTS: Record<PanelId, string> = {
   focus: "#F6C7B8",
@@ -24,7 +25,8 @@ const PANEL_TINTS: Record<PanelId, string> = {
   mood: "#CFE5FF",
   gratitude: "#F2C6D8",
   compliment: "#F7E7A8",
-  reader: "#CFE5FF"
+  reader: "#CFE5FF",
+  books: "#D8F0E4"
 };
 
 const SETTINGS_KEY = "peaceful-room-focus-settings";
@@ -46,12 +48,12 @@ const HREF_TO_PANEL: Record<MoodSuggestion["href"], PanelId> = {
 };
 
 const COLOR_THEME = {
-  background: "#FFF8F3",
-  surface: "rgba(255, 255, 255, 0.72)",
-  surfaceStrong: "#FFFDFB",
-  border: "rgba(232, 196, 180, 0.45)",
-  textPrimary: "#5E4A42",
-  textSecondary: "#8A746B",
+  background: "var(--app-background)",
+  surface: "var(--app-surface)",
+  surfaceStrong: "var(--app-surface-strong)",
+  border: "var(--app-border)",
+  textPrimary: "var(--app-text-primary)",
+  textSecondary: "var(--app-text-secondary)",
   accentPeach: "#F6C7B8",
   accentPink: "#F2C6D8",
   accentLavender: "#DCCFF6",
@@ -122,10 +124,10 @@ const createActiveControlStyle = (tint: string) => ({
 });
 
 const controlClassName =
-  "min-h-11 rounded-2xl border px-4 py-2.5 text-[15px] font-medium tracking-[0.01em] shadow-[0_2px_8px_rgba(188,149,129,0.08)] transition-all duration-150 ease-out hover:-translate-y-[1px] hover:brightness-[1.03] active:translate-y-0 active:brightness-95 sm:px-6 sm:py-3.5 sm:text-[16px]";
+  "cozy-outline min-h-11 rounded-2xl border px-4 py-2.5 text-[15px] font-medium tracking-[0.01em] shadow-[0_2px_8px_rgba(188,149,129,0.08)] transition-all duration-150 ease-out hover:-translate-y-[1px] hover:brightness-[1.03] active:translate-y-0 active:brightness-95 sm:px-6 sm:py-3.5 sm:text-[16px]";
 
 const inputClassName =
-  "mt-1.5 min-h-11 w-full rounded-2xl border bg-transparent px-4 py-3 text-[15px] font-medium outline-none transition-colors sm:text-[16px]";
+  "cozy-outline mt-1.5 min-h-11 w-full rounded-2xl border bg-transparent px-4 py-3 text-[15px] font-medium outline-none transition-colors sm:text-[16px]";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60)
@@ -1103,7 +1105,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
           </label>
           <textarea
             id="gratitude-text"
-            className="block min-h-32 w-full appearance-none rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
+            className="cozy-outline block min-h-32 w-full appearance-none rounded-[1.4rem] border p-4 text-[16px] font-normal outline-none"
             style={{ ...SURFACE_STYLE, color: COLOR_THEME.textPrimary }}
             placeholder={t.gratitude.placeholder}
             value={value}
@@ -1198,13 +1200,24 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
 
 type ComplimentPanelProps = {
   language: AppLanguage;
+  theme: "light" | "dark";
 };
 
-const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
+const ComplimentPanel = ({ language, theme }: ComplimentPanelProps) => {
   const t = TRANSLATIONS[language];
   const complimentList = language === "ja" ? complimentsJa : compliments;
   const [index, setIndex] = useState(() => dailyIndex(complimentList.length));
   const activeControlStyle = createActiveControlStyle(COLOR_THEME.accentButter);
+  const isDark = theme === "dark";
+  const cardGradient = isDark
+    ? "linear-gradient(145deg, rgba(126,104,69,0.4) 0%, rgba(119,92,129,0.32) 48%, rgba(87,103,129,0.34) 100%)"
+    : "linear-gradient(145deg, rgba(247,231,168,0.38) 0%, rgba(242,198,216,0.32) 48%, rgba(207,229,255,0.34) 100%)";
+  const quoteSurface = isDark ? "rgba(34, 29, 27, 0.84)" : "rgba(255, 253, 251, 0.83)";
+  const quoteTextColor = isDark ? "#F9EBD2" : COLOR_THEME.textPrimary;
+  const quoteSubtextColor = isDark ? "rgba(239, 223, 198, 0.74)" : MUTED_COLOR;
+  const badgeSurface = isDark ? "rgba(34, 29, 27, 0.68)" : "rgba(255, 253, 251, 0.72)";
+  const sparkOne = isDark ? "rgba(185, 171, 224, 0.42)" : `${COLOR_THEME.accentLavender}5C`;
+  const sparkTwo = isDark ? "rgba(230, 184, 205, 0.36)" : `${COLOR_THEME.accentPink}52`;
 
   useEffect(() => {
     setIndex(dailyIndex(complimentList.length));
@@ -1217,14 +1230,17 @@ const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
           className="relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-7"
           style={{
             borderColor: COLOR_THEME.border,
-            background:
-              "linear-gradient(145deg, rgba(247,231,168,0.38) 0%, rgba(242,198,216,0.32) 48%, rgba(207,229,255,0.34) 100%)",
-            boxShadow: "0 10px 26px rgba(196, 150, 120, 0.14)"
+            background: cardGradient,
+            boxShadow: isDark ? "0 10px 26px rgba(12, 10, 9, 0.24)" : "0 10px 26px rgba(196, 150, 120, 0.14)"
           }}
         >
           <div
             className="pointer-events-none absolute -right-6 -top-8 h-24 w-24 rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(242,198,216,0.45) 0%, rgba(242,198,216,0) 72%)" }}
+            style={{
+              background: isDark
+                ? "radial-gradient(circle, rgba(205,170,232,0.26) 0%, rgba(205,170,232,0) 72%)"
+                : "radial-gradient(circle, rgba(242,198,216,0.45) 0%, rgba(242,198,216,0) 72%)"
+            }}
           />
 
           <div className="relative mb-5 flex items-center justify-between gap-3">
@@ -1232,18 +1248,18 @@ const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
               className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[12px] font-medium tracking-[0.04em]"
               style={{
                 borderColor: COLOR_THEME.border,
-                background: "rgba(255, 253, 251, 0.72)",
-                color: COLOR_THEME.textPrimary
+                background: badgeSurface,
+                color: quoteTextColor
               }}
             >
               <span aria-hidden>❤</span>
               {t.compliment.sweetNote}
             </span>
             <div className="flex items-center gap-2">
-              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium" style={{ borderColor: COLOR_THEME.border, color: MUTED_COLOR, background: `${COLOR_THEME.accentLavender}5C` }}>
+              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium" style={{ borderColor: COLOR_THEME.border, color: quoteSubtextColor, background: sparkOne }}>
                 ✦
               </span>
-              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium" style={{ borderColor: COLOR_THEME.border, color: MUTED_COLOR, background: `${COLOR_THEME.accentPink}52` }}>
+              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium" style={{ borderColor: COLOR_THEME.border, color: quoteSubtextColor, background: sparkTwo }}>
                 ✶
               </span>
             </div>
@@ -1251,10 +1267,10 @@ const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
 
           <blockquote
             className="relative rounded-[1.6rem] border px-6 py-7 text-[clamp(1.25rem,2.45vw,1.62rem)] font-medium leading-[1.6]"
-            style={{ ...SURFACE_STYLE, background: "rgba(255, 253, 251, 0.83)" }}
+            style={{ ...SURFACE_STYLE, background: quoteSurface, color: quoteTextColor }}
           >
             &ldquo;{complimentList[index]}&rdquo;
-            <p className="mt-4 text-[13px] font-medium" style={{ color: MUTED_COLOR }}>
+            <p className="mt-4 text-[13px] font-medium" style={{ color: quoteSubtextColor }}>
               {t.compliment.keepToday}
             </p>
           </blockquote>
@@ -1265,8 +1281,10 @@ const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
           className={controlClassName}
           style={{
             ...activeControlStyle,
-            background: "linear-gradient(120deg, rgba(247,231,168,0.96) 0%, rgba(242,198,216,0.74) 100%)",
-            boxShadow: "0 6px 14px rgba(196, 150, 120, 0.18)"
+            background: isDark
+              ? "linear-gradient(120deg, rgba(186,155,84,0.82) 0%, rgba(174,132,152,0.74) 100%)"
+              : "linear-gradient(120deg, rgba(247,231,168,0.96) 0%, rgba(242,198,216,0.74) 100%)",
+            boxShadow: isDark ? "0 6px 14px rgba(20, 16, 14, 0.3)" : "0 6px 14px rgba(196, 150, 120, 0.18)"
           }}
           onClick={() => setIndex((current) => nextRandomIndex(complimentList.length, current))}
         >
@@ -1280,6 +1298,7 @@ const ComplimentPanel = ({ language }: ComplimentPanelProps) => {
 const renderActivePanel = (
   panel: PanelId,
   language: AppLanguage,
+  theme: "light" | "dark",
   onOpenPanel: (next: PanelId) => void,
   onFocusModeChange: (isActive: boolean) => void
 ) => {
@@ -1295,7 +1314,7 @@ const renderActivePanel = (
     case "gratitude":
       return <GratitudePanel language={language} />;
     case "compliment":
-      return <ComplimentPanel language={language} />;
+      return <ComplimentPanel language={language} theme={theme} />;
     default:
       return <FocusPanel language={language} />;
   }
@@ -1303,12 +1322,25 @@ const renderActivePanel = (
 
 export const HomeScreen = () => {
   const router = useRouter();
+  const { theme, setTheme } = useAppTheme();
   const [activePanel, setActivePanel] = useState<PanelId>("focus");
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isSidebarCollapsed = activePanel === "focus" && isFocusModeActive;
   const t = TRANSLATIONS[language];
+  const isDark = theme === "dark";
+  const shellVars = {
+    "--app-background": isDark ? "#151311" : "#FFF8F3",
+    "--app-surface": isDark ? "rgba(45, 37, 33, 0.72)" : "rgba(255, 255, 255, 0.72)",
+    "--app-surface-strong": isDark ? "#231E1B" : "#FFFDFB",
+    "--app-border": isDark ? "rgba(255, 226, 179, 0.24)" : "rgba(232, 196, 180, 0.45)",
+    "--app-text-primary": isDark ? "#F2E7D1" : "#5E4A42",
+    "--app-text-secondary": isDark ? "rgba(242, 231, 209, 0.7)" : "#8A746B"
+  } as CSSProperties;
+  const shellBackground = isDark
+    ? "radial-gradient(circle at 14% 12%, rgba(116, 88, 73, 0.3), transparent 36%), radial-gradient(circle at 82% 18%, rgba(82, 78, 104, 0.26), transparent 34%), radial-gradient(circle at 76% 88%, rgba(76, 96, 117, 0.24), transparent 38%), #151311"
+    : "radial-gradient(circle at 14% 12%, rgba(246, 199, 184, 0.35), transparent 36%), radial-gradient(circle at 82% 18%, rgba(220, 207, 246, 0.34), transparent 34%), radial-gradient(circle at 76% 88%, rgba(207, 229, 255, 0.28), transparent 38%), #FFF8F3";
   const panelItems = useMemo(
     () => [
       { id: "focus" as const, label: t.nav.focus, tint: PANEL_TINTS.focus },
@@ -1317,7 +1349,8 @@ export const HomeScreen = () => {
       { id: "mood" as const, label: t.nav.mood, tint: PANEL_TINTS.mood },
       { id: "gratitude" as const, label: t.nav.gratitude, tint: PANEL_TINTS.gratitude },
       { id: "compliment" as const, label: t.nav.compliment, tint: PANEL_TINTS.compliment },
-      { id: "reader" as const, label: t.nav.reader, tint: PANEL_TINTS.reader }
+      { id: "reader" as const, label: t.nav.reader, tint: PANEL_TINTS.reader },
+      { id: "books" as const, label: t.nav.books, tint: PANEL_TINTS.books }
     ],
     [t]
   );
@@ -1396,6 +1429,12 @@ export const HomeScreen = () => {
       return;
     }
 
+    if (nextPanel === "books") {
+      setIsMobileMenuOpen(false);
+      router.push("/books");
+      return;
+    }
+
     setActivePanel(nextPanel);
     setIsMobileMenuOpen(false);
   };
@@ -1404,8 +1443,8 @@ export const HomeScreen = () => {
     <section
       className="fixed inset-0 overflow-hidden"
       style={{
-        background:
-          "radial-gradient(circle at 14% 12%, rgba(246, 199, 184, 0.35), transparent 36%), radial-gradient(circle at 82% 18%, rgba(220, 207, 246, 0.34), transparent 34%), radial-gradient(circle at 76% 88%, rgba(207, 229, 255, 0.28), transparent 38%), #FFF8F3",
+        ...shellVars,
+        background: shellBackground,
         color: COLOR_THEME.textPrimary
       }}
     >
@@ -1437,7 +1476,7 @@ export const HomeScreen = () => {
               type="button"
               aria-label={t.common.cancel}
               className="fixed inset-0 z-40 sm:hidden"
-              style={{ background: "rgba(34, 24, 20, 0.36)" }}
+              style={{ background: isDark ? "rgba(12, 10, 9, 0.58)" : "rgba(34, 24, 20, 0.36)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1462,8 +1501,14 @@ export const HomeScreen = () => {
                 navAriaLabel={t.sidebar.navAriaLabel}
                 languageLabel={t.sidebar.languageLabel}
                 languageAriaLabel={t.sidebar.languageAriaLabel}
+                themeLabel={t.sidebar.themeLabel}
+                themeAriaLabel={t.sidebar.themeAriaLabel}
                 englishLabel={t.sidebar.english}
                 japaneseLabel={t.sidebar.japanese}
+                lightLabel={t.sidebar.light}
+                darkLabel={t.sidebar.dark}
+                theme={theme}
+                onThemeChange={setTheme}
               />
             </motion.div>
           </>
@@ -1497,8 +1542,14 @@ export const HomeScreen = () => {
                   navAriaLabel={t.sidebar.navAriaLabel}
                   languageLabel={t.sidebar.languageLabel}
                   languageAriaLabel={t.sidebar.languageAriaLabel}
+                  themeLabel={t.sidebar.themeLabel}
+                  themeAriaLabel={t.sidebar.themeAriaLabel}
                   englishLabel={t.sidebar.english}
                   japaneseLabel={t.sidebar.japanese}
+                  lightLabel={t.sidebar.light}
+                  darkLabel={t.sidebar.dark}
+                  theme={theme}
+                  onThemeChange={setTheme}
                 />
               </motion.div>
             ) : null}
@@ -1514,7 +1565,7 @@ export const HomeScreen = () => {
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                {renderActivePanel(activePanel, language, handleSelectPanel, setIsFocusModeActive)}
+                {renderActivePanel(activePanel, language, theme, handleSelectPanel, setIsFocusModeActive)}
               </motion.div>
             </AnimatePresence>
           </div>

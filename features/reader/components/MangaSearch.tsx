@@ -62,7 +62,7 @@ export const MangaSearch = () => {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Try: Frieren, Blue Box, One Piece..."
-          className="mt-2 block min-h-11 w-full rounded-2xl border px-4 py-3 text-[16px] outline-none"
+          className="cozy-outline mt-2 block min-h-11 w-full rounded-2xl border px-4 py-3 text-[16px] outline-none"
           style={{
             borderColor: READER_THEME.border,
             background: READER_THEME.surface,
@@ -74,7 +74,7 @@ export const MangaSearch = () => {
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          className="min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
+          className="cozy-outline min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
           style={{
             borderColor: READER_THEME.border,
             background: showUnavailable ? `${READER_THEME.accentLavender}90` : READER_THEME.surface,
