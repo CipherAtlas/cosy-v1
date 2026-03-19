@@ -64,7 +64,7 @@ export const ReadPageClient = () => {
   if (isImmersive) {
     return (
       <section
-        className="fixed inset-0 z-50"
+        className="fixed inset-0 z-50 h-[100dvh]"
         style={{
           ...getReaderThemeCssVars(theme),
           background: getReaderShellBackground(theme),

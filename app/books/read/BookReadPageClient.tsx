@@ -57,7 +57,7 @@ export const BookReadPageClient = () => {
   if (isImmersive) {
     return (
       <section
-        className="fixed inset-0 z-50"
+        className="fixed inset-0 z-50 h-[100dvh]"
         style={{ background: theme === "dark" ? BOOK_THEME.readerDarkBg : BOOK_THEME.background }}
       >
         <BookReader

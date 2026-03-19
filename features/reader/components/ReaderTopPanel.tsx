@@ -31,6 +31,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
     return cleaned.length > 0 ? cleaned : "/";
   }, [pathname]);
   const [history, setHistory] = useState<ReaderHistoryItem[]>([]);
+  const [isMetaOpen, setIsMetaOpen] = useState(false);
 
   useEffect(() => {
     setHistory(getReaderHistory());
@@ -45,7 +46,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
 
   return (
     <section className="space-y-3 rounded-[1.5rem] border p-3 sm:p-4" style={readerCardStyle}>
-      <nav className="flex flex-wrap gap-2" aria-label="Reader top navigation">
+      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Reader top navigation">
         {navItems.map((item) => {
           const isActive = normalizedPathname === item.href;
           const tint = READER_THEME[item.tint];
@@ -54,7 +55,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
             <Link
               key={item.href}
               href={item.href}
-              className={readerControlClassName}
+              className={`${readerControlClassName} shrink-0 whitespace-nowrap`}
               style={{
                 borderColor: isActive ? "rgba(232, 196, 180, 0.82)" : READER_THEME.border,
                 background: isActive ? `${tint}B2` : READER_THEME.surface,
@@ -67,7 +68,16 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
         })}
       </nav>
 
-      <div className="grid gap-3 xl:grid-cols-2">
+      <button
+        type="button"
+        className={`${readerControlClassName} sm:hidden`}
+        style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}8A`, color: READER_THEME.textPrimary }}
+        onClick={() => setIsMetaOpen((value) => !value)}
+      >
+        {isMetaOpen ? "Hide Series Info" : "Show Series Info"}
+      </button>
+
+      <div className={`${isMetaOpen ? "grid" : "hidden"} gap-3 sm:grid xl:grid-cols-2`}>
         {currentSeries ? (
           <section className="space-y-2 rounded-[1.2rem] border p-3" style={readerCardStyle}>
             <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>

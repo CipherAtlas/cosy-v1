@@ -104,6 +104,7 @@ export const ChapterReader = ({
   const imageRoundClassName = settings.imageCorners === "soft" ? "rounded-lg" : "rounded-none";
   const showReaderChrome = !isImmersive || chromeVisible || isSettingsOpen;
   const visiblePages = useMemo(() => pages.slice(0, visiblePageCount), [pages, visiblePageCount]);
+  const chromeSurface = READER_THEME.surface;
 
   const updateSetting = <K extends keyof ReaderUiSettings>(key: K, value: ReaderUiSettings[K]) => {
     setSettings((previous) => {
@@ -448,32 +449,38 @@ export const ChapterReader = ({
     >
       <header
         className={`border-b px-3 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0 pointer-events-none"}`}
-        style={{ borderColor: READER_THEME.border }}
+        style={{
+          borderColor: READER_THEME.border,
+          paddingTop: isImmersive ? "calc(0.6rem + env(safe-area-inset-top))" : undefined
+        }}
       >
-        <div className="flex items-center justify-between gap-2 rounded-2xl border px-3 py-2" style={{ borderColor: READER_THEME.border, background: "rgba(255, 253, 251, 0.92)" }}>
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-2 sm:flex-nowrap sm:justify-between"
+          style={{ borderColor: READER_THEME.border, background: chromeSurface }}
+        >
           <Link
             href={toSeriesHref(seriesId)}
-            className="rounded-full border px-3 py-1 text-[13px] font-medium"
-            style={{ borderColor: READER_THEME.border, color: READER_THEME.textPrimary, background: READER_THEME.surface }}
+            className="cozy-outline shrink-0 rounded-full border px-3 py-1 text-[13px] font-medium"
+            style={{ borderColor: READER_THEME.border, color: READER_THEME.textPrimary, background: READER_THEME.surfaceStrong }}
           >
             Back
           </Link>
 
-          <div className="min-w-0 text-center">
+          <div className="order-3 w-full min-w-0 text-left sm:order-none sm:flex-1 sm:text-center">
             <p className="truncate text-[12px]" style={{ color: READER_THEME.textSecondary }}>
               {series.title}
             </p>
             <p className="truncate text-[14px] font-medium">{chapterLabel}</p>
             {settings.showSettingsHints ? (
-              <p className="truncate text-[11px]" style={{ color: READER_THEME.textSecondary }}>
+              <p className="hidden truncate text-[11px] sm:block" style={{ color: READER_THEME.textSecondary }}>
                 Adjust width, spacing, and controls with Settings.
               </p>
             ) : null}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 sm:ml-0">
             {settings.showProgressChip ? (
-              <div className="rounded-full border px-3 py-1 text-[12px]" style={{ borderColor: READER_THEME.border, color: READER_THEME.textSecondary }}>
+              <div className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: READER_THEME.border, color: READER_THEME.textSecondary }}>
                 {Math.round(scrollPercent)}%
               </div>
             ) : null}
@@ -504,10 +511,10 @@ export const ChapterReader = ({
 
       {isSettingsOpen ? (
         <aside
-          className="absolute right-3 top-[86px] z-40 w-[min(92vw,380px)] rounded-[1.2rem] border p-3 sm:right-4"
+          className="absolute left-1/2 top-[72px] z-40 max-h-[calc(100dvh-7rem)] w-[min(95vw,420px)] -translate-x-1/2 overflow-y-auto rounded-[1.2rem] border p-3 sm:left-auto sm:right-4 sm:top-[86px] sm:w-[min(92vw,380px)] sm:translate-x-0"
           style={{
             borderColor: READER_THEME.border,
-            background: "rgba(255, 253, 251, 0.96)",
+            background: chromeSurface,
             boxShadow: "0 10px 24px rgba(188, 149, 129, 0.16)"
           }}
         >
@@ -660,6 +667,7 @@ export const ChapterReader = ({
         ref={scrollContainerRef}
         className={`min-h-0 flex-1 overflow-y-auto ${isImmersive ? "px-0 py-2 sm:px-2" : "px-2 py-3 sm:px-4"}`}
         onClick={handleReaderAreaClick}
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         <div className={`mx-auto flex w-full flex-col ${pageGapClassName}`} style={pageContainerStyle}>
           {failedPagesCount > 0 ? (
@@ -717,11 +725,14 @@ export const ChapterReader = ({
 
       <footer
         className={`border-t px-3 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 pointer-events-none"}`}
-        style={{ borderColor: READER_THEME.border }}
+        style={{
+          borderColor: READER_THEME.border,
+          paddingBottom: isImmersive ? "calc(0.65rem + env(safe-area-inset-bottom))" : undefined
+        }}
       >
         <div
           className="mx-auto flex w-full items-center justify-between gap-2 rounded-2xl border px-3 py-2"
-          style={{ borderColor: READER_THEME.border, background: "rgba(255, 253, 251, 0.94)", ...pageContainerStyle }}
+          style={{ borderColor: READER_THEME.border, background: chromeSurface, ...pageContainerStyle }}
         >
           {previousChapter ? (
             <Link
@@ -757,7 +768,7 @@ export const ChapterReader = ({
         <button
           type="button"
           className="absolute bottom-4 right-4 z-50 rounded-full border px-4 py-2 text-[13px] font-medium"
-          style={{ borderColor: READER_THEME.border, background: "rgba(255,253,251,0.95)", color: READER_THEME.textPrimary }}
+          style={{ borderColor: READER_THEME.border, background: chromeSurface, color: READER_THEME.textPrimary }}
           onClick={() => {
             setChromeVisible(true);
             scheduleAutoHide();

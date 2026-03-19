@@ -58,6 +58,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [activeSection, setActiveSection] = useState<string>("");
+  const [isControlsOpen, setIsControlsOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const saveTimerRef = useRef<number | null>(null);
@@ -259,6 +260,10 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
   }, [content, isSettingsReady, openLibraryKey, settings.fontSize, settings.lineHeight]);
 
   useEffect(() => {
+    setIsControlsOpen(false);
+  }, [openLibraryKey, isImmersive]);
+
+  useEffect(() => {
     if (!detail) {
       return;
     }
@@ -370,7 +375,13 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
       className="flex h-full min-h-0 flex-col rounded-[1.4rem] border"
       style={{ ...bookCardStyle, background: chromeColors.shellBackground, borderColor: chromeColors.shellBorder, color: chromeColors.shellText }}
     >
-      <header className="flex flex-wrap items-center gap-2 border-b px-3 py-3 sm:px-4" style={{ borderColor: chromeColors.shellBorder }}>
+      <header
+        className="flex flex-wrap items-center gap-2 border-b px-3 py-3 sm:px-4"
+        style={{
+          borderColor: chromeColors.shellBorder,
+          paddingTop: isImmersive ? "calc(0.7rem + env(safe-area-inset-top))" : undefined
+        }}
+      >
         <Link
           href={toBookDetailHref(openLibraryKey)}
           className={bookControlClassName}
@@ -381,11 +392,11 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
 
         <button
           type="button"
-          onClick={() => setSettings((previous) => ({ ...previous, theme: previous.theme === "dark" ? "light" : "dark" }))}
-          className={bookControlClassName}
-          style={{ borderColor: chromeColors.shellBorder, background: `${BOOK_THEME.accentLavender}80`, color: chromeColors.shellText }}
+          onClick={() => setIsControlsOpen((value) => !value)}
+          className={`${bookControlClassName} sm:hidden`}
+          style={{ borderColor: chromeColors.shellBorder, background: `${BOOK_THEME.accentButter}82`, color: chromeColors.shellText }}
         >
-          {settings.theme === "dark" ? "Light mode" : "Dark mode"}
+          {isControlsOpen ? "Hide Controls" : "Show Controls"}
         </button>
 
         <div className="ml-auto flex items-center gap-2 text-[13px]" style={{ color: chromeColors.shellMuted }}>
@@ -402,7 +413,16 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
           ) : null}
         </div>
 
-        <div className="grid w-full gap-2 sm:grid-cols-3">
+        <div className={`${isControlsOpen ? "grid" : "hidden"} w-full gap-2 sm:grid sm:grid-cols-3`}>
+          <button
+            type="button"
+            onClick={() => setSettings((previous) => ({ ...previous, theme: previous.theme === "dark" ? "light" : "dark" }))}
+            className={bookControlClassName}
+            style={{ borderColor: chromeColors.shellBorder, background: `${BOOK_THEME.accentLavender}80`, color: chromeColors.shellText }}
+          >
+            {settings.theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+
           <label className="text-[12px]" style={{ color: chromeColors.shellMuted }}>
             Font size
             <input
@@ -459,7 +479,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
         />
       </div>
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-2 py-4 sm:px-4 sm:py-5" onScroll={onScroll}>
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-2 py-4 sm:px-4 sm:py-5" onScroll={onScroll} style={{ WebkitOverflowScrolling: "touch" }}>
         {isLoading ? (
           <p className="text-[15px]" style={{ color: chromeColors.shellMuted }}>
             Opening book...
@@ -490,7 +510,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
 
         {!isLoading && !error && hasReadableContent ? (
           <article
-            className="mx-auto rounded-[1.3rem] border px-5 py-6 sm:px-8 sm:py-8"
+            className="mx-auto rounded-[1.3rem] border px-4 py-5 sm:px-8 sm:py-8"
             style={{
               maxWidth: "760px",
               borderColor: settings.theme === "dark" ? "rgba(255,255,255,0.08)" : BOOK_THEME.border,
