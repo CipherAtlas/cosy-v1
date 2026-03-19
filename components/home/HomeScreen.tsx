@@ -22,7 +22,8 @@ const PANEL_TINTS: Record<PanelId, string> = {
   breathe: "#D8F0E4",
   mood: "#CFE5FF",
   gratitude: "#F2C6D8",
-  compliment: "#F7E7A8"
+  compliment: "#F7E7A8",
+  reader: "#CFE5FF"
 };
 
 const SETTINGS_KEY = "peaceful-room-focus-settings";
@@ -1313,7 +1314,8 @@ export const HomeScreen = () => {
       { id: "breathe" as const, label: t.nav.breathe, tint: PANEL_TINTS.breathe },
       { id: "mood" as const, label: t.nav.mood, tint: PANEL_TINTS.mood },
       { id: "gratitude" as const, label: t.nav.gratitude, tint: PANEL_TINTS.gratitude },
-      { id: "compliment" as const, label: t.nav.compliment, tint: PANEL_TINTS.compliment }
+      { id: "compliment" as const, label: t.nav.compliment, tint: PANEL_TINTS.compliment },
+      { id: "reader" as const, label: t.nav.reader, tint: PANEL_TINTS.reader }
     ],
     [t]
   );
@@ -1386,6 +1388,12 @@ export const HomeScreen = () => {
   }, [activePanel]);
 
   const handleSelectPanel = (nextPanel: PanelId) => {
+    if (nextPanel === "reader") {
+      setIsMobileMenuOpen(false);
+      window.location.href = "/reader";
+      return;
+    }
+
     setActivePanel(nextPanel);
     setIsMobileMenuOpen(false);
   };

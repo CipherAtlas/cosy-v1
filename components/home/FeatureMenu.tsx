@@ -1,5 +1,5 @@
 import type { AppLanguage } from "@/config/translations";
-export type PanelId = "focus" | "music" | "breathe" | "mood" | "gratitude" | "compliment";
+export type PanelId = "focus" | "music" | "breathe" | "mood" | "gratitude" | "compliment" | "reader";
 
 type MenuItem = {
   id: PanelId;

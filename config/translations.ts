@@ -150,7 +150,8 @@ const EN: TranslationShape = {
     breathe: "Breathe",
     mood: "Mood",
     gratitude: "Gratitude",
-    compliment: "Compliment"
+    compliment: "Compliment",
+    reader: "Reader"
   },
   common: {
     start: "Start",
@@ -354,7 +355,8 @@ const JA: TranslationShape = {
     breathe: "呼吸",
     mood: "気分",
     gratitude: "感謝",
-    compliment: "ひとこと"
+    compliment: "ひとこと",
+    reader: "リーダー"
   },
   common: {
     start: "開始",
