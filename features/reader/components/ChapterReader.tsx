@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { formatChapterLabel, getChapterPages, getMangaSeries, getSeriesChapters } from "@/features/reader/api/mangadex";
+import { formatChapterLabel, getChapterPages, getMangaSeries, getSeriesChapters, refreshChapterPages } from "@/features/reader/api/mangadex";
 import { useReaderProgress } from "@/features/reader/hooks/useReaderProgress";
 import { markLastReadChapter } from "@/features/reader/storage/readerStorage";
 import { DEFAULT_READER_UI_SETTINGS, readReaderUiSettings, saveReaderUiSettings } from "@/features/reader/storage/readerUiSettings";
@@ -72,15 +72,20 @@ export const ChapterReader = ({
   const [series, setSeries] = useState<MangaSeriesDetail | null>(null);
   const [chapters, setChapters] = useState<MangaChapter[]>([]);
   const [pages, setPages] = useState<string[]>([]);
+  const [fallbackPages, setFallbackPages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadedImages, setLoadedImages] = useState(0);
+  const [failedPagesCount, setFailedPagesCount] = useState(0);
   const [scrollPercent, setScrollPercent] = useState(0);
   const [settings, setSettings] = useState<ReaderUiSettings>(DEFAULT_READER_UI_SETTINGS);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [chromeVisible, setChromeVisible] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const autoHideTimerRef = useRef<number | null>(null);
+  const retryingPageIndexesRef = useRef<Set<number>>(new Set());
+  const pageRetryCountsRef = useRef<Map<number, number>>(new Map());
+  const markedHistoryRef = useRef(false);
 
   const currentChapter = useMemo(() => chapters.find((chapter) => chapter.id === chapterId) ?? null, [chapters, chapterId]);
 
@@ -153,6 +158,7 @@ export const ChapterReader = ({
   useEffect(() => {
     setChromeVisible(true);
     setIsSettingsOpen(false);
+    markedHistoryRef.current = false;
   }, [seriesId, chapterId, isImmersive]);
 
   useEffect(() => {
@@ -233,6 +239,9 @@ export const ChapterReader = ({
       setIsLoading(true);
       setError(null);
       setLoadedImages(0);
+      setFailedPagesCount(0);
+      pageRetryCountsRef.current.clear();
+      retryingPageIndexesRef.current.clear();
 
       try {
         const [seriesData, chapterData, pageData] = await Promise.all([
@@ -248,19 +257,11 @@ export const ChapterReader = ({
         setSeries(seriesData);
         setChapters(chapterData);
 
-        const nextPages = pageData.pages.length > 0 ? pageData.pages : pageData.dataSaverPages;
-        setPages(nextPages);
+        const nextPrimaryPages = pageData.pages.length > 0 ? pageData.pages : pageData.dataSaverPages;
+        const nextFallbackPages = pageData.dataSaverPages.length > 0 ? pageData.dataSaverPages : pageData.pages;
 
-        const matchedChapter = chapterData.find((chapter) => chapter.id === chapterId) ?? null;
-        const nextChapterLabel = matchedChapter ? formatChapterLabel(matchedChapter) : "Chapter";
-
-        markLastReadChapter({
-          seriesId,
-          seriesTitle: seriesData.title,
-          coverUrl: seriesData.coverUrl,
-          chapterId,
-          chapterLabel: nextChapterLabel
-        });
+        setPages(nextPrimaryPages);
+        setFallbackPages(nextFallbackPages);
       } catch {
         if (cancelled) {
           return;
@@ -280,6 +281,21 @@ export const ChapterReader = ({
       cancelled = true;
     };
   }, [seriesId, chapterId]);
+
+  useEffect(() => {
+    if (!series || loadedImages <= 0 || markedHistoryRef.current) {
+      return;
+    }
+
+    markedHistoryRef.current = true;
+    markLastReadChapter({
+      seriesId,
+      seriesTitle: series.title,
+      coverUrl: series.coverUrl,
+      chapterId,
+      chapterLabel
+    });
+  }, [chapterId, chapterLabel, loadedImages, series, seriesId]);
 
   useEffect(() => {
     return () => {
@@ -302,6 +318,76 @@ export const ChapterReader = ({
     }
 
     setChromeVisible((previous) => !previous);
+  };
+
+  const handleImageError = async (index: number) => {
+    const retryingSet = retryingPageIndexesRef.current;
+    if (retryingSet.has(index)) {
+      return;
+    }
+
+    const currentPageUrl = pages[index];
+    const fallbackUrl = fallbackPages[index];
+    if (fallbackUrl && currentPageUrl !== fallbackUrl) {
+      setPages((previous) => {
+        const next = [...previous];
+        next[index] = fallbackUrl;
+        return next;
+      });
+      return;
+    }
+
+    const currentRetries = pageRetryCountsRef.current.get(index) ?? 0;
+    if (currentRetries >= 2) {
+      setFailedPagesCount((count) => count + 1);
+      return;
+    }
+
+    retryingSet.add(index);
+    pageRetryCountsRef.current.set(index, currentRetries + 1);
+
+    try {
+      const refreshed = await refreshChapterPages(chapterId);
+      const refreshedPrimary = refreshed.pages.length > 0 ? refreshed.pages : refreshed.dataSaverPages;
+      const refreshedFallback = refreshed.dataSaverPages.length > 0 ? refreshed.dataSaverPages : refreshed.pages;
+
+      if (refreshedFallback.length > 0) {
+        setFallbackPages(refreshedFallback);
+      }
+
+      if (refreshedPrimary.length > 0) {
+        setPages((previous) => {
+          const next = [...previous];
+          const nextUrl = refreshedPrimary[index] ?? refreshedFallback[index] ?? previous[index];
+          if (nextUrl) {
+            next[index] = nextUrl;
+          }
+          return next;
+        });
+      } else {
+        setFailedPagesCount((count) => count + 1);
+      }
+    } catch {
+      setFailedPagesCount((count) => count + 1);
+    } finally {
+      retryingSet.delete(index);
+    }
+  };
+
+  const handleReloadChapterPages = async () => {
+    try {
+      const refreshed = await refreshChapterPages(chapterId);
+      const refreshedPrimary = refreshed.pages.length > 0 ? refreshed.pages : refreshed.dataSaverPages;
+      const refreshedFallback = refreshed.dataSaverPages.length > 0 ? refreshed.dataSaverPages : refreshed.pages;
+
+      setPages(refreshedPrimary);
+      setFallbackPages(refreshedFallback);
+      setFailedPagesCount(0);
+      setLoadedImages(0);
+      pageRetryCountsRef.current.clear();
+    } catch {
+      // Keep existing page state and let user retry.
+    }
   };
 
   if (isLoading) {
@@ -563,6 +649,20 @@ export const ChapterReader = ({
         onClick={handleReaderAreaClick}
       >
         <div className={`mx-auto flex w-full flex-col ${pageGapClassName}`} style={pageContainerStyle}>
+          {failedPagesCount > 0 ? (
+            <div className="rounded-xl border px-4 py-3 text-[13px]" style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentPink}55`, color: READER_THEME.textPrimary }}>
+              {failedPagesCount} page{failedPagesCount === 1 ? "" : "s"} failed to load.{" "}
+              <button
+                type="button"
+                className="underline"
+                style={{ color: READER_THEME.textPrimary }}
+                onClick={handleReloadChapterPages}
+              >
+                Reload chapter pages
+              </button>
+            </div>
+          ) : null}
+
           {pages.map((pageUrl, index) => (
             <img
               key={`${chapterId}-${index}`}
@@ -574,6 +674,9 @@ export const ChapterReader = ({
               className={`w-full border ${imageRoundClassName}`}
               style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}
               onLoad={() => setLoadedImages((value) => value + 1)}
+              onError={() => {
+                void handleImageError(index);
+              }}
             />
           ))}
 

@@ -65,11 +65,14 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
   }, [seriesId]);
 
   const continueChapter = useMemo(() => {
-    if (!historyChapterId) {
-      return null;
+    if (historyChapterId) {
+      const exact = chapters.find((chapter) => chapter.id === historyChapterId) ?? null;
+      if (exact) {
+        return exact;
+      }
     }
 
-    return chapters.find((chapter) => chapter.id === historyChapterId) ?? null;
+    return chapters.length > 0 ? chapters[chapters.length - 1] : null;
   }, [chapters, historyChapterId]);
 
   if (isLoading) {
@@ -134,7 +137,7 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
                 className={`${readerControlClassName} mt-4 inline-flex`}
                 style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentPeach}96`, color: READER_THEME.textPrimary }}
               >
-                Continue Reading · {formatChapterLabel(continueChapter)}
+                {historyChapterId ? "Continue Reading" : "Start from Latest"} · {formatChapterLabel(continueChapter)}
               </Link>
             ) : null}
           </div>

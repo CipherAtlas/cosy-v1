@@ -6,6 +6,16 @@ export type MangaSearchResult = {
   status: string | null;
   year: number | null;
   tags: string[];
+  englishChapterCount: number | null;
+};
+
+export type MangaSearchPage = {
+  items: MangaSearchResult[];
+  total: number | null;
+  limit: number;
+  offset: number;
+  nextOffset: number;
+  hasMore: boolean;
 };
 
 export type MangaSeriesDetail = MangaSearchResult & {
