@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import compliments from "@/data/compliments.json";
 import complimentsJa from "@/data/complimentsJa.json";
 import { AppLanguage, TRANSLATIONS } from "@/config/translations";
@@ -1301,6 +1302,7 @@ const renderActivePanel = (
 };
 
 export const HomeScreen = () => {
+  const router = useRouter();
   const [activePanel, setActivePanel] = useState<PanelId>("focus");
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
@@ -1390,7 +1392,7 @@ export const HomeScreen = () => {
   const handleSelectPanel = (nextPanel: PanelId) => {
     if (nextPanel === "reader") {
       setIsMobileMenuOpen(false);
-      window.location.href = "/reader";
+      router.push("/reader");
       return;
     }
 
