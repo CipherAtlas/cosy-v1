@@ -4,6 +4,10 @@ const PUBLIC_PROXY_FALLBACKS = ["https://corsproxy.io/?{url}", "https://api.allo
 const RESPONSE_CACHE = new Map<string, { expiresAt: number; value: unknown }>();
 const TEXT_CACHE = new Map<string, { expiresAt: number; value: string }>();
 let directRequestsLikelyBlocked = false;
+const REQUEST_TIMEOUT_MS = 12_000;
+const MAX_RESPONSE_CACHE_ENTRIES = 160;
+const MAX_TEXT_CACHE_ENTRIES = 80;
+const MAX_TEXT_RESPONSE_CHARS = 1_800_000;
 
 class HttpStatusError extends Error {
   status: number;
@@ -50,13 +54,18 @@ const shouldRetryError = (error: unknown): boolean => {
 };
 
 const requestRaw = async (url: string): Promise<Response> => {
+  const controller = new AbortController();
+  const timeout = globalThis.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   const response = await fetch(url, {
     method: "GET",
     headers: {
       Accept: "*/*"
     },
     cache: "no-store",
-    credentials: "omit"
+    credentials: "omit",
+    signal: controller.signal
+  }).finally(() => {
+    globalThis.clearTimeout(timeout);
   });
 
   if (!response.ok) {
@@ -115,6 +124,24 @@ type FetchJsonOptions = {
   forceRefresh?: boolean;
 };
 
+const setCacheValue = <T>(cache: Map<string, { expiresAt: number; value: T }>, maxEntries: number, key: string, value: T, ttlMs: number) => {
+  if (ttlMs <= 0) {
+    return;
+  }
+
+  if (cache.size >= maxEntries) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey) {
+      cache.delete(oldestKey);
+    }
+  }
+
+  cache.set(key, {
+    expiresAt: Date.now() + ttlMs,
+    value
+  });
+};
+
 export const fetchJson = async <T>(url: string, options: FetchJsonOptions = {}): Promise<T> => {
   const { cacheTtlMs = 0, forceRefresh = false } = options;
   if (!forceRefresh && cacheTtlMs > 0) {
@@ -126,12 +153,7 @@ export const fetchJson = async <T>(url: string, options: FetchJsonOptions = {}):
 
   const response = await fetchRaw(url);
   const json = (await response.json()) as T;
-  if (cacheTtlMs > 0) {
-    RESPONSE_CACHE.set(url, {
-      expiresAt: Date.now() + cacheTtlMs,
-      value: json
-    });
-  }
+  setCacheValue(RESPONSE_CACHE, MAX_RESPONSE_CACHE_ENTRIES, url, json, cacheTtlMs);
 
   return json;
 };
@@ -146,14 +168,9 @@ export const fetchText = async (url: string, options: FetchJsonOptions = {}): Pr
   }
 
   const response = await fetchRaw(url);
-  const text = await response.text();
+  const text = (await response.text()).slice(0, MAX_TEXT_RESPONSE_CHARS);
 
-  if (cacheTtlMs > 0) {
-    TEXT_CACHE.set(url, {
-      expiresAt: Date.now() + cacheTtlMs,
-      value: text
-    });
-  }
+  setCacheValue(TEXT_CACHE, MAX_TEXT_CACHE_ENTRIES, url, text, cacheTtlMs);
 
   return text;
 };

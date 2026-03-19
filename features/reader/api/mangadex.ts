@@ -6,6 +6,9 @@ const MANGADEX_PROXY = (process.env.NEXT_PUBLIC_MANGADEX_PROXY ?? "").trim();
 const PUBLIC_PROXY_FALLBACKS = ["https://corsproxy.io/?{url}", "https://api.allorigins.win/raw?url={url}"];
 let directRequestsLikelyBlocked = false;
 const RESPONSE_CACHE = new Map<string, { expiresAt: number; value: unknown }>();
+const REQUEST_TIMEOUT_MS = 12_000;
+const MAX_RESPONSE_CACHE_ENTRIES = 220;
+const MAX_CHAPTER_PAGES = 240;
 
 const DEFAULT_LANGS = ["en", "ja"];
 
@@ -153,6 +156,36 @@ const parseChapter = (chapter: MangaDexChapter): MangaChapter => ({
   readableAt: chapter.attributes?.readableAt ?? null
 });
 
+const setResponseCache = (url: string, value: unknown, ttlMs: number) => {
+  if (ttlMs <= 0) {
+    return;
+  }
+
+  if (RESPONSE_CACHE.size >= MAX_RESPONSE_CACHE_ENTRIES) {
+    const oldestKey = RESPONSE_CACHE.keys().next().value;
+    if (oldestKey) {
+      RESPONSE_CACHE.delete(oldestKey);
+    }
+  }
+
+  RESPONSE_CACHE.set(url, {
+    expiresAt: Date.now() + ttlMs,
+    value
+  });
+};
+
+const isHttpUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+const normalizePageUrls = (urls: string[]): string[] =>
+  urls.filter(isHttpUrl).slice(0, MAX_CHAPTER_PAGES);
+
 const chapterSort = (a: MangaChapter, b: MangaChapter): number => {
   const chapterA = Number(a.chapterNumber);
   const chapterB = Number(b.chapterNumber);
@@ -212,13 +245,18 @@ const wait = async (ms: number): Promise<void> =>
   });
 
 const requestJson = async <T>(url: string): Promise<T> => {
+  const controller = new AbortController();
+  const timeout = globalThis.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   const response = await fetch(url, {
     method: "GET",
     headers: {
       Accept: "application/json"
     },
     cache: "no-store",
-    credentials: "omit"
+    credentials: "omit",
+    signal: controller.signal
+  }).finally(() => {
+    globalThis.clearTimeout(timeout);
   });
 
   if (!response.ok) {
@@ -271,12 +309,7 @@ const fetchJson = async <T>(url: string, options: FetchJsonOptions = {}): Promis
   if (!directRequestsLikelyBlocked) {
     try {
       const directResult = await requestJsonWithRetry<T>(url);
-      if (cacheTtlMs > 0) {
-        RESPONSE_CACHE.set(url, {
-          expiresAt: Date.now() + cacheTtlMs,
-          value: directResult
-        });
-      }
+      setResponseCache(url, directResult, cacheTtlMs);
 
       return directResult;
     } catch (directError) {
@@ -291,12 +324,7 @@ const fetchJson = async <T>(url: string, options: FetchJsonOptions = {}): Promis
   for (const proxiedUrl of getProxyCandidates(url)) {
     try {
       const proxiedResult = await requestJsonWithRetry<T>(proxiedUrl);
-      if (cacheTtlMs > 0) {
-        RESPONSE_CACHE.set(url, {
-          expiresAt: Date.now() + cacheTtlMs,
-          value: proxiedResult
-        });
-      }
+      setResponseCache(url, proxiedResult, cacheTtlMs);
 
       return proxiedResult;
     } catch {
@@ -308,7 +336,7 @@ const fetchJson = async <T>(url: string, options: FetchJsonOptions = {}): Promis
 };
 
 export const searchManga = async (query: string, limit = 20, offset = 0): Promise<MangaSearchPage> => {
-  const trimmed = query.trim();
+  const trimmed = query.trim().slice(0, 120);
   if (!trimmed) {
     return {
       items: [],
@@ -434,8 +462,8 @@ const getChapterPagesWithOptions = async (chapterId: string, options: FetchJsonO
   }
 
   return {
-    pages: (payload.chapter.data ?? []).map((fileName) => `${baseUrl}/data/${hash}/${fileName}`),
-    dataSaverPages: (payload.chapter.dataSaver ?? []).map((fileName) => `${baseUrl}/data-saver/${hash}/${fileName}`)
+    pages: normalizePageUrls((payload.chapter.data ?? []).map((fileName) => `${baseUrl}/data/${hash}/${fileName}`)),
+    dataSaverPages: normalizePageUrls((payload.chapter.dataSaver ?? []).map((fileName) => `${baseUrl}/data-saver/${hash}/${fileName}`))
   };
 };
 

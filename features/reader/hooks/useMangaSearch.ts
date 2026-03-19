@@ -4,6 +4,7 @@ import { MangaSearchResult } from "@/features/reader/types";
 import { useDebouncedValue } from "@/features/reader/hooks/useDebouncedValue";
 
 const PAGE_SIZE = 18;
+const MAX_RESULT_ITEMS = 180;
 
 const getTitleScore = (title: string, query: string): number => {
   const normalizedTitle = title.trim().toLowerCase();
@@ -53,7 +54,7 @@ const compareResults = (query: string) => (a: MangaSearchResult, b: MangaSearchR
 };
 
 export const useMangaSearch = (query: string) => {
-  const debouncedQuery = useDebouncedValue(query.trim(), 340);
+  const debouncedQuery = useDebouncedValue(query.trim().slice(0, 120), 340);
   const [results, setResults] = useState<MangaSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -100,7 +101,7 @@ export const useMangaSearch = (query: string) => {
             };
           });
 
-          return changed ? sortByRelevance(updated) : previousResults;
+          return changed ? sortByRelevance(updated).slice(0, MAX_RESULT_ITEMS) : previousResults;
         });
       } finally {
         availabilityRequestCountRef.current = Math.max(0, availabilityRequestCountRef.current - 1);
@@ -141,7 +142,7 @@ export const useMangaSearch = (query: string) => {
           return;
         }
 
-        const sortedWithoutCounts = sortByRelevance(page.items);
+        const sortedWithoutCounts = sortByRelevance(page.items).slice(0, MAX_RESULT_ITEMS);
         setResults(sortedWithoutCounts);
         setHasMore(page.hasMore);
         setNextOffset(page.nextOffset);
@@ -208,7 +209,7 @@ export const useMangaSearch = (query: string) => {
           });
         });
 
-        return sortByRelevance(Array.from(byId.values()));
+        return sortByRelevance(Array.from(byId.values())).slice(0, MAX_RESULT_ITEMS);
       });
 
       const didAdvance = page.nextOffset > nextOffset;

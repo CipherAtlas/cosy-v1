@@ -48,6 +48,7 @@ const GAP_CLASS_BY_SETTING: Record<ReaderUiSettings["pageGap"], string> = {
   normal: "gap-3",
   airy: "gap-5"
 };
+const PAGE_RENDER_BATCH = 18;
 
 const getReaderWidthStyle = (setting: ReaderUiSettings["pageWidth"]): { maxWidth?: string } => {
   switch (setting) {
@@ -77,6 +78,7 @@ export const ChapterReader = ({
   const [error, setError] = useState<string | null>(null);
   const [loadedImages, setLoadedImages] = useState(0);
   const [failedPagesCount, setFailedPagesCount] = useState(0);
+  const [visiblePageCount, setVisiblePageCount] = useState(PAGE_RENDER_BATCH);
   const [scrollPercent, setScrollPercent] = useState(0);
   const [settings, setSettings] = useState<ReaderUiSettings>(DEFAULT_READER_UI_SETTINGS);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -101,6 +103,7 @@ export const ChapterReader = ({
   const pageContainerStyle = getReaderWidthStyle(settings.pageWidth);
   const imageRoundClassName = settings.imageCorners === "soft" ? "rounded-lg" : "rounded-none";
   const showReaderChrome = !isImmersive || chromeVisible || isSettingsOpen;
+  const visiblePages = useMemo(() => pages.slice(0, visiblePageCount), [pages, visiblePageCount]);
 
   const updateSetting = <K extends keyof ReaderUiSettings>(key: K, value: ReaderUiSettings[K]) => {
     setSettings((previous) => {
@@ -159,6 +162,7 @@ export const ChapterReader = ({
     setChromeVisible(true);
     setIsSettingsOpen(false);
     markedHistoryRef.current = false;
+    setVisiblePageCount(PAGE_RENDER_BATCH);
   }, [seriesId, chapterId, isImmersive]);
 
   useEffect(() => {
@@ -186,6 +190,13 @@ export const ChapterReader = ({
     const update = () => {
       const maxScrollable = Math.max(1, container.scrollHeight - container.clientHeight);
       setScrollPercent(Math.max(0, Math.min(100, (container.scrollTop / maxScrollable) * 100)));
+
+      if (visiblePageCount < pages.length) {
+        const nearBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1200;
+        if (nearBottom) {
+          setVisiblePageCount((previous) => Math.min(previous + PAGE_RENDER_BATCH, pages.length));
+        }
+      }
     };
 
     const handle = () => {
@@ -209,7 +220,7 @@ export const ChapterReader = ({
         window.cancelAnimationFrame(raf);
       }
     };
-  }, [pages.length, isImmersive, settings.autoHideChrome, isSettingsOpen]);
+  }, [pages.length, visiblePageCount, isImmersive, settings.autoHideChrome, isSettingsOpen]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -262,6 +273,7 @@ export const ChapterReader = ({
 
         setPages(nextPrimaryPages);
         setFallbackPages(nextFallbackPages);
+        setVisiblePageCount(Math.min(PAGE_RENDER_BATCH, nextPrimaryPages.length || nextFallbackPages.length || PAGE_RENDER_BATCH));
       } catch {
         if (cancelled) {
           return;
@@ -384,6 +396,7 @@ export const ChapterReader = ({
       setFallbackPages(refreshedFallback);
       setFailedPagesCount(0);
       setLoadedImages(0);
+      setVisiblePageCount(Math.min(PAGE_RENDER_BATCH, refreshedPrimary.length || refreshedFallback.length || PAGE_RENDER_BATCH));
       pageRetryCountsRef.current.clear();
     } catch {
       // Keep existing page state and let user retry.
@@ -663,7 +676,7 @@ export const ChapterReader = ({
             </div>
           ) : null}
 
-          {pages.map((pageUrl, index) => (
+          {visiblePages.map((pageUrl, index) => (
             <img
               key={`${chapterId}-${index}`}
               src={pageUrl}
@@ -679,6 +692,20 @@ export const ChapterReader = ({
               }}
             />
           ))}
+
+          {pages.length > visiblePages.length ? (
+            <div className="rounded-xl border px-4 py-3 text-[13px]" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface, color: READER_THEME.textSecondary }}>
+              Showing {visiblePages.length} of {pages.length} pages.
+              <button
+                type="button"
+                className="ml-2 underline"
+                style={{ color: READER_THEME.textPrimary }}
+                onClick={() => setVisiblePageCount((previous) => Math.min(previous + PAGE_RENDER_BATCH, pages.length))}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
 
           {pages.length === 0 ? (
             <div className="rounded-xl border px-4 py-4 text-[15px]" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface, color: READER_THEME.textSecondary }}>

@@ -5,6 +5,7 @@ import { BookSearchItem } from "@/features/books/types";
 import { useDebouncedValue } from "@/features/books/hooks/useDebouncedValue";
 
 const PAGE_SIZE = 18;
+const MAX_RESULT_ITEMS = 180;
 
 const sortResults = (items: BookSearchItem[]) =>
   [...items].sort((a, b) => {
@@ -36,7 +37,7 @@ const applyMatchResults = (items: BookSearchItem[], matches: Record<string, Book
   });
 
 export const useBookSearch = (query: string) => {
-  const debouncedQuery = useDebouncedValue(query.trim(), 320);
+  const debouncedQuery = useDebouncedValue(query.trim().slice(0, 120), 320);
   const [results, setResults] = useState<BookSearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -63,7 +64,7 @@ export const useBookSearch = (query: string) => {
         return;
       }
 
-      setResults((previous) => sortResults(applyMatchResults(previous, matches)));
+      setResults((previous) => sortResults(applyMatchResults(previous, matches)).slice(0, MAX_RESULT_ITEMS));
     } finally {
       pendingMatchCountRef.current = Math.max(0, pendingMatchCountRef.current - 1);
       setIsMatching(pendingMatchCountRef.current > 0);
@@ -102,7 +103,7 @@ export const useBookSearch = (query: string) => {
         }
 
         const deduped = Array.from(new Map(page.items.map((item) => [item.openLibraryKey, item])).values());
-        const sorted = sortResults(deduped);
+        const sorted = sortResults(deduped).slice(0, MAX_RESULT_ITEMS);
         setResults(sorted);
         setHasMore(page.hasMore);
         setNextPage(2);
@@ -150,7 +151,7 @@ export const useBookSearch = (query: string) => {
           }
         });
 
-        return sortResults(Array.from(map.values()));
+        return sortResults(Array.from(map.values())).slice(0, MAX_RESULT_ITEMS);
       });
 
       setHasMore(page.hasMore);

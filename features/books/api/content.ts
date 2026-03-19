@@ -2,6 +2,42 @@ import { fetchText } from "@/features/books/api/http";
 import { BookReadSource, BookReaderContent } from "@/features/books/types";
 
 const SECTION_LIMIT = 80;
+const MAX_HTML_INPUT_CHARS = 1_200_000;
+const MAX_TEXT_INPUT_CHARS = 1_200_000;
+const MAX_TEXT_OUTPUT_CHARS = 900_000;
+const MAX_HTML_OUTPUT_CHARS = 700_000;
+const MAX_PARAGRAPH_COUNT = 2_500;
+
+const ALLOWED_HTML_TAGS = new Set([
+  "a",
+  "abbr",
+  "b",
+  "blockquote",
+  "br",
+  "code",
+  "div",
+  "em",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "li",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "u",
+  "ul"
+]);
 
 const cleanWhitespace = (value: string): string =>
   value
@@ -25,9 +61,43 @@ const trimProjectGutenbergBoilerplate = (value: string): string => {
   return text.trim();
 };
 
+const sanitizeHref = (rawHref: string | null): string | null => {
+  if (!rawHref) {
+    return null;
+  }
+
+  const trimmed = rawHref.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  // Remove control chars/whitespace that can obfuscate protocols.
+  const compacted = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, "");
+
+  if (compacted.startsWith("#")) {
+    return compacted;
+  }
+
+  if (compacted.startsWith("/")) {
+    return compacted;
+  }
+
+  try {
+    const parsed = new URL(compacted, "https://example.com");
+    const protocol = parsed.protocol.toLowerCase();
+    if (protocol === "http:" || protocol === "https:" || protocol === "mailto:") {
+      return compacted;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
 const parseTextSections = (plainText: string): { plainText: string; sectionAnchors: { id: string; label: string }[] } => {
-  const trimmed = trimProjectGutenbergBoilerplate(plainText);
-  const lines = trimmed.split(/\r?\n/).map((line) => line.trim());
+  const trimmed = trimProjectGutenbergBoilerplate(plainText.slice(0, MAX_TEXT_INPUT_CHARS));
+  const lines = trimmed.split(/\r?\n/).slice(0, MAX_PARAGRAPH_COUNT).map((line) => line.trim());
   const sectionAnchors: { id: string; label: string }[] = [];
 
   lines.forEach((line, index) => {
@@ -48,23 +118,26 @@ const parseTextSections = (plainText: string): { plainText: string; sectionAncho
     sectionAnchors.push({ id: `line-${index}`, label });
   });
 
+  const limitedText = lines.join("\n").slice(0, MAX_TEXT_OUTPUT_CHARS);
   return {
-    plainText: trimmed,
+    plainText: limitedText,
     sectionAnchors
   };
 };
 
-const sanitizeHtml = (rawHtml: string): { htmlContent: string; sectionAnchors: { id: string; label: string }[] } => {
+const sanitizeHtml = (
+  rawHtml: string
+): { htmlContent: string; sectionAnchors: { id: string; label: string }[]; plainTextFallback: string | null } => {
   if (typeof window === "undefined") {
-    return { htmlContent: "", sectionAnchors: [] };
+    return { htmlContent: "", sectionAnchors: [], plainTextFallback: null };
   }
 
   const parser = new DOMParser();
-  const documentNode = parser.parseFromString(rawHtml, "text/html");
+  const documentNode = parser.parseFromString(rawHtml.slice(0, MAX_HTML_INPUT_CHARS), "text/html");
   const body = documentNode.body;
   const sectionAnchors: { id: string; label: string }[] = [];
 
-  body.querySelectorAll("script, style, iframe, object, embed, form, nav, footer, noscript").forEach((element) => {
+  body.querySelectorAll("script, style, iframe, object, embed, form, nav, footer, noscript, svg, math, canvas, video, audio").forEach((element) => {
     element.remove();
   });
 
@@ -87,7 +160,12 @@ const sanitizeHtml = (rawHtml: string): { htmlContent: string; sectionAnchors: {
 
   body.querySelectorAll("*").forEach((element) => {
     const tag = element.tagName.toLowerCase();
-    const allowed = new Set(["id", "href"]);
+    if (!ALLOWED_HTML_TAGS.has(tag)) {
+      element.replaceWith(...Array.from(element.childNodes));
+      return;
+    }
+
+    const allowed = tag === "a" ? new Set(["href"]) : new Set(["id"]);
     [...element.attributes].forEach((attribute) => {
       if (!allowed.has(attribute.name.toLowerCase())) {
         element.removeAttribute(attribute.name);
@@ -95,19 +173,34 @@ const sanitizeHtml = (rawHtml: string): { htmlContent: string; sectionAnchors: {
     });
 
     if (tag === "a") {
-      const href = element.getAttribute("href");
-      if (!href || href.startsWith("javascript:")) {
+      const safeHref = sanitizeHref(element.getAttribute("href"));
+      if (!safeHref) {
         element.removeAttribute("href");
-      } else if (href.startsWith("http")) {
+      } else {
+        element.setAttribute("href", safeHref);
+      }
+
+      if (safeHref && (safeHref.startsWith("http://") || safeHref.startsWith("https://"))) {
         element.setAttribute("target", "_blank");
-        element.setAttribute("rel", "noreferrer");
+        element.setAttribute("rel", "noopener noreferrer nofollow");
       }
     }
   });
 
+  const htmlContent = body.innerHTML;
+  if (htmlContent.length > MAX_HTML_OUTPUT_CHARS) {
+    const plainTextFallback = (body.textContent ?? "").replace(/\u00a0/g, " ").slice(0, MAX_TEXT_OUTPUT_CHARS);
+    return {
+      htmlContent: "",
+      sectionAnchors,
+      plainTextFallback: plainTextFallback || null
+    };
+  }
+
   return {
-    htmlContent: body.innerHTML,
-    sectionAnchors
+    htmlContent,
+    sectionAnchors,
+    plainTextFallback: null
   };
 };
 
@@ -132,6 +225,19 @@ export const loadReaderContent = async (
           plainText: null,
           sectionAnchors: sanitized.sectionAnchors,
           mode: "html"
+        };
+      }
+
+      if (sanitized.plainTextFallback) {
+        const parsed = parseTextSections(sanitized.plainTextFallback);
+        return {
+          title: fallbackTitle,
+          authorName: fallbackAuthor,
+          source,
+          htmlContent: null,
+          plainText: parsed.plainText,
+          sectionAnchors: parsed.sectionAnchors,
+          mode: "text"
         };
       }
     } catch {
