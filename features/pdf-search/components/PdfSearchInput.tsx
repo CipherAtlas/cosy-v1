@@ -32,7 +32,7 @@ export const PdfSearchInput = ({ query, onQueryChange, onSearch, isLoading }: Pd
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[13px]" style={{ color: READER_THEME.textSecondary }}>
-          Uses web PDF discovery with <code>filetype:pdf</code> bias.
+          Uses <code>filetype:pdf</code> search bias and supports Google-first results when configured.
         </p>
         <button
           type="submit"

@@ -1,3 +1,5 @@
+export type PdfSearchProvider = "google-cse" | "bing-rss";
+
 export type PdfSearchResult = {
   id: string;
   title: string;
@@ -10,5 +12,11 @@ export type PdfSearchResult = {
 
 export type PdfSearchResponse = {
   results: PdfSearchResult[];
-  provider: "bing-rss";
+  provider: PdfSearchProvider;
+};
+
+export type PdfSearchOptions = {
+  preferGoogle?: boolean;
+  googleApiKey?: string;
+  googleCx?: string;
 };
