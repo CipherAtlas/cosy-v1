@@ -23,7 +23,10 @@ html[data-theme="dark"] {
 html,
 body {
   margin: 0;
+  width: 100%;
   min-height: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
   background:
     radial-gradient(circle at 18% 12%, rgba(246, 199, 184, 0.24), transparent 30%),
     radial-gradient(circle at 86% 78%, rgba(207, 229, 255, 0.22), transparent 34%),
@@ -51,6 +54,13 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 :focus-visible {

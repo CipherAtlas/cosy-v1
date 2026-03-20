@@ -50,8 +50,8 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
   const panelStrong = isDark ? "rgba(31, 27, 24, 0.94)" : BOOK_THEME.surfaceStrong;
 
   return (
-    <section className="space-y-3 rounded-[1.5rem] border p-3 sm:p-4" style={{ borderColor, background: panelSurface }}>
-      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Book top navigation">
+    <section className="space-y-3 rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={{ borderColor, background: panelSurface }}>
+      <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Book top navigation">
         {navItems.map((item) => {
           const isActive = normalizedPathname === item.href;
           const tint = BOOK_THEME[item.tint];
@@ -60,7 +60,7 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
             <Link
               key={item.href}
               href={item.href}
-              className={`${bookControlClassName} shrink-0 whitespace-nowrap`}
+              className={`${bookControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
               style={{
                 borderColor: isActive ? (isDark ? "rgba(255, 226, 179, 0.45)" : "rgba(232, 196, 180, 0.82)") : borderColor,
                 background: isActive ? `${tint}B2` : panelStrong,
@@ -82,7 +82,7 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
         {isMetaOpen ? "Hide Book Info" : "Show Book Info"}
       </button>
 
-      <div className={`${isMetaOpen ? "grid" : "hidden"} gap-3 sm:grid xl:grid-cols-2`}>
+      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 sm:grid xl:grid-cols-2`}>
         {currentBook ? (
           <section className="space-y-2 rounded-[1.2rem] border p-3" style={{ borderColor, background: panelStrong }}>
             <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: textSecondary }}>

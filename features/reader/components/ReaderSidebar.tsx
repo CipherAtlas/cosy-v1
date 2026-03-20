@@ -34,7 +34,7 @@ export const ReaderSidebar = ({ className }: ReaderSidebarProps) => {
 
   return (
     <aside
-      className={`min-h-0 overflow-y-auto rounded-[1.8rem] border p-4 sm:p-5 ${className ?? ""}`}
+      className={`min-h-0 min-w-0 overflow-y-auto rounded-[1.8rem] border p-4 sm:p-5 ${className ?? ""}`}
       style={{
         borderColor: READER_THEME.border,
         background: READER_THEME.surfaceStrong,
@@ -58,10 +58,10 @@ export const ReaderSidebar = ({ className }: ReaderSidebarProps) => {
           <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>
             Language
           </p>
-          <div className="inline-flex rounded-full border p-1" style={{ borderColor: READER_THEME.border, background: READER_THEME.surfaceStrong }}>
+          <div className="flex w-full rounded-full border p-1" style={{ borderColor: READER_THEME.border, background: READER_THEME.surfaceStrong }}>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: language === "en" ? `1px solid ${READER_THEME.border}` : "1px solid transparent",
                 background: language === "en" ? `${READER_THEME.accentPeach}85` : "transparent",
@@ -73,7 +73,7 @@ export const ReaderSidebar = ({ className }: ReaderSidebarProps) => {
             </button>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: language === "ja" ? `1px solid ${READER_THEME.border}` : "1px solid transparent",
                 background: language === "ja" ? `${READER_THEME.accentPeach}85` : "transparent",
@@ -90,10 +90,10 @@ export const ReaderSidebar = ({ className }: ReaderSidebarProps) => {
           <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>
             Mode
           </p>
-          <div className="inline-flex rounded-full border p-1" style={{ borderColor: READER_THEME.border, background: READER_THEME.surfaceStrong }}>
+          <div className="flex w-full rounded-full border p-1" style={{ borderColor: READER_THEME.border, background: READER_THEME.surfaceStrong }}>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: theme === "light" ? `1px solid ${READER_THEME.border}` : "1px solid transparent",
                 background: theme === "light" ? `${READER_THEME.accentLavender}88` : "transparent",
@@ -105,7 +105,7 @@ export const ReaderSidebar = ({ className }: ReaderSidebarProps) => {
             </button>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: theme === "dark" ? `1px solid ${READER_THEME.border}` : "1px solid transparent",
                 background: theme === "dark" ? `${READER_THEME.accentLavender}88` : "transparent",

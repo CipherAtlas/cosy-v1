@@ -40,7 +40,7 @@ export const BookSidebar = ({ themeMode = "light", className }: BookSidebarProps
 
   return (
     <aside
-      className={`min-h-0 overflow-y-auto rounded-[1.8rem] border p-4 sm:p-5 ${className ?? ""}`}
+      className={`min-h-0 min-w-0 overflow-y-auto rounded-[1.8rem] border p-4 sm:p-5 ${className ?? ""}`}
       style={{
         borderColor,
         background: sidebarBackground,
@@ -64,10 +64,10 @@ export const BookSidebar = ({ themeMode = "light", className }: BookSidebarProps
           <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: textSecondary }}>
             Language
           </p>
-          <div className="inline-flex rounded-full border p-1" style={{ borderColor, background: isDark ? "rgba(31, 27, 24, 0.94)" : BOOK_THEME.surfaceStrong }}>
+          <div className="flex w-full rounded-full border p-1" style={{ borderColor, background: isDark ? "rgba(31, 27, 24, 0.94)" : BOOK_THEME.surfaceStrong }}>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: language === "en" ? `1px solid ${borderColor}` : "1px solid transparent",
                 background: language === "en" ? `${BOOK_THEME.accentPeach}88` : "transparent",
@@ -79,7 +79,7 @@ export const BookSidebar = ({ themeMode = "light", className }: BookSidebarProps
             </button>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: language === "ja" ? `1px solid ${borderColor}` : "1px solid transparent",
                 background: language === "ja" ? `${BOOK_THEME.accentPeach}88` : "transparent",
@@ -96,10 +96,10 @@ export const BookSidebar = ({ themeMode = "light", className }: BookSidebarProps
           <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: textSecondary }}>
             Mode
           </p>
-          <div className="inline-flex rounded-full border p-1" style={{ borderColor, background: isDark ? "rgba(31, 27, 24, 0.94)" : BOOK_THEME.surfaceStrong }}>
+          <div className="flex w-full rounded-full border p-1" style={{ borderColor, background: isDark ? "rgba(31, 27, 24, 0.94)" : BOOK_THEME.surfaceStrong }}>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: theme === "light" ? `1px solid ${borderColor}` : "1px solid transparent",
                 background: theme === "light" ? `${BOOK_THEME.accentLavender}88` : "transparent",
@@ -111,7 +111,7 @@ export const BookSidebar = ({ themeMode = "light", className }: BookSidebarProps
             </button>
             <button
               type="button"
-              className="cozy-outline min-h-10 rounded-full px-3 py-1 text-[12px] font-medium"
+              className="cozy-outline min-h-10 flex-1 rounded-full px-3 py-1 text-[12px] font-medium"
               style={{
                 border: theme === "dark" ? `1px solid ${borderColor}` : "1px solid transparent",
                 background: theme === "dark" ? `${BOOK_THEME.accentLavender}88` : "transparent",

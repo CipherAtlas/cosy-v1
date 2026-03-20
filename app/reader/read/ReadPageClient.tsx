@@ -45,13 +45,13 @@ export const ReadPageClient = () => {
   if (!seriesId || !chapterId) {
     return (
       <ReaderFrame title="Read" subtitle="Open a chapter to start reading." fullHeightContent>
-        <div className="max-w-[520px] rounded-2xl border p-4" style={readerCardStyle}>
+        <div className="w-full max-w-[520px] rounded-2xl border p-4" style={readerCardStyle}>
           <p className="text-[15px]" style={{ color: READER_THEME.textSecondary }}>
             Missing chapter details. Open a chapter from a series page first.
           </p>
           <Link
             href="/reader/search"
-            className={`${readerControlClassName} mt-3 inline-flex`}
+            className={`${readerControlClassName} mt-3 inline-flex w-full justify-center sm:w-auto`}
             style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentBlue}82`, color: READER_THEME.textPrimary }}
           >
             Go to search

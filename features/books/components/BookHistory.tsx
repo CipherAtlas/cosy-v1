@@ -31,10 +31,10 @@ export const BookHistory = () => {
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="min-w-0 space-y-3">
       {items.map((item) => (
         <li key={item.openLibraryKey} className="rounded-[1.4rem] border p-4" style={bookCardStyle}>
-          <h2 className="text-[20px] font-medium leading-tight">{item.title}</h2>
+          <h2 className="break-words text-[20px] font-medium leading-tight">{item.title}</h2>
           <p className="mt-1 text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
             {item.authorName}
           </p>
@@ -45,7 +45,7 @@ export const BookHistory = () => {
             {Math.round(item.progressPercent)}% read
           </p>
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
             <Link
               href={toBookDetailHref(item.openLibraryKey, {
                 title: item.title,
@@ -54,7 +54,7 @@ export const BookHistory = () => {
                 firstPublishYear: item.firstPublishYear,
                 matchStatus: item.hasReaderSource ? "readable" : "metadata"
               })}
-              className={bookControlClassName}
+              className={`${bookControlClassName} w-full justify-center sm:w-auto`}
               style={{ borderColor: BOOK_THEME.border, background: BOOK_THEME.surface, color: BOOK_THEME.textPrimary }}
             >
               Open details
@@ -62,7 +62,7 @@ export const BookHistory = () => {
             {item.hasReaderSource ? (
               <Link
                 href={toBookReadHref(item.openLibraryKey)}
-                className={bookControlClassName}
+                className={`${bookControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentMint}88`, color: BOOK_THEME.textPrimary }}
               >
                 Continue

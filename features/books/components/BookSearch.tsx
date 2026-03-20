@@ -51,7 +51,7 @@ export const BookSearch = () => {
   }, [debouncedQuery, hasMore, isLoading, isLoadingMore, loadMore, readableOnly, visibleResults.length]);
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-4 sm:space-y-5">
       <label className="block text-[13px] font-medium" style={{ color: BOOK_THEME.textSecondary }}>
         Search Books (English)
         <input
@@ -67,7 +67,7 @@ export const BookSearch = () => {
         />
       </label>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
         <button
           type="button"
           className="cozy-outline min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
@@ -125,8 +125,8 @@ export const BookSearch = () => {
         </p>
       ) : null}
 
-      <div className="rounded-[1.5rem] border p-3 sm:p-4" style={bookCardStyle}>
-        <div ref={scrollRef} className="max-h-[58vh] overflow-y-auto pr-0.5 sm:pr-1">
+      <div className="rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={bookCardStyle}>
+        <div ref={scrollRef} className="max-h-[62vh] overflow-y-auto pr-0 sm:max-h-[58vh] sm:pr-1">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visibleResults.map((item) => {
               const isReadable = item.matchStatus === "readable";
@@ -149,7 +149,7 @@ export const BookSearch = () => {
                     )}
                   </div>
 
-                  <h3 className="mt-3 line-clamp-2 text-[18px] font-medium leading-tight" style={{ color: BOOK_THEME.textPrimary }}>
+                  <h3 className="mt-3 line-clamp-2 break-words text-[17px] font-medium leading-tight sm:text-[18px]" style={{ color: BOOK_THEME.textPrimary }}>
                     {item.title}
                   </h3>
                   <p className="mt-1 line-clamp-1 text-[14px]" style={{ color: BOOK_THEME.textSecondary }}>
@@ -188,7 +188,7 @@ export const BookSearch = () => {
                       firstPublishYear: item.firstPublishYear,
                       matchStatus: item.matchStatus
                     })}
-                    className={`${bookControlClassName} mt-3 inline-flex`}
+                    className={`${bookControlClassName} mt-3 inline-flex w-full justify-center sm:w-auto`}
                     style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentLavender}78`, color: BOOK_THEME.textPrimary }}
                   >
                     Open book

@@ -372,11 +372,11 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
 
   return (
     <div
-      className="flex h-full min-h-0 flex-col rounded-[1.4rem] border"
+      className="flex h-full min-h-0 min-w-0 flex-col rounded-[1.2rem] border sm:rounded-[1.4rem]"
       style={{ ...bookCardStyle, background: chromeColors.shellBackground, borderColor: chromeColors.shellBorder, color: chromeColors.shellText }}
     >
       <header
-        className="flex flex-wrap items-center gap-2 border-b px-3 py-3 sm:px-4"
+        className="flex min-w-0 flex-wrap items-center gap-2 border-b px-2.5 py-2.5 sm:px-4 sm:py-3"
         style={{
           borderColor: chromeColors.shellBorder,
           paddingTop: isImmersive ? "calc(0.7rem + env(safe-area-inset-top))" : undefined
@@ -399,7 +399,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
           {isControlsOpen ? "Hide Controls" : "Show Controls"}
         </button>
 
-        <div className="ml-auto flex items-center gap-2 text-[13px]" style={{ color: chromeColors.shellMuted }}>
+        <div className="ml-auto flex w-full items-center justify-end gap-2 text-[13px] sm:w-auto" style={{ color: chromeColors.shellMuted }}>
           <span>{Math.round(progress)}%</span>
           {onToggleImmersive ? (
             <button
@@ -413,7 +413,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
           ) : null}
         </div>
 
-        <div className={`${isControlsOpen ? "grid" : "hidden"} w-full gap-2 sm:grid sm:grid-cols-3`}>
+        <div className={`${isControlsOpen ? "grid" : "hidden"} w-full grid-cols-1 gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3`}>
           <button
             type="button"
             onClick={() => setSettings((previous) => ({ ...previous, theme: previous.theme === "dark" ? "light" : "dark" }))}
@@ -479,7 +479,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
         />
       </div>
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-2 py-4 sm:px-4 sm:py-5" onScroll={onScroll} style={{ WebkitOverflowScrolling: "touch" }}>
+      <div ref={scrollRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto px-1.5 py-3 sm:px-4 sm:py-5" onScroll={onScroll} style={{ WebkitOverflowScrolling: "touch" }}>
         {isLoading ? (
           <p className="text-[15px]" style={{ color: chromeColors.shellMuted }}>
             Opening book...
@@ -510,7 +510,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
 
         {!isLoading && !error && hasReadableContent ? (
           <article
-            className="mx-auto rounded-[1.3rem] border px-4 py-5 sm:px-8 sm:py-8"
+            className="mx-auto min-w-0 rounded-[1.2rem] border px-3.5 py-4 sm:rounded-[1.3rem] sm:px-8 sm:py-8"
             style={{
               maxWidth: "760px",
               borderColor: settings.theme === "dark" ? "rgba(255,255,255,0.08)" : BOOK_THEME.border,
@@ -527,7 +527,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
 
             {content?.mode === "html" && content.htmlContent ? (
               <div
-                className="mt-6 space-y-5 [&_a]:underline [&_blockquote]:border-l [&_blockquote]:pl-4 [&_h1]:mt-8 [&_h1]:text-2xl [&_h2]:mt-7 [&_h2]:text-xl [&_h3]:mt-6 [&_h3]:text-lg [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-5 [&_ul]:list-disc"
+                className="mt-6 min-w-0 space-y-5 break-words [&_*]:max-w-full [&_a]:underline [&_blockquote]:border-l [&_blockquote]:pl-4 [&_h1]:mt-8 [&_h1]:text-2xl [&_h2]:mt-7 [&_h2]:text-xl [&_h3]:mt-6 [&_h3]:text-lg [&_img]:h-auto [&_img]:max-w-full [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-5 [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_ul]:list-disc"
                 dangerouslySetInnerHTML={{ __html: content.htmlContent }}
               />
             ) : null}

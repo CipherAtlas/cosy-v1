@@ -92,7 +92,7 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       <article className="rounded-[1.6rem] border p-4 sm:p-5" style={readerCardStyle}>
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="mx-auto w-full max-w-[220px] shrink-0">
@@ -108,7 +108,7 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h2 className="text-[clamp(1.6rem,4vw,2.4rem)] font-medium leading-tight">{series.title}</h2>
+            <h2 className="break-words text-[clamp(1.6rem,4vw,2.4rem)] font-medium leading-tight">{series.title}</h2>
             <p className="mt-3 text-[15px] leading-relaxed" style={{ color: READER_THEME.textSecondary }}>
               {series.description || "No description available."}
             </p>
@@ -134,7 +134,7 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
             {continueChapter ? (
               <Link
                 href={toReadHref(series.id, continueChapter.id)}
-                className={`${readerControlClassName} mt-4 inline-flex`}
+                className={`${readerControlClassName} mt-4 inline-flex w-full justify-center sm:w-auto`}
                 style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentPeach}96`, color: READER_THEME.textPrimary }}
               >
                 {historyChapterId ? "Continue Reading" : "Start from Latest"} · {formatChapterLabel(continueChapter)}
@@ -165,7 +165,7 @@ export const SeriesDetail = ({ seriesId }: SeriesDetailProps) => {
                 <li key={chapter.id}>
                   <Link
                     href={toReadHref(series.id, chapter.id)}
-                    className="flex w-full items-center justify-between gap-3 rounded-2xl border px-3 py-3 text-left transition-colors"
+                    className="flex w-full flex-col items-start gap-2 rounded-2xl border px-3 py-3 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                     style={{
                       borderColor: READER_THEME.border,
                       background: chapter.id === historyChapterId ? `${READER_THEME.accentLavender}64` : READER_THEME.surface,

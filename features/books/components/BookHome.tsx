@@ -15,13 +15,13 @@ export const BookHome = () => {
   }, []);
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       {recentBook ? (
         <section className="rounded-[1.4rem] border p-4 sm:p-5" style={bookCardStyle}>
           <p className="text-[12px] uppercase tracking-[0.11em]" style={{ color: BOOK_THEME.textSecondary }}>
             Continue reading
           </p>
-          <h2 className="mt-2 text-[23px] font-medium leading-tight">{recentBook.title}</h2>
+          <h2 className="mt-2 break-words text-[23px] font-medium leading-tight">{recentBook.title}</h2>
           <p className="mt-1 text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
             {recentBook.authorName}
           </p>
@@ -29,11 +29,11 @@ export const BookHome = () => {
             {Math.round(recentBook.progressPercent)}% completed
           </p>
 
-          <div className="mt-3 flex flex-wrap gap-2.5">
+          <div className="mt-3 grid gap-2.5 sm:flex sm:flex-wrap">
             {recentBook.hasReaderSource ? (
               <Link
                 href={toBookReadHref(recentBook.openLibraryKey)}
-                className={bookControlClassName}
+                className={`${bookControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentMint}88`, color: BOOK_THEME.textPrimary }}
               >
                 Continue reading
@@ -48,7 +48,7 @@ export const BookHome = () => {
                 firstPublishYear: recentBook.firstPublishYear,
                 matchStatus: recentBook.hasReaderSource ? "readable" : "metadata"
               })}
-              className={bookControlClassName}
+              className={`${bookControlClassName} w-full justify-center sm:w-auto`}
               style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentBlue}84`, color: BOOK_THEME.textPrimary }}
             >
               Open details

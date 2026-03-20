@@ -441,21 +441,21 @@ export const ChapterReader = ({
 
   return (
     <section
-      className={`relative flex min-h-0 flex-col overflow-hidden ${isImmersive ? "h-screen" : "h-full rounded-[1.6rem] border"}`}
+      className={`relative flex min-h-0 min-w-0 flex-col overflow-hidden ${isImmersive ? "h-screen" : "h-full rounded-[1.4rem] border sm:rounded-[1.6rem]"}`}
       style={{
         ...(isImmersive ? { background: READER_THEME.surfaceStrong } : readerCardStyle),
         color: READER_THEME.textPrimary
       }}
     >
       <header
-        className={`border-b px-3 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0 pointer-events-none"}`}
+        className={`border-b px-2.5 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0 pointer-events-none"}`}
         style={{
           borderColor: READER_THEME.border,
           paddingTop: isImmersive ? "calc(0.6rem + env(safe-area-inset-top))" : undefined
         }}
       >
         <div
-          className="flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-2 sm:flex-nowrap sm:justify-between"
+          className="flex flex-wrap items-center gap-2 rounded-2xl border px-2.5 py-2 sm:px-3 sm:flex-nowrap sm:justify-between"
           style={{ borderColor: READER_THEME.border, background: chromeSurface }}
         >
           <Link
@@ -478,7 +478,7 @@ export const ChapterReader = ({
             ) : null}
           </div>
 
-          <div className="ml-auto flex items-center gap-2 sm:ml-0">
+          <div className="ml-auto flex w-full items-center justify-end gap-2 sm:ml-0 sm:w-auto">
             {settings.showProgressChip ? (
               <div className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: READER_THEME.border, color: READER_THEME.textSecondary }}>
                 {Math.round(scrollPercent)}%
@@ -511,7 +511,7 @@ export const ChapterReader = ({
 
       {isSettingsOpen ? (
         <aside
-          className="absolute left-1/2 top-[72px] z-40 max-h-[calc(100dvh-7rem)] w-[min(95vw,420px)] -translate-x-1/2 overflow-y-auto rounded-[1.2rem] border p-3 sm:left-auto sm:right-4 sm:top-[86px] sm:w-[min(92vw,380px)] sm:translate-x-0"
+          className="absolute left-1/2 top-[72px] z-40 max-h-[calc(100dvh-7rem)] w-[min(96vw,420px)] -translate-x-1/2 overflow-y-auto rounded-[1.2rem] border p-3 sm:left-auto sm:right-4 sm:top-[86px] sm:w-[min(92vw,380px)] sm:translate-x-0"
           style={{
             borderColor: READER_THEME.border,
             background: chromeSurface,
@@ -665,7 +665,7 @@ export const ChapterReader = ({
 
       <div
         ref={scrollContainerRef}
-        className={`min-h-0 flex-1 overflow-y-auto ${isImmersive ? "px-0 py-2 sm:px-2" : "px-2 py-3 sm:px-4"}`}
+        className={`min-h-0 min-w-0 flex-1 overflow-y-auto ${isImmersive ? "px-0 py-2 sm:px-2" : "px-1.5 py-2.5 sm:px-4 sm:py-3"}`}
         onClick={handleReaderAreaClick}
         style={{ WebkitOverflowScrolling: "touch" }}
       >
@@ -724,14 +724,14 @@ export const ChapterReader = ({
       </div>
 
       <footer
-        className={`border-t px-3 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 pointer-events-none"}`}
+        className={`border-t px-2.5 py-2.5 transition-all duration-200 sm:px-4 ${showReaderChrome ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 pointer-events-none"}`}
         style={{
           borderColor: READER_THEME.border,
           paddingBottom: isImmersive ? "calc(0.65rem + env(safe-area-inset-bottom))" : undefined
         }}
       >
         <div
-          className="mx-auto flex w-full items-center justify-between gap-2 rounded-2xl border px-3 py-2"
+          className="mx-auto flex w-full flex-wrap items-center justify-between gap-2 rounded-2xl border px-2.5 py-2 sm:flex-nowrap sm:px-3"
           style={{ borderColor: READER_THEME.border, background: chromeSurface, ...pageContainerStyle }}
         >
           {previousChapter ? (

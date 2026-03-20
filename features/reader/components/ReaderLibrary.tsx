@@ -35,7 +35,7 @@ export const ReaderLibrary = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       <article className="rounded-[1.6rem] border p-4 sm:p-5" style={readerCardStyle}>
         <h2 className="text-[21px] font-medium">Import your files</h2>
         <p className="mt-2 text-[14px]" style={{ color: READER_THEME.textSecondary }}>
@@ -43,7 +43,7 @@ export const ReaderLibrary = () => {
           so we can extend parsing support safely in a later pass.
         </p>
 
-        <label className="mt-4 inline-flex cursor-pointer rounded-2xl border px-4 py-2 text-[14px] font-medium" style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}66`, color: READER_THEME.textPrimary }}>
+        <label className="mt-4 inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-2xl border px-4 py-2 text-[14px] font-medium sm:w-auto" style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}66`, color: READER_THEME.textPrimary }}>
           Choose files
           <input
             type="file"

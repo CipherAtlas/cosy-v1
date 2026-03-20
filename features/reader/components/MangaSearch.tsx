@@ -55,7 +55,7 @@ export const MangaSearch = () => {
   }, [debouncedQuery, hasMore, isLoading, isLoadingMore, loadMore, showUnavailable, visibleResults.length]);
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-4 sm:space-y-5">
       <label className="block text-[13px] font-medium" style={{ color: READER_THEME.textSecondary }}>
         Search Manga (English)
         <input
@@ -71,7 +71,7 @@ export const MangaSearch = () => {
         />
       </label>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
         <button
           type="button"
           className="cozy-outline min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
@@ -122,8 +122,8 @@ export const MangaSearch = () => {
         </p>
       ) : null}
 
-      <div className="rounded-[1.5rem] border p-3 sm:p-4" style={readerCardStyle}>
-        <div ref={resultsScrollRef} className="max-h-[58vh] overflow-y-auto pr-0.5 sm:pr-1">
+      <div className="rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={readerCardStyle}>
+        <div ref={resultsScrollRef} className="max-h-[62vh] overflow-y-auto pr-0 sm:max-h-[58vh] sm:pr-1">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visibleResults.map((item) => {
               const chapterCount = item.englishChapterCount;
@@ -150,7 +150,7 @@ export const MangaSearch = () => {
                     )}
                   </div>
 
-                  <h3 className="mt-3 line-clamp-2 text-[18px] font-medium leading-tight" style={{ color: READER_THEME.textPrimary }}>
+                  <h3 className="mt-3 line-clamp-2 break-words text-[17px] font-medium leading-tight sm:text-[18px]" style={{ color: READER_THEME.textPrimary }}>
                     {item.title}
                   </h3>
 
@@ -199,7 +199,7 @@ export const MangaSearch = () => {
                   {hasEnglishChapters || chapterCount === null ? (
                     <Link
                       href={toSeriesHref(item.id)}
-                      className={`${readerControlClassName} mt-3 inline-flex`}
+                      className={`${readerControlClassName} mt-3 inline-flex w-full justify-center sm:w-auto`}
                       style={{
                         borderColor: READER_THEME.border,
                         background: `${READER_THEME.accentMint}80`,
@@ -210,7 +210,7 @@ export const MangaSearch = () => {
                     </Link>
                   ) : (
                     <span
-                      className={`${readerControlClassName} mt-3 inline-flex cursor-not-allowed opacity-65`}
+                      className={`${readerControlClassName} mt-3 inline-flex w-full cursor-not-allowed justify-center opacity-65 sm:w-auto`}
                       style={{ borderColor: READER_THEME.border, background: READER_THEME.surface, color: READER_THEME.textSecondary }}
                     >
                       Unavailable in EN

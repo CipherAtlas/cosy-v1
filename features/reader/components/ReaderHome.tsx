@@ -15,7 +15,7 @@ export const ReaderHome = () => {
   }, []);
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       {continueItem ? <ContinueReadingCard item={continueItem} /> : null}
 
       <section className="grid gap-3 sm:grid-cols-2">
@@ -24,7 +24,7 @@ export const ReaderHome = () => {
           className="rounded-[1.4rem] border p-4"
           style={{ ...readerCardStyle, color: READER_THEME.textPrimary }}
         >
-          <h2 className="text-[20px] font-medium">Search manga</h2>
+          <h2 className="break-words text-[20px] font-medium">Search manga</h2>
           <p className="mt-1 text-[14px]" style={{ color: READER_THEME.textSecondary }}>
             Find titles via MangaDex public API.
           </p>
@@ -35,7 +35,7 @@ export const ReaderHome = () => {
           className="rounded-[1.4rem] border p-4"
           style={{ ...readerCardStyle, color: READER_THEME.textPrimary }}
         >
-          <h2 className="text-[20px] font-medium">Reading history</h2>
+          <h2 className="break-words text-[20px] font-medium">Reading history</h2>
           <p className="mt-1 text-[14px]" style={{ color: READER_THEME.textSecondary }}>
             Continue from your last opened series and chapter.
           </p>
@@ -49,17 +49,17 @@ export const ReaderHome = () => {
           protected-source logic is included.
         </p>
 
-        <div className="mt-3 flex flex-wrap gap-2.5">
+        <div className="mt-3 grid gap-2.5 sm:flex sm:flex-wrap">
           <Link
             href="/reader/search"
-            className={readerControlClassName}
+            className={`${readerControlClassName} w-full justify-center sm:w-auto`}
             style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentMint}82`, color: READER_THEME.textPrimary }}
           >
             Start reading
           </Link>
           <Link
             href="/reader/library"
-            className={readerControlClassName}
+            className={`${readerControlClassName} w-full justify-center sm:w-auto`}
             style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}70`, color: READER_THEME.textPrimary }}
           >
             Open library scaffold

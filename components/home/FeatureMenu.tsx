@@ -58,7 +58,7 @@ export const FeatureMenu = ({
 
   return (
     <aside
-      className={`rounded-[2rem] border p-4 sm:p-5 md:flex md:h-full md:min-h-0 md:flex-col md:p-7 ${className ?? ""}`}
+      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border p-4 sm:p-5 md:p-7 ${className ?? ""}`}
       style={{
         borderColor,
         background: surface
@@ -68,7 +68,7 @@ export const FeatureMenu = ({
         {brandLabel}
       </p>
 
-      <nav className="mt-5 flex flex-col gap-2.5 md:mt-8 md:flex-1" aria-label={navAriaLabel}>
+      <nav className="mt-5 flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5 md:mt-8 md:flex-1" aria-label={navAriaLabel}>
         {items.map((item) => {
           const isActive = item.id === activePanel;
           const inactiveTint = `${item.tint}${isDark ? "2B" : "30"}`;
@@ -86,7 +86,7 @@ export const FeatureMenu = ({
               key={item.id}
               type="button"
               onClick={() => onSelect(item.id)}
-              className="cozy-outline min-h-11 rounded-full border px-5 py-3 text-left text-[17px] font-medium tracking-[0.01em] transition-colors duration-200 md:w-full"
+              className="cozy-outline min-h-11 w-full rounded-full border px-4 py-3 text-left text-[16px] font-medium tracking-[0.01em] transition-colors duration-200 sm:px-5 sm:text-[17px]"
               style={{
                 borderColor: itemBorderColor,
                 color: textPrimary,
@@ -105,13 +105,13 @@ export const FeatureMenu = ({
       </nav>
 
       <div className="mt-5 md:mt-auto">
-        <div className="flex flex-wrap items-end gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:flex sm:flex-wrap sm:items-end">
         <div>
           <p className="text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: textSecondary }}>
             {languageLabel}
           </p>
           <div
-            className="mt-2 inline-flex rounded-full border p-1"
+            className="mt-2 flex w-full rounded-full border p-1 sm:inline-flex sm:w-auto"
             style={{
               borderColor,
               background: innerSurface
@@ -132,7 +132,7 @@ export const FeatureMenu = ({
                   key={item.id}
                   type="button"
                   onClick={() => onLanguageChange(item.id)}
-                  className="cozy-outline min-h-11 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183]"
+                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] sm:flex-none"
                   style={{
                     color: textPrimary,
                     background: isActive ? "rgba(246, 199, 184, 0.72)" : "transparent",
@@ -152,7 +152,7 @@ export const FeatureMenu = ({
             {themeLabel}
           </p>
           <div
-            className="mt-2 inline-flex rounded-full border p-1"
+            className="mt-2 flex w-full rounded-full border p-1 sm:inline-flex sm:w-auto"
             style={{
               borderColor,
               background: innerSurface
@@ -173,7 +173,7 @@ export const FeatureMenu = ({
                   key={item.id}
                   type="button"
                   onClick={() => onThemeChange(item.id)}
-                  className="cozy-outline min-h-11 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183]"
+                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] sm:flex-none"
                   style={{
                     color: textPrimary,
                     background: isActive ? "rgba(220, 207, 246, 0.74)" : "transparent",

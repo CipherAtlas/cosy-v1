@@ -45,8 +45,8 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
   const canContinueCurrent = Boolean(currentSeriesId && currentSeries?.lastReadChapterId);
 
   return (
-    <section className="space-y-3 rounded-[1.5rem] border p-3 sm:p-4" style={readerCardStyle}>
-      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Reader top navigation">
+    <section className="space-y-3 rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={readerCardStyle}>
+      <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Reader top navigation">
         {navItems.map((item) => {
           const isActive = normalizedPathname === item.href;
           const tint = READER_THEME[item.tint];
@@ -55,7 +55,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
             <Link
               key={item.href}
               href={item.href}
-              className={`${readerControlClassName} shrink-0 whitespace-nowrap`}
+              className={`${readerControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
               style={{
                 borderColor: isActive ? "rgba(232, 196, 180, 0.82)" : READER_THEME.border,
                 background: isActive ? `${tint}B2` : READER_THEME.surface,
@@ -77,7 +77,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
         {isMetaOpen ? "Hide Series Info" : "Show Series Info"}
       </button>
 
-      <div className={`${isMetaOpen ? "grid" : "hidden"} gap-3 sm:grid xl:grid-cols-2`}>
+      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 sm:grid xl:grid-cols-2`}>
         {currentSeries ? (
           <section className="space-y-2 rounded-[1.2rem] border p-3" style={readerCardStyle}>
             <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>

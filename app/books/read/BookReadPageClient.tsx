@@ -38,13 +38,13 @@ export const BookReadPageClient = () => {
   if (!openLibraryKey) {
     return (
       <BookFrame title="Read" subtitle="Open a book first." fullHeightContent>
-        <div className="max-w-[520px] rounded-2xl border p-4" style={bookCardStyle}>
+        <div className="w-full max-w-[520px] rounded-2xl border p-4" style={bookCardStyle}>
           <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
             Missing book key. Open a title from search or history.
           </p>
           <Link
             href="/books/search"
-            className={`${bookControlClassName} mt-3 inline-flex`}
+            className={`${bookControlClassName} mt-3 inline-flex w-full justify-center sm:w-auto`}
             style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentBlue}82`, color: BOOK_THEME.textPrimary }}
           >
             Go to search

@@ -166,7 +166,7 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
   const continueLabel = progress && progress.progressPercent > 0 ? `Continue reading (${Math.round(progress.progressPercent)}%)` : "Continue reading";
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <section className="grid gap-4 rounded-[1.4rem] border p-4 md:grid-cols-[180px_minmax(0,1fr)] md:gap-5" style={bookCardStyle}>
         <div className="mx-auto w-[150px] overflow-hidden rounded-xl border md:mx-0 md:w-[180px]" style={{ borderColor: BOOK_THEME.border }}>
           {detail.coverUrl ? (
@@ -184,7 +184,7 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
           )}
         </div>
 
-        <div>
+        <div className="min-w-0">
           {error ? (
             <p className="text-[13px]" style={{ color: BOOK_THEME.textSecondary }}>
               Some metadata could not be refreshed right now.
@@ -195,7 +195,7 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
               Refreshing details...
             </p>
           ) : null}
-          <h2 className="text-[clamp(1.6rem,4.5vw,2.4rem)] font-medium leading-tight">{detail.title}</h2>
+          <h2 className="break-words text-[clamp(1.6rem,4.5vw,2.4rem)] font-medium leading-tight">{detail.title}</h2>
           <p className="mt-1 text-[16px]" style={{ color: BOOK_THEME.textSecondary }}>
             {detail.authorName}
           </p>
@@ -237,18 +237,18 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
             </div>
           ) : null}
 
-          <div className="mt-4 flex flex-wrap gap-2.5">
+          <div className="mt-4 grid gap-2.5 sm:flex sm:flex-wrap">
             {isReadable ? (
               <Link
                 href={toBookReadHref(detail.openLibraryKey)}
-                className={bookControlClassName}
+                className={`${bookControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentMint}90`, color: BOOK_THEME.textPrimary }}
               >
                 Read now
               </Link>
             ) : (
               <span
-                className={bookControlClassName}
+                className={`${bookControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: BOOK_THEME.border, background: BOOK_THEME.surface, color: BOOK_THEME.textSecondary }}
               >
                 Unavailable to read
@@ -258,7 +258,7 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
             <button
               type="button"
               onClick={handleSave}
-              className={bookControlClassName}
+              className={`${bookControlClassName} w-full justify-center sm:w-auto`}
               style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentBlue}86`, color: BOOK_THEME.textPrimary }}
             >
               Save
@@ -267,7 +267,7 @@ export const BookDetail = ({ openLibraryKey, initialPrefill }: BookDetailProps) 
             {isReadable ? (
               <Link
                 href={toBookReadHref(detail.openLibraryKey)}
-                className={bookControlClassName}
+                className={`${bookControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentPeach}85`, color: BOOK_THEME.textPrimary }}
               >
                 {continueLabel}

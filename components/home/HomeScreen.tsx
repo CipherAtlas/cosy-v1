@@ -127,7 +127,7 @@ const controlClassName =
   "cozy-outline min-h-11 rounded-2xl border px-4 py-2.5 text-[15px] font-medium tracking-[0.01em] shadow-[0_2px_8px_rgba(188,149,129,0.08)] transition-all duration-150 ease-out hover:-translate-y-[1px] hover:brightness-[1.03] active:translate-y-0 active:brightness-95 sm:px-6 sm:py-3.5 sm:text-[16px]";
 
 const inputClassName =
-  "cozy-outline mt-1.5 min-h-11 w-full rounded-2xl border bg-transparent px-4 py-3 text-[15px] font-medium outline-none transition-colors sm:text-[16px]";
+  "cozy-outline mt-1.5 min-h-11 w-full rounded-2xl border bg-transparent px-4 py-3 text-[16px] font-medium outline-none transition-colors";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60)
@@ -154,7 +154,7 @@ type PanelShellProps = {
 };
 
 const PanelShell = ({ title, subtitle, children, contentClassName }: PanelShellProps) => (
-  <div className="flex h-full min-h-0 flex-col rounded-[2rem] border p-4 sm:rounded-[2.2rem] sm:p-7 lg:p-10" style={PANEL_STYLE}>
+  <div className="flex h-full min-h-0 min-w-0 flex-col rounded-[1.6rem] border p-3 sm:rounded-[2rem] sm:p-6 lg:rounded-[2.2rem] lg:p-9" style={PANEL_STYLE}>
     <header>
       <h1 className="text-[clamp(1.75rem,6vw,3rem)] font-medium tracking-[0.01em]" style={{ color: COLOR_THEME.textPrimary }}>
         {title}
@@ -164,7 +164,7 @@ const PanelShell = ({ title, subtitle, children, contentClassName }: PanelShellP
       </p>
     </header>
 
-    <div className={contentClassName ?? "mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-px pr-0 sm:mt-8 sm:pl-px sm:pr-1"}>{children}</div>
+    <div className={contentClassName ?? "mt-4 min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:mt-7 sm:pr-1"}>{children}</div>
   </div>
 );
 
@@ -395,11 +395,11 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
     <PanelShell
       title={t.focus.title}
       subtitle={isFocusMode ? t.focus.subtitleFocusMode : t.focus.subtitle}
-      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-px pr-0 sm:pl-px sm:pr-1 lg:overflow-hidden"
+      contentClassName="mt-4 min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 sm:mt-6 sm:pr-1 lg:overflow-hidden"
     >
       {isFocusMode ? (
-        <div className="flex h-full min-h-0 flex-col justify-between gap-3 overflow-y-auto rounded-[1.8rem] border p-4 sm:rounded-[2rem] sm:p-6 lg:overflow-hidden lg:p-8" style={{ ...SURFACE_STYLE, background: `${modeTint}30` }}>
-          <div className="flex items-center justify-between gap-3">
+        <div className="flex h-full min-h-0 min-w-0 flex-col justify-between gap-3 overflow-y-auto rounded-[1.5rem] border p-3 sm:rounded-[2rem] sm:p-6 lg:overflow-hidden lg:p-8" style={{ ...SURFACE_STYLE, background: `${modeTint}30` }}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-[13px] font-medium uppercase tracking-[0.12em]" style={{ color: MUTED_COLOR }}>
               {t.focus.modeLabel}
             </p>
@@ -457,8 +457,8 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 </button>
               </div>
 
-            <div className="rounded-[1.5rem] border p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}2A` }}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="rounded-[1.4rem] border p-3 sm:rounded-[1.5rem] sm:p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}2A` }}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <button
                   type="button"
                   className={focusControlClassName}
@@ -471,7 +471,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 >
                   {musicPlaying ? t.focus.pauseMusic : t.focus.playMusic}
                 </button>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-3">
                   {VIBE_ITEMS.map((item) => (
                     <button
                       key={`focus-mode-${item.id}`}
@@ -489,7 +489,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
           </div>
         </div>
       ) : (
-        <div className="grid min-h-0 gap-3 sm:gap-4 lg:h-full lg:grid-cols-[1.2fr_1fr]">
+        <div className="grid min-h-0 min-w-0 gap-3 sm:gap-4 lg:h-full lg:grid-cols-[1.2fr_1fr]">
           <div className="flex min-h-0 flex-col gap-3 sm:gap-4">
             <motion.div
               className="order-1 relative flex min-h-0 flex-col justify-between overflow-hidden rounded-[1.8rem] border px-4 py-6 text-center sm:rounded-[2rem] sm:px-6 sm:py-7 lg:min-h-0 lg:flex-1"
@@ -538,11 +538,11 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
               </div>
             </motion.div>
 
-            <div className="order-2 rounded-[1.8rem] border p-4 sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentPeach}20` }}>
+            <div className="order-2 rounded-[1.5rem] border p-3 sm:rounded-[1.8rem] sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentPeach}20` }}>
               <p className="text-[13px] font-medium uppercase tracking-[0.12em]" style={{ color: MUTED_COLOR }}>
                 {t.focus.sessionPresets}
               </p>
-              <div className="mt-3 flex flex-wrap gap-2.5">
+              <div className="mt-3 grid gap-2.5 sm:flex sm:flex-wrap">
                 {FOCUS_PRESETS.map((preset) => (
                   <button
                     key={preset.id}
@@ -604,7 +604,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
           </div>
 
           <div className="flex min-h-0 flex-col gap-3 sm:gap-4">
-            <div className="rounded-[1.5rem] border p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentBlue}1B` }}>
+            <div className="rounded-[1.4rem] border p-3 sm:rounded-[1.5rem] sm:p-4" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentBlue}1B` }}>
               <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: MUTED_COLOR }}>
                 {t.focus.sessionStatusTitle}
               </p>
@@ -620,7 +620,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
 
             {completionCard}
 
-            <div className="min-h-0 rounded-[1.7rem] border p-4 sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}26` }}>
+            <div className="min-h-0 rounded-[1.5rem] border p-3 sm:rounded-[1.7rem] sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}26` }}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: MUTED_COLOR }}>
                   {t.focus.cozyAudio}
@@ -630,7 +630,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 </p>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2.5">
+              <div className="mt-3 grid gap-2.5 sm:flex sm:flex-wrap">
                 <button
                   type="button"
                   className={focusControlClassName}
@@ -654,7 +654,7 @@ const FocusPanel = ({ language, onFocusModeChange }: FocusPanelProps) => {
                 </button>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
                 {VIBE_ITEMS.map((item) => (
                   <button
                     key={`focus-${item.id}`}
@@ -764,12 +764,12 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
 
   return (
     <PanelShell title={t.music.title} subtitle={t.music.subtitle}>
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div className="space-y-3">
           <p className="text-[13px] font-medium" style={{ color: MUTED_COLOR }}>
             {t.music.vibe}
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
             {VIBE_ITEMS.map((item) => (
               <button
                 key={item.id}
@@ -784,7 +784,7 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           {isPlaying ? (
             <button type="button" className={controlClassName} style={activeControlStyle} onClick={handlePause}>
               {t.music.pause}
@@ -817,7 +817,7 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
           </button>
         </div>
 
-        <div className="rounded-[1.6rem] border p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentMint}1C` }}>
+        <div className="rounded-[1.4rem] border p-4 sm:rounded-[1.6rem] sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentMint}1C` }}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: MUTED_COLOR }}>
               {t.music.mix}
@@ -877,7 +877,7 @@ const MusicPanel = ({ language }: MusicPanelProps) => {
           </div>
         </div>
 
-        <div className="rounded-[1.6rem] border p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}22` }}>
+        <div className="rounded-[1.4rem] border p-4 sm:rounded-[1.6rem] sm:p-5" style={{ ...SURFACE_STYLE, background: `${COLOR_THEME.accentLavender}22` }}>
           <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: MUTED_COLOR }}>
             {t.music.nowPlaying}
           </p>
@@ -924,8 +924,8 @@ const BreathePanel = ({ language }: BreathePanelProps) => {
 
   return (
     <PanelShell title={t.breathe.title} subtitle={t.breathe.subtitle}>
-      <div className="space-y-7">
-        <div className="flex flex-wrap gap-3">
+      <div className="space-y-6 sm:space-y-7">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           {BREATHING_PATTERNS.map((item) => (
             <button
               key={item.id}
@@ -960,7 +960,7 @@ const BreathePanel = ({ language }: BreathePanelProps) => {
           </motion.div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           {isRunning ? (
             <button type="button" className={controlClassName} style={activeControlStyle} onClick={pause}>
               {t.common.pause}
@@ -1000,8 +1000,8 @@ const MoodPanel = ({ language, onOpenPanel }: MoodPanelProps) => {
 
   return (
     <PanelShell title={t.mood.title} subtitle={t.mood.subtitle}>
-      <div className="space-y-7">
-        <div className="flex flex-wrap gap-3">
+      <div className="space-y-6 sm:space-y-7">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:gap-3">
           {MOODS.map((mood) => (
             <button
               key={mood}
@@ -1024,7 +1024,7 @@ const MoodPanel = ({ language, onOpenPanel }: MoodPanelProps) => {
             {suggestions.map((item) => (
               <div
                 key={`${selectedMood}-${item.text}`}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3"
+                className="flex flex-col items-start gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
                 style={{
                   borderColor: COLOR_THEME.border,
                   background: `${COLOR_THEME.accentBlue}22`
@@ -1096,7 +1096,7 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
     <PanelShell
       title={t.gratitude.title}
       subtitle={t.gratitude.subtitle}
-      contentClassName="mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-visible px-1 pr-0 sm:mt-8 sm:px-1.5 sm:pr-1"
+      contentClassName="mt-4 min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-0 pr-0 sm:mt-7 sm:px-1 sm:pr-1"
     >
       <div className="space-y-7">
         <form onSubmit={onSave} className="space-y-3">
@@ -1140,11 +1140,11 @@ const GratitudePanel = ({ language }: GratitudePanelProps) => {
                   <p className="text-[16px] font-normal" style={{ color: COLOR_THEME.textPrimary }}>
                     {entry.text}
                   </p>
-                  <div className="mt-2 flex items-center justify-between gap-3">
+                  <div className="mt-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                     <p className="text-[12px]" style={{ color: MUTED_COLOR }}>
                       {formatDate(entry.createdAt, language)}
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {confirmDeleteId === entry.id ? (
                         <button
                           type="button"
@@ -1225,9 +1225,9 @@ const ComplimentPanel = ({ language, theme }: ComplimentPanelProps) => {
 
   return (
     <PanelShell title={t.compliment.title} subtitle={t.compliment.subtitle}>
-      <div className="space-y-7">
+      <div className="space-y-6 sm:space-y-7">
         <div
-          className="relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-7"
+          className="relative overflow-hidden rounded-[1.8rem] border p-4 sm:rounded-[2.2rem] sm:p-7"
           style={{
             borderColor: COLOR_THEME.border,
             background: cardGradient,
@@ -1266,7 +1266,7 @@ const ComplimentPanel = ({ language, theme }: ComplimentPanelProps) => {
           </div>
 
           <blockquote
-            className="relative rounded-[1.6rem] border px-6 py-7 text-[clamp(1.25rem,2.45vw,1.62rem)] font-medium leading-[1.6]"
+            className="relative break-words rounded-[1.35rem] border px-4 py-5 text-[clamp(1.18rem,2.7vw,1.62rem)] font-medium leading-[1.6] sm:rounded-[1.6rem] sm:px-6 sm:py-7"
             style={{ ...SURFACE_STYLE, background: quoteSurface, color: quoteTextColor }}
           >
             &ldquo;{complimentList[index]}&rdquo;
@@ -1441,7 +1441,7 @@ export const HomeScreen = () => {
 
   return (
     <section
-      className="fixed inset-0 overflow-hidden"
+      className="fixed inset-0 overflow-x-hidden overflow-y-hidden"
       style={{
         ...shellVars,
         background: shellBackground,
@@ -1515,10 +1515,10 @@ export const HomeScreen = () => {
         ) : null}
       </AnimatePresence>
 
-      <div className={`relative z-10 h-full w-full p-3 sm:p-6 sm:pt-6 lg:p-10 ${!isSidebarCollapsed ? "pt-16" : "pt-3"}`}>
+      <div className={`relative z-10 h-full w-full overflow-x-hidden p-2 sm:p-5 sm:pt-6 lg:p-10 ${!isSidebarCollapsed ? "pt-14" : "pt-2"}`}>
         <div
-          className={`mx-auto grid h-full w-full max-w-[1420px] grid-cols-1 gap-4 sm:gap-5 ${
-            isSidebarCollapsed ? "sm:grid-cols-[minmax(0,1fr)]" : "sm:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[300px_minmax(0,1fr)]"
+          className={`mx-auto grid h-full w-full min-w-0 max-w-[1420px] grid-cols-1 gap-3 sm:gap-5 ${
+            isSidebarCollapsed ? "sm:grid-cols-[minmax(0,1fr)]" : "sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]"
           }`}
         >
           <AnimatePresence initial={false}>
@@ -1529,7 +1529,7 @@ export const HomeScreen = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -18 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="hidden min-h-0 sm:block"
+                className="hidden min-h-0 min-w-0 sm:block"
               >
                 <FeatureMenu
                   className="h-full"
@@ -1555,11 +1555,11 @@ export const HomeScreen = () => {
             ) : null}
           </AnimatePresence>
 
-          <div className="min-h-0 overflow-hidden">
+          <div className="min-h-0 min-w-0 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activePanel}
-                className="h-full min-h-0"
+                className="h-full min-h-0 min-w-0"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}

@@ -18,7 +18,7 @@ export const ContinueReadingCard = ({ item }: ContinueReadingCardProps) => {
         Continue Reading
       </p>
 
-      <h2 className="mt-2 text-[22px] font-medium leading-tight" style={{ color: READER_THEME.textPrimary }}>
+      <h2 className="mt-2 break-words text-[22px] font-medium leading-tight" style={{ color: READER_THEME.textPrimary }}>
         {item.seriesTitle}
       </h2>
 
@@ -26,10 +26,10 @@ export const ContinueReadingCard = ({ item }: ContinueReadingCardProps) => {
         {item.lastReadChapterLabel ?? "Resume from series page"}
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-2.5">
+      <div className="mt-4 grid gap-2.5 sm:flex sm:flex-wrap">
         <Link
           href={continueHref}
-          className={readerControlClassName}
+          className={`${readerControlClassName} w-full justify-center sm:w-auto`}
           style={{
             borderColor: READER_THEME.border,
             background: `${READER_THEME.accentPeach}95`,
@@ -40,7 +40,7 @@ export const ContinueReadingCard = ({ item }: ContinueReadingCardProps) => {
         </Link>
         <Link
           href={toSeriesHref(item.seriesId)}
-          className={readerControlClassName}
+          className={`${readerControlClassName} w-full justify-center sm:w-auto`}
           style={{
             borderColor: READER_THEME.border,
             background: READER_THEME.surface,

@@ -31,15 +31,15 @@ export const ReaderHistory = () => {
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="min-w-0 space-y-3">
       {items.map((item) => {
         const continueHref = item.lastReadChapterId ? toReadHref(item.seriesId, item.lastReadChapterId) : toSeriesHref(item.seriesId);
 
         return (
           <li key={item.seriesId} className="rounded-[1.4rem] border p-4" style={readerCardStyle}>
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-[20px] font-medium leading-tight" style={{ color: READER_THEME.textPrimary }}>
+              <div className="min-w-0">
+                <h2 className="break-words text-[20px] font-medium leading-tight" style={{ color: READER_THEME.textPrimary }}>
                   {item.seriesTitle}
                 </h2>
                 <p className="mt-1 text-[13px]" style={{ color: READER_THEME.textSecondary }}>
@@ -51,17 +51,17 @@ export const ReaderHistory = () => {
               </div>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
               <Link
                 href={continueHref}
-                className={readerControlClassName}
+                className={`${readerControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentMint}85`, color: READER_THEME.textPrimary }}
               >
                 Continue
               </Link>
               <Link
                 href={toSeriesHref(item.seriesId)}
-                className={readerControlClassName}
+                className={`${readerControlClassName} w-full justify-center sm:w-auto`}
                 style={{ borderColor: READER_THEME.border, background: READER_THEME.surface, color: READER_THEME.textPrimary }}
               >
                 Series page

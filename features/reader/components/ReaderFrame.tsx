@@ -28,7 +28,7 @@ export const ReaderFrame = ({
 
   return (
     <section
-      className="min-h-screen overflow-hidden"
+      className="min-h-screen overflow-x-hidden overflow-y-hidden"
       style={{
         ...getReaderThemeCssVars(theme),
         background: getReaderShellBackground(theme),
@@ -62,12 +62,12 @@ export const ReaderFrame = ({
       </>
     ) : null}
 
-    <div className="mx-auto h-[100dvh] w-full max-w-[1360px] p-3 pt-16 sm:p-5 sm:pt-16 lg:p-7 lg:pt-7">
-      <div className="grid h-full min-h-0 gap-3 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <div className="mx-auto h-[100dvh] w-full max-w-[1360px] p-2 pt-14 sm:p-5 sm:pt-16 lg:p-7 lg:pt-7">
+      <div className="grid h-full min-h-0 min-w-0 gap-2 sm:gap-3 lg:grid-cols-[220px_minmax(0,1fr)]">
         <ReaderSidebar className="hidden lg:block" />
 
-        <div className="flex min-h-0 flex-col rounded-[2rem] border p-4 sm:p-6 lg:p-8" style={readerPanelStyle}>
-          <header className="flex flex-col gap-4 sm:gap-5">
+        <div className="flex min-h-0 min-w-0 flex-col rounded-[1.5rem] border p-3 sm:rounded-[2rem] sm:p-6 lg:p-8" style={readerPanelStyle}>
+          <header className="flex flex-col gap-3 sm:gap-5">
             <ReaderTopPanel seriesId={seriesId} />
             <div>
               <h1 className="text-[clamp(1.55rem,6.2vw,3.1rem)] font-medium tracking-[0.01em]">{title}</h1>
@@ -80,10 +80,10 @@ export const ReaderFrame = ({
           <div
             className={
               fullHeightContent
-                ? "mt-5 min-h-0 flex-1 overflow-hidden"
+                ? "mt-4 min-h-0 min-w-0 flex-1 overflow-hidden sm:mt-5"
                 : compact
-                  ? "mt-5 overflow-y-auto"
-                  : "mt-6 min-h-0 flex-1 overflow-y-auto sm:mt-8"
+                  ? "mt-4 min-w-0 overflow-y-auto sm:mt-5"
+                  : "mt-5 min-h-0 min-w-0 flex-1 overflow-y-auto sm:mt-8"
             }
             style={{ WebkitOverflowScrolling: "touch" }}
           >
