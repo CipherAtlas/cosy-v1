@@ -58,17 +58,17 @@ export const FeatureMenu = ({
 
   return (
     <aside
-      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border p-4 sm:p-5 md:p-7 ${className ?? ""}`}
+      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border p-4 sm:p-5 md:p-5 ${className ?? ""}`}
       style={{
         borderColor,
         background: surface
       }}
     >
-      <p className="text-[13px] uppercase tracking-[0.18em]" style={{ color: textSecondary }}>
+      <p className="text-[12px] uppercase tracking-[0.16em] md:text-[10px]" style={{ color: textSecondary }}>
         {brandLabel}
       </p>
 
-      <nav className="mt-5 flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5 md:mt-8 md:flex-1" aria-label={navAriaLabel}>
+      <nav className="mt-4 flex min-h-0 flex-col gap-2 sm:mt-5 md:mt-4 md:gap-1.5" aria-label={navAriaLabel}>
         {items.map((item) => {
           const isActive = item.id === activePanel;
           const inactiveTint = `${item.tint}${isDark ? "2B" : "30"}`;
@@ -86,7 +86,7 @@ export const FeatureMenu = ({
               key={item.id}
               type="button"
               onClick={() => onSelect(item.id)}
-              className="cozy-outline min-h-11 w-full rounded-full border px-4 py-3 text-left text-[16px] font-medium tracking-[0.01em] transition-colors duration-200 sm:px-5 sm:text-[17px]"
+              className="cozy-outline min-h-11 w-full rounded-full border px-4 py-2.5 text-left text-[16px] font-medium tracking-[0.01em] transition-colors duration-200 sm:px-5 sm:text-[17px] md:min-h-9 md:px-4 md:py-1.5 md:text-[14px]"
               style={{
                 borderColor: itemBorderColor,
                 color: textPrimary,
@@ -104,14 +104,14 @@ export const FeatureMenu = ({
         })}
       </nav>
 
-      <div className="mt-5 md:mt-auto">
-        <div className="grid grid-cols-1 gap-4 sm:flex sm:flex-wrap sm:items-end">
-        <div>
-          <p className="text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: textSecondary }}>
+      <div className="mt-3 md:mt-auto">
+        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 md:gap-2">
+        <div className="min-w-0">
+          <p className="text-[12px] font-medium uppercase tracking-[0.12em] md:text-[10px]" style={{ color: textSecondary }}>
             {languageLabel}
           </p>
           <div
-            className="mt-2 flex w-full rounded-full border p-1 sm:inline-flex sm:w-auto"
+            className="mt-1.5 flex w-full rounded-full border p-1"
             style={{
               borderColor,
               background: innerSurface
@@ -132,7 +132,7 @@ export const FeatureMenu = ({
                   key={item.id}
                   type="button"
                   onClick={() => onLanguageChange(item.id)}
-                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] sm:flex-none"
+                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] md:min-h-8 md:px-2 md:py-1 md:text-[11px]"
                   style={{
                     color: textPrimary,
                     background: isActive ? "rgba(246, 199, 184, 0.72)" : "transparent",
@@ -147,12 +147,12 @@ export const FeatureMenu = ({
           </div>
         </div>
 
-        <div>
-          <p className="text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: textSecondary }}>
+        <div className="min-w-0">
+          <p className="text-[12px] font-medium uppercase tracking-[0.12em] md:text-[10px]" style={{ color: textSecondary }}>
             {themeLabel}
           </p>
           <div
-            className="mt-2 flex w-full rounded-full border p-1 sm:inline-flex sm:w-auto"
+            className="mt-1.5 flex w-full rounded-full border p-1"
             style={{
               borderColor,
               background: innerSurface
@@ -173,7 +173,7 @@ export const FeatureMenu = ({
                   key={item.id}
                   type="button"
                   onClick={() => onThemeChange(item.id)}
-                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] sm:flex-none"
+                  className="cozy-outline min-h-11 flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A183] md:min-h-8 md:px-2 md:py-1 md:text-[11px]"
                   style={{
                     color: textPrimary,
                     background: isActive ? "rgba(220, 207, 246, 0.74)" : "transparent",
