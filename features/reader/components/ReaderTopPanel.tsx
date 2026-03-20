@@ -15,6 +15,7 @@ type ReaderTopPanelProps = {
 const navItems = [
   { href: "/reader", label: "Reader Home", tint: "accentMint" as const },
   { href: "/reader/search", label: "Search Manga", tint: "accentBlue" as const },
+  { href: "/reader/pdf", label: "Search PDFs", tint: "accentPeach" as const },
   { href: "/reader/history", label: "History", tint: "accentLavender" as const },
   { href: "/reader/library", label: "Library", tint: "accentButter" as const },
   { href: "/books", label: "Book Reader", tint: "accentMint" as const }
@@ -31,6 +32,7 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
     return cleaned.length > 0 ? cleaned : "/";
   }, [pathname]);
   const [history, setHistory] = useState<ReaderHistoryItem[]>([]);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [isMetaOpen, setIsMetaOpen] = useState(false);
 
   useEffect(() => {
@@ -46,27 +48,43 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
 
   return (
     <section className="space-y-3 rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={readerCardStyle}>
-      <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Reader top navigation">
-        {navItems.map((item) => {
-          const isActive = normalizedPathname === item.href;
-          const tint = READER_THEME[item.tint];
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>
+          Reader Navigation
+        </p>
+        <button
+          type="button"
+          className={readerControlClassName}
+          style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}8A`, color: READER_THEME.textPrimary }}
+          onClick={() => setIsNavOpen((value) => !value)}
+        >
+          {isNavOpen ? "Hide Navigation" : "Show Navigation"}
+        </button>
+      </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${readerControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
-              style={{
-                borderColor: isActive ? "rgba(232, 196, 180, 0.82)" : READER_THEME.border,
-                background: isActive ? `${tint}B2` : READER_THEME.surface,
-                color: READER_THEME.textPrimary
-              }}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      {isNavOpen ? (
+        <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Reader top navigation">
+          {navItems.map((item) => {
+            const isActive = normalizedPathname === item.href;
+            const tint = READER_THEME[item.tint];
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${readerControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
+                style={{
+                  borderColor: isActive ? "rgba(232, 196, 180, 0.82)" : READER_THEME.border,
+                  background: isActive ? `${tint}B2` : READER_THEME.surface,
+                  color: READER_THEME.textPrimary
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
 
       <button
         type="button"

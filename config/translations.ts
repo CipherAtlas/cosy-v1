@@ -160,7 +160,8 @@ const EN: TranslationShape = {
     gratitude: "Gratitude",
     compliment: "Compliment",
     reader: "Reader",
-    books: "Books"
+    books: "Books",
+    pdf: "PDF Search"
   },
   common: {
     start: "Start",
@@ -370,7 +371,8 @@ const JA: TranslationShape = {
     gratitude: "感謝",
     compliment: "ひとこと",
     reader: "リーダー",
-    books: "本"
+    books: "本",
+    pdf: "PDF検索"
   },
   common: {
     start: "開始",

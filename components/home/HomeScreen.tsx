@@ -26,7 +26,8 @@ const PANEL_TINTS: Record<PanelId, string> = {
   gratitude: "#F2C6D8",
   compliment: "#F7E7A8",
   reader: "#CFE5FF",
-  books: "#D8F0E4"
+  books: "#D8F0E4",
+  pdf: "#F6C7B8"
 };
 
 const SETTINGS_KEY = "peaceful-room-focus-settings";
@@ -1350,7 +1351,8 @@ export const HomeScreen = () => {
       { id: "gratitude" as const, label: t.nav.gratitude, tint: PANEL_TINTS.gratitude },
       { id: "compliment" as const, label: t.nav.compliment, tint: PANEL_TINTS.compliment },
       { id: "reader" as const, label: t.nav.reader, tint: PANEL_TINTS.reader },
-      { id: "books" as const, label: t.nav.books, tint: PANEL_TINTS.books }
+      { id: "books" as const, label: t.nav.books, tint: PANEL_TINTS.books },
+      { id: "pdf" as const, label: t.nav.pdf, tint: PANEL_TINTS.pdf }
     ],
     [t]
   );
@@ -1432,6 +1434,12 @@ export const HomeScreen = () => {
     if (nextPanel === "books") {
       setIsMobileMenuOpen(false);
       router.push("/books");
+      return;
+    }
+
+    if (nextPanel === "pdf") {
+      setIsMobileMenuOpen(false);
+      router.push("/reader/pdf");
       return;
     }
 

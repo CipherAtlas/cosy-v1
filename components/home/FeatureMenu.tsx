@@ -1,5 +1,5 @@
 import type { AppLanguage } from "@/config/translations";
-export type PanelId = "focus" | "music" | "breathe" | "mood" | "gratitude" | "compliment" | "reader" | "books";
+export type PanelId = "focus" | "music" | "breathe" | "mood" | "gratitude" | "compliment" | "reader" | "books" | "pdf";
 type AppTheme = "light" | "dark";
 
 type MenuItem = {

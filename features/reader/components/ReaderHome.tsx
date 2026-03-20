@@ -40,6 +40,17 @@ export const ReaderHome = () => {
             Continue from your last opened series and chapter.
           </p>
         </Link>
+
+        <Link
+          href="/reader/pdf"
+          className="rounded-[1.4rem] border p-4"
+          style={{ ...readerCardStyle, color: READER_THEME.textPrimary }}
+        >
+          <h2 className="break-words text-[20px] font-medium">PDF search</h2>
+          <p className="mt-1 text-[14px]" style={{ color: READER_THEME.textSecondary }}>
+            Find relevant PDF documents and open or download quickly.
+          </p>
+        </Link>
       </section>
 
       <section className="rounded-[1.4rem] border p-4 sm:p-5" style={readerCardStyle}>

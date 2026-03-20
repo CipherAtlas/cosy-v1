@@ -17,6 +17,7 @@ const navItems = [
   { href: "/books", label: "Books Home", tint: "accentMint" as const },
   { href: "/books/search", label: "Search Books", tint: "accentBlue" as const },
   { href: "/books/history", label: "History", tint: "accentLavender" as const },
+  { href: "/reader/pdf", label: "Search PDFs", tint: "accentPeach" as const },
   { href: "/reader", label: "Manga Reader", tint: "accentButter" as const }
 ] as const;
 
@@ -30,6 +31,7 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
     return cleaned.length > 0 ? cleaned : "/";
   }, [pathname]);
   const [history, setHistory] = useState<BookHistoryItem[]>([]);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [isMetaOpen, setIsMetaOpen] = useState(false);
 
   useEffect(() => {
@@ -51,27 +53,43 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
 
   return (
     <section className="space-y-3 rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={{ borderColor, background: panelSurface }}>
-      <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Book top navigation">
-        {navItems.map((item) => {
-          const isActive = normalizedPathname === item.href;
-          const tint = BOOK_THEME[item.tint];
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: textSecondary }}>
+          Reader Navigation
+        </p>
+        <button
+          type="button"
+          className={bookControlClassName}
+          style={{ borderColor, background: `${BOOK_THEME.accentButter}8A`, color: textPrimary }}
+          onClick={() => setIsNavOpen((value) => !value)}
+        >
+          {isNavOpen ? "Hide Navigation" : "Show Navigation"}
+        </button>
+      </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${bookControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
-              style={{
-                borderColor: isActive ? (isDark ? "rgba(255, 226, 179, 0.45)" : "rgba(232, 196, 180, 0.82)") : borderColor,
-                background: isActive ? `${tint}B2` : panelStrong,
-                color: textPrimary
-              }}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      {isNavOpen ? (
+        <nav className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Book top navigation">
+          {navItems.map((item) => {
+            const isActive = normalizedPathname === item.href;
+            const tint = BOOK_THEME[item.tint];
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${bookControlClassName} shrink-0 whitespace-nowrap px-3 py-2 text-[13px] sm:px-4 sm:py-2.5 sm:text-[15px]`}
+                style={{
+                  borderColor: isActive ? (isDark ? "rgba(255, 226, 179, 0.45)" : "rgba(232, 196, 180, 0.82)") : borderColor,
+                  background: isActive ? `${tint}B2` : panelStrong,
+                  color: textPrimary
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
 
       <button
         type="button"
