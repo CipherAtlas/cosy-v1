@@ -75,14 +75,14 @@ export const BookTopPanel = ({ openLibraryKey, themeMode = "light" }: BookTopPan
 
       <button
         type="button"
-        className={`${bookControlClassName} sm:hidden`}
+        className={bookControlClassName}
         style={{ borderColor, background: `${BOOK_THEME.accentButter}8A`, color: textPrimary }}
         onClick={() => setIsMetaOpen((value) => !value)}
       >
         {isMetaOpen ? "Hide Book Info" : "Show Book Info"}
       </button>
 
-      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 sm:grid xl:grid-cols-2`}>
+      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 xl:grid-cols-2`}>
         {currentBook ? (
           <section className="space-y-2 rounded-[1.2rem] border p-3" style={{ borderColor, background: panelStrong }}>
             <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: textSecondary }}>

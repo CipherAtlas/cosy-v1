@@ -9,6 +9,7 @@ import { BOOK_THEME, bookCardStyle, bookControlClassName } from "@/features/book
 export const BookSearch = () => {
   const [query, setQuery] = useState("");
   const [readableOnly, setReadableOnly] = useState(false);
+  const [isControlsOpen, setIsControlsOpen] = useState(true);
   const { debouncedQuery, results, isLoading, isLoadingMore, isMatching, hasMore, readableCount, error, loadMore } = useBookSearch(query);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const checkingCount = useMemo(() => results.filter((item) => item.matchStatus === "checking").length, [results]);
@@ -52,81 +53,99 @@ export const BookSearch = () => {
 
   return (
     <div className="min-w-0 space-y-4 sm:space-y-5">
-      <label className="block text-[13px] font-medium" style={{ color: BOOK_THEME.textSecondary }}>
-        Search Books (English)
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Try: Pride and Prejudice, Jane Eyre..."
-          className="cozy-outline mt-2 block min-h-11 w-full rounded-2xl border px-4 py-3 text-[16px] outline-none"
-          style={{
-            borderColor: BOOK_THEME.border,
-            background: BOOK_THEME.surface,
-            color: BOOK_THEME.textPrimary
-          }}
-        />
-      </label>
-
-      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[13px] font-medium uppercase tracking-[0.1em]" style={{ color: BOOK_THEME.textSecondary }}>
+          Search Controls
+        </p>
         <button
           type="button"
           className="cozy-outline min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
-          style={{
-            borderColor: BOOK_THEME.border,
-            background: readableOnly ? `${BOOK_THEME.accentMint}95` : BOOK_THEME.surface,
-            color: BOOK_THEME.textPrimary
-          }}
-          onClick={() => setReadableOnly((value) => !value)}
+          style={{ borderColor: BOOK_THEME.border, background: `${BOOK_THEME.accentButter}80`, color: BOOK_THEME.textPrimary }}
+          onClick={() => setIsControlsOpen((value) => !value)}
         >
-          {readableOnly ? "Show all" : "Readable only"}
+          {isControlsOpen ? "Collapse" : "Expand"}
         </button>
-
-        {debouncedQuery ? (
-          <p className="text-[13px]" style={{ color: BOOK_THEME.textSecondary }}>
-            {readableCount} readable matches
-          </p>
-        ) : null}
-        {debouncedQuery && readableOnly && checkingCount > 0 ? (
-          <p className="text-[13px]" style={{ color: BOOK_THEME.textSecondary }}>
-            {checkingCount} still being checked
-          </p>
-        ) : null}
       </div>
 
-      {isLoading ? (
-        <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
-          Searching books...
-        </p>
+      {isControlsOpen ? (
+        <div className="space-y-4">
+          <label className="block text-[13px] font-medium" style={{ color: BOOK_THEME.textSecondary }}>
+            Search Books (English)
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Try: Pride and Prejudice, Jane Eyre..."
+              className="cozy-outline mt-2 block min-h-11 w-full rounded-2xl border px-4 py-3 text-[16px] outline-none"
+              style={{
+                borderColor: BOOK_THEME.border,
+                background: BOOK_THEME.surface,
+                color: BOOK_THEME.textPrimary
+              }}
+            />
+          </label>
+
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            <button
+              type="button"
+              className="cozy-outline min-h-10 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors"
+              style={{
+                borderColor: BOOK_THEME.border,
+                background: readableOnly ? `${BOOK_THEME.accentMint}95` : BOOK_THEME.surface,
+                color: BOOK_THEME.textPrimary
+              }}
+              onClick={() => setReadableOnly((value) => !value)}
+            >
+              {readableOnly ? "Show all" : "Readable only"}
+            </button>
+
+            {debouncedQuery ? (
+              <p className="text-[13px]" style={{ color: BOOK_THEME.textSecondary }}>
+                {readableCount} readable matches
+              </p>
+            ) : null}
+            {debouncedQuery && readableOnly && checkingCount > 0 ? (
+              <p className="text-[13px]" style={{ color: BOOK_THEME.textSecondary }}>
+                {checkingCount} still being checked
+              </p>
+            ) : null}
+          </div>
+
+          {isLoading ? (
+            <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
+              Searching books...
+            </p>
+          ) : null}
+
+          {isMatching ? (
+            <p className="text-[14px]" style={{ color: BOOK_THEME.textSecondary }}>
+              Matching readable sources...
+            </p>
+          ) : null}
+
+          {error ? (
+            <p className="rounded-xl border px-3 py-2 text-[14px]" style={{ ...bookCardStyle, color: BOOK_THEME.textSecondary }}>
+              {error}
+            </p>
+          ) : null}
+
+          {!query.trim() ? (
+            <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
+              Start typing to find a book.
+            </p>
+          ) : null}
+
+          {debouncedQuery && !isLoading && !error && visibleResults.length === 0 ? (
+            <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
+              {readableOnly
+                ? "No readable public-domain matches found for this query yet. Try another title or author."
+                : "No books yet for this query. Try a different title or author."}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
-      {isMatching ? (
-        <p className="text-[14px]" style={{ color: BOOK_THEME.textSecondary }}>
-          Matching readable sources...
-        </p>
-      ) : null}
-
-      {error ? (
-        <p className="rounded-xl border px-3 py-2 text-[14px]" style={{ ...bookCardStyle, color: BOOK_THEME.textSecondary }}>
-          {error}
-        </p>
-      ) : null}
-
-      {!query.trim() ? (
-        <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
-          Start typing to find a book.
-        </p>
-      ) : null}
-
-      {debouncedQuery && !isLoading && !error && visibleResults.length === 0 ? (
-        <p className="text-[15px]" style={{ color: BOOK_THEME.textSecondary }}>
-          {readableOnly
-            ? "No readable public-domain matches found for this query yet. Try another title or author."
-            : "No books yet for this query. Try a different title or author."}
-        </p>
-      ) : null}
-
-      <div className="rounded-[1.4rem] border p-2.5 sm:rounded-[1.5rem] sm:p-4" style={bookCardStyle}>
-        <div ref={scrollRef} className="max-h-[62vh] overflow-y-auto pr-0 sm:max-h-[58vh] sm:pr-1">
+      <div className="flex min-h-[320px] max-h-[76dvh] flex-col rounded-[1.4rem] border p-2.5 sm:min-h-[360px] sm:max-h-[70dvh] sm:rounded-[1.5rem] sm:p-4" style={bookCardStyle}>
+        <div ref={scrollRef} className="h-full min-h-0 overflow-y-auto pr-0 sm:pr-1">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visibleResults.map((item) => {
               const isReadable = item.matchStatus === "readable";

@@ -70,14 +70,14 @@ export const ReaderTopPanel = ({ seriesId }: ReaderTopPanelProps) => {
 
       <button
         type="button"
-        className={`${readerControlClassName} sm:hidden`}
+        className={readerControlClassName}
         style={{ borderColor: READER_THEME.border, background: `${READER_THEME.accentButter}8A`, color: READER_THEME.textPrimary }}
         onClick={() => setIsMetaOpen((value) => !value)}
       >
         {isMetaOpen ? "Hide Series Info" : "Show Series Info"}
       </button>
 
-      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 sm:grid xl:grid-cols-2`}>
+      <div className={`${isMetaOpen ? "grid" : "hidden"} min-w-0 gap-3 xl:grid-cols-2`}>
         {currentSeries ? (
           <section className="space-y-2 rounded-[1.2rem] border p-3" style={readerCardStyle}>
             <p className="text-[11px] uppercase tracking-[0.11em]" style={{ color: READER_THEME.textSecondary }}>

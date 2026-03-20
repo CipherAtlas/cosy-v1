@@ -393,7 +393,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
         <button
           type="button"
           onClick={() => setIsControlsOpen((value) => !value)}
-          className={`${bookControlClassName} sm:hidden`}
+          className={bookControlClassName}
           style={{ borderColor: chromeColors.shellBorder, background: `${BOOK_THEME.accentButter}82`, color: chromeColors.shellText }}
         >
           {isControlsOpen ? "Hide Controls" : "Show Controls"}
@@ -413,7 +413,7 @@ export const BookReader = ({ openLibraryKey, isImmersive = false, onToggleImmers
           ) : null}
         </div>
 
-        <div className={`${isControlsOpen ? "grid" : "hidden"} w-full grid-cols-1 gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3`}>
+        <div className={`${isControlsOpen ? "grid" : "hidden"} w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3`}>
           <button
             type="button"
             onClick={() => setSettings((previous) => ({ ...previous, theme: previous.theme === "dark" ? "light" : "dark" }))}

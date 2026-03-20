@@ -530,12 +530,12 @@ export const ChapterReader = ({
             </button>
           </div>
 
-          <div className="mt-3 space-y-3">
-            <div>
-              <p className="mb-2 text-[12px] uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
+          <div className="mt-3 space-y-2.5">
+            <details className="rounded-xl border p-2.5" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}>
+              <summary className="cursor-pointer list-none text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
                 Page Width
-              </p>
-              <div className="flex flex-wrap gap-2">
+              </summary>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {(
                   [
                     ["narrow", "Narrow"],
@@ -563,13 +563,13 @@ export const ChapterReader = ({
                   );
                 })}
               </div>
-            </div>
+            </details>
 
-            <div>
-              <p className="mb-2 text-[12px] uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
+            <details className="rounded-xl border p-2.5" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}>
+              <summary className="cursor-pointer list-none text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
                 Panel Spacing
-              </p>
-              <div className="flex flex-wrap gap-2">
+              </summary>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {(
                   [
                     ["tight", "Tight"],
@@ -596,13 +596,13 @@ export const ChapterReader = ({
                   );
                 })}
               </div>
-            </div>
+            </details>
 
-            <div>
-              <p className="mb-2 text-[12px] uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
+            <details className="rounded-xl border p-2.5" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}>
+              <summary className="cursor-pointer list-none text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
                 Panel Corners
-              </p>
-              <div className="flex flex-wrap gap-2">
+              </summary>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {(
                   [
                     ["soft", "Soft"],
@@ -628,28 +628,33 @@ export const ChapterReader = ({
                   );
                 })}
               </div>
-            </div>
+            </details>
 
-            <div className="space-y-2 rounded-xl border p-2.5" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}>
-              {UI_TOGGLE_LABELS.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  className="w-full rounded-xl border px-3 py-2 text-left transition-colors"
-                  style={{
-                    borderColor: READER_THEME.border,
-                    background: settings[item.key] ? `${READER_THEME.accentLavender}72` : "rgba(255,253,251,0.8)",
-                    color: READER_THEME.textPrimary
-                  }}
-                  onClick={() => updateSetting(item.key, !settings[item.key])}
-                >
-                  <p className="text-[14px] font-medium">{item.label}</p>
-                  <p className="text-[12px]" style={{ color: READER_THEME.textSecondary }}>
-                    {item.hint}
-                  </p>
-                </button>
-              ))}
-            </div>
+            <details className="rounded-xl border p-2.5" style={{ borderColor: READER_THEME.border, background: READER_THEME.surface }}>
+              <summary className="cursor-pointer list-none text-[12px] font-medium uppercase tracking-[0.12em]" style={{ color: READER_THEME.textSecondary }}>
+                Behavior
+              </summary>
+              <div className="mt-2 space-y-2">
+                {UI_TOGGLE_LABELS.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className="w-full rounded-xl border px-3 py-2 text-left transition-colors"
+                    style={{
+                      borderColor: READER_THEME.border,
+                      background: settings[item.key] ? `${READER_THEME.accentLavender}72` : "rgba(255,253,251,0.8)",
+                      color: READER_THEME.textPrimary
+                    }}
+                    onClick={() => updateSetting(item.key, !settings[item.key])}
+                  >
+                    <p className="text-[14px] font-medium">{item.label}</p>
+                    <p className="text-[12px]" style={{ color: READER_THEME.textSecondary }}>
+                      {item.hint}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </details>
 
             <button
               type="button"
