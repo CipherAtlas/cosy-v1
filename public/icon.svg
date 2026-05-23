@@ -1,0 +1,38 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="room" x1="96" y1="56" x2="416" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5A4845"/>
+      <stop offset="1" stop-color="#2C2321"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="128" y1="338" x2="384" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8A6C57"/>
+      <stop offset="1" stop-color="#5B4639"/>
+    </linearGradient>
+    <linearGradient id="windowGlow" x1="166" y1="111" x2="352" y2="303" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE6B7"/>
+      <stop offset="1" stop-color="#F4AFA2"/>
+    </linearGradient>
+    <filter id="softGlow" x="99" y="61" width="314" height="316" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feGaussianBlur in="BackgroundImageFix" stdDeviation="18"/>
+      <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_1_1" result="shape"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#F6D7C5"/>
+  <rect x="54" y="54" width="404" height="404" rx="92" fill="url(#room)"/>
+  <path d="M80 338H432V386C432 411.405 411.405 432 386 432H126C100.595 432 80 411.405 80 386V338Z" fill="url(#floor)"/>
+  <ellipse cx="256" cy="358" rx="128" ry="34" fill="#1E1715" fill-opacity="0.22"/>
+  <g filter="url(#softGlow)">
+    <rect x="158" y="104" width="196" height="196" rx="36" fill="url(#windowGlow)"/>
+    <rect x="181" y="127" width="150" height="150" rx="22" fill="#463532"/>
+    <path d="M181 201H331" stroke="#FFE4B8" stroke-width="16" stroke-linecap="round"/>
+    <path d="M256 127V277" stroke="#FFE4B8" stroke-width="16" stroke-linecap="round"/>
+    <circle cx="292" cy="166" r="28" fill="#FFF3CC"/>
+    <circle cx="306" cy="158" r="28" fill="#463532"/>
+  </g>
+  <path d="M168 323C168 311.954 176.954 303 188 303H324C335.046 303 344 311.954 344 323V354H168V323Z" fill="#A77A68"/>
+  <path d="M191 291C191 284.373 196.373 279 203 279H252C258.627 279 264 284.373 264 291V354H191V291Z" fill="#D8A58A"/>
+  <path d="M270 307C270 300.373 275.373 295 282 295H318C324.627 295 330 300.373 330 307V354H270V307Z" fill="#EBC0A0"/>
+  <path d="M126 432H386" stroke="#F7D7C1" stroke-opacity="0.32" stroke-width="10" stroke-linecap="round"/>
+</svg>

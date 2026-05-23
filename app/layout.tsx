@@ -10,7 +10,12 @@ const raleway = Raleway({
 
 export const metadata: Metadata = {
   title: "A Peaceful Room",
-  description: "A calm, intimate digital room for gentle focus and rest."
+  description: "A calm, intimate digital room for gentle focus and rest.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

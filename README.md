@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./public/icon.svg" alt="A Peaceful Room icon" width="112" height="112" />
+</p>
+
 # A Peaceful Room
 
 A Peaceful Room is a calm, single-screen wellness space designed for quiet focus and gentle self-care.
