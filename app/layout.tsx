@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import { withBasePath } from "@/lib/basePath";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -12,9 +13,9 @@ export const metadata: Metadata = {
   title: "A Peaceful Room",
   description: "A calm, intimate digital room for gentle focus and rest.",
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg"
+    icon: withBasePath("/icon.svg"),
+    shortcut: withBasePath("/icon.svg"),
+    apple: withBasePath("/icon.svg")
   }
 };
 
