@@ -1,0 +1,9 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0",
+  "context": "running",
+  "sampled": true,
+  "listenerAPI": "legacy methods",
+  "peak": 0.044461872428655624,
+  "rms": 0.007066898103169818,
+  "pass": true
+}

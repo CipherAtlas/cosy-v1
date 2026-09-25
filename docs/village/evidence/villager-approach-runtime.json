@@ -1,0 +1,252 @@
+{
+  "pass": true,
+  "samples": [
+    {
+      "second": 0,
+      "position": [
+        1.3594268312831255,
+        0.05,
+        7
+      ],
+      "distance": 5.3935146240647205,
+      "state": "roam",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": "One day I'll learn to whistle. Not today."
+    },
+    {
+      "second": 1,
+      "position": [
+        1.5319959845331845,
+        0.05,
+        7.91461651222531
+      ],
+      "distance": 4.462760372348065,
+      "state": "approach",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "One day I'll learn to whistle. Not today."
+    },
+    {
+      "second": 2,
+      "position": [
+        1.7614518443917901,
+        0.05,
+        9.130732569475926
+      ],
+      "distance": 3.225186836623324,
+      "state": "approach",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "One day I'll learn to whistle. Not today."
+    },
+    {
+      "second": 3,
+      "position": [
+        1.9108859876453321,
+        0.05,
+        9.922733528719696
+      ],
+      "distance": 2.419211599650765,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": true,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 4,
+      "position": [
+        1.9109106592784704,
+        0.05,
+        9.922864288375324
+      ],
+      "distance": 2.419078532836639,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": true,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 5,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": true,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 6,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": true,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 7,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": true,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 8,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 9,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 10,
+      "position": [
+        1.9109106592860168,
+        0.05,
+        9.922864288415322
+      ],
+      "distance": 2.419078532795935,
+      "state": "visit",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 11,
+      "position": [
+        1.840702774081057,
+        0.05,
+        9.550762496829037
+      ],
+      "distance": 2.7977457883735415,
+      "state": "return",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 12,
+      "position": [
+        1.6319502524420837,
+        0.05,
+        8.44437413214248
+      ],
+      "distance": 3.9236555666437294,
+      "state": "return",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "Oh! A new walking buddy. Excellent."
+    },
+    {
+      "second": 13,
+      "position": [
+        1.422936893533005,
+        0.05,
+        7.336603329924361
+      ],
+      "distance": 5.050972174544736,
+      "state": "return",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": null
+    },
+    {
+      "second": 14,
+      "position": [
+        1.380598048943414,
+        0.05,
+        7.112207453599529
+      ],
+      "distance": 5.279327352004698,
+      "state": "roam",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": null
+    },
+    {
+      "second": 15,
+      "position": [
+        1.3805980157148963,
+        0.05,
+        7.112207277488387
+      ],
+      "distance": 5.279327531223192,
+      "state": "roam",
+      "gait": "idle",
+      "chatting": false,
+      "bubble": null
+    },
+    {
+      "second": 16,
+      "position": [
+        1.4347705299246063,
+        0.05,
+        7.953580564983104
+      ],
+      "distance": 4.443686665454104,
+      "state": "roam",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "Maple says my pockets are a tiny museum."
+    },
+    {
+      "second": 17,
+      "position": [
+        1.507800983134653,
+        0.05,
+        9.087843454585936
+      ],
+      "distance": 3.3231334997981983,
+      "state": "roam",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "Maple says my pockets are a tiny museum."
+    },
+    {
+      "second": 18,
+      "position": [
+        1.579635594269724,
+        0.05,
+        10.203533280105903
+      ],
+      "distance": 2.236793929030211,
+      "state": "roam",
+      "gait": "walk",
+      "chatting": false,
+      "bubble": "Maple says my pockets are a tiny museum."
+    }
+  ]
+}

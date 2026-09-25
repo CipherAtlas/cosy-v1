@@ -1,0 +1,11 @@
+[
+  "All 14 piano samples decoded",
+  "Starting at master zero suspends the graph",
+  "Unmute resumes the graph (running)",
+  "Transient voices capped at 16",
+  "Leaving focus resets simple-view shelter",
+  "Legacy Firefox listener path updates position and orientation",
+  "Overdue queue discarded",
+  "Stop suspends context and clears voices",
+  "Sample failure is reported"
+]

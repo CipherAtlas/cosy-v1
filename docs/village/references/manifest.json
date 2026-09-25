@@ -1,0 +1,122 @@
+[
+  {
+    "file": "approved-village.png",
+    "purpose": "User-approved visual target",
+    "source": "/Users/sabar/.codex/generated_images/01a0d8d7-18db-75d0-b6ef-47d00326f11f/exec-c9335347-ba22-4383-963d-9ee5584d8590.png",
+    "recordedDate": "2026-09-25",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "6e86561002b69d3d26d0391e27cc68e19e5ce8f1d6c64270f65bad7e8abeca9e",
+    "mediaType": "image/png"
+  },
+  {
+    "file": "prototype-village.jpg",
+    "purpose": "Unfinished prototype; do not use as the target",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/implementation/village-final.png",
+    "recordedDate": "2026-09-25",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "245cb7fcef54776c8a6c846dee026cab63455bb7a620a51cf4ce6cf6543263ec",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "prototype-cottage.jpg",
+    "purpose": "Unfinished focus interior",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/implementation/cottage-final.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "15c411e9b90a77a97bdab45c644044f69e2735f40d1287779dcf610f8f036e1d",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "prototype-mobile.jpg",
+    "purpose": "Mobile rainy village check",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/implementation/mobile-village.png",
+    "recordedDate": "2026-09-25",
+    "width": 390,
+    "height": 844,
+    "sha256": "5f947d18c6e8cd7e10830de2ce6614f6a3ea9795b721431b6c297aa8ea730b78",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "prototype-simple.jpg",
+    "purpose": "Mobile simple-view check",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/implementation/mobile-simple.png",
+    "recordedDate": "2026-09-25",
+    "width": 390,
+    "height": 844,
+    "sha256": "7a964a846ff4d7bb3027b7658ebad5ddefbceba0f592ad283876cb3e5cb60247",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "arkenfall-title.jpg",
+    "purpose": "Title-screen reference only; not movement or audio evidence",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/arkenfall-title.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "12a7329557e1e5eaf92f0f7fee3de725e2b18b5cb6258a1c5fc4bead12b8ea31",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-focus.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/01-focus.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "575e9c75bdbe1554a63a90d19a398a32520a2a6496fe8104aee6d3e1f4874a68",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-music.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/02-music.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "8a00e5ae21e7e3ed23a5401b973e3bb86e472303a546d65ea9a8c764f0d93d9f",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-breathe.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/03-breathe.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "73f0a78b69dac5c09896b317fc8ae8e180a5840df58c80f934fc66d3b8ca594f",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-mood.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/04-mood.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "51db76039dbfe138eb37a3b722f073f338f8c8e0741b33a5151964f2baec5d02",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-gratitude.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/05-gratitude.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "99e375382cc808fb7db9f84560be4ca75e9b436b0143814a598c7c6d3de7adc6",
+    "mediaType": "image/jpeg"
+  },
+  {
+    "file": "baseline-compliment.jpg",
+    "purpose": "Published Cosy functional baseline capture from prior implementation session",
+    "source": "/Users/sabar/.codex/visualizations/2026/09/25/01a0d8d7-18db-75d0-b6ef-47d00326f11f/live/06-compliment.png",
+    "recordedDate": "2026-09-25",
+    "width": 1280,
+    "height": 720,
+    "sha256": "5d8911cbe1bfaf06e1f15123bbad29ba06189c981ad7ad9e472532a97992cca3",
+    "mediaType": "image/jpeg"
+  }
+]

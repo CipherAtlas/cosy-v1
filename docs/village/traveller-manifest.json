@@ -1,0 +1,37 @@
+{
+  "id": "traveller-rig-v1",
+  "status": "candidate",
+  "runtimeFile": "public/village/models/traveller.glb",
+  "sourceFile": "assets/village/traveller.blend",
+  "creatorOrTool": "Original scripted modeling and rigging, Blender 5.2.1 LTS",
+  "license": "Original project artwork; no third-party character assets",
+  "sha256": "b9576c8342d510f9d205d53ce7808166701f53409653662a566dea3fa442fe87",
+  "units": "metres",
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "animationClips": {
+    "Idle": 2.8,
+    "Walk": 0.635,
+    "Run": 0.622,
+    "Sprint": 0.583,
+    "JumpStart": 0.13,
+    "AirLoop": 0.6,
+    "LandSoft": 0.24,
+    "LandMoving": 0.16
+  },
+  "contactPhases": [
+    0,
+    0.5
+  ],
+  "strideMetres": {
+    "Walk": 1.65,
+    "Run": 2.8,
+    "Sprint": 3.5
+  },
+  "triangles": 21288,
+  "bones": 21,
+  "limitations": [
+    "Candidate procedural anatomy and cloth; needs close-view art and gait review.",
+    "Single LOD. Cloth uses secondary bones, not physical simulation."
+  ]
+}

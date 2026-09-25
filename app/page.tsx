@@ -1,5 +1,5 @@
-import { HomeScreen } from "@/components/home/HomeScreen";
+import { Village } from "@/features/village/Village";
 
 export default function HomePage() {
-  return <HomeScreen />;
+  return <Village />;
 }

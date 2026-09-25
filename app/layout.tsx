@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Outfit, Raleway } from "next/font/google";
 import { withBasePath } from "@/lib/basePath";
 import "./globals.css";
 
@@ -9,9 +9,15 @@ const raleway = Raleway({
   variable: "--font-raleway"
 });
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-outfit"
+});
+
 export const metadata: Metadata = {
-  title: "A Peaceful Room",
-  description: "A calm, intimate digital room for gentle focus and rest.",
+  title: "Cosy — a quiet village",
+  description: "A quiet village for focus, music, breathing, and a little time for yourself.",
   icons: {
     icon: withBasePath("/icon.svg"),
     shortcut: withBasePath("/icon.svg"),
@@ -24,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${raleway.variable} antialiased`}>
+      <body className={`${raleway.variable} ${outfit.variable} antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {children}
       </body>

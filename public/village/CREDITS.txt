@@ -1,0 +1,31 @@
+Cosy Village — art and music credits
+
+Poly Haven materials, tree and sky: CC0 (https://polyhaven.com/license)
+https://polyhaven.com/a/medieval_wood
+https://polyhaven.com/a/roof_slates_02
+https://polyhaven.com/a/plastered_stone_wall
+https://polyhaven.com/a/medieval_blocks_03
+https://polyhaven.com/a/forest_ground_04
+https://polyhaven.com/a/tree_small_02
+https://polyhaven.com/a/kloppenheim_06_puresky
+Sky by Greg Zaal and Jarod Guest. Tree simplified for browser rendering.
+
+Salamander Grand Piano: Alexander Holm, CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+Samples distributed by https://github.com/Tonejs/audio/tree/master/salamander
+Locally served MP3 samples; original generative arrangements with pitch shifting,
+filtering and reverb. Original sample README: audio/Salamander-LICENSE.txt
+
+Village architecture, terrain, traveller and music arrangements: authored for Cosy.
+Cobblestone texture: generated for this project using OpenAI ImageGen.
+Arkenfall is a design reference; no Arkenfall assets were copied.
+
+Representative-slice additions (2026-09-25):
+Qwantani Sunset (Pure Sky), Greg Zaal (photography), Jarod Guest (processing).
+CC0, https://polyhaven.com/a/qwantani_sunset_puresky
+Original 1K HDR, locally served as textures/sunset.hdr.
+Skinned traveller, woven textures, eight animation clips and willow geometry are
+original scripted project artwork. Editable traveller source: assets/village/traveller.blend.
+Footsteps, percussion, bass, birds and other new foley are original Web Audio synthesis.
+
+2026-09-25 additions: original procedural cloud sky, stone arch bridge, ambient resident routes and bird geometry. Distant birch cards are rendered at runtime from the licensed birch model above; they add no third-party source asset.

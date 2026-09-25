@@ -1,0 +1,14 @@
+{
+  "bridgePlantingClear": true,
+  "mainPathClear": true,
+  "residents": 4,
+  "residentsMoving": 2,
+  "birds": 12,
+  "sky": true,
+  "stats": {
+    "fps": 46,
+    "draws": 54,
+    "triangles": 1546422
+  },
+  "colliders": 67
+}
