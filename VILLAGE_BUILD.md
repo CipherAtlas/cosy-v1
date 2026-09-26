@@ -2,6 +2,48 @@
 
 Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canonical direction and future work. This file records implementation evidence and limits. The latest section below supersedes historical prototype descriptions; older results are retained under their original headings.
 
+## 2026-09-26 performance investigation
+
+The user authorized deploying these fixes through the existing GitHub Pages workflow after local verification. The measurements below precede publication; the release task and [Pages workflow](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml) record the live outcome. Friends report 8–20 FPS on gaming PCs; a supplied Opera/Windows crop shows 3 FPS, 229 calls and 2.212M triangles. It does not identify resolution, GPU renderer, acceleration status or selected quality.
+
+Confirmed application problems:
+
+- The old DPR-only limit let battery mode render 3264×1836 (5,992,704 pixels) in a 4K window. A real-engine assertion failed against a 1280×720 pixel budget. The entrance was GPU-bound: Chrome high averaged 42.97 ms (23.3 FPS), battery 33.61 ms (29.8 FPS), with CPU submission around 2.5–2.7 ms. Disabling shadows helped but did not recover 60 FPS.
+- Automatic called `setQuality("low")`, which turned off its own automatic flag. It could never adapt again; explicitly selected battery mode did not adapt at all. Both retained live shadows even when unusably slow.
+
+Changes in `graphics.ts`, `VillageEngine.ts`, `Village.tsx` and `village.css`:
+
+- Detailed is bounded to 2,073,600 pixels (1080p at 16:9), battery to 921,600 (720p), and the final fallback to 518,400 (540p). Aspect ratio is preserved; CSS-sized controls/text retain their original resolution. Large displays trade some scene sharpness for bounded GPU work.
+- Automatic and battery retain their preference while moving to lighter tiers. Two consecutive samples below 45 FPS, or severe sub-24 FPS after warmup, can downgrade again. The final tier removes live shadows and further reduces vegetation/tree detail. Shadow enablement also changes the directional light’s shadow state, invalidating cached lighting shaders; otherwise WebKit could retain a comparison sampler after its depth texture was disposed. Explicit Detailed stays fixed; reselecting a preference resets its tier. Startup, resize and visibility changes reset samples. Tiers do not automatically promote during a session, avoiding oscillation.
+- Settings → Show performance → Get performance report produces selectable browser/GPU, viewport/drawing-buffer, preference/tier and FPS data. It makes no upload and includes no saved activity content.
+
+Local measurements, Apple M4/macOS, entrance scene, six-second samples after two-second warmup:
+
+| Case | Before | After |
+| --- | --- | --- |
+| Chrome 154, 4K CSS viewport, Detailed | 23.3 FPS; 3840×2160 buffer | 60.0 FPS; 1920×1080 buffer |
+| Chrome 154, 4K CSS viewport, battery | 29.8 FPS; 3264×1836 buffer | 60.0 FPS; 1280×720 buffer |
+| Opera 136 / Chromium 152, 4K CSS viewport | Not measured | 47.2 FPS Detailed; 60.0 FPS battery |
+
+Detailed retains 2.212M reported triangles and 222 calls in the measured entrance. These are short harness samples, not sustained thermal, Windows, dedicated-GPU or friend-device acceptance. Chromium browsers were headless; Firefox 142 was an existing headed Playwright build and rendered smoothly, but its timings are not comparable with headless Chromium. Headless Firefox showed substantial timing differences, so those numbers are not used as a browser performance verdict. A deliberately forced SwiftShader run was extremely slow; this demonstrates why renderer identity matters but does **not** establish that the friend uses software rendering.
+
+Evidence: [raw profiles and regression results](docs/village/evidence/performance-2026-09-26.json). Exported-application checks and their limits are recorded alongside those profiles. Typecheck, root and `/cosy-v1` production exports, 28 graphics assertions, 10 controller/composition checks, three bridge checks, 28 dialogue checks and 20 resident checks pass. An initial dialogue rerun had its animation loop stopped by the test runner; restoring the running engine fixed that harness error. Existing workspace-root, Browserslist and unrelated RoomScene image warnings remain.
+
+Release preparation: all 14 inspected subpath HTML asset references resolve. The subpath export passes arrival, report/quality controls, all six activity exits, rain and portrait checks in Chrome, reporting 60 FPS in battery mode and no captured console/network errors. The first subpath build encountered a transient `next/font` loader error; the unchanged retry passed. No dependencies or deployment configuration changed.
+
+Reproduce using an existing Playwright package (no dependency additions):
+
+```bash
+python3 scripts/village/preview_qa.py --port 3013 --evidence-prefix perf-
+PLAYWRIGHT_PATH=/absolute/path/to/playwright URL=http://127.0.0.1:3013/ CHECKS=1 WIDTH=3840 HEIGHT=2160 MIN_FPS=55 node scripts/village/profile.cjs chrome
+```
+
+The script accepts `chrome`, `edge`, `firefox`, `webkit`, or `BROWSER_EXECUTABLE` for Opera. Set `HEADED=1` for Firefox and use a matching existing Playwright/browser pair. `OUTPUT` chooses the JSON destination; default is the system temporary directory. The optional FPS threshold is a local regression condition, not a universal device guarantee. Software-renderer and shadow/sky probes are opt-in.
+
+Browser acceptance boundary: exported-app arrival, graphics/report controls, all six activity exits, rain and a 390×844 report layout pass in Chrome 154, Edge 154 and Opera 136, with no captured console errors or failed responses. Battery mode reported 60 FPS in those Mac tests. WebKit 26.5 exposed the shadow-off cache bug described above; toggling the light shadow state removes its sampler errors and restores scenery. Its automation runs still report roughly 6–8 FPS even with stock shadows and hardware identifying as Apple GPU, so Safari performance is **not accepted**. The final WebKit export repeats all six exits and the graphics/report/portrait flows without errors and with scenery restored. Firefox 142 also passes those functional checks, but production timing varied substantially from its harness result (one report sampled 1 FPS after falling to the minimal tier). A controlled Firefox CSS probe measured 13.7–14.6 FPS with and without backdrop blur, so blur was not changed. Native-current Firefox/Safari performance acceptance remains open; these automation results are not a Windows Opera diagnosis.
+
+Outstanding diagnosis: obtain the affected machine's `opera://gpu` Graphics Feature Status and renderer details (or the new report after an authorized release). Check graphics acceleration and relaunch after changing it; compare Opera battery saver off. [Opera documents](https://help.opera.com/en/latest/features/) that its battery saver can reduce frame rate and recommends disabling it for online games; [its FAQ](https://help.opera.com/en/faq/) documents graphics acceleration. Driver/backend, software fallback, resolution and browser settings remain candidate explanations. Do not state a specific cause for the friend's 3 FPS without that evidence.
+
 ## 2026-09-26 main release
 
 Published the combined polish and inhabited-activity passes as [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290) on `main`, following the user's explicit commit/push/deploy request. All source, licensed recordings, credits and implementation evidence are included. The unchanged [Pages workflow run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977) completed both build and deploy successfully for that exact commit; deployment finished at 10:04:13 UTC on 2026-09-26. Live destination: [Cosy Village](https://cipheratlas.github.io/cosy-v1/).

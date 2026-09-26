@@ -1,0 +1,2948 @@
+{
+  "date": "2026-09-26",
+  "machine": "Apple M4, macOS",
+  "scope": "Local compiled production-engine harness. Six-second entrance samples after two-second warmup, one browser at a time. Firefox uses a headed Playwright test build; Chromium browsers are headless. Browser timings are not directly comparable. 4K comparison intentionally changes drawing-buffer resolution. No Windows or friend-device validation. Baseline 404 errors are harness favicon requests. Forced SwiftShader was a synthetic diagnostic, not evidence of the friend renderer.",
+  "runs": {
+    "chrome": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 16.758938547486036,
+            "p95": 16.799999999999272,
+            "min": 16.5,
+            "max": 33.400000000001455
+          },
+          "cpu": {
+            "mean": 2.2696378802190584,
+            "p95": 4.100000023841858,
+            "min": 1.1999999284744263,
+            "max": 5
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 16.665833333333346,
+            "p95": 16.700000000004366,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 3.1110803298342593,
+            "p95": 4.099999904632568,
+            "min": 1.2000000476837158,
+            "max": 5.299999952316284
+          },
+          "draws": {
+            "mean": 171.025,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1472940.6666666667,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            1632,
+            918
+          ],
+          "quality": "low",
+          "shadows": true
+        },
+        {
+          "variant": "low-no-shadows",
+          "frame": {
+            "mean": 16.666111111111118,
+            "p95": 16.799999999995634,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 2.7855955682633,
+            "p95": 3.399999976158142,
+            "min": 1.3000000715255737,
+            "max": 4.200000047683716
+          },
+          "draws": {
+            "mean": 127.41111111111111,
+            "p95": 129,
+            "min": 125,
+            "max": 129
+          },
+          "triangles": {
+            "mean": 1203926.7333333334,
+            "p95": 1205199,
+            "min": 1201983,
+            "max": 1205199
+          },
+          "buffer": [
+            1632,
+            918
+          ],
+          "quality": "low",
+          "shadows": false
+        },
+        {
+          "variant": "low-half-resolution",
+          "frame": {
+            "mean": 16.6661111111111,
+            "p95": 16.700000000004366,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 2.9986149610905106,
+            "p95": 3.8000000715255737,
+            "min": 1.4000000953674316,
+            "max": 5.100000023841858
+          },
+          "draws": {
+            "mean": 179.79444444444445,
+            "p95": 222,
+            "min": 134,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1488576.588888889,
+            "p95": 1748614,
+            "min": 1225347,
+            "max": 1748614
+          },
+          "buffer": [
+            960,
+            540
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (File not found)"
+      ]
+    },
+    "chrome-4k-before": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 42.97428571428572,
+            "p95": 50.099999999999454,
+            "min": 33.19999999999891,
+            "max": 50.100000000000364
+          },
+          "cpu": {
+            "mean": 2.7156028375557972,
+            "p95": 3.600000023841858,
+            "min": 1.7000000476837158,
+            "max": 4.200000047683716
+          },
+          "gpu": {
+            "mean": 77.16642617021277,
+            "p95": 85.538291,
+            "min": 60.367458,
+            "max": 91.729249
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            3840,
+            2160
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 33.61117318435754,
+            "p95": 50,
+            "min": 16.600000000002183,
+            "max": 50.100000000000364
+          },
+          "cpu": {
+            "mean": 2.5255555503898197,
+            "p95": 4.100000023841858,
+            "min": 1.5,
+            "max": 7.399999976158142
+          },
+          "gpu": {
+            "mean": 59.569832361111104,
+            "p95": 69.540124,
+            "min": 43.861874,
+            "max": 76.61975
+          },
+          "draws": {
+            "mean": 202.01117318435755,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1680345.5083798883,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            3264,
+            1836
+          ],
+          "quality": "low",
+          "shadows": true
+        },
+        {
+          "variant": "low-no-shadows",
+          "frame": {
+            "mean": 28.114485981308412,
+            "p95": 33.400000000001455,
+            "min": 16.5,
+            "max": 50.10000000000218
+          },
+          "cpu": {
+            "mean": 1.6386046487231587,
+            "p95": 2.1999999284744263,
+            "min": 1.100000023841858,
+            "max": 2.600000023841858
+          },
+          "gpu": {
+            "mean": 49.73766892093023,
+            "p95": 58.495,
+            "min": 36.155916,
+            "max": 68.886916
+          },
+          "draws": {
+            "mean": 128.49532710280374,
+            "p95": 129,
+            "min": 125,
+            "max": 129
+          },
+          "triangles": {
+            "mean": 1204800.4205607476,
+            "p95": 1205199,
+            "min": 1201983,
+            "max": 1205199
+          },
+          "buffer": [
+            3264,
+            1836
+          ],
+          "quality": "low",
+          "shadows": false
+        },
+        {
+          "variant": "low-no-sky",
+          "frame": {
+            "mean": 30.92628865979382,
+            "p95": 33.400000000001455,
+            "min": 16.5,
+            "max": 50.10000000000218
+          },
+          "cpu": {
+            "mean": 2.1933333354118543,
+            "p95": 3.1999999284744263,
+            "min": 1.399999976158142,
+            "max": 4
+          },
+          "gpu": {
+            "mean": 54.538027056410264,
+            "p95": 63.490374,
+            "min": 39.639666,
+            "max": 77.018791
+          },
+          "draws": {
+            "mean": 204.97938144329896,
+            "p95": 221,
+            "min": 137,
+            "max": 221
+          },
+          "triangles": {
+            "mean": 1648255.737113402,
+            "p95": 1747398,
+            "min": 1227571,
+            "max": 1747398
+          },
+          "buffer": [
+            3264,
+            1836
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (File not found)"
+      ]
+    },
+    "chrome-4k-after": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 16.66592797783934,
+            "p95": 16.700000000000728,
+            "min": 16.5,
+            "max": 16.80000000000109
+          },
+          "cpu": {
+            "mean": 4.161049721649339,
+            "p95": 5.200000047683716,
+            "min": 2.200000047683716,
+            "max": 6.399999976158142
+          },
+          "gpu": {
+            "mean": 8.518938933701655,
+            "p95": 12.281875,
+            "min": 6.462749,
+            "max": 19.924458
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 16.66611111111111,
+            "p95": 16.700000000000728,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 3.3698060931921665,
+            "p95": 4.399999976158142,
+            "min": 1.6999999284744263,
+            "max": 6.099999904632568
+          },
+          "gpu": {
+            "mean": 4.098334577348063,
+            "p95": 5.479,
+            "min": 3.19675,
+            "max": 8.28975
+          },
+          "draws": {
+            "mean": 171.125,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1473195.5222222223,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            1280,
+            720
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    },
+    "opera-4k-after": {
+      "browser": "opera",
+      "version": "152.0.7977.130",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 OPR/136.0.0.0",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 21.184507042253525,
+            "p95": 33.400000000001455,
+            "min": 16.5,
+            "max": 33.400000000001455
+          },
+          "cpu": {
+            "mean": 3.8333333337516113,
+            "p95": 5,
+            "min": 2.1999999284744263,
+            "max": 6.400000095367432
+          },
+          "gpu": {
+            "mean": 15.272765449122804,
+            "p95": 19.589,
+            "min": 10.704291,
+            "max": 22.485624
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 16.665833333333325,
+            "p95": 16.700000000004366,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 2.7096952919814727,
+            "p95": 3.8000000715255737,
+            "min": 1.5,
+            "max": 4.399999976158142
+          },
+          "gpu": {
+            "mean": 7.9949309307479215,
+            "p95": 12.146791,
+            "min": 5.013291,
+            "max": 15.08325
+          },
+          "draws": {
+            "mean": 170.2138888888889,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1471368.822222222,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            1280,
+            720
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    },
+    "edge-before": {
+      "browser": "edge",
+      "version": "154.0.4258.37",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 16.66611111111111,
+            "p95": 16.700000000000728,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 4.033240997560137,
+            "p95": 5.899999976158142,
+            "min": 2,
+            "max": 8.399999976158142
+          },
+          "gpu": {
+            "mean": 13.556887296398882,
+            "p95": 30.695041,
+            "min": 6.262208,
+            "max": 41.161791
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 16.66611111111111,
+            "p95": 16.700000000004366,
+            "min": 16.5,
+            "max": 16.80000000000291
+          },
+          "cpu": {
+            "mean": 3.2828254841701474,
+            "p95": 4.399999976158142,
+            "min": 1.600000023841858,
+            "max": 8.099999904632568
+          },
+          "gpu": {
+            "mean": 5.103808144044321,
+            "p95": 6.79125,
+            "min": 3.696916,
+            "max": 8.816333
+          },
+          "draws": {
+            "mean": 166.43055555555554,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1463757.2777777778,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            1632,
+            918
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (File not found)"
+      ]
+    },
+    "firefox-headed-after": {
+      "browser": "firefox",
+      "version": "142.0.1",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "gpu": "Apple M1, or similar",
+        "antialias": true,
+        "timer": false
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 9.692988691437803,
+            "p95": 17.020000000000437,
+            "min": 7.359999999998763,
+            "max": 41.5600000000004
+          },
+          "cpu": {
+            "mean": 6.280645161290322,
+            "p95": 10,
+            "min": 2,
+            "max": 25
+          },
+          "gpu": null,
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        },
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 8.344923504867872,
+            "p95": 9.279999999998836,
+            "min": 7.360000000000582,
+            "max": 15.94000000000051
+          },
+          "cpu": {
+            "mean": 2.2916666666666665,
+            "p95": 3,
+            "min": 1,
+            "max": 6
+          },
+          "gpu": null,
+          "draws": {
+            "mean": 152.01668984700973,
+            "p95": 222,
+            "min": 125,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1346433.2698191933,
+            "p95": 1748614,
+            "min": 1201983,
+            "max": 1748614
+          },
+          "buffer": [
+            1280,
+            720
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    },
+    "chrome-software-before": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 3541.4500000000044,
+            "p95": 3983.100000000006,
+            "min": 3099.800000000003,
+            "max": 3983.100000000006
+          },
+          "cpu": {
+            "mean": 4.899999936421712,
+            "p95": 5.699999928474426,
+            "min": 3.899999976158142,
+            "max": 5.699999928474426
+          },
+          "gpu": {
+            "mean": 3630.332542,
+            "p95": 3955.775875,
+            "min": 3065.054542,
+            "max": 3955.775875
+          },
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1748614,
+            "p95": 1748614,
+            "min": 1748614,
+            "max": 1748614
+          },
+          "buffer": [
+            1632,
+            918
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (File not found)"
+      ]
+    },
+    "checks": {
+      "graphics": {
+        "passed": 28,
+        "results": [
+          "detailed pixel budget at 3840x2160, DPR 1",
+          "battery pixel budget at 3840x2160, DPR 1",
+          "minimal pixel budget at 3840x2160, DPR 1",
+          "detailed pixel budget at 2560x1440, DPR 2",
+          "battery pixel budget at 2560x1440, DPR 2",
+          "minimal pixel budget at 2560x1440, DPR 2",
+          "detailed pixel budget at 1920x1080, DPR 1",
+          "battery pixel budget at 1920x1080, DPR 1",
+          "minimal pixel budget at 1920x1080, DPR 1",
+          "detailed pixel budget at 390x844, DPR 3",
+          "battery pixel budget at 390x844, DPR 3",
+          "minimal pixel budget at 390x844, DPR 3",
+          "Battery mode caps the real 4K drawing buffer",
+          "Startup samples do not downgrade",
+          "First downgrade preserves Automatic",
+          "Automatic can downgrade a second time",
+          "Minimum tier removes the live shadow pass",
+          "Minimum tier caps the real drawing buffer",
+          "Shadow-off frame has no stale shadow-sampler error",
+          "Battery preference can adapt further",
+          "One moderately slow sample does not downgrade",
+          "A healthy sample clears consecutive slow samples",
+          "Sustained sub-45 FPS lowers the tier",
+          "Explicit Detailed restores shadows and stays selected",
+          "Restoring shadows has no WebGL error",
+          "Detailed restores full vegetation counts",
+          "Visibility change clears stale frame samples",
+          "Report identifies browser, renderer and actual resolution"
+        ]
+      },
+      "dialogue": {
+        "pass": true,
+        "checks": 28,
+        "results": [
+          "Arrival hides speech and chat controls",
+          "Nearby resident greets the player",
+          "Greeting pauses the resident",
+          "Ambient speech does not announce repeatedly to screen readers",
+          "Explicit chat cycles through five different personality lines",
+          "Explicit chat has a named polite announcement",
+          "Language switches the current line without resetting it",
+          "Chat control has a Japanese accessible name",
+          "Portrait bubble stays within the viewport",
+          "Chat target is at least 44 pixels high",
+          "Disabling dialogue hides bubbles and releases residents",
+          "Hidden dialogue cannot be activated",
+          "Behind-camera speech is hidden",
+          "Distant speech is hidden",
+          "Rain has a character-specific remark",
+          "Dusk has a character-specific remark",
+          "Disposal removes the overlay",
+          "Building collider occludes speech",
+          "Pip has the correct voice and identity",
+          "Maple has the correct voice and identity",
+          "Moss has the correct voice and identity",
+          "Luma has the correct voice and identity",
+          "Overlapping residents do not stack unreadable bubbles",
+          "At most two ambient bubbles appear together",
+          "Engine menus suppress conversations",
+          "Activities suppress conversations",
+          "Leaving an activity restores conversations",
+          "Tea garden exit keeps Luma readable"
+        ],
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+      },
+      "residents": {
+        "pass": true,
+        "checks": 20,
+        "results": [
+          "Approach stops with personal space at 30 fps",
+          "One resident approaches at a time at 30 fps",
+          "Approach stops with personal space at 60 fps",
+          "One resident approaches at a time at 60 fps",
+          "Resident settles without orbiting or shuffling",
+          "Resident returns to their original routine",
+          "Staying nearby does not repeatedly summon the same resident",
+          "Leaving and returning allows a new greeting",
+          "Opening a menu cancels the approach and returns the resident",
+          "Approach stops with personal space at 120 fps",
+          "One resident approaches at a time at 120 fps",
+          "Approach distance stays consistent across frame rates",
+          "Maple also walks over to greet the player",
+          "Moss also walks over to greet the player",
+          "Luma also walks over to greet the player",
+          "Residents do not approach through a wall",
+          "Approach planning rejects a river shortcut",
+          "Approach planning accepts the real bridge",
+          "Walking away ends pursuit and returns the resident",
+          "Arrival and activities do not attract villagers"
+        ],
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+      }
+    },
+    "final-profile-script": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "antialias": true,
+        "timer": true
+      },
+      "results": [
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 16.66611111111111,
+            "p95": 16.700000000000728,
+            "min": 16.5,
+            "max": 16.80000000000109
+          },
+          "cpu": {
+            "mean": 2.9423822729211104,
+            "p95": 4.300000071525574,
+            "min": 1.399999976158142,
+            "max": 5.399999976158142
+          },
+          "gpu": {
+            "mean": 4.48180549030471,
+            "p95": 5.40025,
+            "min": 3.365499,
+            "max": 7.751749
+          },
+          "draws": {
+            "mean": 180,
+            "p95": 222,
+            "min": 138,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1488700.5,
+            "p95": 1748614,
+            "min": 1228787,
+            "max": 1748614
+          },
+          "buffer": [
+            1280,
+            720
+          ],
+          "quality": "low",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 240102,
+          "instances": 13339,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 160160,
+          "instances": 208,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 58320,
+          "instances": 81,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 46200,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 38280,
+          "instances": 330,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    }
+  },
+  "applicationChecks": {
+    "chrome": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1280,
+          720
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 60,
+        "draws": 222,
+        "triangles": 1748614
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    },
+    "edge": {
+      "browser": "edge",
+      "version": "154.0.4258.37",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1280,
+          720
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 60,
+        "draws": 138,
+        "triangles": 1228787
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    },
+    "opera": {
+      "browser": "opera",
+      "version": "152.0.7977.130",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 OPR/136.0.0.0",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1280,
+          720
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 60,
+        "draws": 222,
+        "triangles": 1748614
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    },
+    "firefox": {
+      "browser": "firefox",
+      "version": "142.0.1",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "gpu": "Apple M1, or similar",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          960,
+          540
+        ],
+        "preference": "low",
+        "tier": "minimal",
+        "shadows": false,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 1,
+        "draws": 138,
+        "triangles": 1011203
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    },
+    "webkit": {
+      "browser": "webkit",
+      "version": "26.5",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "gpu": "Apple GPU",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          960,
+          540
+        ],
+        "preference": "low",
+        "tier": "minimal",
+        "shadows": false,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 8,
+        "draws": 222,
+        "triangles": 1748614
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    }
+  },
+  "webkitInvestigation": {
+    "webkit-ui": {
+      "browser": "webkit",
+      "version": "26.5",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "gpu": "Apple GPU",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          960,
+          540
+        ],
+        "preference": "low",
+        "tier": "minimal",
+        "shadows": false,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 2,
+        "draws": 138,
+        "triangles": 1011203
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow).",
+        "WebGL: INVALID_OPERATION: glDrawElements: Mismatch between texture format and sampler type (signed/unsigned/float/shadow). (No more validation messages will be reported)"
+      ],
+      "failed": []
+    },
+    "webkit-high-after": {
+      "browser": "webkit",
+      "version": "26.5",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "gpu": "Apple GPU",
+        "antialias": true,
+        "timer": false
+      },
+      "results": [
+        {
+          "variant": "high",
+          "frame": {
+            "mean": 153.56410256410257,
+            "p95": 233,
+            "min": 23,
+            "max": 237
+          },
+          "cpu": {
+            "mean": 4.6,
+            "p95": 7,
+            "min": 3,
+            "max": 7
+          },
+          "gpu": null,
+          "draws": {
+            "mean": 222,
+            "p95": 222,
+            "min": 222,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 2211218,
+            "p95": 2211218,
+            "min": 2211218,
+            "max": 2211218
+          },
+          "buffer": [
+            1920,
+            1080
+          ],
+          "quality": "high",
+          "shadows": true
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 414000,
+          "instances": 23000,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 277200,
+          "instances": 360,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 100800,
+          "instances": 140,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 79660,
+          "instances": 569,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 66004,
+          "instances": 569,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 22536,
+          "instances": 12,
+          "cast": true,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    },
+    "webkit-light-toggle": {
+      "browser": "webkit",
+      "version": "26.5",
+      "env": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "gpu": "Apple GPU",
+        "antialias": true,
+        "timer": false
+      },
+      "results": [
+        {
+          "variant": "low",
+          "frame": {
+            "mean": 158.30769230769232,
+            "p95": 269,
+            "min": 11,
+            "max": 466
+          },
+          "cpu": {
+            "mean": 15.4,
+            "p95": 13,
+            "min": 3,
+            "max": 458
+          },
+          "gpu": null,
+          "draws": {
+            "mean": 163.84615384615384,
+            "p95": 222,
+            "min": 138,
+            "max": 222
+          },
+          "triangles": {
+            "mean": 1249256.8461538462,
+            "p95": 1748614,
+            "min": 1011203,
+            "max": 1748614
+          },
+          "buffer": [
+            960,
+            540
+          ],
+          "quality": "low",
+          "shadows": false
+        }
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 144882,
+          "instances": 8049,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 96250,
+          "instances": 125,
+          "cast": false,
+          "receive": false
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 88200,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 77664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 62040,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 45360,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 35280,
+          "instances": 49,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 34224,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 31680,
+          "instances": 1,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 27860,
+          "instances": 199,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 24924,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23800,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 23084,
+          "instances": 199,
+          "cast": false,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21952,
+          "instances": 2,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "",
+          "type": "Mesh",
+          "triangles": 21168,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        },
+        {
+          "name": "SpiritBody",
+          "type": "Mesh",
+          "triangles": 17664,
+          "instances": 1,
+          "cast": true,
+          "receive": true
+        }
+      ],
+      "errors": []
+    }
+  },
+  "cssProbe": {
+    "firefox": [
+      {
+        "variant": "village",
+        "fps": 13.763594567968012,
+        "frames": 57
+      },
+      {
+        "variant": "settings",
+        "fps": 14.078457573732935,
+        "frames": 59
+      },
+      {
+        "variant": "settings-no-blur",
+        "fps": 13.65557291117649,
+        "frames": 57
+      },
+      {
+        "variant": "village-no-blur",
+        "fps": 14.56027955736749,
+        "frames": 59
+      }
+    ],
+    "finding": "Removing backdrop blur did not materially change this Firefox automation run. No blur styling was changed."
+  },
+  "validation": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "graphics": 28,
+    "controllerAndComposition": 10,
+    "bridge": 3,
+    "dialogue": 28,
+    "resident": 20,
+    "limits": "No Windows or friend-device result. Firefox and WebKit functional flows passed but production timing was inconsistent/low; no Safari performance acceptance. These local measurements precede the authorized release.",
+    "profileScript": "Passed CHECKS=1 CASES=low MIN_FPS=55 against final compiled engine"
+  },
+  "releaseValidation": {
+    "subpath": "/cosy-v1",
+    "htmlAssetsChecked": 14,
+    "missingAssets": [],
+    "firstBuild": "next/font loader error; unchanged retry passed",
+    "subpathApp": {
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "report": {
+        "graphicsVersion": "pixel-budget-v1",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1920,
+          1080
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1280,
+          720
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "fps": 60,
+        "draws": 222,
+        "triangles": 1748614
+      },
+      "checks": [
+        "arrival",
+        "battery pixel cap",
+        "performance report",
+        "activity 1 exit",
+        "activity 2 exit",
+        "activity 3 exit",
+        "activity 4 exit",
+        "activity 5 exit",
+        "activity 6 exit",
+        "rain and quality switching",
+        "portrait report"
+      ],
+      "errors": [],
+      "failed": []
+    }
+  }
+}

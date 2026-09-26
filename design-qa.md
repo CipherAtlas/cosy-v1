@@ -4,6 +4,10 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
 
+## 2026-09-26 performance update
+
+The user confirmed a 1080p maximum rendering budget and 720p battery allowance. Local limits and repeated adaptive downgrades are implemented, with a lighter fallback and an opt-in GPU report. Chrome’s 4K-window entrance sample improves from 23–30 FPS to 60 FPS; Chrome, Edge and Opera exported-app checks report 60 FPS in battery mode. Firefox and WebKit functional checks pass, but their automated performance remains inconsistent/low. The friend’s Windows Opera GPU path is unverified; friend-device acceptance remains open. Publication was authorized separately; see the release task/workflow for live verification. See the [investigation and evidence](VILLAGE_BUILD.md#2026-09-26-performance-investigation).
+
 ## 2026-09-26 published candidate
 
 Application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290) is live after a successful [Pages build and deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). Live Chromium checks passed for arrival, scene rendering, recorded-music start/stop, tea-garden exit and Luma chat; no warnings/errors were captured in the inspected tab. Model, HDR and all seven recorded-audio URLs returned 200. See [the release ledger](VILLAGE_BUILD.md#2026-09-26-main-release) for exact scope. This confirms publication and those flows; physical-device, long-session listening and complete art acceptance remain open.

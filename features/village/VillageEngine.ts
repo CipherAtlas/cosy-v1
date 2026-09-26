@@ -11,6 +11,7 @@ import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import type { ActivityMoment } from "./environment";
 import { softenShadowEdges } from "./shadows";
+import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
 import { floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
@@ -61,8 +62,10 @@ export class VillageEngine {
   private blocked = false;
   private place: PlaceId | null = null;
   private near: PlaceId | null = null;
-  private autoQuality = true;
   private quality: Quality = "auto";
+  private graphicsTier: GraphicsTier = "detailed";
+  private qualityChangedAt = 0;
+  private slowSamples = 0;
   private frameSum = 0;
   private frames = 0;
   private statsTime = 0;
@@ -119,6 +122,8 @@ export class VillageEngine {
   private onVisibility = () => {
     this.clearKeys();
     this.lastTime = 0;
+    this.frameSum = this.frames = this.slowSamples = 0;
+    this.statsTime = this.qualityChangedAt = performance.now();
   };
   private motionChange = () => {
     this.reducedMotion = this.motionQuery.matches;
@@ -203,7 +208,6 @@ export class VillageEngine {
       alpha: false,
       powerPreference: "high-performance",
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.outputColorSpace = T.SRGBColorSpace;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
@@ -356,6 +360,7 @@ export class VillageEngine {
     this.scene.add(this.rain);
     this.callbacks.progress(100);
     this.callbacks.ready();
+    this.applyGraphicsTier();
     this.renderer.setAnimationLoop((t) => this.frame(t));
   }
   private buildInterior() {
@@ -509,6 +514,9 @@ export class VillageEngine {
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.host;
     if (!w || !h) return;
+    this.statsTime = this.qualityChangedAt = performance.now();
+    this.frameSum = this.frames = this.slowSamples = 0;
+    this.renderer.setPixelRatio(graphicsPixelRatio(this.graphicsTier, w, h, window.devicePixelRatio));
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.compactView = w <= 700;
@@ -533,24 +541,45 @@ export class VillageEngine {
   }
   setQuality(q: Quality) {
     this.quality = q;
-    this.autoQuality = q === "auto";
-    const low = q === "low";
-    this.renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, low ? 0.85 : 1.25),
-    );
-    this.renderer.shadowMap.enabled = true;
+    this.graphicsTier = initialGraphicsTier(q);
+    this.applyGraphicsTier();
+  }
+  private applyGraphicsTier() {
+    const budget = GRAPHICS_TIERS[this.graphicsTier];
+    this.qualityChangedAt = this.statsTime = performance.now();
+    this.frameSum = this.frames = this.slowSamples = 0;
+    this.renderer.shadowMap.enabled = budget.shadowSize > 0;
+    // Changing the light's shadow count also invalidates Three's cached lighting shaders.
+    this.sun.castShadow = this.renderer.shadowMap.enabled;
     this.renderer.shadowMap.autoUpdate = false;
     this.renderer.shadowMap.needsUpdate = true;
-    const shadowSize = low ? 1024 : 2048;
+    const shadowSize = budget.shadowSize || 512;
     if (this.sun.shadow.mapSize.x !== shadowSize) {
       this.sun.shadow.map?.dispose(); this.sun.shadow.map = null;
       this.sun.shadow.mapSize.set(shadowSize, shadowSize);
     }
     this.world?.vegetation.forEach(mesh => {
       if (mesh.userData.fullCount === undefined) mesh.userData.fullCount = mesh.count;
-      mesh.count = Math.floor(mesh.userData.fullCount * (low ? 0.58 : 1));
+      mesh.count = Math.floor(mesh.userData.fullCount * budget.vegetation);
     });
     this.resize();
+  }
+  getPerformanceReport() {
+    const gl = this.renderer.getContext();
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    return {
+      graphicsVersion: "pixel-budget-v1",
+      browser: navigator.userAgent,
+      gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+      viewport: [this.host.clientWidth, this.host.clientHeight],
+      devicePixelRatio: window.devicePixelRatio,
+      drawingBuffer: [gl.drawingBufferWidth, gl.drawingBufferHeight],
+      preference: this.quality,
+      tier: this.graphicsTier,
+      shadows: this.renderer.shadowMap.enabled,
+      antialias: gl.getContextAttributes()?.antialias,
+      contextLost: gl.isContextLost(),
+    };
   }
   setWeather(w: Weather) {
     this.weather = w;
@@ -799,7 +828,7 @@ export class VillageEngine {
       const treeSource = this.world.trees[0];
       treeSource?.bounds.forEach((bounds, index) => {
         const distance = Math.hypot(bounds.center.x - this.player.position.x, bounds.center.z - this.player.position.z);
-        if (distance < (this.quality === "low" ? 22 : 32)) nearTrees.push(index);
+        if (distance < GRAPHICS_TIERS[this.graphicsTier].trees) nearTrees.push(index);
         else if (this.treeFrustum.intersectsSphere(bounds)) farTrees.push(index);
       });
       for (const batch of this.world.trees) {
@@ -814,7 +843,7 @@ export class VillageEngine {
       }
     }
     // Refresh moving shadows every frame in detailed view; cap simple view at 30 Hz.
-    if (now - this.shadowTime > (this.quality === "low" ? 32 : 0) && (!this.reducedMotion || moving)) {
+    if (this.renderer.shadowMap.enabled && now - this.shadowTime > (this.graphicsTier === "detailed" ? 0 : 32) && (!this.reducedMotion || moving)) {
       const texel = 48 / this.sun.shadow.mapSize.x;
       const x = Math.round(this.player.position.x / texel) * texel, z = Math.round(this.player.position.z / texel) * texel;
       this.sun.position.set(x + 35, 28, z - 48);
@@ -826,15 +855,20 @@ export class VillageEngine {
     this.dialogue?.update(dt, this.camera, this.player.position, this.weather);
     this.frameSum += frameDelta;
     this.frames++;
-    if (now - this.statsTime > 4000) {
+    if (now - this.statsTime > 2000) {
       const fps = Math.round(this.frames / this.frameSum);
       this.callbacks.stats(
         fps,
         this.renderer.info.render.calls,
         this.renderer.info.render.triangles,
       );
-      if (this.autoQuality && this.elapsed > 8 && fps < 28) {
-        this.setQuality("low");
+      this.slowSamples = fps < 45 ? this.slowSamples + 1 : 0;
+      // Keep the selected preference: automatic and battery modes can step down again.
+      // Ignore startup/resizing and isolated slow samples; explicit Detailed stays fixed.
+      if (this.quality !== "high" && this.graphicsTier !== "minimal" &&
+          now - this.qualityChangedAt > 4000 && (fps < 24 || this.slowSamples >= 2)) {
+        this.graphicsTier = slowerGraphicsTier(this.graphicsTier);
+        this.applyGraphicsTier();
       }
       this.frameSum = 0;
       this.frames = 0;

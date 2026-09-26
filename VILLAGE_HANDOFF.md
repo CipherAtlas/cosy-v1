@@ -4,6 +4,8 @@ Updated: 2026-09-26. **Status: colorful spirit village, recorded soundtrack and 
 
 Published application: [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), with successful [Pages build/deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). Live arrival, scene assets, recorded-music controls, activity exit and villager chat were verified. [The release ledger](VILLAGE_BUILD.md#2026-09-26-main-release) records exact checks and limits; earlier milestone descriptions are historical.
 
+Latest performance investigation (2026-09-26): friends report 8–20 FPS; an Opera/Windows screenshot shows 3 FPS, 229 calls and 2.212M triangles. The performance update caps drawing-buffer pixels by tier, preserves Automatic through repeated downgrades, and adds an opt-in performance report in Settings. Read [the performance investigation](VILLAGE_BUILD.md#2026-09-26-performance-investigation) before further renderer changes. The user authorized publishing these fixes through the existing Pages workflow; verify the release task/workflow for its live outcome. The friend's GPU/acceleration path remains unverified. Mac browser results are not Windows-device proof.
+
 ## Current art direction — 2026-09-26
 
 The user has superseded the earlier realistic traveler brief: use **Arkenfall atmosphere plus a strongly Genshin-inspired, colorful stylized palette**, with **a cute floating white spirit and a cartoon smile** as the player. Keep all artwork original. The approved village image still guides composition, scale and environmental craft, but its muted palette and human player are no longer requirements. Preserve the named villagers and their conversations.

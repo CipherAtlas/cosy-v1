@@ -825,6 +825,10 @@ kbd {
   background: #17201488;
   padding: 4px 7px;
 }
+.v-performance-report { display: grid; gap: 12px; }
+.v-performance-report button { padding: 10px 14px; border: 1px solid #b8c2ad; border-radius: 8px; background: #edf1e5; color: #344d40; }
+.v-performance-report label { display: grid; gap: 8px; font-size: 13px; line-height: 1.5; }
+.v-performance-report textarea { width: 100%; min-height: 180px; padding: 10px; border: 1px solid #b8c2ad; border-radius: 8px; background: #fffdf4; color: #344d40; font: 12px/1.5 monospace; resize: vertical; }
 .v-simple .v-activity {
   max-height: calc(100dvh - 210px);
 }

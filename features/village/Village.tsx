@@ -60,6 +60,7 @@ export function Village() {
   const preferences = useRef({ quality, weather, language });
   preferences.current = { quality, weather, language };
   const [notice, setNotice] = useState("");
+  const [performanceReport, setPerformanceReport] = useState("");
   const loaded = useRef(false),
     enterRef = useRef(false);
   const ja = language === "ja",
@@ -653,6 +654,21 @@ export function Village() {
                   />
                   {t("Show performance", "パフォーマンス表示")}
                 </label>
+                {showStats && engine.current && (
+                  <div className="v-performance-report">
+                    <button type="button" onClick={() => setPerformanceReport(JSON.stringify({
+                      ...engine.current?.getPerformanceReport(), ...stats,
+                    }, null, 2))}>
+                      {t("Get performance report", "パフォーマンスレポートを表示")}
+                    </button>
+                    {performanceReport && (
+                      <label>
+                        {t("Share this report when something runs slowly. It stays on this device until you share it.", "動作が遅い場合は、このレポートを共有してください。共有するまで端末内に保存されます。")}
+                        <textarea readOnly value={performanceReport} onFocus={e => e.target.select()} />
+                      </label>
+                    )}
+                  </div>
+                )}
                 <p>
                   {t(
                     "Your device’s reduced-motion setting is respected. Notes stay in this browser.",
