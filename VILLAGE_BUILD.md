@@ -2,6 +2,14 @@
 
 Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canonical direction and future work. This file records implementation evidence and limits. The latest section below supersedes historical prototype descriptions; older results are retained under their original headings.
 
+## 2026-09-26 custom domain release
+
+At the user's request, `cosy.sabarg.com` now has a DNS-only Cloudflare CNAME to `cipheratlas.github.io`. GitHub Pages lists the custom domain, an approved certificate and enforced HTTPS. Commit [`ec0da2d`](https://github.com/CipherAtlas/cosy-v1/commit/ec0da2d52eae51b0ddc5b6f1e7d822c2a3b2e1ec) changed the Pages workflow to build at `/`; [run 36257520921](https://github.com/CipherAtlas/cosy-v1/actions/runs/36257520921) completed both build and deploy jobs. No application behavior, dependencies, storage keys or `personalSite` files changed.
+
+The root-path local build and TypeScript check passed. Live HTTPS returned 200 for the root page and all 17 inspected root HTML asset references, with no `/cosy-v1/` references in that HTML. The spirit model and HDR asset returned 200. In the live in-app browser, the village rendered, Places opened all six destinations, Willow pond opened and Back to village restored exploration; no warning or error logs were captured. This does not repeat full device, audio or performance acceptance.
+
+At cutover verification, the old `https://cipheratlas.github.io/cosy-v1/` still returned its previous subpath export rather than redirecting. Do not depend on that behavior continuing. Browser storage is origin-specific; saved notes and settings at the old address do not appear at `cosy.sabarg.com`. The user approved going live without migration.
+
 ## 2026-09-26 village controls and layout release
 
 Complete working-tree change set reviewed, documented, committed and published at the user's request. Application commit [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b) passed [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). No dependencies, storage keys, infrastructure or deployment configuration changed.
