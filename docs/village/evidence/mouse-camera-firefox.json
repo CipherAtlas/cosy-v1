@@ -1,0 +1,28 @@
+{
+  "pass": true,
+  "browser": "firefox",
+  "checks": 20,
+  "results": [
+    "Click captures the mouse without moving the player",
+    "Mouse-look state reflects the real browser lock",
+    "Mouse movement rotates both camera axes without a held button",
+    "Looking around does not move the player",
+    "WASD movement still works during mouse look",
+    "Escape releases the cursor and clears held movement",
+    "Released mouse movement does not rotate the camera",
+    "A new click resumes mouse look after Escape",
+    "Opening a menu releases the cursor",
+    "Clicks cannot capture the mouse while a menu blocks exploration",
+    "Closing a menu does not recapture the cursor",
+    "Entering an activity releases the cursor",
+    "Leaving an activity restores exploration with a free cursor",
+    "Window blur releases the cursor and stops movement",
+    "Opening a menu during a pending capture prevents a late mouse grab",
+    "Event-only requestPointerLock implementations are supported",
+    "A denied capture exposes working drag-to-look fallback",
+    "Fallback dragging still cannot move the player",
+    "Disposal releases mouse capture and removes the canvas",
+    "No uncaught browser errors"
+  ],
+  "errors": []
+}

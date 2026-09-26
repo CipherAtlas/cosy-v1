@@ -25,7 +25,7 @@ shutil.copy(ROOT/'scripts/village/tests/graphics.js',temp/'graphics-tests.js')
 (temp/'village').symlink_to(ROOT/'public/village',target_is_directory=True)
 (temp/'three').symlink_to(ROOT/'node_modules/three',target_is_directory=True)
 evidence=ROOT/'docs/village/evidence';evidence.mkdir(exist_ok=True)
-allowed={'activity-exits.json','bridge-side.png','hearth.png','camera-up.png','camera-down.png','camera-rear.png','audio-output.json','scene-audit.json','entrance.png','cottage.png','bridge.png','rain.png','dusk.png','motion.webm','profile.json','audio-piano.wav','audio-lofi.wav','audio-jazz.wav','audio-measurements.json','audio-lifecycle.json'}
+allowed={'roaming-streets.json','activity-exits.json','bridge-side.png','hearth.png','camera-up.png','camera-down.png','camera-rear.png','audio-output.json','scene-audit.json','entrance.png','cottage.png','bridge.png','rain.png','dusk.png','motion.webm','profile.json','audio-piano.wav','audio-lofi.wav','audio-jazz.wav','audio-measurements.json','audio-lifecycle.json'}
 allowed.update({'villager-dialogue.json', 'villager-approach.json', 'villager-approach-runtime.json','spirit-front.png','spirit-back.png','cottage-exterior.png','art-checks.json','movement-checks.json'})
 allowed.update({'valley-wide.png','distant-gardens.png','rear-valley.png','resident-pip.png','resident-maple.png','resident-moss.png','resident-luma.png','spirit-villagers.png','fantasy-checks.json'})
 allowed.update({'arrival-directory.png','arrival-directory-ja.png','junction-post.png','cottage-post.png','soft-shadows.png','polish-checks.json','soundscape.webm'})

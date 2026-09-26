@@ -48,13 +48,10 @@ export class VillageEngine {
     id: number;
     x: number;
     y: number;
-    moved: boolean;
-    startX: number;
-    startY: number;
   };
-  private walkTarget?: T.Vector3;
-  private walkMarker = new T.Mesh(new T.RingGeometry(.16, .21, 40),
-    new T.MeshBasicMaterial({ color: "#ffe4a1", transparent: true, opacity: .85, depthWrite: false }));
+  private mouseLook: "free" | "locked" | "drag" = "free";
+  private wantsMouseLook = false;
+  private pointerLockPending = false;
   private lastTime = 0;
   private elapsed = 0;
   private resizeObserver: ResizeObserver;
@@ -92,6 +89,11 @@ export class VillageEngine {
   private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
   private onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      this.releaseMouseLook();
+      this.clearKeys();
+      return;
+    }
     if (
       this.blocked || this.place ||
       e.target instanceof HTMLInputElement ||
@@ -116,11 +118,15 @@ export class VillageEngine {
   private clearKeys = () => {
     this.keys.clear();
     this.pointer = undefined;
-    this.walkTarget = undefined;
     this.movement?.pause();
+  };
+  private onBlur = () => {
+    this.releaseMouseLook();
+    this.clearKeys();
   };
   private onVisibility = () => {
     this.clearKeys();
+    if (document.hidden) this.releaseMouseLook();
     this.lastTime = 0;
     this.frameSum = this.frames = this.slowSamples = 0;
     this.statsTime = this.qualityChangedAt = performance.now();
@@ -129,54 +135,89 @@ export class VillageEngine {
     this.reducedMotion = this.motionQuery.matches;
   };
   private onDown = (e: PointerEvent) => {
-    if (this.blocked || this.place) return;
+    if (this.blocked || this.place || e.button !== 0 || this.pointer) return;
+    this.renderer.domElement.focus({ preventScroll: true });
+    if (document.pointerLockElement === this.renderer.domElement) return;
     this.pointer = {
       id: e.pointerId,
       x: e.clientX,
       y: e.clientY,
-      moved: false,
-      startX: e.clientX,
-      startY: e.clientY,
     };
-    this.renderer.domElement.setPointerCapture(e.pointerId);
+    if (e.pointerType === "mouse") this.captureMouse();
+    else this.renderer.domElement.setPointerCapture(e.pointerId);
   };
   private onMove = (e: PointerEvent) => {
-    if (!this.pointer || this.blocked || this.place) return;
+    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked || this.place
+      || (e.pointerType === "mouse" && this.mouseLook !== "drag")) return;
     const dx = e.clientX - this.pointer.x,
       dy = e.clientY - this.pointer.y;
     this.yaw -= dx * 0.004;
     this.pitch = T.MathUtils.clamp(this.pitch + dy * 0.004, -0.85, 1.35);
     this.pointer.x = e.clientX;
     this.pointer.y = e.clientY;
-    if (
-      Math.hypot(
-        e.clientX - this.pointer.startX,
-        e.clientY - this.pointer.startY,
-      ) > 8
-    )
-      this.pointer.moved = true;
   };
   private onUp = (e: PointerEvent) => {
-    const p = this.pointer;
-    this.pointer = undefined;
-    if (!p || p.moved || this.blocked || this.place) return;
-    const rect = this.renderer.domElement.getBoundingClientRect();
-    const ray = new T.Raycaster();
-    ray.setFromCamera(
-      new T.Vector2(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        (-(e.clientY - rect.top) / rect.height) * 2 + 1,
-      ),
-      this.camera,
-    );
-    const hit = new T.Vector3();
-    if (
-      ray.ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), 0), hit) &&
-      hit.distanceTo(this.player.position) < 45
-    ) {
-      this.walkTarget = hit;
+    if (this.pointer?.id === e.pointerId) this.pointer = undefined;
+  };
+  private onMouseMove = (e: MouseEvent) => {
+    if (document.pointerLockElement !== this.renderer.domElement || this.blocked || this.place) return;
+    this.yaw -= e.movementX * .004;
+    this.pitch = T.MathUtils.clamp(this.pitch + e.movementY * .004, -.85, 1.35);
+  };
+  private setMouseLook(mode: "free" | "locked" | "drag") {
+    if (this.mouseLook === mode) return;
+    this.mouseLook = mode;
+    this.callbacks.mouseLook?.(mode);
+  }
+  private onPointerLockChange = () => {
+    this.pointerLockPending = false;
+    if (this.disposed) {
+      this.releaseMouseLook();
+      document.removeEventListener("pointerlockchange", this.onPointerLockChange);
+      document.removeEventListener("pointerlockerror", this.onPointerLockError);
+      return;
+    }
+    if (document.pointerLockElement === this.renderer.domElement) {
+      // A menu, Escape or disposal may have happened while the browser handled the request.
+      if (!this.wantsMouseLook || this.blocked || this.place || this.disposed || document.hidden) {
+        this.releaseMouseLook();
+        return;
+      }
+      this.pointer = undefined;
+      this.setMouseLook("locked");
+    } else {
+      this.wantsMouseLook = false;
+      this.clearKeys();
+      this.setMouseLook("free");
     }
   };
+  private onPointerLockError = () => {
+    this.pointerLockPending = false;
+    if (this.disposed) {
+      document.removeEventListener("pointerlockchange", this.onPointerLockChange);
+      document.removeEventListener("pointerlockerror", this.onPointerLockError);
+    }
+    if (this.wantsMouseLook && !this.disposed && !this.blocked && !this.place) this.setMouseLook("drag");
+    this.wantsMouseLook = false;
+  };
+  captureMouse() {
+    const canvas = this.renderer.domElement;
+    if (this.blocked || this.place || this.disposed || !this.world || document.hidden
+      || this.pointerLockPending || document.pointerLockElement === canvas) return;
+    this.wantsMouseLook = true;
+    this.pointerLockPending = true;
+    if (!canvas.requestPointerLock) { this.onPointerLockError(); return; }
+    try {
+      // Firefox also supports the event-only version, which returns no promise.
+      const request = canvas.requestPointerLock();
+      request?.catch(this.onPointerLockError);
+    } catch { this.onPointerLockError(); }
+  }
+  private releaseMouseLook() {
+    this.wantsMouseLook = false;
+    if (document.pointerLockElement === this.renderer.domElement) document.exitPointerLock();
+    this.setMouseLook("free");
+  }
   private onWheel = (e: WheelEvent) => {
     if (this.blocked || this.place) return;
     e.preventDefault();
@@ -184,6 +225,8 @@ export class VillageEngine {
   };
   private onLost = (e: Event) => {
     e.preventDefault();
+    this.releaseMouseLook();
+    this.clearKeys();
     this.renderer.setAnimationLoop(null);
     this.callbacks.error(
       "The 3D view was interrupted. Your activities are still available in simple view.",
@@ -201,6 +244,7 @@ export class VillageEngine {
       movement: (status: MovementStatus) => void;
       contact: (event: WorldContact) => void;
       environment: (frame: EnvironmentFrame) => void;
+      mouseLook?: (mode: "free" | "locked" | "drag") => void;
     },
   ) {
     this.renderer = new T.WebGLRenderer({
@@ -217,7 +261,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump, drag to look, click to glide to a spot, E for activities, F to chat with a nearby villager. Places provides direct access to every activity.",
+      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. On touch screens, drag to look and use the movement buttons. E for activities, F to chat with a nearby villager. Places provides direct access to every activity.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -248,9 +292,6 @@ export class VillageEngine {
     this.player.position.set(0.3, 0, 20);
     this.player.rotation.y = Math.PI;
     this.scene.add(this.player);
-    this.walkMarker.rotation.x = -Math.PI / 2;
-    this.walkMarker.visible = false;
-    this.scene.add(this.walkMarker);
     this.camera.position.set(0.3, 2.0, 23.8);
     this.currentLook.set(0.3, 1.35, 20);
     this.camera.lookAt(this.currentLook);
@@ -259,7 +300,10 @@ export class VillageEngine {
     this.resize();
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
-    window.addEventListener("blur", this.clearKeys);
+    window.addEventListener("blur", this.onBlur);
+    document.addEventListener("mousemove", this.onMouseMove);
+    document.addEventListener("pointerlockchange", this.onPointerLockChange);
+    document.addEventListener("pointerlockerror", this.onPointerLockError);
     document.addEventListener("visibilitychange", this.onVisibility);
     this.motionQuery.addEventListener("change", this.motionChange);
     this.motionChange();
@@ -268,6 +312,8 @@ export class VillageEngine {
     el.addEventListener("pointermove", this.onMove);
     el.addEventListener("pointerup", this.onUp);
     el.addEventListener("pointercancel", this.clearKeys);
+    el.addEventListener("lostpointercapture", this.onUp);
+    el.addEventListener("pointerleave", this.onUp);
     el.addEventListener("wheel", this.onWheel, { passive: false });
     el.addEventListener("webglcontextlost", this.onLost);
   }
@@ -531,6 +577,7 @@ export class VillageEngine {
     this.blocked = v;
     this.dialogue?.setEnabled(!v && !this.place);
     if (v) {
+      this.releaseMouseLook();
       this.clearKeys();
     }
   }
@@ -609,6 +656,7 @@ export class VillageEngine {
   }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); }
   setPlace(id: PlaceId | null) {
+    this.releaseMouseLook();
     this.dialogue?.setEnabled(!id && !this.blocked);
     const previousPlace = this.place;
     if (id && !previousPlace) this.walkingHeading=this.player.rotation.y;
@@ -699,7 +747,7 @@ export class VillageEngine {
   private reportMovement(force = false) {
     const m = this.movement;
     if (!m) return;
-    const status = { stamina: Math.round(m.stamina), exhausted: m.exhausted, gait: m.gait, running: this.running };
+    const status = { gait: m.gait, running: this.running };
     const key = JSON.stringify(status);
     if (force || key !== this.lastStatus) {
       this.lastStatus = key;
@@ -720,29 +768,16 @@ export class VillageEngine {
       const side = Number(this.keys.has("d") || this.keys.has("arrowright")) - Number(this.keys.has("a") || this.keys.has("arrowleft"));
       this.direction.set(side * Math.cos(this.yaw) - forward * Math.sin(this.yaw), 0,
         -forward * Math.cos(this.yaw) - side * Math.sin(this.yaw));
-      if (this.direction.lengthSq() > 0) {
-        this.walkTarget = undefined; this.direction.normalize();
-      } else if (this.walkTarget) {
-        this.direction.subVectors(this.walkTarget, this.player.position); this.direction.y = 0;
-        if (this.direction.length() < 0.25) { this.walkTarget = undefined; this.direction.set(0, 0, 0); }
-        else this.direction.normalize();
-      }
+      if (this.direction.lengthSq() > 0) this.direction.normalize();
     }
     movement.update(dt, { x: this.direction.x, z: this.direction.z, run: this.running,
       sprint: this.keys.has("shift"), blocked: this.blocked || this.place !== null });
     this.player.position.set(movement.position.x, movement.position.y, movement.position.z);
-    this.walkMarker.visible = !!this.walkTarget && !this.blocked && !this.place;
-    if (this.walkTarget) {
-      this.walkMarker.position.set(this.walkTarget.x, floorHeight(this.walkTarget.x, this.walkTarget.z) + .065, this.walkTarget.z);
-      this.walkMarker.scale.setScalar(this.reducedMotion ? 1 : 1 + Math.sin(this.elapsed*4)*.08);
-    }
     const moving = movement.speed > 0.12;
     if (moving) {
       const angle = Math.atan2(movement.velocity.x, movement.velocity.z);
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 14));
-    } else {
-      if (this.walkTarget && this.direction.lengthSq() > 0) this.walkTarget = undefined;
     }
     if (!this.blocked && !this.place) {
       let near: PlaceId | null = null,
@@ -877,11 +912,17 @@ export class VillageEngine {
   }
   dispose() {
     this.disposed = true;
+    this.releaseMouseLook();
     this.renderer.setAnimationLoop(null);
     this.resizeObserver.disconnect();
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
-    window.removeEventListener("blur", this.clearKeys);
+    window.removeEventListener("blur", this.onBlur);
+    document.removeEventListener("mousemove", this.onMouseMove);
+    if (!this.pointerLockPending) {
+      document.removeEventListener("pointerlockchange", this.onPointerLockChange);
+      document.removeEventListener("pointerlockerror", this.onPointerLockError);
+    }
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.motionQuery.removeEventListener("change", this.motionChange);
     const el = this.renderer.domElement;
@@ -889,6 +930,8 @@ export class VillageEngine {
     el.removeEventListener("pointermove", this.onMove);
     el.removeEventListener("pointerup", this.onUp);
     el.removeEventListener("pointercancel", this.clearKeys);
+    el.removeEventListener("lostpointercapture", this.onUp);
+    el.removeEventListener("pointerleave", this.onUp);
     el.removeEventListener("wheel", this.onWheel);
     el.removeEventListener("webglcontextlost", this.onLost);
     this.dialogue?.dispose();

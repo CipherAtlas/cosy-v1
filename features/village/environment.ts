@@ -16,8 +16,6 @@ export type WorldContact = {
   foot: "left" | "right";
 };
 export type MovementStatus = {
-  stamina: number;
-  exhausted: boolean;
   gait: "idle" | "walk" | "run" | "sprint" | "air";
   running: boolean;
 };

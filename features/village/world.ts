@@ -468,9 +468,9 @@ export async function buildWorld(
   }
   // Seats face the fire; the main village path stays unobstructed.
   bench(HEARTH.x, HEARTH.z + 2.9, Math.PI);
-  bench(HEARTH.x + 2.7, HEARTH.z, -Math.PI / 2);
+  bench(HEARTH.x, HEARTH.z - 2.9, 0);
   bench(HEARTH.x - 2.7, HEARTH.z, Math.PI / 2);
-  bench(16, -10, Math.PI / 4);
+  bench(15.2, -11.65, 0);
   bench(-20, -9, Math.PI / 2);
   // Hearth with glowing embers and gently animated flame geometry.
   for (let i = 0; i < 16; i++) {

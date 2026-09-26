@@ -4,6 +4,14 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
 
+## 2026-09-26 controls/layout release review
+
+Reviewed the complete pending change set: wider roaming, reduced roadside signs, hearth/tea seating, unlimited dash, mouse-look and dark green dialogue panels. Updated current documentation to remove stale energy, nine-sign and click-to-move requirements. Release verification and deployment status are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). This review does not close the broader art/device acceptance verdict above.
+
+## 2026-09-26 roaming and street clearance
+
+The local layout uses three smaller wooden fingerposts and moves the road-side hearth bench to the north of the clearing. All four residents now cover wider circuits, including Luma leaving the tea garden. Inspected the entrance, junctions, English/Japanese boards and hearth/activity views; an initial pole/lettering overlap found in Firefox was corrected. The loaded-world suite verifies complete NPC circuits at three frame rates and at least 35 cm of street clearance around every sign and hearth bench. Existing approach/dialogue and six exit checks pass. See [the evidence ledger](VILLAGE_BUILD.md#2026-09-26-roaming-and-clear-streets). This is a local implementation; the broader art/device verdict above and published version are unchanged.
+
 ## 2026-09-26 performance update
 
 The user confirmed a 1080p maximum rendering budget and 720p battery allowance. Local limits and repeated adaptive downgrades are implemented, with a lighter fallback and an opt-in GPU report. Chrome’s 4K-window entrance sample improves from 23–30 FPS to 60 FPS; Chrome, Edge and Opera exported-app checks report 60 FPS in battery mode. Firefox and WebKit functional checks pass, but their automated performance remains inconsistent/low. The friend’s Windows Opera GPU path is unverified; friend-device acceptance remains open. Publication was authorized separately; see the release task/workflow for live verification. See the [investigation and evidence](VILLAGE_BUILD.md#2026-09-26-performance-investigation).
@@ -140,4 +148,4 @@ The playable prototype is not a visual match for the selected concept. The remai
 
 ## Additional required acceptance
 
-The latest user request expands the acceptance work beyond the historical visual findings: recorded music that follows the scenery, Genshin-inspired run/sprint animations and energy, real jumping/landing, shared wind, Arkenfall-like world sound, richer assets and more alive lighting. These are required open features, not claims about what the above screenshots prove. Follow [movement and world acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance), [music and listening acceptance](docs/village/MUSIC_AND_SOUND.md#verification-and-acceptance), and the [canonical gap register](VILLAGE_HANDOFF.md#required-work-in-order).
+The latest user request expands the acceptance work beyond the historical visual findings: recorded music that follows the scenery, Genshin-inspired movement with unlimited dashing, real jumping/landing, shared wind, Arkenfall-like world sound, richer assets and more alive lighting. These are required open features, not claims about what the above screenshots prove. Follow [movement and world acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance), [music and listening acceptance](docs/village/MUSIC_AND_SOUND.md#verification-and-acceptance), and the [canonical gap register](VILLAGE_HANDOFF.md#required-work-in-order).

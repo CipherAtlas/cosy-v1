@@ -2,13 +2,13 @@
 <style>body{margin:0;background:#17251f;color:#fff;font:14px system-ui}#scene{width:1280px;height:720px}nav{padding:12px;display:flex;gap:10px;flex-wrap:wrap}button{padding:10px}pre{white-space:pre-wrap;padding:16px}audio{width:280px}</style>
 <link rel="stylesheet" href="/village.css"><style>#scene{position:relative;isolation:isolate;overflow:hidden}#scene .v-villager-bubble{box-sizing:border-box;font-family:system-ui}#scene .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}</style>
 <script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>
-<div id="scene"></div><nav><button id="load">Load village</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Record soundscape</button><button id="polish">Review navigation and shadows</button><button id="living">Review living activities</button><button id="rituals">Record water fire and activities</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
+<div id="scene"></div><nav><button id="load">Load village</button><button id="roaming">Check roaming and street clearance</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Record soundscape</button><button id="polish">Review navigation and shadows</button><button id="living">Review living activities</button><button id="rituals">Record water fire and activities</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
 <script type="module">
 import {VillageEngine} from './modules/features/village/VillageEngine.js';
 import {VillageAudio} from './modules/features/village/audio.js';
 import {Matrix4} from 'three';
 import {checkDialogue} from './dialogue-tests.js';
-import {checkResidents} from './resident-tests.js';
+import {checkResidents,checkRoaming} from './resident-tests.js';
 import {BRIDGE} from './modules/features/village/environment.js';
 import {VillageMovement} from './modules/features/village/movement.js';
 import {ACTIVITY_STAGES} from './modules/features/village/activityScene.js';
@@ -26,6 +26,10 @@ document.querySelector('#load').onclick=async()=>{
  engine?.dispose();sound?.dispose();sound=new VillageAudio();
  engine=new VillageEngine(host,{progress:n=>report('Loading '+n+'%'),ready:()=>report('Loaded'),near:()=>{},interact:()=>{},error:report,stats:(fps,draws,triangles)=>{stats={fps,draws,triangles}},movement:s=>motion.push(s),contact:e=>{contacts.push(e);sound.contact(e)},environment:e=>sound.setEnvironment(e)});
  await engine.load();engine.setQuality('high');engine.setWeather('golden');report('Ready: engine loaded, high tier.');
+};
+document.querySelector('#roaming').onclick=async()=>{
+ if(!engine)return report('Load the village first.');
+ const result=checkRoaming(engine);await save('roaming-streets.json',JSON.stringify(result,null,2));report(result);
 };
 document.querySelector('#residents').onclick=async()=>{
  try{const results=checkResidents();await save('villager-approach.json',JSON.stringify(results,null,2));report(results)}
@@ -173,8 +177,8 @@ document.querySelector('#motion').onclick=async()=>{
  engine.walkKey(' ',true);engine.walkKey(' ',false);await walk('w',1.1);await delay(500);
  engine.movement.settle(BRIDGE.x+BRIDGE.length/2+.8,BRIDGE.z);engine.yaw=0;await walk('a',3.3);await delay(400);await walk('d',3.3);engine.walkKey(' ',true);engine.walkKey(' ',false);await delay(1200);
  recorder.stop();stream.getTracks().forEach(t=>t.stop());sound.master.disconnect(audioCapture);sound.stop();await save('motion.webm',await recording);
- const gaits=[...new Set(motion.map(s=>s.gait))],energy=Math.min(...motion.map(s=>s.stamina));
- const result={pass:['walk','run','sprint'].every(gait=>gaits.includes(gait))&&energy<100&&!contacts.some(event=>event.kind==='footstep'),recording:'motion.webm (canvas and master-bus audio before the output compressor)',gaits,contacts:contacts.reduce((a,e)=>(a[e.kind]=(a[e.kind]||0)+1,a),{}),energy,stats};
+ const gaits=[...new Set(motion.map(s=>s.gait))];
+ const result={pass:['walk','run','sprint'].every(gait=>gaits.includes(gait))&&!contacts.some(event=>event.kind==='footstep'),recording:'motion.webm (canvas and master-bus audio before the output compressor)',gaits,contacts:contacts.reduce((a,e)=>(a[e.kind]=(a[e.kind]||0)+1,a),{}),stats};
  await save('movement-checks.json',JSON.stringify(result,null,2));report(result);
 };
 document.querySelector('#profile').onclick=async()=>{

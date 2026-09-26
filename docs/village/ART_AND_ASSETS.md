@@ -2,6 +2,20 @@
 
 Updated: 2026-09-26. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
 
+## Placement and road clearance
+
+Never place furniture, props, decorative objects or signage on roads, walking paths or bridge approaches. Keep the full travel width open and put these objects on adjacent verges, in courtyards or in dedicated activity clearings. Hearth benches and other fireplace furnishings must remain wholly within their clearing.
+
+Judge clearance using the entire visible object and its collision bounds, including rotated corners, bench backs and signboard overhangs; checking only its origin or supporting post is insufficient. After placement changes, inspect the road from both directions and traverse the affected route to verify that geometry and collisions stay clear. This is a standing requirement for all future world dressing and takes precedence over historical placement examples below.
+
+## Signage and hearth revision — 2026-09-26
+
+Three smaller timber fingerposts at route choices replace the nine cream directory/destination signs. They use irregular planks, cream serif lettering and subtle wood grain; both languages and reverse directions remain. Their complete board bounds are outside the streets. Hearth seating occupies the south, north and west sides of the existing clearing, leaving the road-facing east side open. The tea-garden bench sits south of its table at `(15.2, -11.65)`, facing inward. [Placement evidence](../../VILLAGE_BUILD.md#2026-09-26-roaming-and-clear-streets) supersedes the older nine-sign layout below.
+
+## Villager dialogue presentation — 2026-09-26
+
+Speech uses dark green panels, cream serif text and pastel resident names. The Chat control contains a separate F keycap, with visible hover/focus states and a 44 px minimum target; touch hides the keyboard-only key hint. Larger desktop/phone bubble widths support readable text. Personalities, translations, timing and accessible announcements are unchanged.
+
 ## Water, fire and activity staging — 2026-09-26
 
 `water.ts` provides world-space current noise and corrected ripple normals, with slower pond motion, turquoise depth colors and pale bank edges. `flame.ts` shares animated curved ribbons, smoke and embers between the hearth and indoor fireplace; charred logs and pulsing coals ground both fires. These are lightweight stylized effects, not fluid or volumetric simulation.
@@ -18,7 +32,7 @@ Directional shadows use a fixed weighted 16-sample PCF filter instead of the ins
 
 The 2026-09-26 user update takes precedence over the older realistic art briefs below. Art direction is **Arkenfall + Genshin Impact**, with an explicitly vivid Genshin-inspired palette: clear blue sky, lively meadow greens, turquoise water, cream plaster, blue slate/terracotta, warm practicals and cool shadows. Avoid a uniform brown or grey cast. This is original art inspired by the references, with no copied game assets.
 
-The player is a **cute flying white blob with a cartoon smile**, replacing the adult traveler requirement. Source: `assets/village/spirit.blend`; generator: `scripts/village/create_spirit.py`; runtime: `public/village/models/spirit.glb`; [measured manifest](spirit-manifest.json). It floats above the existing collision controller, leans while gliding, flutters its small fins, and squashes on landing. At rest it turns toward the camera so its face is visible. All four residents now use this base spirit with cloned materials and original accessories: sky-blue Pip with scarf/pouch, peach Maple with a baker hat and bow, mint Moss with a sprout, and lavender Luma with a crescent and star collar. Their controllers and conversations are preserved; humanoid clips are no longer used.
+The player is a **cute flying white blob with a cartoon smile**, replacing the adult traveler requirement. Source: `assets/village/spirit.blend`; generator: `scripts/village/create_spirit.py`; runtime: `public/village/models/spirit.glb`; [measured manifest](spirit-manifest.json). It floats above the existing collision controller, leans while gliding, flutters its small fins, and squashes on landing. At rest it retains its last movement heading. All four residents now use this base spirit with cloned materials and original accessories: sky-blue Pip with scarf/pouch, peach Maple with a baker hat and bow, mint Moss with a sprout, and lavender Luma with a crescent and star collar. Their controllers and conversations are preserved; humanoid clips are no longer used.
 
 The fantasy world pass uses original 512×512 CanvasTexture maps for timber, shingles, plaster, limestone, meadow, paving and window reflections. `architecture.ts` provides nine swept-roof cottages with cream facades, arched doors/windows, shutters, flower boxes, turrets/chimneys and warm trim. `fantasyTrees.ts` creates matching near/far opaque crowns; 360 distant trees replace photographic crossed cards. Mountain colors are baked to vertices according to slope, with organic meadow patches replacing distance stripes. Two floating gardens are skyline scenery outside the playable area. Rain still changes roughness and practical lights. The existing smooth sky/sun/fill/fog weather transitions remain.
 

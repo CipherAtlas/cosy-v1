@@ -74,6 +74,11 @@ export async function checkDialogue(engine) {
       check(engine.dialogue.layer.hidden, 'Activities suppress conversations');
       engine.setPlace(null);
       check(!engine.dialogue.layer.hidden, 'Leaving an activity restores conversations');
+      // Luma now roams away from the garden; stage her here to isolate exit readability.
+      const resident = engine.life.residents[3];
+      resident.movement.settle(...resident.route[0]);
+      resident.root.position.set(resident.movement.position.x, resident.movement.position.y, resident.movement.position.z);
+      resident.pause = 2;
       engine.travel('mood'); engine.setPlace(null);
       await new Promise(resolve => setTimeout(resolve, 700));
       const luma = engine.dialogue.bubbles[3];

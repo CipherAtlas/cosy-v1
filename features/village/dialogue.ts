@@ -114,7 +114,7 @@ export class VillagerDialogue {
       const element = document.createElement("div");
       element.className = "v-villager-bubble";
       element.dataset.villager = profile.id;
-      element.style.setProperty("--villager-ink", profile.ink);
+      element.style.setProperty("--villager-color", profile.color);
       element.hidden = true;
       const text = document.createElement("p");
       const footer = document.createElement("div");
@@ -122,6 +122,11 @@ export class VillagerDialogue {
       const name = document.createElement("span");
       const button = document.createElement("button");
       button.type = "button";
+      const buttonLabel = document.createElement("span");
+      const shortcut = document.createElement("kbd");
+      shortcut.textContent = "F";
+      shortcut.setAttribute("aria-hidden", "true");
+      button.append(buttonLabel, shortcut);
       button.addEventListener("click", () => this.talk(index));
       button.addEventListener("keydown", event => {
         if (event.key.toLowerCase() === "f" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
@@ -131,7 +136,7 @@ export class VillagerDialogue {
       footer.append(name, button);
       element.append(text, footer);
       this.layer.append(element);
-      return { resident, profile, element, text, name, button, line: profile.greeting,
+      return { resident, profile, element, text, name, button, buttonLabel, line: profile.greeting,
         greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0,
         visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "" };
     });
@@ -153,7 +158,7 @@ export class VillagerDialogue {
     this.bubbles.forEach(b => {
       b.name.textContent = b.profile.name[language];
       b.text.textContent = b.line[language];
-      b.button.textContent = language === "ja" ? "話す · F" : "Chat · F";
+      b.buttonLabel.textContent = language === "ja" ? "話す" : "Chat";
       b.button.setAttribute("aria-label", language === "ja" ? `${b.profile.name.ja}と話す` : `Chat with ${b.profile.name.en}`);
       b.button.setAttribute("aria-keyshortcuts", "F");
     });

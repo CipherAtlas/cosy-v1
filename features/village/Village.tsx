@@ -48,7 +48,8 @@ export function Village() {
   const [activityCompact,setActivityCompact]=useState(false);
   const onMoment=useCallback((moment:ActivityMoment)=>engine.current?.setActivityMoment(moment),[]);
   const soundBusy = useRef(false);
-  const [movement, setMovement] = useState<MovementStatus>({ stamina: 100, exhausted: false, gait: "idle", running: false });
+  const [movement, setMovement] = useState<MovementStatus>({ gait: "idle", running: false });
+  const [mouseLook, setMouseLook] = useState<"free" | "locked" | "drag">("free");
   const [soundLoading, setSoundLoading] = useState(false);
   const [sound, setSound] = useState(false),
     [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
@@ -125,6 +126,7 @@ export function Village() {
         local = new VillageEngine(canvas.current!, {
           progress: setProgress,
           movement: setMovement,
+          mouseLook: setMouseLook,
           contact: event => audio.current?.contact(event),
           environment: frame => audio.current?.setEnvironment(frame),
           ready: () => {
@@ -360,14 +362,11 @@ export function Village() {
               <ArrowUpRight size={16} />
             </button>
           )}
-          <div className={`v-energy ${movement.stamina < 100 ? "v-energy-visible" : ""}`}>
-            <span>{movement.exhausted ? t("Catching your breath", "ひと休み") : t("Energy", "体力")}</span>
-            <meter min={0} max={100} value={movement.stamina} aria-label={t("Sprint energy", "ダッシュの体力")} />
-          </div>
           <footer className="v-walk-hints">
             <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> {t("Glide", "移動")}</span>
-            <span>{t("Drag to look", "ドラッグで見回す")}</span>
-            <span>{t("Click to glide", "クリックで移動")}</span>
+            <span>{mouseLook === "locked" ? t("Mouse to look · Esc to release", "マウスで見回す · Escで解除")
+              : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
+                : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
             <button className="v-controls-button" onClick={() => setPanel("controls")}>
               {t("Controls", "操作方法")}
             </button>
@@ -523,15 +522,16 @@ export function Village() {
                 <dl>
                   {[
                     ["W A S D / ↑ ↓ ← →", t("Glide", "浮かんで移動")],
-                    [t("Click / tap", "クリック / タップ"), t("Glide to a spot", "その場所へ移動")],
-                    [t("Drag", "ドラッグ"), t("Look around", "見回す")],
+                    [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
+                    ["Esc", t("Release the mouse / close", "マウスを解除 / 閉じる")],
+                    [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
                     ["R", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
                     ["Shift", t("Hold to dash", "長押しでダッシュ")],
                     ["Space", t("Jump", "ジャンプ")],
                     ["E", t("Enjoy a nearby activity", "近くの場所に入る")],
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
-                    ["M / Esc", t("Places / close", "場所 / 閉じる")],
+                    ["M", t("Places", "場所")],
                   ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
                 </dl>
               </div>

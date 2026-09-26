@@ -1,10 +1,14 @@
 # Cosy Village — canonical handoff
 
-Updated: 2026-09-26. **Status: colorful spirit village, recorded soundtrack and inhabited activities deployed; final visual, movement, listening, and device acceptance remain open.** This document records the agreed direction and future work. It does not claim that planned features are implemented.
+Updated: 2026-09-26. **Status: controls/layout/dialogue release candidate; full art, movement, listening and device acceptance remain open.** Implementation history is in [VILLAGE_BUILD.md](VILLAGE_BUILD.md); current contracts below supersede earlier milestone descriptions.
 
-Published application: [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), with successful [Pages build/deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). Live arrival, scene assets, recorded-music controls, activity exit and villager chat were verified. [The release ledger](VILLAGE_BUILD.md#2026-09-26-main-release) records exact checks and limits; earlier milestone descriptions are historical.
+Release candidate: wider resident circuits, three timber fingerposts, clear hearth seating, adjusted tea-garden seating, unlimited dashing without an energy bar, desktop mouse-look, and restyled dialogue. Deployment verification is pending in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). Previous published commit: [`6784834`](https://github.com/CipherAtlas/cosy-v1/commit/678483411f201af1fbec96f86a44294db01f5bec), with successful [Pages deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36236769733).
 
-Latest performance investigation (2026-09-26): friends report 8–20 FPS; an Opera/Windows screenshot shows 3 FPS, 229 calls and 2.212M triangles. The performance update caps drawing-buffer pixels by tier, preserves Automatic through repeated downgrades, and adds an opt-in performance report in Settings. Read [the performance investigation](VILLAGE_BUILD.md#2026-09-26-performance-investigation) before further renderer changes. The user authorized publishing these fixes through the existing Pages workflow; verify the release task/workflow for its live outcome. The friend's GPU/acceleration path remains unverified. Mac browser results are not Windows-device proof.
+Current movement: WASD/arrows glide, R toggles quick glide, Shift dashes continuously, and Space jumps. Click the desktop canvas to capture the mouse; Escape, menus, activities, blur and disposal release it. Touch retains dragging and direction buttons. Ground clicks/taps do not move the player. No stamina, exhaustion, recovery or energy UI remains. Preserve the [movement/input contracts](docs/village/MOVEMENT_AND_WORLD.md).
+
+Current village: all four residents roam wider multi-point circuits, including Luma leaving the tea garden. Three bilingual timber fingerposts replace the older nine-sign layout. The hearth's road-facing east side is open; full sign/bench footprints are verified outside the streets. Dialogue retains both languages and the existing personalities with dark green panels, cream serif text and visible keyboard hints.
+
+The prior performance release caps drawing-buffer pixels at 1080p/720p/540p by tier, preserves automatic downgrades and adds an opt-in performance report. Read [the investigation](VILLAGE_BUILD.md#2026-09-26-performance-investigation) before renderer changes. The friend's Windows GPU path, native-current Safari/Firefox performance and physical-device acceptance remain unverified.
 
 ## Current art direction — 2026-09-26
 
@@ -12,7 +16,7 @@ The user has superseded the earlier realistic traveler brief: use **Arkenfall at
 
 The latest user update extends the fantasy direction to houses, distant scenery and all four residents. The cottages now have swept colorful roofs, arched glazing, turrets, shutters and flower boxes. Original painted surfaces replace the photographic house/path materials. Rounded opaque tree crowns and vertex-painted mountain layers replace distant birch cards and repeated stone texture; two suspended gardens add fantasy landmarks. Pip, Maple, Moss and Luma reuse the spirit mesh with pastel colors, distinct accessories and hovering animation. The human traveler and birch remain archived assets and are no longer loaded by the village. Preserve the controller, six activities, weather, resident encounters and Controls guide. Current evidence is in the newest build/QA milestone.
 
-The latest polish request also removes the player’s automatic idle turn toward the camera, smooths the moving shadow filter, and adds nine physical wayfinding posts including an entrance directory. Music now uses four complete licensed recordings selected by location/scenery; stream, fire and rain are recordings too. The prior art state was committed/pushed first at `7642527`; the following polish is bundled with the water/activity release. Read [the current milestone](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) and [recorded audio specification](docs/village/MUSIC_AND_SOUND.md) before changing these systems.
+The earlier polish removed the player’s automatic idle turn toward the camera and softened shadows. Its nine-sign layout is superseded by the current three timber fingerposts. Music now uses four complete licensed recordings selected by location/scenery; stream, fire and rain are recordings too. The prior art state was committed/pushed first at `7642527`; the following polish is bundled with the water/activity release. Read [the current milestone](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) and [recorded audio specification](docs/village/MUSIC_AND_SOUND.md) before changing these systems.
 
 The latest water/activity pass includes: flowing water shading; layered fire, embers, smoke and charred logs; visible spirit staging with animated hourglass, breathing rings, tea, quill and letters; warm activity panels, a phone bottom sheet and an Enjoy the view toggle. Keep the `ActivityMoment` bridge and camera/actor staging together when changing an activity. Read [the latest evidence](VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities) and [stage captures](docs/village/evidence/README.md#water-fire-and-inhabited-activities) before refining this pass. Both this pass and the preceding orientation/shadow/audio polish are included in the published application above.
 
@@ -20,7 +24,7 @@ The latest water/activity pass includes: flowing water shading; layered fire, em
 
 1. Read applicable `AGENTS.md` instructions and inspect the current Git status. Preserve any uncommitted work; do not reset it or assume it is disposable.
 2. Read this document, then [the implementation evidence](VILLAGE_BUILD.md) and [design QA](design-qa.md).
-3. Open the [approved image](docs/village/references/approved-village.png) and [current entrance](docs/village/evidence/polish-entrance.png), then inspect the [cottage](docs/village/evidence/fantasy-cottage-exterior.png), [residents](docs/village/evidence/fantasy-spirit-villagers.png), [bridge](docs/village/evidence/fantasy-bridge-side.png) and [movement recording](docs/village/evidence/fantasy-motion.webm). Use the [evidence index](docs/village/evidence/README.md) for provenance. The unprefixed, `art-` and `fantasy-` captures are earlier milestones; `references/prototype-*` captures are historical.
+3. Open the [approved image](docs/village/references/approved-village.png) and [current entrance](docs/village/evidence/roaming-entrance.png), then inspect the [cottage](docs/village/evidence/fantasy-cottage-exterior.png), [residents](docs/village/evidence/fantasy-spirit-villagers.png), [bridge](docs/village/evidence/fantasy-bridge-side.png) and [movement recording](docs/village/evidence/fantasy-motion.webm). Use the [evidence index](docs/village/evidence/README.md) for provenance. The unprefixed, `art-` and `fantasy-` captures are earlier milestones; `references/prototype-*` captures are historical.
 4. Read the relevant specification: [art, lighting, and assets](docs/village/ART_AND_ASSETS.md), [movement and living world](docs/village/MOVEMENT_AND_WORLD.md), or [music and sound](docs/village/MUSIC_AND_SOUND.md).
 5. Verify the relevant source before changing it. Historical test results are not evidence that a new change works. Update the status and evidence after each verified milestone.
 
@@ -34,7 +38,7 @@ The target is **as close to AAA craft as practical in a small browser world**: c
 
 | Reference | Authority and use |
 | --- | --- |
-| Latest user requirements | Natural flowing water and lively fireplaces; visible, animated activities that belong in the world; warmer, clearer UI; recorded music matched to scenery and location; player retains heading when idle; smooth shadows; arrival directory and village signposts; jumping; fluid gliding/dashing with energy; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers approaching to greet the player. |
+| Latest user requirements | Natural flowing water and lively fireplaces; visible, animated activities that belong in the world; warmer, clearer UI; recorded music matched to scenery and location; player retains heading when idle; smooth shadows; three restrained roadside fingerposts; clear roads and hearth seating; wider NPC roaming; jumping; unlimited gliding/dashing without energy; desktop mouse-look; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers approaching to greet the player. |
 | [Approved village image](docs/village/references/approved-village.png) | Composition and craft reference: detailed cottages, stream/bridge, planting, mountains and restrained UI. The latest colorful stylized palette and white spirit replace its palette/player brief. |
 | Original Cosy v1, preserved in [baseline captures](docs/village/references/README.md) | **Only functional baseline.** The [live Pages URL](https://cipheratlas.github.io/cosy-v1/) now tracks the village on `main`. Ignore earlier local redesign experiments as product/design references. The six activities remain the product. |
 | [Arkenfall](https://www.arkenfall.site/) | **Heavy experiential reference**, throughout development: sense of place, RPG traversal and camera feel, environmental atmosphere, wind, world sound, and immersion. Study the live experience; do not reduce this reference to a title-screen palette. |
@@ -47,6 +51,8 @@ The approved image controls visual direction when other references differ. Arken
 ## Places and presentation
 
 Keep the stable place IDs in [places.ts](features/village/places.ts). Improve the environmental identity of each place; activities must also remain available through direct travel and the accessible simple view.
+
+**Keep roads clear.** Never place furniture, props, decorative objects or signage on roads, walking paths or bridge approaches. Place them beside routes in verges, courtyards or dedicated clearings. Their full geometry, overhangs and collision bounds must stay outside the travel surface; a roadside origin or signpost base alone is not sufficient. This applies to hearth seating and every future layout change. Follow the [placement and clearance rules](docs/village/ART_AND_ASSETS.md#placement-and-road-clearance).
 
 | ID / place | Existing activity to preserve | Environmental direction |
 | --- | --- | --- |
@@ -81,14 +87,14 @@ The detailed source contracts now live in the [movement/world spec](docs/village
 
 ## What exists now
 
-The root page uses raw Three.js inside the existing accessible React shell. The six activities, storage keys, direct travel and simple view remain intact. Current published behavior:
+The root page uses raw Three.js inside the existing accessible React shell. The six activities, storage keys, direct travel and simple view remain intact. Current implementation:
 
 | Area | Implemented now | Still required |
 | --- | --- | --- |
-| Movement | 120 Hz fixed simulation; walk/run/sprint; acceleration; jump/air/landing; buffered jump; stamina with recovery threshold; keyboard and touch controls | Motion polish, exhaustive collision/camera checks and physical-touch proof. |
-| Ambient life | Four named residents who walk over to greet nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer expressions and behavior; all four now use decorated pastel spirit forms. |
+| Movement | 120 Hz fixed simulation; walk/run/sprint; acceleration; jump/air/landing; buffered jump; unlimited dashing; desktop mouse-look; keyboard and touch controls | Motion polish, exhaustive collision/camera checks and physical-touch proof. |
+| Ambient life | Four named residents on wider multi-point circuits who approach nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer expressions and behavior; all four now use decorated pastel spirit forms. |
 | Player / residents | Original white spirit plus four pastel blob residents; hover, lean, fin flutter and character accessories; reproducible base Blender source | More expressive faces and motion refinement; no free vertical flight. |
-| Scene | Colorful swept-roof cottages, painted materials, stone bridge, rounded tree crowns, mountain layers/floating gardens, nine wayfinding posts, flowing water and layered indoor/outdoor fire | More authored variation, terrain/material blending and composition refinement. |
+| Scene | Colorful swept-roof cottages, painted materials, stone bridge, rounded tree crowns, mountain layers/floating gardens, three roadside timber fingerposts, flowing water and layered indoor/outdoor fire | More authored variation, terrain/material blending and composition refinement. |
 | Activities / UI | Visible spirit at all six stations; state-driven hourglass, breathing rings, tea, quill and letters; warm paper panels, portrait bottom sheet, Enjoy the view toggle | Further environmental craft and physical-touch/long-session usability review. |
 | Lighting/wind | Cloud sky and sunset HDR illumination; coordinated sun, fill and haze; practical lights; shared gusts across foliage, water and audio; weighted 16-tap PCF with detailed shadows updated each frame | Authored indirect light, smooth weather transitions, wind refinement and weather visual acceptance. |
 | Music | Four complete Holizna recordings, scenery/location selection, four-second crossfades, manual override and two streaming decks; generated score archived | Long-session listening, Firefox streaming and physical-device/network coverage. |
@@ -105,7 +111,7 @@ All acceptance entries below remain **open**. MOVE-01, AUDIO-01/02, WIND-01 and 
 | `VIS-01` | P1 | Rebuild the entrance's architecture, terrain, bridge, planting and skyline. Paired captures visibly approach the approved composition without obvious repeated blockout assets. |
 | `VIS-02` | P1 | Player is an original cute white flying spirit. Verify its smile, silhouette, gliding, hover, dash and jump in close/in-world views; retain four distinct animated blob residents and their conversations. |
 | `LIGHT-01` | P1 | Art-direct sunlight, indirect light, shadows, haze and practical lights. Golden/dusk/rain all remain readable and intentional; no blown-out water or uniformly flat illumination. |
-| `MOVE-01` | P1 | Implement walk/run/sprint, jump/air/landing and energy UI with collisions, smooth camera, keyboard and touch support. Meet [movement acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance). |
+| `MOVE-01` | P1 | Refine gliding/unlimited dashing, jump/air/landing and mouse-look with collisions, smooth camera, keyboard and touch support. Meet [movement acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance). |
 | `AUDIO-01` | P1 | Use authored recordings that fit each location and weather context, with comfortable transitions and long-session listening quality. The procedural-score requirement is superseded. |
 | `AUDIO-02` | P1 | Add world sound and animation-linked effects, spatial attenuation and indoor/outdoor transitions. Demonstrate audible behavior in a recorded traversal. |
 | `WIND-01` | P1 | Coordinate wind across grass, trees, cloth, water and sound. Preserve grounded roots, believable motion and a calm experience. |
@@ -117,7 +123,7 @@ All acceptance entries below remain **open**. MOVE-01, AUDIO-01/02, WIND-01 and 
 
 1. **Production contracts are integrated.** Preserve the implemented scale, rig/clip names and shared movement/audio/wind events. Asset delivery conventions and device budgets still need final validation. Do not recreate the controller or restart settled product discovery.
 2. **Finish a representative slice.** Produce the entrance, expressive spirits, focus cottage and nearby hearth/bridge. Assets and lighting are developed together. Review against the approved image before dressing the entire map.
-3. **Polish the integrated experience.** Movement, stamina, camera, wind, recorded music and world sound are implemented. Refine their quality and verify them together before expansion.
+3. **Polish the integrated experience.** Movement, unlimited dashing, camera, wind, recorded music and world sound are implemented. Refine their quality and verify them together before expansion.
 4. **Finish the remaining places.** Reuse a coherent art kit with authored variation, preserving every activity and persistence contract.
 5. **Optimize and prove completion.** Profile the finished assets, tune tiers, validate loading/recovery, record visual and audio evidence, and update the QA verdict. Publishing is a separate authorized action.
 
@@ -138,7 +144,7 @@ Lighting and performance should be checked throughout, not deferred until every 
 | [audio.ts](features/village/audio.ts), [soundtrack.ts](features/village/soundtrack.ts) | Web Audio mixer, recorded music streaming/crossfades, location selection, recorded nature beds and responsive effects. `composition.ts` is retained historical code, no longer imported by the village runtime. |
 | [bridge.ts](features/village/bridge.ts), [atmosphere.ts](features/village/atmosphere.ts), [life.ts](features/village/life.ts) | Solid bridge geometry, cloud sky and bounded resident/bird animation. |
 | [dialogue.ts](features/village/dialogue.ts), [life.ts](features/village/life.ts) | Resident personalities/localization, overhead DOM speech, chat and approach/visit/return behavior. |
-| [movement.ts](features/village/movement.ts), [environment.ts](features/village/environment.ts) | Fixed simulation and stamina; shared bridge/floor/surface/collider/wind definitions and engine-to-shell contracts. |
+| [movement.ts](features/village/movement.ts), [environment.ts](features/village/environment.ts) | Fixed simulation and unlimited dashing; shared bridge/floor/surface/collider/wind definitions and engine-to-shell contracts. |
 | [public/village](public/village), [scripts/village](scripts/village) | Runtime assets/credits and asset preparation scripts. |
 | [lib/basePath.ts](lib/basePath.ts) | Static-host asset URL prefixing. Preserve subpath hosting. |
 
@@ -179,7 +185,7 @@ These are handoff boundaries, **not authorization to launch agents, buy assets, 
 | Package | Owns | Boundary / required delivery |
 | --- | --- | --- |
 | Environment art | Asset sources, GLBs/textures, placement proposal, credits | Read art spec. Supply an asset manifest, contact sheets, LOD/texture counts, and recommended placement. Coordinate `world.ts` edits with integration owner. |
-| Character and movement | Traveler rig/clips, movement state/collision/camera, stamina UI | Read movement spec. Own `VillageEngine.ts` only during an agreed window; coordinate shell events/HUD with integrator. Deliver motion recordings and collision tests. |
+| Character and movement | Traveler rig/clips, movement state/collision/camera, input hints | Read movement spec. Own `VillageEngine.ts` only during an agreed window; coordinate shell events/HUD with integrator. Deliver motion recordings and collision tests. |
 | Lighting and atmosphere | Scene lighting, materials, environment maps, wind integration | Read both art and world specs. Coordinate renderer/world edits; demonstrate reference-matched captures and GPU cost. |
 | Music and world sound | Composition engine, licensed samples/effects, mixer and audio events | Read sound spec. Own `audio.ts` and audio assets; request engine events rather than independently rewriting movement. Deliver playable recordings and listening notes. |
 | Integration and performance | Shared contracts, shell, lifecycle, profiling, functional QA | Preserve source/data boundaries; review all assets and code. Own canonical evidence and final QA verdict. |
@@ -193,7 +199,7 @@ Every package returns: changed paths, implemented versus pending items, provenan
 ## Completion gate
 
 - The entrance and activity environments visibly approach the approved image in composition, assets, lighting, depth and material quality. Updated paired visual QA has no unresolved P1 art gaps.
-- The traveler walks, runs, sprints, jumps and lands convincingly; stamina works and never blocks basic access to activities.
+- The traveler walks, runs, sprints, jumps and lands convincingly; dashing remains unlimited and never blocks basic access to activities.
 - Wind and world sound make the environment feel alive. Music passes actual long-session listening, with clearly distinct presets and meaningful musical development.
 - All six activities and stored data still work across reloads; touch, keyboard, language, focus management and reduced motion are validated.
 - Frame times, memory estimates and cold loading are measured on declared devices. Console, disposal, tab-resume and WebGL failure/recovery behavior have been checked.

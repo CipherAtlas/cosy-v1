@@ -4,6 +4,14 @@
 
 The `living-` and `polish-` milestones are included in application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), published by [Pages run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). [The release record](../../../VILLAGE_BUILD.md#2026-09-26-main-release) documents subpath/build checks, deployed assets and live Chromium arrival, audio controls, activity exit and chat verification. The captures below are local implementation evidence, not screenshots of the deployed site or proof of physical-device/listening acceptance.
 
+## Controls and layout release verification
+
+The combined local release review is recorded in [the release ledger](../../../VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). Deployment proof is recorded there after publication; the files here describe local production modules and exports.
+
+- [Combined regressions](release-regressions.json): wider circuits/street clearance, resident encounters, graphics policy, dialogue and all six activity exits against the complete current world geometry.
+- [Chrome camera and Pages export](release-camera-chrome.json): 28 checks, including real capture/motion/release and exported-app controls, without uncaught errors.
+- Earlier input-pass evidence: [Chrome](mouse-camera-chrome.json), [Firefox 142](mouse-camera-firefox.json). Firefox has 20 engine/input checks; it was not rerun for the combined release review. Touch assertions use emulation, not a physical phone.
+
 ## Water, fire and inhabited activities
 
 The `living-` renderer captures use the current production modules, Chromium 153, detailed quality and a 1280×720 canvas. They omit React/DOM controls; browser UI checks are described in [the ledger](../../../VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities). Earlier milestone files are preserved.
@@ -53,3 +61,14 @@ The historical generated-music previews above use Alexander Holm's Salamander Gr
 ## 2026-09-26 colorful spirit pass
 
 Files prefixed `art-` record the earlier original white-spirit/colorful-palette pass. They predate the fantasy, polish and inhabited-activity milestones above; the player’s camera-facing idle pose in these captures is superseded by retained movement heading. Captures come from the production-engine harness at 1280×720; close front/back cameras inspect the spirit. `art-movement-checks.json` accompanies `art-motion.webm` and verifies glide/dash/jump state reporting, energy use and zero footfalls. `art-art-checks.json` records active player nodes, resident clips, renderer counts and captured console errors. See the [build ledger](../../../VILLAGE_BUILD.md#2026-09-26-colorful-art-pass-and-spirit-player) for scope, tools and limitations.
+
+## Roaming and clear streets
+
+Local 2026-09-26 candidate, not deployed. Captures use production engine modules in the local QA harness, Chrome 154 on macOS, 1280×720, detailed quality. Renderer views omit the React activity panels. The native Firefox observation is recorded separately in the build ledger.
+
+- [Entrance](roaming-entrance.png), [central junction](roaming-junction-en.png), [Japanese junction](roaming-junction-ja.png), [waterside fork](roaming-waterside.png).
+- [Open hearth and road](roaming-hearth.png), [unchanged seated activity](roaming-hearth-activity.png).
+- [Roaming, clearance and regression results](roaming-streets.json): 43 new assertions, 20 approach checks, 28 dialogue checks, six four-direction activity exit checks; no captured errors.
+- [Overhead NPC circuits](roaming-circuits.webm): roughly 20 seconds, three seconds of actual controller simulation per recorded second, covering one simulated minute. Residents follow their real circuits from their starting points; this is an accelerated renderer capture without audio or user input. Use the four-minute simulation results for repeated-completion evidence.
+
+Reproduce the geometry/simulation assertions using the local QA harness's **Check roaming and street clearance** button. These checks establish route completion and furniture placement, not new FPS, Windows, physical-phone or long-session acceptance.

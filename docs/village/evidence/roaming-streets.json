@@ -1,0 +1,272 @@
+{
+  "roaming": {
+    "pass": true,
+    "checks": 43,
+    "results": [
+      "Pip: every route segment clears buildings, furniture and water",
+      "Maple: every route segment clears buildings, furniture and water",
+      "Moss: every route segment clears buildings, furniture and water",
+      "Luma: every route segment clears buildings, furniture and water",
+      "Pip: completes every waypoint and repeats the circuit at 30 fps",
+      "Pip: explores a wider area in both directions at 30 fps",
+      "Maple: completes every waypoint and repeats the circuit at 30 fps",
+      "Maple: explores a wider area in both directions at 30 fps",
+      "Moss: completes every waypoint and repeats the circuit at 30 fps",
+      "Moss: explores a wider area in both directions at 30 fps",
+      "Luma: completes every waypoint and repeats the circuit at 30 fps",
+      "Luma: explores a wider area in both directions at 30 fps",
+      "Pip: completes every waypoint and repeats the circuit at 60 fps",
+      "Pip: explores a wider area in both directions at 60 fps",
+      "Maple: completes every waypoint and repeats the circuit at 60 fps",
+      "Maple: explores a wider area in both directions at 60 fps",
+      "Moss: completes every waypoint and repeats the circuit at 60 fps",
+      "Moss: explores a wider area in both directions at 60 fps",
+      "Luma: completes every waypoint and repeats the circuit at 60 fps",
+      "Luma: explores a wider area in both directions at 60 fps",
+      "Pip: completes every waypoint and repeats the circuit at 120 fps",
+      "Pip: explores a wider area in both directions at 120 fps",
+      "Maple: completes every waypoint and repeats the circuit at 120 fps",
+      "Maple: explores a wider area in both directions at 120 fps",
+      "Moss: completes every waypoint and repeats the circuit at 120 fps",
+      "Moss: explores a wider area in both directions at 120 fps",
+      "Luma: completes every waypoint and repeats the circuit at 120 fps",
+      "Luma: explores a wider area in both directions at 120 fps",
+      "Wayfinding is limited to three useful junctions",
+      "All three hearth benches and sign footprints are checked",
+      "Clearance checks use the rendered streets including their shoulders",
+      "Entrance fingerpost: physical footprint exists",
+      "Entrance fingerpost: entire footprint stays at least 35 cm off the street",
+      "Bridge and garden fingerpost: physical footprint exists",
+      "Bridge and garden fingerpost: entire footprint stays at least 35 cm off the street",
+      "Waterside fingerpost: physical footprint exists",
+      "Waterside fingerpost: entire footprint stays at least 35 cm off the street",
+      "Hearth bench 1: physical footprint exists",
+      "Hearth bench 1: entire footprint stays at least 35 cm off the street",
+      "Hearth bench 2: physical footprint exists",
+      "Hearth bench 2: entire footprint stays at least 35 cm off the street",
+      "Hearth bench 3: physical footprint exists",
+      "Hearth bench 3: entire footprint stays at least 35 cm off the street"
+    ],
+    "samples": [
+      {
+        "fps": 30,
+        "residents": [
+          {
+            "name": "Pip",
+            "laps": 4,
+            "waypoints": 8,
+            "width": 5.422977226305685,
+            "depth": 22.78457547285155
+          },
+          {
+            "name": "Maple",
+            "laps": 3,
+            "waypoints": 13,
+            "width": 22.740004705229225,
+            "depth": 17.408087679785723
+          },
+          {
+            "name": "Moss",
+            "laps": 4,
+            "waypoints": 10,
+            "width": 5.964066446505024,
+            "depth": 23.887762928097267
+          },
+          {
+            "name": "Luma",
+            "laps": 3,
+            "waypoints": 14,
+            "width": 20.07064716764674,
+            "depth": 15.320312504468871
+          }
+        ]
+      },
+      {
+        "fps": 60,
+        "residents": [
+          {
+            "name": "Pip",
+            "laps": 4,
+            "waypoints": 8,
+            "width": 5.414686727796054,
+            "depth": 22.787878761787553
+          },
+          {
+            "name": "Maple",
+            "laps": 3,
+            "waypoints": 13,
+            "width": 22.734463879527993,
+            "depth": 17.38744439144088
+          },
+          {
+            "name": "Moss",
+            "laps": 4,
+            "waypoints": 10,
+            "width": 5.958761695453078,
+            "depth": 23.871055692732487
+          },
+          {
+            "name": "Luma",
+            "laps": 3,
+            "waypoints": 14,
+            "width": 20.06132749705914,
+            "depth": 15.300258965070352
+          }
+        ]
+      },
+      {
+        "fps": 120,
+        "residents": [
+          {
+            "name": "Pip",
+            "laps": 4,
+            "waypoints": 8,
+            "width": 5.413520798053387,
+            "depth": 22.774325289749555
+          },
+          {
+            "name": "Maple",
+            "laps": 3,
+            "waypoints": 13,
+            "width": 22.731193517736013,
+            "depth": 17.372143297058678
+          },
+          {
+            "name": "Moss",
+            "laps": 4,
+            "waypoints": 10,
+            "width": 5.957765961852104,
+            "depth": 23.869759103671992
+          },
+          {
+            "name": "Luma",
+            "laps": 3,
+            "waypoints": 14,
+            "width": 20.06133001643878,
+            "depth": 15.291937592466718
+          }
+        ]
+      }
+    ],
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+  },
+  "residents": {
+    "pass": true,
+    "checks": 20,
+    "results": [
+      "Approach stops with personal space at 30 fps",
+      "One resident approaches at a time at 30 fps",
+      "Approach stops with personal space at 60 fps",
+      "One resident approaches at a time at 60 fps",
+      "Resident settles without orbiting or shuffling",
+      "Resident returns to their original routine",
+      "Staying nearby does not repeatedly summon the same resident",
+      "Leaving and returning allows a new greeting",
+      "Opening a menu cancels the approach and returns the resident",
+      "Approach stops with personal space at 120 fps",
+      "One resident approaches at a time at 120 fps",
+      "Approach distance stays consistent across frame rates",
+      "Maple also walks over to greet the player",
+      "Moss also walks over to greet the player",
+      "Luma also walks over to greet the player",
+      "Residents do not approach through a wall",
+      "Approach planning rejects a river shortcut",
+      "Approach planning accepts the real bridge",
+      "Walking away ends pursuit and returns the resident",
+      "Arrival and activities do not attract villagers"
+    ],
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+  },
+  "dialogue": {
+    "pass": true,
+    "checks": 28,
+    "results": [
+      "Arrival hides speech and chat controls",
+      "Nearby resident greets the player",
+      "Greeting pauses the resident",
+      "Ambient speech does not announce repeatedly to screen readers",
+      "Explicit chat cycles through five different personality lines",
+      "Explicit chat has a named polite announcement",
+      "Language switches the current line without resetting it",
+      "Chat control has a Japanese accessible name",
+      "Portrait bubble stays within the viewport",
+      "Chat target is at least 44 pixels high",
+      "Disabling dialogue hides bubbles and releases residents",
+      "Hidden dialogue cannot be activated",
+      "Behind-camera speech is hidden",
+      "Distant speech is hidden",
+      "Rain has a character-specific remark",
+      "Dusk has a character-specific remark",
+      "Disposal removes the overlay",
+      "Building collider occludes speech",
+      "Pip has the correct voice and identity",
+      "Maple has the correct voice and identity",
+      "Moss has the correct voice and identity",
+      "Luma has the correct voice and identity",
+      "Overlapping residents do not stack unreadable bubbles",
+      "At most two ambient bubbles appear together",
+      "Engine menus suppress conversations",
+      "Activities suppress conversations",
+      "Leaving an activity restores conversations",
+      "Tea garden exit keeps Luma readable"
+    ],
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+  },
+  "exits": [
+    {
+      "place": "focus",
+      "distances": [
+        0.4211480825955016,
+        0.4211480825955016,
+        0.4211480825955043,
+        0.4211480825955043
+      ]
+    },
+    {
+      "place": "music",
+      "distances": [
+        0.4211480825955003,
+        0.4211480825955003,
+        0.4211480825955043,
+        0.42114808259548653
+      ]
+    },
+    {
+      "place": "breathe",
+      "distances": [
+        0.42114808259548653,
+        0.42114808259548653,
+        0.4211480825955016,
+        0.4211480825955016
+      ]
+    },
+    {
+      "place": "mood",
+      "distances": [
+        0.4211480825955043,
+        0.4211480825955043,
+        0.4211480825955043,
+        0.4211480825955043
+      ]
+    },
+    {
+      "place": "gratitude",
+      "distances": [
+        0.42114808259548653,
+        0.42114808259548653,
+        0.4211480825955043,
+        0.4211480825955016
+      ]
+    },
+    {
+      "place": "compliment",
+      "distances": [
+        0.4211480825955003,
+        0.4211480825955003,
+        0.4211480825954998,
+        0.4211480825954998
+      ]
+    }
+  ],
+  "errors": []
+}

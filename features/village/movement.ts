@@ -4,13 +4,11 @@ import type { Collider, MovementStatus, WorldContact } from "./environment";
 const STEP = 1 / 120;
 export const MOVEMENT = { walk: 2.6, run: 4.5, sprint: 6, gravity: 12, jump: 5, radius: 0.32, height: 1.8 };
 
-/** Fixed-step movement; rendered frames may vary without changing jump or energy. */
+/** Fixed-step movement; rendered frames may vary without changing speed or jump height. */
 export class VillageMovement {
   position = { x: 0.3, y: floorHeight(0.3, 20), z: 20 };
   velocity = { x: 0, y: 0, z: 0 };
   grounded = true;
-  stamina = 100;
-  exhausted = false;
   speed = 0;
   phase = 0;
   gait: MovementStatus["gait"] = "idle";
@@ -19,7 +17,6 @@ export class VillageMovement {
   private accumulator = 0;
   private jumpBuffer = 0;
   private coyote = 0;
-  private recoveryDelay = 0;
   private contactIndex = 0;
 
   constructor(private colliders: Collider[], private contact: (event: WorldContact) => void) {}
@@ -91,7 +88,7 @@ export class VillageMovement {
       this.emit("takeoff");
     }
     const requested = Math.hypot(input.x, input.z) > 0.01;
-    const sprint = input.sprint && !this.exhausted && requested;
+    const sprint = input.sprint && requested;
     const target = sprint ? MOVEMENT.sprint : input.run || input.sprint ? MOVEMENT.run : MOVEMENT.walk;
     const damping = 1 - Math.exp(-dt * (requested ? this.grounded ? 10 : 3 : 15));
     this.velocity.x += (input.x * target - this.velocity.x) * damping;
@@ -132,16 +129,6 @@ export class VillageMovement {
         this.emit("landing", impact);
       }
     } else this.position.y = floor;
-    const draining = sprint && this.grounded && this.speed > MOVEMENT.run + 0.15;
-    if (draining) {
-      this.stamina = Math.max(0, this.stamina - 18 * dt);
-      this.recoveryDelay = 0.8;
-      if (this.stamina === 0) this.exhausted = true;
-    } else {
-      this.recoveryDelay = Math.max(0, this.recoveryDelay - dt);
-      if (this.recoveryDelay === 0) this.stamina = Math.min(100, this.stamina + 24 * dt);
-      if (this.stamina >= 30) this.exhausted = false;
-    }
     this.gait = !this.grounded ? "air" : this.speed < 0.12 ? "idle" : this.speed > 4.7 ? "sprint" : this.speed > 3.05 ? "run" : "walk";
     if (this.grounded && this.speed > 0.2 && this.landing === 0) {
       const oldPhase = this.phase;

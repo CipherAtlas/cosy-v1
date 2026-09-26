@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { VillageLife } from './modules/features/village/life.js';
 import { VillageMovement } from './modules/features/village/movement.js';
-import { BRIDGE } from './modules/features/village/environment.js';
+import { BRIDGE, HEARTH } from './modules/features/village/environment.js';
 
 export function checkResidents() {
   const results = [];
@@ -74,4 +74,80 @@ export function checkResidents() {
     check(paused.residents.every(r => r.encounter.state === 'roam'), 'Arrival and activities do not attract villagers');
   } finally { dispose(paused); }
   return { pass: true, checks: results.length, results, browser: navigator.userAgent };
+}
+
+// Exercise the authored circuits against the loaded world's real colliders and paving.
+export function checkRoaming(engine) {
+  const results = [], samples = [];
+  const check = (condition, name) => { if (!condition) throw Error(name); results.push(name); };
+  const dispose = life => {
+    const geometries = new Set(), materials = new Set();
+    life.group.traverse(o => { if (o.isMesh) { geometries.add(o.geometry); materials.add(o.material); } });
+    life.dispose(); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose());
+  };
+  for (const fps of [30, 60, 120]) {
+    const life = new VillageLife(new T.Group(), engine.world.colliders);
+    try {
+      for (const r of life.residents) {
+        if (fps === 30) {
+          const blocked = r.route.filter((point, i) => {
+            r.movement.settle(...point);
+            return !r.movement.canWalkTo(...r.route[(i + 1) % r.route.length]);
+          });
+          check(!blocked.length, `${r.root.name}: every route segment clears buildings, furniture and water`);
+        }
+        r.movement.settle(...r.route[0]);
+      }
+      const journeys = life.residents.map(r => ({ name: r.root.name, reached: new Set([0]), last: r.waypoint, laps: 0,
+        minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity }));
+      const player = new T.Vector3(38, 0, 40);
+      for (let frame = 0; frame < 240 * fps; frame++) {
+        life.update(1 / fps, frame / fps, player, false, false);
+        life.residents.forEach((r, i) => {
+          const journey = journeys[i], p = r.root.position;
+          journey.minX = Math.min(journey.minX, p.x); journey.maxX = Math.max(journey.maxX, p.x);
+          journey.minZ = Math.min(journey.minZ, p.z); journey.maxZ = Math.max(journey.maxZ, p.z);
+          if (journey.last !== r.waypoint) {
+            journey.reached.add(journey.last); if (r.waypoint === 0) journey.laps++;
+            journey.last = r.waypoint;
+          }
+        });
+      }
+      journeys.forEach((journey, i) => {
+        check(journey.reached.size === life.residents[i].route.length && journey.laps >= 2,
+          `${journey.name}: completes every waypoint and repeats the circuit at ${fps} fps`);
+        check(journey.maxX - journey.minX > 4 && journey.maxZ - journey.minZ > 12,
+          `${journey.name}: explores a wider area in both directions at ${fps} fps`);
+      });
+      samples.push({ fps, residents: journeys.map(j => ({ name: j.name, laps: j.laps, waypoints: j.reached.size,
+        width: j.maxX - j.minX, depth: j.maxZ - j.minZ })) });
+    } finally { dispose(life); }
+  }
+  const navigation = engine.world.group.getObjectByName('Village wayfinding');
+  const posts = navigation.children.filter(o => o.userData.signpost);
+  check(posts.length === 3, 'Wayfinding is limited to three useful junctions');
+  const obstacles = posts.map(post => ({ name: post.name,
+    collider: engine.world.colliders.find(c => Math.hypot(c.x - post.position.x, c.z - post.position.z) < .01) }));
+  engine.world.colliders.filter(c => c.top === 1.4 && Math.hypot(c.x - HEARTH.x, c.z - HEARTH.z) < 4)
+    .forEach((collider, i) => obstacles.push({ name: `Hearth bench ${i + 1}`, collider }));
+  check(obstacles.length === 6, 'All three hearth benches and sign footprints are checked');
+  const paving = [];
+  engine.world.group.traverse(o => {
+    if (o.isMesh && o.material.customProgramCacheKey().startsWith('village-path-shoulder')) paving.push(o);
+  });
+  check(paving.length > 0, 'Clearance checks use the rendered streets including their shoulders');
+  engine.world.group.updateMatrixWorld(true);
+  const ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0), margin = .35;
+  for (const { name, collider: c } of obstacles) {
+    check(!!c, `${name}: physical footprint exists`);
+    let overlaps = false;
+    const width = c.w + margin * 2, depth = c.d + margin * 2;
+    const nx = Math.ceil(width / .1), nz = Math.ceil(depth / .1);
+    for (let ix = 0; ix <= nx; ix++) for (let iz = 0; iz <= nz; iz++) {
+      ray.set(new T.Vector3(c.x - width / 2 + width * ix / nx, 8, c.z - depth / 2 + depth * iz / nz), down);
+      if (ray.intersectObjects(paving, false).length) overlaps = true;
+    }
+    check(!overlaps, `${name}: entire footprint stays at least 35 cm off the street`);
+  }
+  return { pass: true, checks: results.length, results, samples, browser: navigator.userAgent };
 }

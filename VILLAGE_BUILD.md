@@ -2,6 +2,54 @@
 
 Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canonical direction and future work. This file records implementation evidence and limits. The latest section below supersedes historical prototype descriptions; older results are retained under their original headings.
 
+## 2026-09-26 village controls and layout release
+
+Release candidate reviewed together at the user's request. Publication through the existing main-branch GitHub Pages workflow is pending. No dependencies, storage keys, infrastructure or deployment configuration changed.
+
+The release combines wider circuits for all four residents; three small bilingual timber fingerposts instead of nine large signs; hearth furniture fully outside the streets; a tea-garden bench facing its table; unlimited dashing with all energy state and UI removed; desktop mouse capture with Escape/menu release and touch drag controls; and dark green dialogue panels with cream serif text, pastel names and a separate F key hint. The following implementation milestones retain their original local-only status as historical records; this section records their combined release.
+
+### Combined verification
+
+- TypeScript, root static export, `/cosy-v1` static export and diff checks pass. All 13 inspected HTML subpath asset references resolve in the isolated Pages preview. The ordinary root preview was restored afterward.
+- Ten controller/composition checks and three bridge checks pass. Continuous dashing retains 6 m/s for 60 simulated seconds at each of 30/60/120 FPS, then returns to normal or quick glide on release.
+- [Combined real-engine regressions](docs/village/evidence/release-regressions.json): 43 roaming/street-clearance assertions, 20 resident approach assertions, 28 graphics assertions, 28 dialogue assertions and all six activity exits in four directions, with no captured errors. The current world geometry includes both the hearth and tea-garden seating adjustments.
+- [Fresh Chrome camera/export checks](docs/village/evidence/release-camera-chrome.json): 28 passing checks against the current engine and the exact `/cosy-v1` export, including capture, mouse movement, Escape, pending-request cancellation, touch/denied-capture fallback, Places, hearth, guide and portrait controls. [Earlier Firefox input evidence](docs/village/evidence/mouse-camera-firefox.json) records 20 passing checks; that browser was not rerun during this combined release review.
+- Inspected the exported app in the in-app browser at 1280×720: small timber signs, no energy label/bar, dark green dialogue with F keycap, tea-garden seating facing the table, working mood panel and return to village. These local checks do not establish physical touch, Windows or fresh sustained-performance acceptance.
+
+Existing build warnings concern workspace lockfile discovery, outdated Browserslist data and an unrelated room image. No release blocker was found in the combined source/diff review. Full art-target, listening and device acceptance remain separate open work in [design QA](design-qa.md).
+
+### Publication
+
+Pending push, successful Pages workflow and live-site smoke verification.
+
+## 2026-09-26 mouse-look controls
+
+Local implementation only. `VillageEngine.ts` removes ground-target movement and its ring, and uses Pointer Lock for desktop camera input. The first canvas click captures the mouse; movement controls yaw/pitch without a held button. Escape releases it and clears held movement. Menus, activities, blur, hidden tabs, renderer loss and disposal release capture; a menu opening during an asynchronous request prevents a late grab. Denied/unsupported capture falls back to dragging. Touch retains drag-to-look and movement buttons, with no tap-to-move. `Village.tsx` updates the English/Japanese guide and live control hint; the obsolete hidden click-to-glide hint rule is removed from `village.css`.
+
+Verification: production export, TypeScript and diff checks pass. [Chromium evidence](docs/village/evidence/mouse-camera-chrome.json) records 28 checks including actual mouse capture/motion, Escape/re-entry, keyboard movement, pending-request cancellation, fallback, touch drag/no tap movement, and exported-app M/Places, E/hearth, guide and portrait controls. [Firefox 142 evidence](docs/village/evidence/mouse-camera-firefox.json) records 20 engine/input checks with real pointer lock. No uncaught browser errors. Chromium's touch tests use emulated input; physical phone acceptance is not claimed. Firefox's first runner used a mismatched Playwright/browser pair, then touch emulation suppressed its mouse pointer events; using the existing matching 1.56.1/Firefox 1495 pair with desktop input passes. This was a runner issue, not an application workaround.
+
+Reproduce with `python3 scripts/village/preview_qa.py --port 3026`, then `PLAYWRIGHT_PATH=/absolute/path/to/playwright node scripts/village/tests/camera.cjs chrome` (or `firefox`). `APP_URL=http://127.0.0.1:3020` additionally checks the built application; `OUTPUT` selects a JSON file. Use an installed matching Firefox/Playwright pair. The existing local production preview is rebuilt; no Git writes, dependency changes or deployment were performed for this input change.
+
+## 2026-09-26 energy removal
+
+Removed the energy mechanic at the user's request. `movement.ts` no longer stores stamina/exhaustion/recovery state or gates dashing; `environment.ts` and `VillageEngine.ts` no longer report energy fields. `Village.tsx` and `village.css` remove the bar, translated energy/recovery labels and desktop/mobile/reduced-motion styles. The quick-glide toggle and existing 2.6/4.5/6 m/s movement speeds remain. Updated the recording harness, controller regression and current movement specification; concurrent camera/dialogue changes were preserved.
+
+Verification: TypeScript, production export, 10 controller/composition checks and three bridge checks pass. The replacement dash test holds full speed for 60 simulated seconds at each of 30/60/120 FPS, then verifies release back to normal/quick gliding. Inspected the exported village in the in-app browser at 1280×720: the HUD has no energy label/bar, and the live DOM contains zero `meter` or `.v-energy` elements. An initial build failed on a missing generated `.next/types` file; an unchanged retry passed. Existing unrelated build warnings remain. The local preview at `http://127.0.0.1:3020/` is rebuilt; no commit or deployment was performed.
+
+## 2026-09-26 roaming and clear streets
+
+Local implementation of the user's request for wider NPC roaming, less signage and clear streets. This pass has not been committed or deployed.
+
+- `life.ts`: all four villagers now follow multi-point neighbourhood circuits. Pip visits the cottage lane/entrance, Maple crosses the bridge and visits the pond approach, Moss explores the northern lane and riverside verge, and Luma leaves the tea garden for the centre and garden perimeter. Two longer pauses per circuit preserve a calm pace without stopping at every bend. Approach, personal space, chat and return behavior remain intact.
+- `wayfinding.ts`: nine large cream signs become three small timber fingerposts at the entrance, central junction and waterside fork. Cream serif lettering, subtle grain and irregular plank edges replace badges, gold borders and glowing finials. English/Japanese and reverse-side directions remain. Full plank bounds now participate in collisions/occlusion, and the planks enclose the supporting pole so it cannot obscure lettering.
+- `world.ts`: the road-side hearth bench moves to the northern edge of the clearing, facing the fire. The eastern entrance is fully open. The southern activity seat, fire, audio position and activity framing keep their existing coordinates.
+
+Verification: production export and TypeScript pass, as do 10 controller/composition checks, three bridge checks, 20 approach checks, 28 dialogue checks and all six activity exits. The new **43 roaming/layout assertions** simulate four minutes at each of 30/60/120 FPS with the loaded world colliders: all villagers visit every waypoint and complete 3–4 circuits. Measured roaming spans are approximately 5.4×22.8 m (Pip), 22.7×17.4 m (Maple), 6.0×23.9 m (Moss), and 20.1×15.3 m (Luma). Raycasts against the actual rendered street ribbons, including their shoulders, verify at least 35 cm between paving and the complete bounds of every sign and hearth bench. No captured runtime errors. The dialogue exit test now explicitly stages Luma in the garden because her routine no longer leaves her there permanently.
+
+Inspected entrance, central/waterside posts, both languages, hearth and seated activity views in the running Chromium engine at 1280×720. Native Firefox loaded the production export and showed the clear junction, new signs and Luma roaming into the centre with a greeting. The user was actively using Firefox, so further native interaction was left alone; the six exit and chat regressions above are harness evidence. Existing workspace-root/Browserslist and unrelated RoomScene image build warnings remain. No fresh performance/device acceptance is claimed.
+
+[Evidence and captures](docs/village/evidence/README.md#roaming-and-clear-streets) include the machine-readable results and an accelerated overhead recording of the actual NPC controller movement. Reproduce with `python3 scripts/village/preview_qa.py --port 3024 --evidence-prefix roam-`, Load village, **Check roaming and street clearance**, plus the existing approach/dialogue/exit buttons. The rebuilt local production preview remains at `http://127.0.0.1:3020/`; reload it to load the final lettering fix.
+
 ## 2026-09-26 performance investigation
 
 The user authorized deploying these fixes through the existing GitHub Pages workflow after local verification. The measurements below precede publication; the release task and [Pages workflow](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml) record the live outcome. Friends report 8–20 FPS on gaming PCs; a supplied Opera/Windows crop shows 3 FPS, 229 calls and 2.212M triangles. It does not identify resolution, GPU renderer, acceleration status or selected quality.

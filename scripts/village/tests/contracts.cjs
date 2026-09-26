@@ -23,17 +23,24 @@ test('30/60/120 fps travel, jump height and contact counts agree', () => {
  });
  for (const result of results.slice(1)) { assert(Math.abs(result.z-results[0].z)<.03); assert(Math.abs(result.apex-results[0].apex)<.015); assert.equal(result.steps,results[0].steps); }
 });
-test('blocking wall stops displacement, sprint drain and footsteps', () => {
+test('blocking wall stops displacement and footsteps while dashing', () => {
  const events = [], m = new VillageMovement([{x:0,z:18,w:10,d:1}], e=>events.push(e));
- simulate(m, 2, 60, {...input,sprint:true}); const energy=m.stamina; events.length=0;
+ simulate(m, 2, 60, {...input,sprint:true}); events.length=0;
  simulate(m, 2, 60, {...input,sprint:true});
- assert(m.position.z>=18.82-.01); assert.equal(m.speed,0); assert.equal(events.length,0); assert(m.stamina>=energy);
+ assert(m.position.z>=18.82-.01); assert.equal(m.speed,0); assert.equal(events.length,0);
 });
-test('sprint drains, exhausts with hysteresis and recovers without blocking walking', () => {
- const m = new VillageMovement([],()=>{});m.settle(30,30);
- simulate(m,6,60,{...input,sprint:true});assert(m.exhausted);assert(m.stamina<10);assert(m.speed>4);
- simulate(m,.5,60,{...input,sprint:true});assert(m.exhausted);
- simulate(m,6,60,{...input,x:0,z:0});assert.equal(m.stamina,100);assert(!m.exhausted);
+test('dash stays at full speed for a minute at 30/60/120 fps and releases to normal gliding', () => {
+ for (const fps of [30,60,120]) {
+  const m = new VillageMovement([],()=>{});m.settle(25,0);
+  // Circle on clear ground so a world boundary cannot masquerade as dash exhaustion.
+  for (let frame=0;frame<60*fps;frame++) {
+   const angle=frame/fps;
+   m.update(1/fps,{...input,x:Math.cos(angle),z:Math.sin(angle),sprint:true});
+   if(frame>fps) { assert(m.speed>5.9);assert.equal(m.gait,'sprint'); }
+  }
+  simulate(m,1,fps,input);assert(Math.abs(m.speed-MOVEMENT.walk)<.01);
+  simulate(m,1,fps,{...input,run:true});assert(Math.abs(m.speed-MOVEMENT.run)<.01);
+ }
 });
 test('dialogs, focus loss and travel clear buffered jump and motion', () => {
  const events=[], m=new VillageMovement([],e=>events.push(e));m.jump();m.update(1/60,{...input,blocked:true});

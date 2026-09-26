@@ -1,6 +1,6 @@
 import * as T from "three";
 import { VillageMovement } from "./movement";
-import { roadX, type Collider } from "./environment";
+import { type Collider } from "./environment";
 import { VILLAGERS } from "./dialogue";
 
 /** A few residents on authored safe routes, and an economical flock over the valley. */
@@ -24,10 +24,17 @@ export class VillageLife {
 
   constructor(source: T.Object3D, colliders: Collider[]) {
     const routes: [number, number][][] = [
-      [[roadX(7) + .7, 7], [roadX(26) + .7, 26]],
-      [[-5, 3], [-19, 3]],
-      [[roadX(-8) - .7, -8], [roadX(-29) - .7, -29]],
-      [[13.8, -6.8]],
+      // Cottage lane and the entrance meadow.
+      [[1.4, 7], [3.8, 10.8], [4.7, 13.5], [3.8, 19], [1.8, 30], [-.7, 28], [-.8, 18], [-.6, 7]],
+      // Cross the bridge, visit the pond approach, then return to the cottages.
+      [[-5, 3], [-17.8, 3], [-19, 0], [-19, -6], [-18, -7], [-18, 0], [-17.8, 3],
+        [-5, 3], [-1.5, 4], [2.8, 6], [3.8, 10.8], [1.3, 10], [-1.5, 4]],
+      // Northern lane and the riverside verge, outside the hearth seating.
+      [[-.7, -8], [-.6, -16], [.1, -24], [1, -31], [-1.2, -32], [-2.5, -25],
+        [-2.8, -22], [-3.2, -15], [-5, -13], [-5, -8]],
+      // Tea garden, central junction and the open garden perimeter.
+      [[13.8, -6.8], [12.8, -7.5], [9, -7.8], [6.5, -7.8], [4, -3], [.5, 1],
+        [-1.2, -3], [-.8, -9], [4, -10], [8, -10], [12, -14.5], [18, -14.5], [19, -7.5], [17, -5.8]],
     ];
     routes.forEach((route, i) => {
       const root = source.clone(true);
@@ -120,7 +127,11 @@ export class VillageLife {
         : encounter.state === "return" ? encounter.path.at(-1)! : r.route[r.waypoint];
       const dx = target[0] - r.movement.position.x, dz = target[1] - r.movement.position.z;
       const length = Math.hypot(dx, dz);
-      if (encounter.state === "roam" && length < .3 && r.route.length > 1) { r.waypoint = (r.waypoint + 1) % r.route.length; r.pause = 4.5; }
+      if (encounter.state === "roam" && length < .3 && r.route.length > 1) {
+        // Rest twice per circuit; intermediate waypoints guide turns without repeated stops.
+        r.pause = r.waypoint === 0 || r.waypoint === Math.floor(r.route.length / 2) ? 4.5 : 0;
+        r.waypoint = (r.waypoint + 1) % r.route.length;
+      }
       const moving = !r.chatting && distance > 1.2 && (encounter.state === "approach" || (encounter.state === "return" && length >= .2)
         || (encounter.state === "roam" && r.route.length > 1 && r.pause === 0 && length > .3));
       const pace = encounter.state === "approach" ? r.pace : .43;
