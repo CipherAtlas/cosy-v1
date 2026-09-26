@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-Updated: 2026-09-26. **Status: controls/layout/dialogue release candidate; full art, movement, listening and device acceptance remain open.** Implementation history is in [VILLAGE_BUILD.md](VILLAGE_BUILD.md); current contracts below supersede earlier milestone descriptions.
+Updated: 2026-09-26. **Status: controls/layout/dialogue release published; full art, movement, listening and device acceptance remain open.** Implementation history is in [VILLAGE_BUILD.md](VILLAGE_BUILD.md); current contracts below supersede earlier milestone descriptions.
 
-Release candidate: wider resident circuits, three timber fingerposts, clear hearth seating, adjusted tea-garden seating, unlimited dashing without an energy bar, desktop mouse-look, and restyled dialogue. Deployment verification is pending in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). Previous published commit: [`6784834`](https://github.com/CipherAtlas/cosy-v1/commit/678483411f201af1fbec96f86a44294db01f5bec), with successful [Pages deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36236769733).
+Published application: [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b) through successful [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). Includes wider resident circuits, three timber fingerposts, clear hearth seating, adjusted tea-garden seating, unlimited dashing without an energy bar, desktop mouse-look, and restyled dialogue. Local and live verification are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release).
 
 Current movement: WASD/arrows glide, R toggles quick glide, Shift dashes continuously, and Space jumps. Click the desktop canvas to capture the mouse; Escape, menus, activities, blur and disposal release it. Touch retains dragging and direction buttons. Ground clicks/taps do not move the player. No stamina, exhaustion, recovery or energy UI remains. Preserve the [movement/input contracts](docs/village/MOVEMENT_AND_WORLD.md).
 

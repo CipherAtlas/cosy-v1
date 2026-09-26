@@ -2,11 +2,13 @@
 
 ## Published application release
 
-The `living-` and `polish-` milestones are included in application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), published by [Pages run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). [The release record](../../../VILLAGE_BUILD.md#2026-09-26-main-release) documents subpath/build checks, deployed assets and live Chromium arrival, audio controls, activity exit and chat verification. The captures below are local implementation evidence, not screenshots of the deployed site or proof of physical-device/listening acceptance.
+Current application: [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b), published by [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). [Publication evidence](release-publication.json) records deployed assets and live UI smoke checks; [the release ledger](../../../VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release) describes coverage and limits.
+
+Earlier release: The `living-` and `polish-` milestones are included in application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), published by [Pages run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). [The release record](../../../VILLAGE_BUILD.md#2026-09-26-main-release) documents subpath/build checks, deployed assets and live Chromium arrival, audio controls, activity exit and chat verification. The captures below are local implementation evidence, not screenshots of the deployed site or proof of physical-device/listening acceptance.
 
 ## Controls and layout release verification
 
-The combined local release review is recorded in [the release ledger](../../../VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). Deployment proof is recorded there after publication; the files here describe local production modules and exports.
+The combined local release review is recorded in [the release ledger](../../../VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). [Publication proof](release-publication.json) is separate from the local production-module/export results below.
 
 - [Combined regressions](release-regressions.json): wider circuits/street clearance, resident encounters, graphics policy, dialogue and all six activity exits against the complete current world geometry.
 - [Chrome camera and Pages export](release-camera-chrome.json): 28 checks, including real capture/motion/release and exported-app controls, without uncaught errors.
@@ -64,7 +66,7 @@ Files prefixed `art-` record the earlier original white-spirit/colorful-palette 
 
 ## Roaming and clear streets
 
-Local 2026-09-26 candidate, not deployed. Captures use production engine modules in the local QA harness, Chrome 154 on macOS, 1280×720, detailed quality. Renderer views omit the React activity panels. The native Firefox observation is recorded separately in the build ledger.
+Captured locally before publication; now included in application commit `738e408`. Captures use production engine modules in the local QA harness, Chrome 154 on macOS, 1280×720, detailed quality. Renderer views omit the React activity panels. The native Firefox observation is recorded separately in the build ledger.
 
 - [Entrance](roaming-entrance.png), [central junction](roaming-junction-en.png), [Japanese junction](roaming-junction-ja.png), [waterside fork](roaming-waterside.png).
 - [Open hearth and road](roaming-hearth.png), [unchanged seated activity](roaming-hearth-activity.png).

@@ -26,7 +26,7 @@ Pip, Maple, Moss and Luma follow wider neighbourhood circuits, approach nearby p
 
 The spirit stays visible during all six activities. Recorded music follows the scenery, with manual selection and separate music/world-sound controls. Data stays in the existing local storage keys. Art fidelity, long-session listening, physical touch and target-device performance acceptance remain open.
 
-Release candidate: the current controls/layout/dialogue changes are ready for the existing GitHub Pages workflow; deployment verification is pending. See [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). The preceding published commit is [`6784834`](https://github.com/CipherAtlas/cosy-v1/commit/678483411f201af1fbec96f86a44294db01f5bec), with a successful [Pages run](https://github.com/CipherAtlas/cosy-v1/actions/runs/36236769733).
+Published application: [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b), verified after successful [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). Live arrival, controls guide, six-place menu and hearth return checks passed, with no energy UI or captured console warnings/errors. See [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release) for local test coverage and live-browser limits.
 
 ## Local development and verification
 

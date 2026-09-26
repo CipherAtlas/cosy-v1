@@ -2,15 +2,15 @@
 
 final result: blocked
 
-This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
+This verdict concerns the approved art and full-experience acceptance. Publishing the current release does not close those findings.
 
 ## 2026-09-26 controls/layout release review
 
-Reviewed the complete pending change set: wider roaming, reduced roadside signs, hearth/tea seating, unlimited dash, mouse-look and dark green dialogue panels. Updated current documentation to remove stale energy, nine-sign and click-to-move requirements. Release verification and deployment status are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). This review does not close the broader art/device acceptance verdict above.
+Reviewed and published the complete change set: wider roaming, reduced roadside signs, hearth/tea seating, unlimited dash, mouse-look and dark green dialogue panels. Updated current documentation to remove stale energy, nine-sign and click-to-move requirements. Release verification and deployment status are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). This review does not close the broader art/device acceptance verdict above.
 
 ## 2026-09-26 roaming and street clearance
 
-The local layout uses three smaller wooden fingerposts and moves the road-side hearth bench to the north of the clearing. All four residents now cover wider circuits, including Luma leaving the tea garden. Inspected the entrance, junctions, English/Japanese boards and hearth/activity views; an initial pole/lettering overlap found in Firefox was corrected. The loaded-world suite verifies complete NPC circuits at three frame rates and at least 35 cm of street clearance around every sign and hearth bench. Existing approach/dialogue and six exit checks pass. See [the evidence ledger](VILLAGE_BUILD.md#2026-09-26-roaming-and-clear-streets). This is a local implementation; the broader art/device verdict above and published version are unchanged.
+The local layout uses three smaller wooden fingerposts and moves the road-side hearth bench to the north of the clearing. All four residents now cover wider circuits, including Luma leaving the tea garden. Inspected the entrance, junctions, English/Japanese boards and hearth/activity views; an initial pole/lettering overlap found in Firefox was corrected. The loaded-world suite verifies complete NPC circuits at three frame rates and at least 35 cm of street clearance around every sign and hearth bench. Existing approach/dialogue and six exit checks pass. See [the evidence ledger](VILLAGE_BUILD.md#2026-09-26-roaming-and-clear-streets). These local layout checks are included in the published controls/layout release above; the broader art/device verdict remains open.
 
 ## 2026-09-26 performance update
 

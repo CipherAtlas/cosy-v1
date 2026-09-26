@@ -4,7 +4,7 @@ Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canon
 
 ## 2026-09-26 village controls and layout release
 
-Release candidate reviewed together at the user's request. Publication through the existing main-branch GitHub Pages workflow is pending. No dependencies, storage keys, infrastructure or deployment configuration changed.
+Complete working-tree change set reviewed, documented, committed and published at the user's request. Application commit [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b) passed [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). No dependencies, storage keys, infrastructure or deployment configuration changed.
 
 The release combines wider circuits for all four residents; three small bilingual timber fingerposts instead of nine large signs; hearth furniture fully outside the streets; a tea-garden bench facing its table; unlimited dashing with all energy state and UI removed; desktop mouse capture with Escape/menu release and touch drag controls; and dark green dialogue panels with cream serif text, pastel names and a separate F key hint. The following implementation milestones retain their original local-only status as historical records; this section records their combined release.
 
@@ -20,7 +20,11 @@ Existing build warnings concern workspace lockfile discovery, outdated Browsersl
 
 ### Publication
 
-Pending push, successful Pages workflow and live-site smoke verification.
+Published at [the live village](https://cipheratlas.github.io/cosy-v1/) after the build and deploy jobs succeeded for application commit [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b). All 13 inspected deployed HTML asset URLs return HTTP 200; ten are byte-identical to the local Pages preview, while three build-generated JavaScript bundles have different hashes. [Publication evidence](docs/village/evidence/release-publication.json) records the deployed URLs and checks.
+
+Live in-app-browser inspection at 1280×720 confirms arrival, rendered timber signs, clear hearth seating, zero `meter`/`.v-energy` nodes, the updated controls guide, all six Places entries, hearth activity and return to exploration. No warnings/errors were captured. This embedded browser rejects mouse capture and displays the intended drag fallback; Escape restores the capture hint. Successful full capture/motion/release is established by the local Chrome and earlier Firefox checks above, not by this live embedded-browser run. No fresh audio, performance or physical-device acceptance is claimed.
+
+GitHub Actions also emits non-blocking Node-action runtime deprecation and upcoming Ubuntu-image notices. The existing workflow succeeds; no CI configuration was changed. This documentation follow-up records the verified application release without changing application code.
 
 ## 2026-09-26 mouse-look controls
 

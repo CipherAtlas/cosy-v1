@@ -1,0 +1,124 @@
+{
+  "checkedAt": "2026-09-26T13:29:57.653389+00:00",
+  "url": "https://cipheratlas.github.io/cosy-v1/",
+  "htmlStatus": 200,
+  "assets": [
+    {
+      "path": "/cosy-v1/_next/static/chunks/255-6e2d956f5d565f17.js",
+      "status": 200,
+      "bytes": 172883,
+      "sha256": "0ebe3a9fbe2be38c8b858536f65ba9b776e3e51f3a90b1e325e3b03a5e971e9d",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/36-5d11b1a9d3586fbe.js",
+      "status": 200,
+      "bytes": 100238,
+      "sha256": "08871328f0b20716d8a3c1045aacb630b18aee6d94331be78fce689a3c291d1f",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "status": 200,
+      "bytes": 173019,
+      "sha256": "2c752a401191671d5bbbe7514f5828bbb0a7cc50bfbe77ddaf1b1ccba4412ed2",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/937-820514b86c4c430b.js",
+      "status": 200,
+      "bytes": 109956,
+      "sha256": "8219e2b8bab5b9fd0f26e605e0349122ce0a047a38b2013076de0eefa3bbc614",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/app/page-dd72ecadf8599b96.js",
+      "status": 200,
+      "bytes": 51832,
+      "sha256": "f2fca7c533bd564adfed76132a623e43d0151fbf41d85b583e624548a3eaec2a",
+      "matchesLocalPreview": false
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/app/template-fe05001d0ca40588.js",
+      "status": 200,
+      "bytes": 4394,
+      "sha256": "90c080ea45609c774e2a4a243666ba4d7df59496d71a7421dd2d5d3c4f370277",
+      "matchesLocalPreview": false
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/main-app-5037e7411c5f27b8.js",
+      "status": 200,
+      "bytes": 557,
+      "sha256": "0980984a81db5f3beb31adf5fbb71ad980481945d2fcb60ad65b7767553989e4",
+      "matchesLocalPreview": false
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "status": 200,
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/chunks/webpack-b7732c204d068a4e.js",
+      "status": 200,
+      "bytes": 3614,
+      "sha256": "712c75c6b38c4c64ec84750a4ef82323261d56083d864bab7dfdd1bd658e0bc7",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/css/d184910ebafac9eb.css",
+      "status": 200,
+      "bytes": 41310,
+      "sha256": "177d1580ed6036ad3ea7c4fafa016d56dca795b664b23d661947d025907d99ee",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/css/d45baa6cb1c530c5.css",
+      "status": 200,
+      "bytes": 26425,
+      "sha256": "e7088204c1bdc871cac4ce5a8754f956cfa421ede9162ec64ba20bceeb5ab91a",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/media/630c17af355fa44e-s.p.woff2",
+      "status": 200,
+      "bytes": 43120,
+      "sha256": "10f1a0ef3f3497901c1c3e9987d0cb97d092a6ce1ff45669a1aed503cf67e6ef",
+      "matchesLocalPreview": true
+    },
+    {
+      "path": "/cosy-v1/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",
+      "status": 200,
+      "bytes": 32228,
+      "sha256": "92684e4acde79ef07758cd09380b7e01e9824d8b061eddeda046f78c166d7b12",
+      "matchesLocalPreview": true
+    }
+  ],
+  "applicationCommit": "738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b",
+  "deploymentRun": 36245251354,
+  "deploymentConclusion": "success",
+  "browserSmoke": {
+    "browser": "Codex in-app Chromium browser",
+    "viewport": [
+      1280,
+      720
+    ],
+    "passed": [
+      "Arrival and rendered village",
+      "Small timber roadside signs",
+      "Clear hearth seating",
+      "Zero meter or .v-energy elements",
+      "Updated controls guide",
+      "All six Places entries",
+      "Hearth activity and return to exploration",
+      "Capture-unavailable drag fallback hint",
+      "Escape restores capture hint",
+      "No captured console warnings or errors"
+    ],
+    "limits": [
+      "Embedded browser does not allow pointer lock; full capture verified locally in Chrome and Firefox",
+      "No fresh audio, sustained-performance or physical-device acceptance"
+    ]
+  }
+}
