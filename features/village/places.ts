@@ -63,6 +63,7 @@ export const PLACES = [
   },
 ] as const;
 export type PlaceId = (typeof PLACES)[number]["id"];
+export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト"];
 export type Quality = "auto" | "high" | "low";
 export type Weather = "golden" | "dusk" | "rain";
 export type AudioMix = {
@@ -73,6 +74,7 @@ export type AudioMix = {
   ambience?: number;
   effects?: number;
   vibe: "piano" | "lofi" | "jazz";
+  soundtrack?: "auto" | "village" | "water" | "rest" | "hearth";
 };
 export const DEFAULT_MIX: AudioMix = {
   music: 0.6,
@@ -82,4 +84,5 @@ export const DEFAULT_MIX: AudioMix = {
   ambience: 0.5,
   effects: 0.6,
   vibe: "piano",
+  soundtrack: "auto",
 };

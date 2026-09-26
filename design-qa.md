@@ -4,6 +4,18 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
 
+## 2026-09-26 water, fire and activity UI
+
+The striped water and flat flame cards are replaced by flowing surface detail and layered fire with embers/smoke. The spirit now inhabits each activity: desk/hourglass, hearth seat, breathing dock, tea table, writing desk and postbox. State changes animate those props. Warm paper controls keep the action visible, with compact mobile framing and a hide-controls toggle. Initial sign occlusion, a water/fire transparency artifact and a cropped mobile spirit were found and corrected.
+
+All six activities were inspected across native Firefox and Chromium, including the cottage timer, local note saving, playback, Japanese controls and 390×844 framing. Renderer checks, exits and dialogue regressions pass; see [the milestone](VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities) and [motion evidence](docs/village/evidence/living-activity-motion.webm). The overall verdict above still concerns complete reference/AAA and target-device acceptance, not whether this requested pass is implemented.
+
+## 2026-09-26 navigation, shadow and soundtrack polish
+
+The player now retains its movement heading when idle. The entrance has a readable six-place directory; junction and destination posts guide exploration, with English/Japanese labels and correct reverse-side arrows. Sign placement was visually corrected to clear the lamp, cottage facade and activity return camera. The weighted shadow filter and continuous detailed-tier updates address grainy edges and stepped motion. See [current entrance](docs/village/evidence/polish-entrance.png), [post detail](docs/village/evidence/polish-cottage-post.png) and [shadows](docs/village/evidence/polish-soft-shadows.png).
+
+Four complete recordings now follow location/scenery, with crossfades and manual selection; rain/fire/river beds are recorded too. All 28 new audio lifecycle checks pass, including a missing-track test. The generated-score direction is superseded. Desktop/390×844 music controls and Japanese labels were checked, but no subjective long-session listening or physical-phone certification is claimed. [Current evidence](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) records the checkpoint release and subsequent local changes separately. The overall art/device acceptance verdict above remains open.
+
 ## 2026-09-26 fantasy village pass
 
 The revised user brief extends the Genshin-inspired fantasy language to architecture, distant materials and NPCs. The local implementation now has swept colorful roofs, limestone arches, reflective glazing, flower boxes, rounded tree crowns, softer mountain colors, organic meadow patches and two floating skyline gardens. All four named residents are pastel spirits with distinct accessories; their approach and dialogue checks pass.
@@ -120,4 +132,4 @@ The playable prototype is not a visual match for the selected concept. The remai
 
 ## Additional required acceptance
 
-The latest user request expands the acceptance work beyond the historical visual findings: substantially better procedural music, Genshin-inspired run/sprint animations and energy, real jumping/landing, shared wind, Arkenfall-like world sound, richer assets and more alive lighting. These are required open features, not claims about what the above screenshots prove. Follow [movement and world acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance), [music and listening acceptance](docs/village/MUSIC_AND_SOUND.md#verification-and-acceptance), and the [canonical gap register](VILLAGE_HANDOFF.md#required-work-in-order).
+The latest user request expands the acceptance work beyond the historical visual findings: recorded music that follows the scenery, Genshin-inspired run/sprint animations and energy, real jumping/landing, shared wind, Arkenfall-like world sound, richer assets and more alive lighting. These are required open features, not claims about what the above screenshots prove. Follow [movement and world acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance), [music and listening acceptance](docs/village/MUSIC_AND_SOUND.md#verification-and-acceptance), and the [canonical gap register](VILLAGE_HANDOFF.md#required-work-in-order).

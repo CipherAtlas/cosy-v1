@@ -2,6 +2,18 @@
 
 Updated: 2026-09-26. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
 
+## Water, fire and activity staging — 2026-09-26
+
+`water.ts` provides world-space current noise and corrected ripple normals, with slower pond motion, turquoise depth colors and pale bank edges. `flame.ts` shares animated curved ribbons, smoke and embers between the hearth and indoor fireplace; charred logs and pulsing coals ground both fires. These are lightweight stylized effects, not fluid or volumetric simulation.
+
+`activityScene.ts` authors the spirit pose, camera and physical props together. Desk sand follows focus time; music gently sways the spirit; breathing expands pond rings; tea lifts on check-in; the quill and paper react to writing/saving; letters unfold at the postbox. DOM controls now sit beside the action in warm paper panels, and above a phone bottom sheet. Keep the accessible simple view, reduced-motion behavior and state-driven animations intact. See [current captures](evidence/README.md#water-fire-and-inhabited-activities) and [verification](../../VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities).
+
+## Wayfinding and shadow polish — 2026-09-26
+
+Nine physical posts now mark the entrance, two junctions and six destinations. The entrance directory and painted labels use shared English/Japanese place names, warm wood, pale faces and colored arrows. Reverse-side arrows reverse direction correctly. The player retains its movement heading when idle.
+
+Directional shadows use a fixed weighted 16-sample PCF filter instead of the installed Three r186 randomized five-sample pattern. Detailed quality refreshes every frame; low quality is capped at roughly 30 Hz. The shadow anchor advances by small texel-scale steps instead of two-meter jumps. Existing vegetation shader hooks are preserved. Inspect [current shadows](evidence/polish-soft-shadows.png) and [entrance](evidence/polish-entrance.png); target-device performance and complete lighting acceptance remain open.
+
 ## Latest direction — colorful fantasy and a white spirit
 
 The 2026-09-26 user update takes precedence over the older realistic art briefs below. Art direction is **Arkenfall + Genshin Impact**, with an explicitly vivid Genshin-inspired palette: clear blue sky, lively meadow greens, turquoise water, cream plaster, blue slate/terracotta, warm practicals and cool shadows. Avoid a uniform brown or grey cast. This is original art inspired by the references, with no copied game assets.

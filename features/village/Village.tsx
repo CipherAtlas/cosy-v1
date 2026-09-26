@@ -11,34 +11,28 @@ import {
   GearSix,
   Leaf,
   MapTrifold,
+  Timer, Fire, Drop, Coffee, BookOpen, EnvelopeSimple,
   SpeakerHigh,
   SpeakerSlash,
   X,
 } from "@phosphor-icons/react";
 import {
   PLACES,
+  JAPANESE_PLACE_NAMES as japaneseNames,
   DEFAULT_MIX,
   type PlaceId,
   type Quality,
   type Weather,
   type AudioMix,
 } from "./places";
-import { Activities, MixSliders } from "./Activities";
+import { Activities, MixSliders, SoundtrackChoices } from "./Activities";
 import { VillageAudio } from "./audio";
 import { useSession } from "./useSession";
-import type { MovementStatus } from "./environment";
+import type { ActivityMoment, MovementStatus } from "./environment";
 import type { VillageEngine } from "./VillageEngine";
 import "./village.css";
 import { withBasePath } from "@/lib/basePath";
 
-const japaneseNames = [
-  "集中のコテージ",
-  "村の焚き火",
-  "柳の池",
-  "お茶の庭",
-  "書きものの隅",
-  "小さなポスト",
-];
 export function Village() {
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
@@ -51,6 +45,8 @@ export function Village() {
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
     [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | null>(null);
+  const [activityCompact,setActivityCompact]=useState(false);
+  const onMoment=useCallback((moment:ActivityMoment)=>engine.current?.setActivityMoment(moment),[]);
   const soundBusy = useRef(false);
   const [movement, setMovement] = useState<MovementStatus>({ stamina: 100, exhausted: false, gait: "idle", running: false });
   const [soundLoading, setSoundLoading] = useState(false);
@@ -74,6 +70,7 @@ export function Village() {
   });
   const openPlace = useCallback((id: PlaceId) => {
     setPlace(id);
+    setActivityCompact(false);
     setPanel(null);
     engine.current?.travel(id);
     audio.current?.setPlace(id);
@@ -87,7 +84,9 @@ export function Village() {
     target?.focus();
   }, []);
   useEffect(() => {
-    audio.current = new VillageAudio();
+    audio.current = new VillageAudio(() => setNotice(preferences.current.language === "ja"
+      ? "音楽を切り替えられませんでした。音をオフにして、もう一度お試しください。"
+      : "The music couldn't change. Turn sound off and on to retry."));
     try {
       const p = JSON.parse(
         localStorage.getItem("cosy-village-preferences") || "null",
@@ -106,6 +105,7 @@ export function Village() {
           )
         )
           setMix({ ...p.mix,
+            soundtrack: ["auto", "village", "water", "rest", "hearth"].includes(p.mix.soundtrack) ? p.mix.soundtrack : "auto",
             ambience: typeof p.mix.ambience === "number" && p.mix.ambience >= 0 && p.mix.ambience <= 1 ? p.mix.ambience : .5,
             effects: typeof p.mix.effects === "number" && p.mix.effects >= 0 && p.mix.effects <= 1 ? p.mix.effects : .6,
           });
@@ -224,7 +224,7 @@ export function Village() {
         setSoundLoading(true);
         const result = await audio.current?.start();
         setSound(true);
-        if (result && !result.sampled) setNotice(t("Some piano samples could not load. Using a simpler sound.", "ピアノ音源の一部を読み込めなかったため、簡易音源を使います。"));
+        if (result && !result.ambience) setNotice(t("Some nature recordings could not load. Music is still available; turn sound off and on to retry.", "環境音の一部を読み込めませんでした。音楽は再生できます。音をオフにして再度お試しください。"));
       } catch {
         audio.current?.stop();
         setSound(false);
@@ -250,6 +250,7 @@ export function Village() {
     <div
       className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""} ${simple ? "v-simple" : ""}`}
       data-weather={weather}
+      data-activity={place ?? "explore"}
     >
       <div className="v-canvas" ref={canvas} />
       <div className="v-shade" aria-hidden="true" />
@@ -417,7 +418,10 @@ export function Village() {
         </>
       )}
       {entered && place && (
+        <div id="v-activity-panel" hidden={activityCompact && !simple}>
         <Activities
+          key={place}
+          onMoment={onMoment}
           place={place}
           session={focus}
           mix={mix}
@@ -428,6 +432,7 @@ export function Village() {
           travel={openPlace}
           language={language}
         />
+        </div>
       )}
       {entered && simple && !place && (
         <section className="v-simple-places">
@@ -440,17 +445,9 @@ export function Village() {
           ))}
         </section>
       )}
-      {entered && place && (
-        <button
-          className="v-now-playing"
-          aria-label={t("Sound", "音")}
-          onClick={() => setPanel("sound")}
-        >
-          {sound ? <SpeakerHigh size={17} /> : <SpeakerSlash size={17} />}{" "}
-          {sound
-            ? `${mix.vibe === "piano" ? "Soft piano" : mix.vibe === "lofi" ? "Lofi" : "Quiet jazz"}${mix.rain > 0 ? " + rain" : ""}`
-            : t("Sound is off", "音はオフ")}
-          <CaretDown size={14} />
+      {entered && place && !simple && (
+        <button className="v-scene-toggle" aria-controls="v-activity-panel" aria-expanded={!activityCompact} onClick={()=>setActivityCompact(value=>!value)}>
+          {activityCompact ? t("Show activity", "操作を表示") : t("Enjoy the view", "景色を楽しむ")}<CaretDown size={16} style={{transform:activityCompact?"rotate(180deg)":undefined}} />
         </button>
       )}
       {entered && focus.running && place !== "focus" && (
@@ -548,6 +545,7 @@ export function Village() {
                       openPlace(p.id);
                     }}
                   >
+                    <span className="v-place-icon" aria-hidden="true">{[<Timer key="focus" size={23}/>,<Fire key="music" size={23}/>,<Drop key="breathe" size={23}/>,<Coffee key="mood" size={23}/>,<BookOpen key="gratitude" size={23}/>,<EnvelopeSimple key="compliment" size={23}/>][PLACES.findIndex(a=>a.id===p.id)]}</span>
                     <div>
                       <strong>{placeName(p.id)}</strong>
                       <span>
@@ -580,18 +578,7 @@ export function Village() {
                     ? t("Turn sound off", "音をオフ")
                     : t("Turn sound on", "音をオン")}
                 </button>
-                <div className="v-preset-row">
-                  {(["piano", "lofi", "jazz"] as const).map((v) => (
-                    <button
-                      key={v}
-                      className="v-chip"
-                      aria-pressed={mix.vibe === v}
-                      onClick={() => setMix({ ...mix, vibe: v })}
-                    >
-                      {v === "piano" ? "Piano" : v === "lofi" ? "Lofi" : "Jazz"}
-                    </button>
-                  ))}
-                </div>
+                <SoundtrackChoices mix={mix} setMix={setMix} language={language} />
                 <MixSliders mix={mix} setMix={setMix} language={language} />
               </>
             )}

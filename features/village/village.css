@@ -1087,3 +1087,128 @@ kbd {
 .v-control-guide dd { margin: 0; text-align: right; color: #e5ddcc; }
 .v-control-guide kbd { font: inherit; font-size: 13px; color: #ffdfa9; }
 @media (max-width: 600px) { .v-control-guide dl > div { gap: 12px; font-size: 14px; } }
+.v-soundtrack { display: grid; gap: .55rem; margin: 1.2rem 0; color: #f3ebd9; }
+.v-soundtrack select { width: 100%; min-height: 46px; padding: .7rem .8rem; border: 1px solid #c9b98166; border-radius: 10px; background: #283d35; color: #fff3d3; font: inherit; }
+.v-soundtrack small { opacity: .7; font-size: .78rem; }
+
+/* Activity controls sit beside the scene, with a compact bottom sheet on phones. */
+.v-header nav { gap: 8px; }
+.v-header nav button {
+  min-height: 44px; padding: 10px 16px; border: 1px solid #fff9e59c;
+  border-radius: 24px; background: #fff8e8e8; color: #314b45;
+  box-shadow: 0 3px 12px #18352c14; text-shadow: none; backdrop-filter: blur(12px);
+}
+.v-header nav button:hover { background: #fffdf4; color: #183f3b; }
+.v-header nav .v-leave { background: #254d48e8; border-color: #c7e3cd75; color: #fff5dc; }
+.v-settled .v-shade { background: linear-gradient(180deg,#152c2826,transparent 20%,transparent 85%,#152c2826); }
+.v-location { text-shadow: 0 2px 7px #223b38; }
+.v-walk-hints { gap: 14px; }
+.v-walk-hints > span:nth-child(3) { display: none; }
+.v-interact { background: #fff7e5f2; color: #2a4d47; border-color: #fff9e8; box-shadow: 0 7px 24px #122c3329; }
+.v-interact kbd { border-color: #9baf9e; background: #e3e8d6; color: #24453d; }
+.village .v-activity {
+  left: auto; right: 28px; top: auto; bottom: 78px; transform: none;
+  width: min(388px,calc(100vw - 48px)); max-height: calc(100dvh - 180px);
+  padding: 28px; border-radius: 20px; border: 1px solid #fff9e8;
+  background: linear-gradient(145deg,#fff9edf7,#f0ead8f2); color: #304b43;
+  box-shadow: 0 12px 48px #17392f26, inset 0 0 0 5px #fffaf033;
+  backdrop-filter: blur(16px); color-scheme: light; text-align: left;
+  scrollbar-color: #b5b79d transparent; animation: village-panel-in .35s ease both;
+}
+.v-activity h2 { font-size: 28px; line-height: 1.18; letter-spacing: -.55px; margin: 0 0 12px; text-wrap: pretty; }
+.v-activity > p { color: #647367; font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
+.v-activity .v-button { min-height: 46px; padding: 11px 17px; border-radius: 12px; background: #f9f6e9; border-color: #c9d0b8; color: #3e594e; }
+.v-activity .v-button:hover { background: #e8eddc; }
+.v-activity .v-primary { background: #32655b; border-color: #32655b; color: #fff9e6; }
+.v-activity .v-primary:hover { background: #254f47; }
+.v-activity .v-actions { gap: 9px; }
+.v-activity .v-text-button { color: #4c685e; }
+.v-activity .v-chip { color: #53655b; background: #fffaf0; border-color: #d4d8c2; border-radius: 10px; }
+.v-activity .v-chip:hover { background: #edf0df; }
+.v-activity .v-chip[aria-pressed="true"] { background: #e0ecd9; color: #284e3b; border-color: #70927b; box-shadow: inset 0 0 0 1px #70927b; }
+.v-activity .v-session-options { color: #526a5d; font-size: 13px; margin-top: 20px; }
+.v-session-options summary,.v-mix-details summary { cursor: pointer; padding: 12px 0; min-height: 44px; }
+.v-activity .v-session-options input { color: #344c42; background: #fffdf4; border-color: #c9d0ba; width: 100%; }
+.v-activity .v-timer { font: 400 78px/1.12 var(--font-outfit),sans-serif; letter-spacing: -4px; font-variant-numeric: tabular-nums; margin-top: 24px; color: #36594e; }
+.v-activity .v-timer span { transform: none; font-size: .7em; margin: 0 1px; opacity: .55; }
+.v-activity .v-intention { margin: 7px 0 24px !important; font-size: 15px !important; color: #6b7968 !important; }
+.v-activity .v-mix { gap: 18px; margin-top: 15px; }
+.v-activity .v-mix label { color: #53685b; grid-template-columns: 76px 1fr 36px; gap: 10px; font-size: 13px; }
+.v-activity .v-mix output { color: #647361; }
+.v-activity input[type="range"] { accent-color: #668b72; }
+.v-activity .v-soundtrack { color: #425e51; font-size: 13px; margin: 22px 0 8px; }
+.v-activity .v-soundtrack select { color: #35584c; background: #fffdf3; border-color: #c2cdb6; border-radius: 11px; }
+.v-activity .v-soundtrack small { color: #73806c; opacity: 1; font-size: 11px; }
+.v-mix-details { border-top: 1px solid #ced4bd; margin-top: 18px; font-size: 13px; color: #4f6c5c; }
+.v-music-waves { display: flex; gap: 5px; align-items: center; height: 28px; margin-bottom: 16px; }
+.v-music-waves i { display: block; width: 4px; height: 7px; border-radius: 4px; background: #89a88a; }
+.v-music-waves.is-playing i { animation: village-music-wave 1.1s ease-in-out infinite alternate; }
+.v-activity.v-breathe { text-align: center; }
+.v-activity .v-breath-orbit { width: 170px; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 0; margin: 26px auto; transition: transform .25s linear; }
+.v-breath-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
+.v-breath-ring circle { fill: #e2eee333; stroke: #d0decb; stroke-width: 1.5; }
+.v-breath-ring circle+circle { fill: none; stroke: #6d9e90; stroke-width: 3; stroke-linecap: round; }
+.v-breath-label { color: #5d796b; font-size: 13px; }
+.v-activity .v-breath-count { font: 400 52px/1.1 Georgia,serif; margin: 5px 0 0; color: #365c53; }
+.v-activity.v-breathe .v-preset-row { margin-top: 24px; }
+.v-activity.v-breathe .v-chip { font-size: 11px; padding: 9px 10px; }
+.v-activity .v-moods { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.v-activity .v-moods .v-chip { min-height: 52px; text-align: left; font-size: 13px; padding: 12px; }
+.v-activity .v-moods .v-chip[aria-pressed="true"]::after { content: " ✓"; }
+.v-activity .v-suggestion { border-color: #cdd6be; margin-top: 22px; }
+.v-activity .v-suggestion p { color: #637663; font-size: 14px; }
+.v-activity.v-journal textarea { height: 156px; background: repeating-linear-gradient(#fffdf4,#fffdf4 28px,#dfe4d432 29px); border: 1px solid #d8d9c3; border-radius: 9px; color: #445548; padding: 14px 16px; font-size: 16px; line-height: 29px; }
+.v-activity .v-save-status { color: #597b5b; margin: 12px 0 0; min-height: 0; }
+.v-save-status:empty { display: none; }
+.v-activity .v-notes article { border-color: #ced5be; }
+.v-activity .v-notes footer { color: #73806d; }
+.v-activity.v-letter blockquote { font-size: 27px; line-height: 1.45; margin: 24px 0; color: #536251; animation: village-letter-in .5s ease both; }
+.v-activity.v-letter h2 { color: #3d584c; font-size: 28px; }
+.v-scene-toggle { position: absolute; z-index: 4; right: 30px; bottom: max(22px,env(safe-area-inset-bottom)); min-height: 44px; display: flex; align-items: center; gap: 18px; border-radius: 24px; border: 1px solid #fff1d57a; background: #25483dcc; color: #fff5dd; padding: 10px 18px; backdrop-filter: blur(10px); font: 13px var(--font-outfit),sans-serif; }
+.v-settled .v-session-mini { right: auto; left: 32px; bottom: 24px; }
+.village.v-simple .v-activity { left: 50%; right: auto; top: 50%; bottom: auto; transform: translate(-50%,-50%); width: min(520px,calc(100vw - 48px)); max-height: calc(100dvh - 170px); }
+.village .v-activity button:focus-visible,.village .v-activity input:focus-visible,.village .v-activity textarea:focus-visible,.village .v-activity select:focus-visible { outline: 2px solid #39745d; outline-offset: 3px; }
+.v-dialog { background: #fbf7eaf7; color: #354e43; border-color: #fff9e9; color-scheme: light; box-shadow: 0 20px 80px #193b3026; }
+.v-dialog-close { color: #4e6c5b; width: 44px; height: 44px; }
+.v-dialog h2 { font-size: 30px; margin-bottom: 28px; }
+.v-dialog .v-button { border-color: #cad3bb; color: #426151; background: #f4f6e9; }
+.v-dialog .v-primary { color: #fff8e4; background: #32655b; border-color: #32655b; }
+.v-dialog .v-mix label,.v-dialog .v-soundtrack,.v-dialog .v-control-guide dd { color: #4f695c; }
+.v-dialog .v-mix output,.v-dialog .v-settings p,.v-dialog .v-control-guide p { color: #71806a; }
+.v-dialog select { color: #3d5c4d; background: #fffdf4; border-color: #c8d1b9; }
+.v-dialog .v-mix input,.v-dialog .v-check input { accent-color: #658971; }
+.v-dialog .v-credits,.v-dialog .v-control-guide kbd { color: #547b63; }
+.v-dialog .v-controls-button { color: #446151; background: #e9efdc; border-color: #ccd6bf; }
+.v-dialog button:focus-visible,.v-dialog input:focus-visible,.v-dialog select:focus-visible { outline-color: #39745d; }
+.v-place-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v-place-list > button { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 14px; padding: 18px 15px; border: 1px solid #d8ddc9; border-radius: 14px; background: #fffdf4; color: #3b5a4b; min-height: 165px; }
+.v-place-list > button:hover { color: #244d3e; background: #eff3e5; border-color: #8eab8b; transform: translateY(-2px); }
+.v-place-list strong { font-size: 20px; margin-bottom: 6px; }
+.v-place-list span { color: #77816c; font-size: 12px; line-height: 1.45; }
+.v-place-list > button > svg:last-child { position: absolute; top: 20px; right: 15px; width: 16px; color: #8b9c7e; }
+.v-place-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: #e1edde; color: #547d63 !important; }
+.v-place-list > button:nth-child(2n) .v-place-icon { background: #f4e5cd; color: #a27747 !important; }
+@keyframes village-panel-in { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@keyframes village-letter-in { from { opacity: .2; transform: translateY(9px) rotate(-1deg); } to { opacity: 1; transform: none; } }
+@keyframes village-music-wave { from { height: 5px; } to { height: 24px; } }
+@media (max-width:700px) {
+  .v-header nav button { padding: 10px; }
+  .v-header nav .v-leave { padding: 10px 15px; }
+  .village .v-activity { left: 12px; right: 12px; top: auto; bottom: 70px; width: auto; padding: 22px; max-height: 49dvh; border-radius: 18px; }
+  .v-activity h2,.v-activity.v-letter h2 { font-size: 25px; }
+  .v-activity .v-timer { font-size: 65px; margin-top: 12px; }
+  .v-activity .v-breath-orbit { width: 125px; height: 125px; margin: 17px auto; }
+  .v-activity .v-breath-label { max-width: 94px; font-size: 11px; line-height: 1.3; }
+  .v-activity .v-breath-count { font-size: 39px; }
+  .v-activity.v-breathe .v-preset-row { margin-top: 16px; }
+  .v-scene-toggle { right: 14px; bottom: max(14px,env(safe-area-inset-bottom)); }
+  .v-settled .v-session-mini { left: 14px; bottom: 17px; max-width: 43vw; font-size: 11px; }
+  .village.v-simple .v-activity { left: 12px; right: 12px; top: 140px; bottom: 18px; width: auto; max-height: none; transform: none; }
+  .v-dialog { padding: 40px 22px; }
+  .v-place-list > button { padding: 15px 12px; min-height: 153px; }
+  .v-place-list strong { font-size: 18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .village .v-activity,.v-music-waves.is-playing i,.v-activity.v-letter blockquote { animation: none; }
+  .v-breath-orbit.is-running { transform: none; }
+}

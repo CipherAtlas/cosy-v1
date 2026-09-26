@@ -1,5 +1,11 @@
 import type { Weather } from "./places";
 
+export type ActivityMoment =
+  | { kind: "focus"; running: boolean; progress: number }
+  | { kind: "music"; playing: boolean }
+  | { kind: "breathe"; active: boolean; amount: number }
+  | { kind: "tea" | "write" | "save" | "letter" | "keep" };
+
 export type Surface = "stone" | "wood" | "soil" | "grass";
 export type WorldContact = {
   kind: "footstep" | "takeoff" | "landing";

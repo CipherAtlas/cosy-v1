@@ -1,0 +1,86 @@
+[
+  {
+    "file": "audio/music/quiet-village-1.mp3",
+    "title": "Quiet Village 1",
+    "author": "Holizna",
+    "source": "https://opengameart.org/content/quiet-village-collection",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Loudness normalization and MP3 transcode; full composition retained.",
+    "bytes": 3423965,
+    "sha256": "9005895143da6d32e4458e25a139a566e97287c6874c2e5fc2ade894d8767c5f",
+    "durationSeconds": 213.936984
+  },
+  {
+    "file": "audio/music/quiet-village-2.mp3",
+    "title": "Quiet Village 2",
+    "author": "Holizna",
+    "source": "https://opengameart.org/content/quiet-village-collection",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Loudness normalization and MP3 transcode; full composition retained.",
+    "bytes": 3200357,
+    "sha256": "4550240cc388dde4f1ef2ab1d5a303b24fabcb40cda7f246cdf373a5bb1bd50d",
+    "durationSeconds": 199.944989
+  },
+  {
+    "file": "audio/music/quiet-village-3.mp3",
+    "title": "Quiet Village 3",
+    "author": "Holizna",
+    "source": "https://opengameart.org/content/quiet-village-collection",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Loudness normalization and MP3 transcode; full composition retained.",
+    "bytes": 4096462,
+    "sha256": "e35779ec28380119cd55304e272ad9b9474101471ef1c5cdb8f64c13e30a427d",
+    "durationSeconds": 255.960975
+  },
+  {
+    "file": "audio/music/quiet-village-4.mp3",
+    "title": "Quiet Village 4",
+    "author": "Holizna",
+    "source": "https://opengameart.org/content/quiet-village-collection",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Loudness normalization and MP3 transcode; full composition retained.",
+    "bytes": 2175939,
+    "sha256": "fb747a3294be0c4bb098203c57170d584328a3b37f3af737792faa2942357e88",
+    "durationSeconds": 135.936984
+  },
+  {
+    "file": "audio/world/fire.mp3",
+    "title": "Fireplace Sound loop",
+    "author": "PagDev",
+    "source": "https://opengameart.org/content/fireplace-sound-loop",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Excerpt, mono downmix, normalization and MP3 transcode. Runtime overlaps loop boundaries.",
+    "bytes": 241101,
+    "sha256": "cdae3e620e2a4d6655d45c983162145638e294df1ecaec61431bece36bfb818d",
+    "durationSeconds": 20.0
+  },
+  {
+    "file": "audio/world/stream.mp3",
+    "title": "Stream Sounds (stream1)",
+    "author": "kurt",
+    "source": "https://opengameart.org/content/stream-sounds",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "changes": "Excerpt, mono downmix, normalization and MP3 transcode. Runtime overlaps loop boundaries.",
+    "bytes": 216909,
+    "sha256": "c936eb73ee7d4403106118a773e5c010b4b01a7d508bb078112964aa46538c40",
+    "durationSeconds": 18.0
+  },
+  {
+    "file": "audio/world/rain.mp3",
+    "title": "Rain (loopable), sample 1",
+    "author": "Ylmir",
+    "source": "https://opengameart.org/content/rain-loopable",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "Excerpt, mono downmix, normalization and MP3 transcode. Runtime overlaps loop boundaries.",
+    "bytes": 289053,
+    "sha256": "5b89f430375607b66a728840d81087b7c082e6028cc39a6add111889af519401",
+    "durationSeconds": 24.0
+  }
+]

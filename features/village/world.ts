@@ -1,10 +1,12 @@
 import * as T from "three";
 import { makeFlame } from "./flame";
+import { makeWater } from "./water";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { fantasyTreeGeometry } from "./fantasyTrees";
+import { buildWayfinding } from "./wayfinding";
 import { BRIDGE, HEARTH, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
 export { groundY, riverX } from "./environment";
 
@@ -17,6 +19,7 @@ export type World = {
   }[];
   treeLod: T.InstancedMesh;
   setWeather: (rain: number, dusk: number) => void;
+  setLanguage: (language: "en" | "ja") => void;
   colliders: Collider[];
   flames: T.Mesh[];
   lanterns: T.Mesh[];
@@ -331,30 +334,10 @@ export async function buildWorld(
   }
   // Water occupies a shallow channel, with shader normals moving independently of the banks.
   const waterUniform = { time: { value: 0 } };
-  const waterMat = new T.MeshStandardMaterial({
-    color: "#42a49b",
-    metalness: 0,
-    roughness: 0.3,
-    transparent: true,
-    opacity: 0.86,
-  });
-  waterMat.onBeforeCompile = (s) => {
-    s.uniforms.uTime = waterUniform.time;
-    s.uniforms.uGust = wind.strength;
-    s.vertexShader =
-      "uniform float uTime; uniform float uGust;\nvarying vec3 vWorld;\n" + s.vertexShader;
-    s.vertexShader = s.vertexShader.replace(
-      "#include <begin_vertex>",
-      "#include <begin_vertex>\nvWorld = position;\ntransformed.y += sin(position.x*2.4+uTime*.6)*.028 + cos(position.z*2.1+uTime*.8)*.024;",
-    );
-    s.fragmentShader =
-      "uniform float uTime; uniform float uGust;\nvarying vec3 vWorld;\n" + s.fragmentShader;
-    s.fragmentShader = s.fragmentShader.replace(
-      "#include <normal_fragment_begin>",
-      "#include <normal_fragment_begin>\nnormal.x += sin(vWorld.x*4.0+uTime*.75)*(.08+uGust*.12);\nnormal.z += cos(vWorld.z*3.5+uTime*.6)*.14;\nnormal=normalize(normal);",
-    );
-  };
-  const wg = new T.PlaneGeometry(1, 1, 1, 220);
+  const riverSurface=makeWater(waterUniform.time,wind.strength);
+  const pondSurface=makeWater(waterUniform.time,wind.strength,true);
+  const waterMat=riverSurface.material;
+  const wg = new T.PlaneGeometry(1, 1, 12, 220);
   wg.rotateX(-Math.PI / 2);
   const wp = wg.attributes.position;
   for (let i = 0; i < wp.count; i++) {
@@ -365,9 +348,9 @@ export async function buildWorld(
   const water = add(wg, waterMat, 0, 0, 0);
   water.castShadow = false;
   water.userData.time = waterUniform.time;
-  const pondGeo = new T.CircleGeometry(7, 64);
+  const pondGeo = new T.RingGeometry(0, 7, 80, 8);
   pondGeo.rotateX(-Math.PI / 2);
-  const pond = add(pondGeo, waterMat, -25, -0.3, -17, 1.1, 1, 1);
+  const pond = add(pondGeo, pondSurface.material, -25, -0.3, -17, 1.1, 1, 1);
   pond.castShadow = false;
   // River stones, a shallow arch bridge, and rustic railings.
   for (let i = 0; i < 240; i++) {
@@ -510,11 +493,12 @@ export async function buildWorld(
   });
   add(new T.CylinderGeometry(.8, .8, 0.12, 24), coal, HEARTH.x, 0.15, HEARTH.z);
   add(new T.CylinderGeometry(3.6, 3.6, .06, 48), mat.path, HEARTH.x, .01, HEARTH.z).castShadow = false;
+  const charredWood=mat.darkWood.clone();charredWood.color.set("#624030");charredWood.roughness=1;
   for (let i = 0; i < 7; i++) {
     let a = i * 0.8;
     const log = add(
       cylGeo,
-      mat.darkWood,
+      charredWood,
       HEARTH.x + Math.sin(a) * 0.3,
       0.32,
       HEARTH.z + Math.cos(a) * 0.3,
@@ -524,17 +508,13 @@ export async function buildWorld(
     );
     log.rotation.set(1.25, a, 0.3);
   }
-  for (let i = 0; i < 4; i++) {
-    const f = makeFlame(0.65, 1.1);
-    f.position.set(HEARTH.x + (rnd() - 0.5) * 0.5, 0.8, HEARTH.z + (rnd() - 0.5) * 0.5);
-    f.rotation.y = (i * Math.PI) / 4;
-    group.add(f);
-    flames.push(f);
-  }
+  const fire=makeFlame(1.25,1.7);
+  fire.position.set(HEARTH.x,1.0,HEARTH.z);group.add(fire);flames.push(fire);
   colliders.push({ x: HEARTH.x, z: HEARTH.z, w: 2.3, d: 2.3, top: .7 });
   lantern(HEARTH.x - 2.5, .25, HEARTH.z - 2.2);
   const hearthLight = new T.PointLight("#ffad54", 9, 8, 2);
   hearthLight.position.set(HEARTH.x, 1, HEARTH.z); group.add(hearthLight);
+  fire.userData.light=hearthLight;fire.userData.coal=coal;
   // Pond dock.
   for (let i = 0; i < 18; i++)
     box(mat.wood, -20.8 - i * 0.2, 0.15, -10.5, 0.18, 0.18, 3.3);
@@ -1009,16 +989,18 @@ export async function buildWorld(
   treeLod.customDepthMaterial = windMaterial(forestMaterial, .11, true);
   // Crown colors carry their soft occlusion; self-shadowing intersecting lobes produces striping.
   inst.castShadow = true; inst.receiveShadow = false; group.add(inst);
+  const wayfinding = buildWayfinding(colliders);
+  group.add(wayfinding.group);
   onProgress(80);
   return {
     group,
     trees,
     treeLod,
+    setLanguage: wayfinding.setLanguage,
     setWeather(rain: number, dusk: number) {
       wetness.value = rain;
       mat.glass.emissiveIntensity = .12 + dusk * 1.3 + rain * .22;
-      waterMat.roughness = .3 + rain * .28;
-      waterMat.color.setRGB(.045 + rain*.02, .34 - dusk*.17, .29 - dusk*.1);
+      riverSurface.setWeather(rain,dusk);pondSurface.setWeather(rain,dusk);
     },
     colliders,
     flames,
@@ -1030,9 +1012,9 @@ export async function buildWorld(
       const geometries = new Set<T.BufferGeometry>(),
         materials = new Set<T.Material>();
       group.traverse((o) => {
-        if (o instanceof T.Mesh) {
+        if (o instanceof T.Mesh || o instanceof T.Points) {
           geometries.add(o.geometry);
-          if (o.customDepthMaterial) materials.add(o.customDepthMaterial);
+          if (o instanceof T.Mesh && o.customDepthMaterial) materials.add(o.customDepthMaterial);
           (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
             materials.add(m),
           );

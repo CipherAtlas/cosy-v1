@@ -2,7 +2,7 @@
 <style>body{margin:0;background:#17251f;color:#fff;font:14px system-ui}#scene{width:1280px;height:720px}nav{padding:12px;display:flex;gap:10px;flex-wrap:wrap}button{padding:10px}pre{white-space:pre-wrap;padding:16px}audio{width:280px}</style>
 <link rel="stylesheet" href="/village.css"><style>#scene{position:relative;isolation:isolate;overflow:hidden}#scene .v-villager-bubble{box-sizing:border-box;font-family:system-ui}#scene .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}</style>
 <script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>
-<div id="scene"></div><nav><button id="load">Load village</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Render music samples</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
+<div id="scene"></div><nav><button id="load">Load village</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Record soundscape</button><button id="polish">Review navigation and shadows</button><button id="living">Review living activities</button><button id="rituals">Record water fire and activities</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
 <script type="module">
 import {VillageEngine} from './modules/features/village/VillageEngine.js';
 import {VillageAudio} from './modules/features/village/audio.js';
@@ -11,8 +11,9 @@ import {checkDialogue} from './dialogue-tests.js';
 import {checkResidents} from './resident-tests.js';
 import {BRIDGE} from './modules/features/village/environment.js';
 import {VillageMovement} from './modules/features/village/movement.js';
+import {ACTIVITY_STAGES} from './modules/features/village/activityScene.js';
 import {PLACES} from './modules/features/village/places.js';
-import {VillageScore,SCORE_VERSION} from './modules/features/village/composition.js';
+import {RECORDINGS, soundtrackFor} from './modules/features/village/soundtrack.js';
 const status=document.querySelector('#status'),host=document.querySelector('#scene');
 let engine, sound, stats, contacts=[], motion=[], consoleErrors=[];
 const originalError=console.error;
@@ -123,7 +124,7 @@ document.querySelector('#signal').onclick=async()=>{
   const result=await a.start();a.setEnvironment({listener:[-5,1.4,-19],forward:[0,0,-1],wind:.5,weather:'golden',sheltered:false});
   const analyser=a.context.createAnalyser();analyser.fftSize=2048;a.master.connect(analyser);const data=new Float32Array(analyser.fftSize);let peak=0,sum=0,count=0;
   for(let i=0;i<35;i++){await delay(100);analyser.getFloatTimeDomainData(data);for(const sample of data){peak=Math.max(peak,Math.abs(sample));sum+=sample*sample;count++}}
-  const output={browser:navigator.userAgent,context:a.context.state,sampled:result.sampled,listenerAPI:a.context.listener.positionX?'AudioParam':'legacy methods',peak,rms:Math.sqrt(sum/count),pass:peak>.0001&&a.context.state==='running'};
+  const output={browser:navigator.userAgent,context:a.context.state,recorded:result.recorded,ambience:result.ambience,listenerAPI:a.context.listener.positionX?'AudioParam':'legacy methods',peak,rms:Math.sqrt(sum/count),pass:peak>.0001&&a.context.state==='running'};
   await save('audio-output.json',JSON.stringify(output,null,2));report(output);a.master.disconnect(analyser);
  }finally{a.dispose()}
 };
@@ -147,7 +148,7 @@ document.querySelector('#exits').onclick=async()=>{
    if(distances.some(d=>d<.2))throw Error(place.id+' blocks walking after exit: '+distances);
    if(engine.place!==null||!engine.player.visible||engine.keys.size||!engine.movement.grounded||engine.movement.velocity.y!==0)throw Error(place.id+' did not restore exploration');
    const cameraDistance=engine.camera.position.distanceTo(engine.currentLook);
-   if(cameraDistance<1.5||engine.camera.position.distanceTo(engine.cameraGoal)>.001)throw Error(place.id+' did not restore the walking camera');
+   if(cameraDistance<3.79||engine.camera.position.distanceTo(engine.cameraGoal)>.001)throw Error(place.id+' did not restore the walking camera');
    results.push({place:place.id,arrival:[x,z],walkDistances:distances,cameraDistance});
   }
   engine.travel('breathe');engine.setPlace(null);
@@ -185,45 +186,104 @@ document.querySelector('#profile').onclick=async()=>{
  await save('profile.json',JSON.stringify(reportData,null,2));report(reportData);
 };
 document.querySelector('#lifecycle').onclick=async()=>{
- const results=[];const check=(name,condition)=>{if(!condition)throw Error(name);results.push(name)};
- const a=new VillageAudio();a.setMix({music:.6,rain:0,fire:0,master:0,vibe:'piano',ambience:0,effects:0});
- try {
-  const ready=await a.start();check('All 14 piano samples decoded',ready.sampled&&a.piano.size===14);
-  check('Starting at master zero suspends the graph',a.context.state==='suspended');
-  a.setMix({music:0,rain:0,fire:0,master:.1,vibe:'piano',ambience:0,effects:0});for(let retry=0;retry<20&&a.context.state!=='running';retry++)await delay(100);check('Unmute resumes the graph ('+a.context.state+')',a.context.state==='running');
-  for(let i=0;i<40;i++)a.contact({kind:'footstep',position:[0,0,20],surface:'stone',speed:4,impact:0,foot:'left'});
-  check('Transient voices capped at 16',a.voices.size<=16);
-  a.setPlace('focus');a.setPlace(null);check('Leaving focus resets simple-view shelter',!a.environment.sheltered&&a.environment.listener[0]<100);
-  let legacyPosition=false,legacyOrientation=false;const listener=a.context.listener;
-  Object.defineProperty(listener,'positionX',{value:undefined,configurable:true});
-  const oldPosition=listener.setPosition.bind(listener),oldOrientation=listener.setOrientation.bind(listener);
-  listener.setPosition=(...v)=>{legacyPosition=true;oldPosition(...v)};listener.setOrientation=(...v)=>{legacyOrientation=true;oldOrientation(...v)};
-  a.setEnvironment({listener:[1,2,3],forward:[0,0,-1],sheltered:false,wind:.4,weather:'golden'});
-  check('Legacy Firefox listener path updates position and orientation',legacyPosition&&legacyOrientation);
-  delete listener.positionX;listener.setPosition=oldPosition;listener.setOrientation=oldOrientation;
-  a.nextBar=a.context.currentTime-10;a.queue=[{time:0,event:{instrument:'piano',midi:60,beat:0,duration:1,velocity:.1},duration:1,vibe:'piano'}];a.schedule();
-  check('Overdue queue discarded',a.queue.every(e=>e.time>=a.context.currentTime-.05));
-  a.stop();await delay(450);check('Stop suspends context and clears voices',a.context.state==='suspended'&&a.voices.size===0);a.dispose();
-  const originalFetch=window.fetch;window.fetch=(url,options)=>String(url).includes('/village/audio/')?Promise.resolve(new Response('',{status:503})):originalFetch(url,options);
-  const fallback=new VillageAudio();fallback.setMix({music:0,rain:0,fire:0,master:0,vibe:'piano'});
-  try{const result=await fallback.start();check('Sample failure is reported',!result.sampled&&fallback.piano.size===0)}finally{window.fetch=originalFetch;fallback.dispose()}
-  report(results);await save('audio-lifecycle.json',JSON.stringify(results,null,2));
- }finally{a.dispose()}
+ const originalRestFile=RECORDINGS.rest.file;const results=[],issues=[];const check=(name,condition)=>{if(!condition)throw Error(name);results.push(name);report(results)};
+ const wait=async(test,label)=>{for(let i=0;i<150&&!test();i++)await delay(100);check(label,test())};
+ const a=new VillageAudio(kind=>issues.push(kind));const mix={music:.6,rain:.12,fire:.35,master:.65,vibe:'piano',soundtrack:'auto',ambience:.5,effects:.6};
+ try{
+  a.setMix({...mix,master:0});const ready=await a.start();
+  check('Three recorded nature beds decoded',ready.ambience&&a.recordings.size===3);
+  check('Master zero starts suspended without fetching music',a.context.state==='suspended'&&a.soundtrack.decks.every(d=>!d.audio.src));
+  a.setMix(mix);await wait(()=>a.context.state==='running'&&a.soundtrack.current==='village','Unmute starts the village recording');
+  await delay(1500);check('Music playback advances',a.soundtrack.decks[a.soundtrack.active].audio.currentTime>.5);
+  const analyser=a.context.createAnalyser();a.master.connect(analyser);analyser.fftSize=2048;const samples=new Float32Array(2048);let peak=0;
+  for(let i=0;i<20;i++){analyser.getFloatTimeDomainData(samples);peak=Math.max(peak,...samples.map(Math.abs));await delay(100)}
+  check('Recorded mix produces a non-silent signal',peak>.0001);a.master.disconnect(analyser);
+  for(const [place,cue] of [['breathe','water'],['music','hearth'],['focus','rest']]){
+   a.setPlace(place);await wait(()=>a.soundtrack.current===cue,place+' selects '+cue);
+   check('Crossfade has at most two streaming decks',a.soundtrack.decks.filter(d=>!d.audio.paused).length<=2);
+   await delay(4400);check('Old deck stops after '+place+' fade',a.soundtrack.decks.filter(d=>!d.audio.paused).length===1);
+  }
+  a.setMix({...mix,soundtrack:'village'});await wait(()=>a.soundtrack.current==='village','Manual soundtrack overrides the cottage cue');await delay(4500);
+  const original=RECORDINGS.rest.file;RECORDINGS.rest.file='missing-test-track.mp3';a.setMix({...mix,soundtrack:'rest'});
+  await wait(()=>issues.includes('music'),'Missing music reports an error');
+  check('Failed change keeps the previous recording playing',a.soundtrack.current==='village'&&!a.soundtrack.decks[a.soundtrack.active].audio.paused);RECORDINGS.rest.file=original;
+  a.setMix({...mix,soundtrack:'village',music:0});check('Music slider zero pauses media',a.soundtrack.decks.every(d=>d.audio.paused));
+  a.setMix({...mix,soundtrack:'village'});await wait(()=>a.soundtrack.decks.some(d=>!d.audio.paused),'Music slider restores recorded playback');
+  a.setMix({...mix,master:0});await wait(()=>a.context.state==='suspended','Master zero suspends all sound');
+  check('Master zero pauses both music decks',a.soundtrack.decks.every(d=>d.audio.paused));
+  a.setMix({...mix,music:0});await wait(()=>a.context.state==='running','World-only unmute resumes the context');
+  a.setPlace('focus');a.setPlace(null);check('Leaving a place restores the outdoor listener',!a.environment.sheltered&&a.environment.listener[0]<100);
+  for(let i=0;i<40;i++)a.contact({kind:'takeoff',position:[0,0,20],surface:'stone',speed:4,impact:0,foot:'left'});
+  check('Transient effects remain capped at sixteen',[...a.voices].filter(v=>v.effect).length<=16);
+  a.stop();await delay(450);check('Stop clears voices, pauses streams and suspends',a.voices.size===0&&a.context.state==='suspended'&&a.soundtrack.decks.every(d=>d.audio.paused));
+  const frame={listener:[0,1.4,20],forward:[0,0,-1],wind:.3,weather:'dusk',sheltered:false};
+  check('Dusk selects the quiet recording',soundtrackFor(mix,null,frame)==='rest');
+  check('Rain selects the quiet recording',soundtrackFor(mix,null,{...frame,weather:'rain'})==='rest');
+  const fetchOriginal=window.fetch;window.fetch=(url,options)=>String(url).includes('/audio/world/')?Promise.resolve(new Response('',{status:503})):fetchOriginal(url,options);
+  const missing=new VillageAudio();missing.setMix({...mix,master:0});
+  try{const r=await missing.start();check('Missing nature recordings report partial availability',!r.ambience)}finally{window.fetch=fetchOriginal;missing.dispose()}
+  const result={pass:true,checks:results.length,results,peak,expectedMusicFailures:issues.length,browser:navigator.userAgent};
+  await save('audio-lifecycle.json',JSON.stringify(result,null,2));report(result);
+ }finally{RECORDINGS.rest.file=originalRestFile;a.dispose()}
 };
-function wav(buffer){const samples=buffer.length,channels=buffer.numberOfChannels,data=new ArrayBuffer(44+samples*channels*2),v=new DataView(data);const str=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));str(0,'RIFF');v.setUint32(4,data.byteLength-8,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,channels,true);v.setUint32(24,buffer.sampleRate,true);v.setUint32(28,buffer.sampleRate*channels*2,true);v.setUint16(32,channels*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,samples*channels*2,true);let peak=0,sum=0;const arrays=Array.from({length:channels},(_,i)=>buffer.getChannelData(i));for(let i=0;i<samples;i++)for(let ch=0;ch<channels;ch++){const a=arrays[ch][i];peak=Math.max(peak,Math.abs(a));sum+=a*a;v.setInt16(44+(i*channels+ch)*2,Math.round(Math.max(-1,Math.min(1,a))*32767),true)}return{blob:new Blob([data],{type:'audio/wav'}),peakDb:20*Math.log10(peak),rmsDb:10*Math.log10(sum/(samples*channels))};}
 document.querySelector('#audio').onclick=async()=>{
- const original=window.AudioContext,measurements=[];engine?.setBlocked(true);
- try{for(const [i,vibe] of ['piano','lofi','jazz'].entries()){
-  report('Rendering '+vibe+' (120 seconds)');
-  const offline=new OfflineAudioContext(2,22050*125,22050);window.AudioContext=function(){return offline};
-  const audio=new VillageAudio();audio.graph();window.AudioContext=original;
-  await Promise.all([['A1',33],['C2',36],['Ds2',39],['Fs2',42],['A2',45],['C3',48],['Ds3',51],['Fs3',54],['A3',57],['C4',60],['Ds4',63],['Fs4',66],['A4',69],['C5',72]].map(async([name,midi])=>audio.piano.set(midi,await offline.decodeAudioData(await(await fetch('/village/audio/'+name+'.mp3')).arrayBuffer()))));
-  audio.master.gain.value=.65*.65;audio.music.gain.value=.6;audio.ambience.gain.value=0;audio.effects.gain.value=0;
-  const seed=62025+i*17,score=new VillageScore(seed);let time=.1,maxVoices=0,bars=0;
-  while(time<120){const plan=score.next(vibe),beat=60/plan.tempo;bars++;for(const event of plan.events){const when=time+event.beat*beat;if(when>120)continue;for(const v of audio.voices)if(v.end<when)audio.voices.delete(v);if(event.instrument==='piano'||event.instrument==='bass')audio.tone(event,when,event.duration*beat,vibe);else audio.percussion(event,when,event.duration*beat);maxVoices=Math.max(maxVoices,audio.voices.size)}time+=beat*4;}
-  const buffer=await offline.startRendering(),result=wav(buffer);await save('audio-'+vibe+'.wav',result.blob);
-  measurements.push({vibe,seed,scoreVersion:SCORE_VERSION,bars,maxVoices,peakDb:result.peakDb,rmsDb:result.rmsDb,seconds:125,music:.6,master:.65,method:'Offline rendering of production instruments and score; includes 5 seconds tail. Not a live traversal or listening certification.'});
-  const element=document.createElement('audio');element.controls=true;element.src=URL.createObjectURL(result.blob);element.setAttribute('aria-label',vibe+' sample');document.querySelector('#samples').append(element);document.removeEventListener('visibilitychange',audio.onVisibility);
- }await save('audio-measurements.json',JSON.stringify(measurements,null,2));report(measurements)}finally{window.AudioContext=original;engine?.setBlocked(false)}
+ const a=new VillageAudio(),chunks=[];await a.start();
+ const destination=a.context.createMediaStreamDestination();a.master.connect(destination);
+ const recorder=new MediaRecorder(destination.stream,{mimeType:'audio/webm;codecs=opus'});
+ const recording=new Promise(resolve=>{recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=()=>resolve(new Blob(chunks,{type:'audio/webm'}))});recorder.start();
+ try{for(const place of [null,'breathe','music','focus']){a.setPlace(place);report('Recording '+(place??'village')+' soundscape');await delay(14000)}}
+ finally{recorder.stop();await save('soundscape.webm',await recording);a.master.disconnect(destination);a.dispose()}
+ report('Saved 56-second recorded soundtrack transition sample.');
+};
+document.querySelector('#polish').onclick=async()=>{
+ if(!engine)return report('Load the village first.');
+ engine.setPlace(null);engine.setBlocked(false);engine.setWeather('golden');engine.movement.settle(.3,20);engine.yaw=0;engine.pitch=.15;engine.distance=3.8;engine.player.rotation.y=Math.PI;
+ await delay(1500);await capture('entrance.png');
+ await walk('w',.6);await delay(350);const heading=engine.player.rotation.y;engine.yaw+=.8;await delay(2600);
+ if(Math.abs(engine.player.rotation.y-heading)>.001)throw Error('Player turns toward camera while idle');
+ const navigation=engine.world.group.getObjectByName('Village wayfinding');
+ for(const [name,position,look] of [['arrival-directory',[-1.8,2.45,19.5],[-2.8,2.1,16]],['junction-post',[3.2,2.1,10],[3.15,1.8,5.2]],['cottage-post',[3,2.2,18],[4,1.7,14.4]],['soft-shadows',[0,2.7,16],[4,0,7]]]){
+  const camera=engine.camera.clone();camera.position.set(...position);camera.lookAt(...look);await capture(name+'.png',camera);
+ }
+ engine.setLanguage('ja');const camera=engine.camera.clone();camera.position.set(-1.8,2.45,19.5);camera.lookAt(-2.8,2.1,16);await capture('arrival-directory-ja.png',camera);engine.setLanguage('en');
+ const result={pass:true,playerHeadingRetained:true,posts:navigation.children.filter(object=>object.userData.signpost).length,shadowFilter:'16-tap weighted PCF',highQualityShadowRefresh:'every frame',errors:consoleErrors,stats};
+ await save('polish-checks.json',JSON.stringify(result,null,2));report(result);
+};
+
+const activityMoment=id=>id==='focus'?{kind:'focus',running:true,progress:.35}:id==='music'?{kind:'music',playing:true}:id==='breathe'?{kind:'breathe',active:true,amount:.8}:{kind:({mood:'tea',gratitude:'write',compliment:'letter'})[id]};
+document.querySelector('#living').onclick=async()=>{
+ if(!engine)return report('Load the village first.');
+ consoleErrors=[];const results=[];engine.setWeather('golden');engine.setBlocked(false);
+ for(const id of ['focus','music','breathe','mood','gratitude','compliment']){
+  engine.travel(id);engine.setActivityMoment(activityMoment(id));await delay(1400);
+  const expected=ACTIVITY_STAGES[id].actor,actual=engine.player.position.toArray();
+  if(!engine.player.visible||actual.some((v,i)=>Math.abs(v-expected[i])>.01))throw Error(id+' spirit staging failed');
+  if(!engine.camera.view?.enabled)throw Error(id+' scene does not make room for controls');
+  await capture('activity-'+id+'.png');results.push({id,actor:actual,visible:true});
+ }
+ for(const [name,position,look] of [['water-detail',[-5,2.5,13],[-11,-.3,1]],['fire-detail',[-3.8,1.65,-16.7],[-5.8,.8,-19]]]){
+  engine.setPlace(null);await delay(400);const camera=engine.camera.clone();camera.position.set(...position);camera.lookAt(...look);await capture(name+'.png',camera);
+ }
+ engine.travel('breathe');engine.reducedMotion=true;await delay(300);const before=engine.character.position.clone();await delay(300);
+ if(engine.character.position.distanceTo(before)>.001)throw Error('Reduced motion still moves the staged spirit');
+ engine.reducedMotion=false;engine.setPlace(null);
+ if(engine.camera.view?.enabled)throw Error('Activity framing persisted after exit');
+ const result={pass:consoleErrors.length===0,activities:results,reducedMotion:true,exitFramingRestored:true,errors:consoleErrors,stats};
+ await save('living-checks.json',JSON.stringify(result,null,2));report(result);
+};
+document.querySelector('#rituals').onclick=async()=>{
+ const chunks=[],stream=engine.renderer.domElement.captureStream(30);
+ const recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9',videoBitsPerSecond:2000000});
+ const recording=new Promise(resolve=>{recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=()=>resolve(new Blob(chunks,{type:'video/webm'}))});recorder.start();
+ for(const id of ['music','breathe','focus','mood','gratitude','compliment']){
+  engine.travel(id);engine.setActivityMoment(activityMoment(id));report('Recording '+id);
+  for(let step=0;step<35;step++){
+   if(id==='breathe')engine.setActivityMoment({kind:'breathe',active:true,amount:(Math.sin(step/35*Math.PI*2-Math.PI/2)+1)/2});
+   if(id==='gratitude'&&step===22)engine.setActivityMoment({kind:'save'});
+   if(id==='compliment'&&step===22)engine.setActivityMoment({kind:'keep'});
+   await delay(100);
+  }
+ }
+ recorder.stop();await save('activity-motion.webm',await recording);engine.setPlace(null);report('Saved activity animation recording.');
 };
 </script></html>

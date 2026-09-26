@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-26T09:09:34.197Z",
+  "durationSeconds": 120.02880000007153,
+  "viewport": [
+    1280,
+    720
+  ],
+  "canvas": [
+    1280,
+    720
+  ],
+  "buffer": [
+    1280,
+    720
+  ],
+  "dpr": 1,
+  "tier": "high",
+  "frames": 10324,
+  "meanMs": 11.625058117013529,
+  "p95Ms": 17.10000000000582,
+  "stats": {
+    "fps": 87,
+    "draws": 182,
+    "triangles": 2177996
+  },
+  "rendererMemory": {
+    "geometries": 94,
+    "textures": 32
+  },
+  "limits": "In-app browser, local desktop, no physical phone or thermal profiling. JS geometry counts are not GPU residency."
+}

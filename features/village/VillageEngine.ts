@@ -8,6 +8,9 @@ import { VillageMovement } from "./movement";
 import { createAtmosphere } from "./atmosphere";
 import { VillageLife } from "./life";
 import { VillagerDialogue } from "./dialogue";
+import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
+import type { ActivityMoment } from "./environment";
+import { softenShadowEdges } from "./shadows";
 import { floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
@@ -19,6 +22,8 @@ export class VillageEngine {
   private atmosphere = createAtmosphere();
   private life?: VillageLife;
   private dialogue?: VillagerDialogue;
+  private activities?: VillageActivities;
+  private walkingHeading = Math.PI;
   private language: "en" | "ja" = "en";
   private world?: World;
   private environment?: T.WebGLRenderTarget;
@@ -27,7 +32,6 @@ export class VillageEngine {
   private character?: T.Object3D;
   private movement?: VillageMovement;
   private running = false;
-  private idleTime = 0;
   private lastStatus = "";
   private statusTime = 0;
   private environmentTime = 0;
@@ -72,6 +76,7 @@ export class VillageEngine {
   private cameraGoal = new T.Vector3();
   private lookGoal = new T.Vector3();
   private currentLook = new T.Vector3();
+  private compactView = false;
   private direction = new T.Vector3();
   private temp = new T.Vector3();
   private indoor?: T.Group;
@@ -227,7 +232,7 @@ export class VillageEngine {
     });
     this.sun.shadow.bias = -0.0003;
     this.sun.shadow.normalBias = 0.025;
-    this.sun.shadow.radius = 2;
+    this.sun.shadow.radius = 3.5;
     this.scene.add(this.sun.target);
     this.scene.add(
       this.sun,
@@ -237,7 +242,7 @@ export class VillageEngine {
       new T.AmbientLight("#e9d9ba", 0.08),
     );
     this.player.position.set(0.3, 0, 20);
-    this.player.rotation.y = 0;
+    this.player.rotation.y = Math.PI;
     this.scene.add(this.player);
     this.walkMarker.rotation.x = -Math.PI / 2;
     this.walkMarker.visible = false;
@@ -274,6 +279,7 @@ export class VillageEngine {
       return;
     }
     this.world = world;
+    world.setLanguage(this.language);
     this.movement = new VillageMovement(world.colliders, event => {
       // A floating spirit has no footfalls; jump/landing events retain the movement contract.
       if (event.kind !== "footstep") this.callbacks.contact(event);
@@ -322,6 +328,9 @@ export class VillageEngine {
     this.dialogue.setEnabled(!this.blocked && !this.place);
     this.resize();
     this.buildInterior();
+    this.activities=new VillageActivities(this.world.colliders);
+    this.world.group.add(this.activities.outdoor);this.scene.add(this.activities.indoor);
+    softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
       rainPositions = new Float32Array(1200 * 6);
     for (let i = 0; i < 1200; i++) {
@@ -436,28 +445,22 @@ export class VillageEngine {
       1.45,
       0.02,
     );
-    cube(
-      new T.MeshStandardMaterial({
-        color: "#27160d",
-        emissive: "#d64408",
-        emissiveIntensity: 0.5,
-      }),
-      2.7,
-      0.3,
-      -3.5,
-      1.45,
-      0.08,
-      0.65,
-    );
-    cube(wooden, 2.7, 2.75, -3.9, 2.8, 0.18, 0.9);
-    for (let i = 0; i < 3; i++) {
-      const f = makeFlame(0.65, 1.15);
-      f.position.set(112.25 + i * 0.42, 0.82, -3.38);
-      this.scene.add(f);
-      f.visible = false;
-      f.userData.interior = true;
-      this.world?.flames.push(f);
+    const embers=new T.MeshStandardMaterial({color:"#25160e",emissive:"#d64408",emissiveIntensity:.45,roughness:1});
+    const charred=wooden.clone();charred.color.set("#3a2117");charred.roughness=1;
+    for(let i=0;i<5;i++) {
+      const log=new T.Mesh(new T.CylinderGeometry(.095,.13,1.05,10),charred);
+      log.position.set(2.7+Math.sin(i*2.3)*.22,.38+(i%2)*.12,-3.38+Math.cos(i*2.3)*.14);
+      log.rotation.set(Math.PI/2,i*.9,.14);log.castShadow=log.receiveShadow=true;g.add(log);
     }
+    for(let i=0;i<16;i++) {
+      const ember=new T.Mesh(new T.IcosahedronGeometry(.075+(i%3)*.016,0),embers);
+      ember.position.set(2.7+Math.sin(i*2.4)*.57,.32,-3.42+Math.cos(i*2.4)*.24);ember.scale.y=.45;g.add(ember);
+    }
+    cube(wooden, 2.7, 2.75, -3.9, 2.8, 0.18, 0.9);
+    const f = makeFlame(1.2, 1.1);
+    f.position.set(112.7, .82, -3.38);this.scene.add(f);
+    f.visible=false;f.userData.interior=true;f.userData.light=this.indoorLight;f.userData.coal=embers;
+    this.world?.flames.push(f);
     const cloth = new T.MeshStandardMaterial({ color: "#b26756", roughness: 1 });
     const linen = new T.MeshStandardMaterial({ color: "#c6ba97", roughness: 1, side: T.DoubleSide });
     cube(cloth, -.6, .006, .1, 4.8, .018, 3.2);
@@ -508,6 +511,11 @@ export class VillageEngine {
     if (!w || !h) return;
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
+    this.compactView = w <= 700;
+    this.camera.clearViewOffset();
+    if (this.place) {
+      this.camera.setViewOffset(w,h,w>700?w*.16:0,w>700?0:h*.18,w,h);
+    }
     this.camera.updateProjectionMatrix();
     this.dialogue?.resize(w, h);
   }
@@ -521,6 +529,7 @@ export class VillageEngine {
   setLanguage(language: "en" | "ja") {
     this.language = language;
     this.dialogue?.setLanguage(language);
+    this.world?.setLanguage(language);
   }
   setQuality(q: Quality) {
     this.quality = q;
@@ -569,32 +578,35 @@ export class VillageEngine {
     this.world?.setWeather(rain, dusk);
     this.atmosphere.setWeather(rain, dusk);
   }
+  setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); }
   setPlace(id: PlaceId | null) {
     this.dialogue?.setEnabled(!id && !this.blocked);
     const previousPlace = this.place;
+    if (id && !previousPlace) this.walkingHeading=this.player.rotation.y;
+    this.activities?.enter(id);
     this.renderer.shadowMap.needsUpdate = true;
     this.place = id;
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = id !== "focus";
-    if (id === "focus") {
-      this.camera.position.set(110.2, 2.25, 2.8);
-      this.currentLook.set(110, 1.8, -3.8);
-    } else if (id) {
-      const p = PLACES.find((p) => p.id === id)!;
-      this.camera.position.fromArray(p.camera);
-      this.currentLook.fromArray(p.look);
+    if (id) {
+      this.updateActivityCamera(id);
+      this.camera.position.copy(this.cameraGoal);
+      this.currentLook.copy(this.lookGoal);
     }
     this.clearKeys();
     this.movement?.settle();
     if (!id && previousPlace !== null) {
       // Authored return angles keep residents and nearby walls out of the foreground.
+      if (this.movement) this.player.position.copy(this.movement.position);
+      this.player.rotation.y=this.walkingHeading;
       this.yaw = previousPlace === "mood" ? -Math.PI + .4 : 0;
       this.updateWalkingCamera();
       this.camera.position.copy(this.cameraGoal);
       this.currentLook.copy(this.lookGoal);
       this.camera.lookAt(this.currentLook);
     }
-    this.player.visible = !id;
+    this.player.visible = true;
+    this.resize();
     if (this.indoor) this.indoor.visible = id === "focus";
     this.indoorLight.intensity = id === "focus" ? 18 : 0;
     this.world?.flames.forEach((f) => {
@@ -622,6 +634,15 @@ export class VillageEngine {
     } else this.keys.delete(key);
   }
   toggleRun() { this.running = !this.running; this.reportMovement(true); }
+  private updateActivityCamera(place: PlaceId) {
+    const stage=ACTIVITY_STAGES[place];
+    this.cameraGoal.fromArray(stage.camera);
+    this.lookGoal.fromArray(stage.look);
+    if(this.compactView) {
+      this.temp.fromArray(stage.actor).y+=1.1;
+      this.lookGoal.lerp(this.temp,.7);
+    }
+  }
   private updateWalkingCamera() {
     this.lookGoal.copy(this.player.position).add(this.temp.set(0, 1.35, 0));
     this.lookGoal.y += Math.max(0, -Math.sin(this.pitch)) * 2.4;
@@ -691,14 +712,8 @@ export class VillageEngine {
       const angle = Math.atan2(movement.velocity.x, movement.velocity.z);
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 14));
-      this.idleTime = 0;
     } else {
       if (this.walkTarget && this.direction.lengthSq() > 0) this.walkTarget = undefined;
-      this.idleTime += dt;
-      if (this.idleTime > 1.4 && !this.blocked && !this.place) {
-        const turn = T.MathUtils.euclideanModulo(this.yaw - this.player.rotation.y + Math.PI, Math.PI*2)-Math.PI;
-        this.player.rotation.y += turn * (1-Math.exp(-dt*2.5));
-      }
     }
     if (!this.blocked && !this.place) {
       let near: PlaceId | null = null,
@@ -728,13 +743,9 @@ export class VillageEngine {
       this.character.scale.set(this.spiritScale*(1-squash*.4),this.spiritScale*(1+squash),this.spiritScale*(1-squash*.4));
       this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
     }
-    if (this.place === "focus") {
-      this.cameraGoal.set(110.2, 2.25, 2.8);
-      this.lookGoal.set(110, 1.8, -3.8);
-    } else if (this.place) {
-      const p = PLACES.find((p) => p.id === this.place)!;
-      this.cameraGoal.fromArray(p.camera);
-      this.lookGoal.fromArray(p.look);
+    this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
+    if (this.place) {
+      this.updateActivityCamera(this.place);
     } else this.updateWalkingCamera();
     if (this.rain) {
       this.rain.visible = this.weather === "rain" && this.place !== "focus";
@@ -774,6 +785,8 @@ export class VillageEngine {
       f.scale.y = 0.95 + Math.sin(t * 3 + i * 2) * 0.08;
       if (f.material instanceof T.ShaderMaterial)
         f.material.uniforms.time.value = t + i;
+      if (f.userData.light) f.userData.light.intensity = (f.userData.interior ? (this.place === "focus" ? 18 : 0) : 9) * (1 + Math.sin(t*7.1)*.045 + Math.sin(t*11.7)*.03);
+      if (f.userData.coal) f.userData.coal.emissiveIntensity=.45+Math.sin(t*2.1)*.1;
     });
     if (this.place !== "focus") {
       this.camera.updateMatrixWorld();
@@ -800,9 +813,10 @@ export class VillageEngine {
         this.world.treeLod.instanceMatrix.needsUpdate = true;
       }
     }
-    // Bound moving foliage/character shadow work; stationary weather still has animated casters.
-    if (now - this.shadowTime > (this.quality === "low" ? 180 : 100) && (!this.reducedMotion || moving)) {
-      const x = Math.round(this.player.position.x / 2) * 2, z = Math.round(this.player.position.z / 2) * 2;
+    // Refresh moving shadows every frame in detailed view; cap simple view at 30 Hz.
+    if (now - this.shadowTime > (this.quality === "low" ? 32 : 0) && (!this.reducedMotion || moving)) {
+      const texel = 48 / this.sun.shadow.mapSize.x;
+      const x = Math.round(this.player.position.x / texel) * texel, z = Math.round(this.player.position.z / texel) * texel;
       this.sun.position.set(x + 35, 28, z - 48);
       this.sun.target.position.set(x, 0, z);
       this.sun.target.updateMatrixWorld();
@@ -848,7 +862,7 @@ export class VillageEngine {
     this.world?.group.removeFromParent();
     this.world?.dispose();
     this.scene.traverse((object) => {
-      if (!(object instanceof T.Mesh) && !(object instanceof T.LineSegments))
+      if (!(object instanceof T.Mesh) && !(object instanceof T.LineSegments) && !(object instanceof T.Points))
         return;
       if (object instanceof T.SkinnedMesh) object.skeleton.dispose();
       object.geometry.dispose();

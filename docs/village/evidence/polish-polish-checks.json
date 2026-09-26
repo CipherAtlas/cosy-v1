@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "playerHeadingRetained": true,
+  "posts": 9,
+  "shadowFilter": "16-tap weighted PCF",
+  "highQualityShadowRefresh": "every frame",
+  "errors": [],
+  "stats": {
+    "fps": 47,
+    "draws": 173,
+    "triangles": 2162548
+  }
+}

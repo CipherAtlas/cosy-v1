@@ -11,6 +11,7 @@ import {
   SpeakerSlash,
 } from "@phosphor-icons/react";
 import type { AudioMix, PlaceId } from "./places";
+import type { ActivityMoment } from "./environment";
 import type { FocusSession } from "./useSession";
 
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
   toggleSound: () => void;
   travel: (id: PlaceId) => void;
   language: "en" | "ja";
+  onMoment: (moment: ActivityMoment) => void;
 };
 const phrases = [
   "You are allowed to rest without earning it.",
@@ -47,12 +49,19 @@ const phrasesJa = [
 export function Activities(p: Props) {
   const ja = p.language === "ja",
     t = (en: string, jp: string) => (ja ? jp : en);
+  const { place, session, sound, onMoment } = p;
+  const duration=(session.mode === "focus" ? session.minutes : session.breakMinutes)*60;
+  useEffect(() => {
+    if (place === "focus") onMoment({kind:"focus",running:session.running,progress:Math.max(0,Math.min(1,1-session.remaining/duration))});
+    if (place === "music") onMoment({kind:"music",playing:sound});
+  }, [place,session.running,session.remaining,duration,sound,onMoment]);
   if (p.place === "focus")
     return (
       <section
         className="v-activity v-focus"
         aria-label={t("Focus session", "集中セッション")}
       >
+        {!p.session.done && <h2>{t(p.session.mode === "break" ? "A moment by the window." : "Settle into your own rhythm.", p.session.mode === "break" ? "窓辺でひと休み。" : "自分のペースで。")}</h2>}
         {p.session.done ? (
           <>
             <h2>{t("A little space, well spent.", "おつかれさまでした。")}</h2>
@@ -140,7 +149,7 @@ export function Activities(p: Props) {
                   aria-pressed={p.session.minutes === n}
                   onClick={() => p.session.duration(n, b)}
                 >
-                  {n} / {b}
+                  {n} {t("min", "分")} · {b} {t("rest", "休憩")}
                 </button>
               ))}
             </div>
@@ -175,6 +184,7 @@ export function Activities(p: Props) {
   if (p.place === "music")
     return (
       <section className="v-activity v-music">
+        <div className={`v-music-waves ${p.sound ? "is-playing" : ""}`} aria-hidden="true">{[0,1,2,3,4,5,6].map(i=><i key={i} style={{animationDelay:`${i*-.19}s`}} />)}</div>
         <h2>{t("Stay a little longer.", "もう少し、ここで。")}</h2>
         <p>
           {t(
@@ -188,27 +198,35 @@ export function Activities(p: Props) {
             ? t("Pause music", "音楽を止める")
             : t("Play music", "音楽を流す")}
         </button>
-        <div className="v-preset-row">
-          {(["piano", "lofi", "jazz"] as const).map((v) => (
-            <button
-              className="v-chip"
-              aria-pressed={p.mix.vibe === v}
-              key={v}
-              onClick={() => p.setMix({ ...p.mix, vibe: v })}
-            >
-              {v === "lofi" ? "Lofi" : v === "piano" ? "Piano" : "Jazz"}
-            </button>
-          ))}
-        </div>
-        <MixSliders mix={p.mix} setMix={p.setMix} language={p.language} />
+        <SoundtrackChoices mix={p.mix} setMix={p.setMix} language={p.language} />
+        <details className="v-mix-details"><summary>{t("Balance the sounds", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
       </section>
     );
-  if (p.place === "breathe") return <Breathing language={p.language} />;
+  if (p.place === "breathe") return <Breathing language={p.language} onMoment={p.onMoment} />;
   if (p.place === "mood")
-    return <Mood travel={p.travel} language={p.language} />;
-  if (p.place === "gratitude") return <Journal language={p.language} />;
-  return <KindNote language={p.language} />;
+    return <Mood travel={p.travel} language={p.language} onMoment={p.onMoment} />;
+  if (p.place === "gratitude") return <Journal language={p.language} onMoment={p.onMoment} />;
+  return <KindNote language={p.language} onMoment={p.onMoment} />;
 }
+export function SoundtrackChoices({ mix, setMix, language }: {
+  mix: AudioMix; setMix: (mix: AudioMix) => void; language: "en" | "ja";
+}) {
+  const choices = [
+    ["auto", "Follow the scenery", "景色に合わせる"],
+    ["village", "Village paths", "村の小道"],
+    ["water", "Pond & tea garden", "池とお茶の庭"],
+    ["rest", "Quiet cottage", "静かなコテージ"],
+    ["hearth", "By the hearth", "焚き火のそば"],
+  ] as const;
+  return <label className="v-soundtrack">
+    <span>{language === "ja" ? "音楽" : "Soundtrack"}</span>
+    <select value={mix.soundtrack ?? "auto"} onChange={event => setMix({ ...mix, soundtrack: event.target.value as AudioMix["soundtrack"] })}>
+      {choices.map(([value,en,ja]) => <option key={value} value={value}>{language === "ja" ? ja : en}</option>)}
+    </select>
+    <small>{language === "ja" ? "Holizna 作曲の録音音楽。" : "Recorded music by Holizna."}</small>
+  </label>;
+}
+
 export function MixSliders({
   mix,
   setMix,
@@ -225,7 +243,7 @@ export function MixSliders({
           <span>
             {language === "ja"
               ? ["音楽", "環境音", "効果音", "雨", "暖炉", "全体"][i]
-              : ["Music", "World", "Footsteps & details", "Rain", "Fire", "Volume"][i]}
+              : ["Music", "World", "Spirit & details", "Rain", "Fire", "Volume"][i]}
           </span>
           <input
             aria-label={key + " volume"}
@@ -242,7 +260,7 @@ export function MixSliders({
     </div>
   );
 }
-function Breathing({ language }: { language: "en" | "ja" }) {
+function Breathing({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
   const ja = language === "ja";
   const [pattern, setPattern] = useState(0),
     [running, setRunning] = useState(false),
@@ -269,33 +287,24 @@ function Breathing({ language }: { language: "en" | "ja" }) {
     if (!running) return;
     const start = Date.now() - elapsed * 1000;
     const id = setInterval(
-      () => setElapsed(Math.floor((Date.now() - start) / 1000)),
-      200,
+      () => setElapsed((Date.now() - start) / 1000),
+      100,
     );
     return () => clearInterval(id); // Capture elapsed only at start/resume.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, pattern]);
+  const amount=phase===0?cycle/times[phase]:phase===1?1:phase===2?1-cycle/times[phase]:0;
+  useEffect(()=>{onMoment({kind:"breathe",active:running,amount});},[running,amount,onMoment]);
   return (
     <section className="v-activity v-breathe">
-      <div
-        className={`v-breath-orbit ${running ? "is-running" : ""}`}
-        style={
-          {
-            "--breath-scale": phase < 2 ? 1.15 : 0.78,
-            "--breath-duration": `${times[phase]}s`,
-          } as React.CSSProperties
-        }
-      >
-        <h2>
-          {running
-            ? label
-            : ja
-              ? "ひと息つきましょう。"
-              : "Make room for a breath."}
-        </h2>
-        <div className="v-breath-count" aria-hidden="true">
-          {times[phase] - cycle}
-        </div>
+      <h2>{ja ? "水辺で、ひと呼吸。" : "A breath by the water."}</h2>
+      <div className={`v-breath-orbit ${running ? "is-running" : ""}`} style={{"--breath-scale":1+amount*.12} as React.CSSProperties}>
+        <svg className="v-breath-ring" viewBox="0 0 160 160" aria-hidden="true">
+          <circle cx="80" cy="80" r="70" />
+          <circle cx="80" cy="80" r="70" pathLength="100" strokeDasharray={`${running?(1-cycle/times[phase])*100:100} 100`} />
+        </svg>
+        <span className="v-breath-label" aria-hidden={running}>{running?label:ja?"ゆっくりと":"At your own pace"}</span>
+        <div className="v-breath-count" aria-hidden="true">{running?Math.ceil(times[phase]-cycle):"~"}</div>
       </div>
       <p role="status" className="sr-only">
         {running ? label : ""}
@@ -340,7 +349,9 @@ function Breathing({ language }: { language: "en" | "ja" }) {
 function Mood({
   travel,
   language,
+  onMoment,
 }: {
+  onMoment: Props["onMoment"];
   travel: (id: PlaceId) => void;
   language: "en" | "ja";
 }) {
@@ -360,7 +371,7 @@ function Mood({
       <p>
         {ja
           ? "どんな気持ちでも、ここにいて大丈夫。"
-          : "There is room for all of it."}
+          : "Take a sip of tea. There is room for all of it."}
       </p>
       <div className="v-moods">
         {moods.map((m, i) => (
@@ -368,7 +379,7 @@ function Mood({
             key={m[0]}
             className="v-chip"
             aria-pressed={selected === i}
-            onClick={() => setSelected(i)}
+            onClick={() => { setSelected(i); onMoment({kind:"tea"}); }}
           >
             {m[ja ? 1 : 0]}
           </button>
@@ -379,7 +390,7 @@ function Mood({
           <p>
             {ja
               ? "少しゆっくりしてみませんか。"
-              : "Perhaps a little time here would feel good."}
+              : ["Let the pond set a slower pace.","A few breaths by the water might help.","There is a warm seat by the fire.","A kind note is waiting at the postbox.","The cottage is ready when you are.","Keep a little of this feeling in your journal."][selected]}
           </p>
           <button
             className="v-button v-primary"
@@ -394,7 +405,7 @@ function Mood({
   );
 }
 type Entry = { id: string; text: string; createdAt: string };
-function Journal({ language }: { language: "en" | "ja" }) {
+function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
   const ja = language === "ja";
   const [text, setText] = useState(""),
     [entries, setEntries] = useState<Entry[]>([]),
@@ -453,6 +464,7 @@ function Journal({ language }: { language: "en" | "ja" }) {
             ])
           ) {
             setText("");
+            onMoment({kind:"save"});
             setStatus(
               ja ? "この端末に保存しました。" : "Kept safely on this device.",
             );
@@ -467,6 +479,7 @@ function Journal({ language }: { language: "en" | "ja" }) {
           value={text}
           onChange={(e) => {
             setText(e.target.value);
+            onMoment({kind:"write"});
             setStatus("");
           }}
           maxLength={10000}
@@ -544,7 +557,7 @@ function Journal({ language }: { language: "en" | "ja" }) {
     </section>
   );
 }
-function KindNote({ language }: { language: "en" | "ja" }) {
+function KindNote({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
   const ja = language === "ja";
   const [index, setIndex] = useState(
       () => Math.floor(Date.now() / 86400000) % phrases.length,
@@ -563,13 +576,14 @@ function KindNote({ language }: { language: "en" | "ja" }) {
   return (
     <section className="v-activity v-letter">
       <h2>{ja ? "あなたへ。" : "A little note for you."}</h2>
-      <blockquote>“{(ja ? phrasesJa : phrases)[index]}”</blockquote>
+      <blockquote key={index}>“{(ja ? phrasesJa : phrases)[index]}”</blockquote>
       <div className="v-actions">
         <button
           className="v-button"
           onClick={() => {
             setIndex((i) => (i + 1) % phrases.length);
             setSaved(false);
+            onMoment({kind:"letter"});
           }}
         >
           {ja ? "もうひとつ" : "Another note"}
@@ -582,6 +596,7 @@ function KindNote({ language }: { language: "en" | "ja" }) {
             try {
               localStorage.setItem("cosy-kept-note", phrases[index]);
               setSaved(true);
+              onMoment({kind:"keep"});
             } catch {
               setSaved(false);
             }

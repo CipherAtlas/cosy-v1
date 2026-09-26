@@ -42,3 +42,26 @@ Sources: features/village/architecture.ts, paintedTextures.ts, fantasyTrees.ts, 
 Pastel blob residents reuse the original spirit mesh; accessories and animation are
 original runtime geometry/transforms in life.ts. Older traveller/birch models and
 photographic surfaces remain archived but are not loaded by the current village.
+
+Recorded soundtrack and nature audio (2026-09-26)
+------------------------------------------------
+Quiet Village 1, 2, 3 and 4 — Holizna / HoliznaCC0.
+Source: https://opengameart.org/content/quiet-village-collection
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Full compositions retained; normalized and transcoded for local streaming.
+
+Stream Sounds (stream1) — kurt.
+Source: https://opengameart.org/content/stream-sounds
+Creative Commons Attribution 3.0: https://creativecommons.org/licenses/by/3.0/
+Excerpt, mono downmix, normalization and MP3 transcode; overlapping loop boundaries.
+
+Fireplace Sound loop — PagDev.
+Source: https://opengameart.org/content/fireplace-sound-loop
+Rain (loopable), sample 1 — Ylmir.
+Source: https://opengameart.org/content/rain-loopable
+Both CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Excerpts, mono downmix, normalization and MP3 transcodes; overlapping loop boundaries.
+
+Detailed file provenance, duration and SHA-256: audio/recordings.json.
+The village no longer schedules procedural musical notes or loads the Salamander
+piano samples. Those earlier assets and credits are retained as historical sources.
