@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-Updated: 2026-09-26. **Status: integrated systems and villager-interaction milestone with candidate art; final visual, movement, listening, and device acceptance remain open.** This document records the agreed direction and future work. It does not claim that planned features are implemented.
+Updated: 2026-09-26. **Status: colorful spirit village, recorded soundtrack and inhabited activities deployed; final visual, movement, listening, and device acceptance remain open.** This document records the agreed direction and future work. It does not claim that planned features are implemented.
 
-Snapshot boundary: the feedback, activity-exit, villager-dialogue and villager-approach milestones are recorded in [the build ledger](VILLAGE_BUILD.md). Broader art, listening and device acceptance remains open.
+Published application: [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), with successful [Pages build/deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). Live arrival, scene assets, recorded-music controls, activity exit and villager chat were verified. [The release ledger](VILLAGE_BUILD.md#2026-09-26-main-release) records exact checks and limits; earlier milestone descriptions are historical.
 
 ## Current art direction — 2026-09-26
 
@@ -12,7 +12,7 @@ The latest user update extends the fantasy direction to houses, distant scenery 
 
 The latest polish request also removes the player’s automatic idle turn toward the camera, smooths the moving shadow filter, and adds nine physical wayfinding posts including an entrance directory. Music now uses four complete licensed recordings selected by location/scenery; stream, fire and rain are recordings too. The prior art state was committed/pushed first at `7642527`; the following polish is bundled with the water/activity release. Read [the current milestone](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) and [recorded audio specification](docs/village/MUSIC_AND_SOUND.md) before changing these systems.
 
-The latest water/activity pass includes: flowing water shading; layered fire, embers, smoke and charred logs; visible spirit staging with animated hourglass, breathing rings, tea, quill and letters; warm activity panels, a phone bottom sheet and an Enjoy the view toggle. Keep the `ActivityMoment` bridge and camera/actor staging together when changing an activity. Read [the latest evidence](VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities) and [stage captures](docs/village/evidence/README.md#water-fire-and-inhabited-activities) before refining this pass. The user has authorized committing both passes to `main` and publishing through the existing GitHub Pages workflow. Deployment evidence is reported in the release task and the linked workflow; local checks alone are not deployment proof.
+The latest water/activity pass includes: flowing water shading; layered fire, embers, smoke and charred logs; visible spirit staging with animated hourglass, breathing rings, tea, quill and letters; warm activity panels, a phone bottom sheet and an Enjoy the view toggle. Keep the `ActivityMoment` bridge and camera/actor staging together when changing an activity. Read [the latest evidence](VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities) and [stage captures](docs/village/evidence/README.md#water-fire-and-inhabited-activities) before refining this pass. Both this pass and the preceding orientation/shadow/audio polish are included in the published application above.
 
 ## Start here in every new task
 
@@ -32,7 +32,7 @@ The target is **as close to AAA craft as practical in a small browser world**: c
 
 | Reference | Authority and use |
 | --- | --- |
-| Latest user requirements | Recorded music matched to scenery and location; player retains heading when idle; smooth shadows; arrival directory and village signposts; jumping; fluid running/sprinting with energy; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers walking over to greet the player. |
+| Latest user requirements | Natural flowing water and lively fireplaces; visible, animated activities that belong in the world; warmer, clearer UI; recorded music matched to scenery and location; player retains heading when idle; smooth shadows; arrival directory and village signposts; jumping; fluid gliding/dashing with energy; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers approaching to greet the player. |
 | [Approved village image](docs/village/references/approved-village.png) | Composition and craft reference: detailed cottages, stream/bridge, planting, mountains and restrained UI. The latest colorful stylized palette and white spirit replace its palette/player brief. |
 | Original Cosy v1, preserved in [baseline captures](docs/village/references/README.md) | **Only functional baseline.** The [live Pages URL](https://cipheratlas.github.io/cosy-v1/) now tracks the village on `main`. Ignore earlier local redesign experiments as product/design references. The six activities remain the product. |
 | [Arkenfall](https://www.arkenfall.site/) | **Heavy experiential reference**, throughout development: sense of place, RPG traversal and camera feel, environmental atmosphere, wind, world sound, and immersion. Study the live experience; do not reduce this reference to a title-screen palette. |
@@ -57,7 +57,9 @@ Keep the stable place IDs in [places.ts](features/village/places.ts). Improve th
 
 The entrance, cottage, stream/bridge, and hearth should form one convincing first scene. Distant landmarks provide orientation and depth; they do not require a large explorable map.
 
-## Latest user-feedback pass
+## Earlier interaction and environment milestones
+
+These records describe the 2026-09-25 feedback fixes and subsequent resident work. The current art, soundtrack and performance evidence above supersedes their traveler, birch and generated-audio descriptions.
 
 Pip, Maple, Moss and Luma now have distinct personalities, English/Japanese overhead dialogue, weather remarks and click/F conversations. A nearby villager can approach over a clear path, stop with personal space, greet the player and return to their routine. Only one visit runs at a time; menus/activities suppress invitations, and distance plus cooldown prevent repeated visits. Read the [villager approach](VILLAGE_BUILD.md#2026-09-26-villager-approaches) and [dialogue](VILLAGE_BUILD.md#2026-09-25-villager-dialogue) milestones before changing these systems. Their 48 browser checks and integrated runtime observation supplement the earlier scene evidence; the old renderer-only captures do not show the speech bubbles.
 
@@ -77,19 +79,20 @@ The detailed source contracts now live in the [movement/world spec](docs/village
 
 ## What exists now
 
-The root page uses raw Three.js inside the existing accessible React shell. The six activities, storage keys, direct travel and simple view remain intact. The 2026-09-25 implementation pass added:
+The root page uses raw Three.js inside the existing accessible React shell. The six activities, storage keys, direct travel and simple view remain intact. Current published behavior:
 
 | Area | Implemented now | Still required |
 | --- | --- | --- |
 | Movement | 120 Hz fixed simulation; walk/run/sprint; acceleration; jump/air/landing; buffered jump; stamina with recovery threshold; keyboard and touch controls | Motion polish, exhaustive collision/camera checks and physical-touch proof. |
 | Ambient life | Four named residents who walk over to greet nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer expressions and behavior; all four now use decorated pastel spirit forms. |
 | Player / residents | Original white spirit plus four pastel blob residents; hover, lean, fin flutter and character accessories; reproducible base Blender source | More expressive faces and motion refinement; no free vertical flight. |
-| Scene | Layered cottage detail, solid masonry bridge, willows, surrounding textured valley and distant tree LODs, open hearth with inward-facing benches, furnished cottage | Cohesive finished assets, natural terrain/material blending, much stronger entrance composition and background art. |
-| Lighting/wind | Procedural cloud sky and sunset HDR illumination; coordinated sun, fill and haze; practical cottage/window/fire lights; shared gusts across grass, bushes, trees, willow leaves, scarf, water and audio; bounded shadow refresh | Authored indirect light, smooth weather transitions, wind refinement and weather visual acceptance. |
-| Music | Seeded five-section/40-bar form, developing motif, voice-leading, rests, separate bass/percussion for lo-fi/jazz, bounded voices | Actual long-session listening, more seeds, equipment/browser coverage and musical refinement. |
-| World audio | Spatial water/fire, gust/shelter response, six synthesized step variants per surface, takeoff/landing, birds and interaction details; World/Effects mixer controls; recorded traversal with stereo audio | Perceptual review of recorded traversal, animation-contact listening, richer foley, occlusion and physical output-device review. |
+| Scene | Colorful swept-roof cottages, painted materials, stone bridge, rounded tree crowns, mountain layers/floating gardens, nine wayfinding posts, flowing water and layered indoor/outdoor fire | More authored variation, terrain/material blending and composition refinement. |
+| Activities / UI | Visible spirit at all six stations; state-driven hourglass, breathing rings, tea, quill and letters; warm paper panels, portrait bottom sheet, Enjoy the view toggle | Further environmental craft and physical-touch/long-session usability review. |
+| Lighting/wind | Cloud sky and sunset HDR illumination; coordinated sun, fill and haze; practical lights; shared gusts across foliage, water and audio; weighted 16-tap PCF with detailed shadows updated each frame | Authored indirect light, smooth weather transitions, wind refinement and weather visual acceptance. |
+| Music | Four complete Holizna recordings, scenery/location selection, four-second crossfades, manual override and two streaming decks; generated score archived | Long-session listening, Firefox streaming and physical-device/network coverage. |
+| World audio | Recorded spatial stream/fire and rain; synthesized wind, sparse birds, takeoff/landing and interaction effects; separate mixer controls; hovering suppresses footsteps | Perceptual mix/positioning review, richer foley, occlusion and physical output-device review. |
 
-Read [VILLAGE_BUILD.md](VILLAGE_BUILD.md) for current evidence and limits. Source and contract checks do not close art or listening acceptance. Earlier 26 fps/2.17M-triangle measurements describe the previous prototype, not the current build.
+Read [VILLAGE_BUILD.md](VILLAGE_BUILD.md) for current evidence and limits. The latest local two-minute profile averaged 75.0 fps (13.34 ms), p95 20.4 ms, at 1280×720, DPR 1, detailed quality. This is not physical-device or thermal acceptance. Source and contract checks do not close art or listening acceptance; earlier profiles describe earlier scenes and conditions.
 
 ## Required work, in order
 
@@ -126,7 +129,9 @@ Lighting and performance should be checked throughout, not deferred until every 
 | [Village.tsx](features/village/Village.tsx) | React shell, engine lifecycle, preferences, dialogs, language, simple view, mobile controls and audio coordination. |
 | [VillageEngine.ts](features/village/VillageEngine.ts) | Three.js renderer, character/camera, input, collision, scene transitions, weather and frame loop. Main integration hotspot. |
 | [world.ts](features/village/world.ts), [architecture.ts](features/village/architecture.ts), [paintedTextures.ts](features/village/paintedTextures.ts), [fantasyTrees.ts](features/village/fantasyTrees.ts), [flame.ts](features/village/flame.ts) | World placement/colliders, original cottage kit, painted materials, opaque tree geometry, vegetation/water and flames. |
+| [water.ts](features/village/water.ts), [shadows.ts](features/village/shadows.ts), [wayfinding.ts](features/village/wayfinding.ts) | Flowing river/pond shading, directional shadow filtering and localized physical signs. |
 | [Activities.tsx](features/village/Activities.tsx), [useSession.ts](features/village/useSession.ts) | Activity controls and local persistence; deadline-based focus session. |
+| [activityScene.ts](features/village/activityScene.ts), [environment.ts](features/village/environment.ts) | Authored activity actor/camera positions, animated props and the typed `ActivityMoment` UI-to-scene contract. |
 | [places.ts](features/village/places.ts) | Stable place IDs, position/camera definitions, `Quality`, `Weather`, `AudioMix`. |
 | [audio.ts](features/village/audio.ts), [soundtrack.ts](features/village/soundtrack.ts) | Web Audio mixer, recorded music streaming/crossfades, location selection, recorded nature beds and responsive effects. `composition.ts` is retained historical code, no longer imported by the village runtime. |
 | [bridge.ts](features/village/bridge.ts), [atmosphere.ts](features/village/atmosphere.ts), [life.ts](features/village/life.ts) | Solid bridge geometry, cloud sky and bounded resident/bird animation. |

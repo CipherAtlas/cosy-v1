@@ -4,6 +4,10 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
 
+## 2026-09-26 published candidate
+
+Application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290) is live after a successful [Pages build and deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). Live Chromium checks passed for arrival, scene rendering, recorded-music start/stop, tea-garden exit and Luma chat; no warnings/errors were captured in the inspected tab. Model, HDR and all seven recorded-audio URLs returned 200. See [the release ledger](VILLAGE_BUILD.md#2026-09-26-main-release) for exact scope. This confirms publication and those flows; physical-device, long-session listening and complete art acceptance remain open.
+
 ## 2026-09-26 water, fire and activity UI
 
 The striped water and flat flame cards are replaced by flowing surface detail and layered fire with embers/smoke. The spirit now inhabits each activity: desk/hourglass, hearth seat, breathing dock, tea table, writing desk and postbox. State changes animate those props. Warm paper controls keep the action visible, with compact mobile framing and a hide-controls toggle. Initial sign occlusion, a water/fire transparency artifact and a cropped mobile spirit were found and corrected.
@@ -14,7 +18,7 @@ All six activities were inspected across native Firefox and Chromium, including 
 
 The player now retains its movement heading when idle. The entrance has a readable six-place directory; junction and destination posts guide exploration, with English/Japanese labels and correct reverse-side arrows. Sign placement was visually corrected to clear the lamp, cottage facade and activity return camera. The weighted shadow filter and continuous detailed-tier updates address grainy edges and stepped motion. See [current entrance](docs/village/evidence/polish-entrance.png), [post detail](docs/village/evidence/polish-cottage-post.png) and [shadows](docs/village/evidence/polish-soft-shadows.png).
 
-Four complete recordings now follow location/scenery, with crossfades and manual selection; rain/fire/river beds are recorded too. All 28 new audio lifecycle checks pass, including a missing-track test. The generated-score direction is superseded. Desktop/390×844 music controls and Japanese labels were checked, but no subjective long-session listening or physical-phone certification is claimed. [Current evidence](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) records the checkpoint release and subsequent local changes separately. The overall art/device acceptance verdict above remains open.
+Four complete recordings now follow location/scenery, with crossfades and manual selection; rain/fire/river beds are recorded too. All 28 new audio lifecycle checks pass, including a missing-track test. The generated-score direction is superseded. Desktop/390×844 music controls and Japanese labels were checked, but no subjective long-session listening or physical-phone certification is claimed. [Implementation evidence](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) records the initial checkpoint and polish checks; the published candidate above includes this work. The overall art/device acceptance verdict above remains open.
 
 ## 2026-09-26 fantasy village pass
 

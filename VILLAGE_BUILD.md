@@ -4,11 +4,20 @@ Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canon
 
 ## 2026-09-26 main release
 
-The user authorized committing, pushing to `main` and deploying the combined polish and inhabited-activity passes. This release includes all source, licensed recordings, credits and verification evidence from the two sections below. Publication uses the unchanged [GitHub Pages workflow](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml); the live destination is [Cosy Village](https://cipheratlas.github.io/cosy-v1/). The release task records the exact commit, workflow result and live browser verification. Earlier statements that work was local/uncommitted describe the original implementation boundary.
+Published the combined polish and inhabited-activity passes as [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290) on `main`, following the user's explicit commit/push/deploy request. All source, licensed recordings, credits and implementation evidence are included. The unchanged [Pages workflow run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977) completed both build and deploy successfully for that exact commit; deployment finished at 10:04:13 UTC on 2026-09-26. Live destination: [Cosy Village](https://cipheratlas.github.io/cosy-v1/).
+
+Release verification:
+
+- `npm run typecheck` and `NEXT_PUBLIC_BASE_PATH=/cosy-v1 npm run build` passed. The export contains 22 routes; all 14 subpath asset references inspected in its root HTML resolve. Existing workspace-root, Browserslist and unrelated RoomScene image warnings remain.
+- All seven local recording sizes and SHA-256 hashes match the provenance manifest. The deployed manifest matches the committed file; HTTP checks returned 200 for the spirit model, sunset HDR and all seven recordings, with matching byte lengths.
+- Live Chromium smoke checks passed: arrival/scene rendering, the six-place menu, hearth activity and recorded-music start/stop, tea-garden exit with restored canvas focus, and explicit Luma chat with its accessible announcement. The inspected tab reported no captured console warnings/errors. Playback controls reached Pause music and returned to Play music; this is loading/control evidence, not a listening review.
+- The root-path local export was restored after subpath verification, preserving the existing preview at `http://127.0.0.1:3020/`. No dependencies, deployment settings or CI configuration changed.
+
+Physical-phone input/thermal checks, constrained-network tests, long-session listening and full art acceptance remain open. The implementation sections below preserve their original local verification boundary; both passes are now included in the published commit above.
 
 ## 2026-09-26 water, fire and inhabited activities
 
-This local pass builds on the preceding uncommitted polish. No new commit, push or deployment was requested or performed.
+Originally verified locally on top of the preceding polish, this pass is now published in [the main release](#2026-09-26-main-release). The following observations describe its implementation checks before publication.
 
 - `water.ts` replaces repeated sine highlights with advected world-space noise, small intersecting waves, corrected view-space ripple normals, depth colors and sparse edge foam. River and pond use different flow speeds and subdivided surfaces. Water is opaque to prevent transparent river triangles from cutting through the fire. This is stylized surface shading, not fluid simulation or screen-space reflections.
 - `flame.ts` uses seven curved flame ribbons with moving silhouettes, soft tips, warm cores, drifting embers and subtle smoke. Indoor and outdoor fires share it; charred logs, scattered indoor coals and gently varying lights replace the flat indoor ember block.
@@ -25,7 +34,7 @@ The rebuilt static export is served at `http://127.0.0.1:3020/` and reopened in 
 
 ## 2026-09-26 orientation, shadows, wayfinding and recorded soundtrack
 
-The existing art work was committed and pushed **before new edits**, as requested: [`7642527`](https://github.com/CipherAtlas/cosy-v1/commit/764252724fc26c5036fc02d483a5fac998a95b4d) on `main`. The subpath build passed before the push. The existing Pages workflow initially failed in the Google-font download loader; retrying the same failed run succeeded without configuration changes. [Successful workflow](https://github.com/CipherAtlas/cosy-v1/actions/runs/36230332415). Verified the deployed checkpoint's arrival, loaded scene, tea-garden exit and Luma chat. The following polish work is local and has not been committed or deployed.
+The existing art work was committed and pushed **before new edits**, as requested: [`7642527`](https://github.com/CipherAtlas/cosy-v1/commit/764252724fc26c5036fc02d483a5fac998a95b4d) on `main`. The subpath build passed before the push. The existing Pages workflow initially failed in the Google-font download loader; retrying the same failed run succeeded without configuration changes. [Successful workflow](https://github.com/CipherAtlas/cosy-v1/actions/runs/36230332415). Verified the deployed checkpoint's arrival, loaded scene, tea-garden exit and Luma chat. The following polish was verified locally first and subsequently published in [the combined main release](#2026-09-26-main-release).
 
 ### Delivered
 

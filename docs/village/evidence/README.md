@@ -1,5 +1,9 @@
 # Village implementation evidence — updated 2026-09-26
 
+## Published application release
+
+The `living-` and `polish-` milestones are included in application commit [`ae3f826`](https://github.com/CipherAtlas/cosy-v1/commit/ae3f826340bbfb57dacb558efb41269c1dc47290), published by [Pages run 36234597977](https://github.com/CipherAtlas/cosy-v1/actions/runs/36234597977). [The release record](../../../VILLAGE_BUILD.md#2026-09-26-main-release) documents subpath/build checks, deployed assets and live Chromium arrival, audio controls, activity exit and chat verification. The captures below are local implementation evidence, not screenshots of the deployed site or proof of physical-device/listening acceptance.
+
 ## Water, fire and inhabited activities
 
 The `living-` renderer captures use the current production modules, Chromium 153, detailed quality and a 1280×720 canvas. They omit React/DOM controls; browser UI checks are described in [the ledger](../../../VILLAGE_BUILD.md#2026-09-26-water-fire-and-inhabited-activities). Earlier milestone files are preserved.
@@ -44,8 +48,8 @@ Generated from the actual village modules with `python3 scripts/village/preview_
 - [activity-exits.json](activity-exits.json): later Firefox check using real world colliders. Reproduces the former pond/nook traps, then verifies clear arrival coordinates, four-direction walking and restored 3.8 m camera distance after all six exits. Desktop/mobile/simple-view button and focus observations are recorded separately in the [activity-exit ledger](../../../VILLAGE_BUILD.md#2026-09-25-activity-exit-fix).
 - [profile-systems.json](profile-systems.json): retained earlier 120-second systems-milestone profile for comparison; it is not a controlled before/after benchmark.
 
-The music uses Alexander Holm's Salamander Grand Piano samples, CC BY 3.0, with original procedural arrangements and synthesis. See [runtime credits](../../../public/village/CREDITS.txt) and the [original license](../../../public/village/audio/Salamander-LICENSE.txt). No Arkenfall audio or art was copied.
+The historical generated-music previews above use Alexander Holm's Salamander Grand Piano samples, CC BY 3.0, with original procedural arrangements and synthesis. Those samples and arrangements are no longer loaded by the runtime. The published soundtrack uses Holizna recordings and recorded nature beds; see [the current audio specification](../MUSIC_AND_SOUND.md), [runtime credits](../../../public/village/CREDITS.txt) and the archived piano [license](../../../public/village/audio/Salamander-LICENSE.txt). No Arkenfall audio or art was copied.
 
 ## 2026-09-26 colorful spirit pass
 
-Files prefixed `art-` are the current original white-spirit/colorful-palette pass. Earlier unprefixed files remain historical evidence. Captures come from the production-engine harness at 1280×720; close front/back cameras inspect the spirit, and the entrance includes its idle smile. `art-movement-checks.json` accompanies `art-motion.webm` and verifies glide/dash/jump state reporting, energy use and zero footfalls. `art-art-checks.json` records active player nodes, resident clips, renderer counts and captured console errors. See the [build ledger](../../../VILLAGE_BUILD.md#2026-09-26-colorful-art-pass-and-spirit-player) for scope, tools and limitations.
+Files prefixed `art-` record the earlier original white-spirit/colorful-palette pass. They predate the fantasy, polish and inhabited-activity milestones above; the player’s camera-facing idle pose in these captures is superseded by retained movement heading. Captures come from the production-engine harness at 1280×720; close front/back cameras inspect the spirit. `art-movement-checks.json` accompanies `art-motion.webm` and verifies glide/dash/jump state reporting, energy use and zero footfalls. `art-art-checks.json` records active player nodes, resident clips, renderer counts and captured console errors. See the [build ledger](../../../VILLAGE_BUILD.md#2026-09-26-colorful-art-pass-and-spirit-player) for scope, tools and limitations.

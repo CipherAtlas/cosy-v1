@@ -54,6 +54,8 @@ Current browser evidence is under `polish-` in [the evidence index](evidence/REA
 
 Historical Firefox files and old offline piano/lo-fi/jazz previews describe the superseded implementation. Do not use those recordings as evidence for this soundtrack.
 
+The [published application release](../../VILLAGE_BUILD.md#2026-09-26-main-release) includes all seven recordings and their credits. Live checks confirmed the deployed manifest matches the committed file and every recording URL returns 200 with the expected byte length. Chromium hearth playback reached Pause music after explicit activation and returned to Play music on stop, with no captured console warnings/errors. This confirms delivery and controls; Firefox streaming and subjective listening remain separate acceptance items.
+
 Remaining acceptance:
 
 - Listen on speakers and headphones through a continuous 15-minute live traversal/focus session. Judge transitions, melody repetition, low-end balance, fatigue and environmental clarity.

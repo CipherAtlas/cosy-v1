@@ -30,7 +30,7 @@ The runtime now uses `atmosphere.ts` for an animated cloud sky, with golden/dusk
 
 `bridge.ts` builds a solid 12 m stone arch with upward-facing paving, continuous parapets, coping stones and supported approaches. Its geometry follows the same deck-height function as movement. The flat path beneath the old crossing was removed, and planting is excluded from the deck/approaches. The hearth now occupies an open riverside clearing beside the road, with three inward-facing seats; the overlapping shelter and duplicate benches were removed. Preserve these functional arrangements while improving materials and authored detail. Four original-rig residents and twelve animated birds add ambient life.
 
-Current views: [entrance](evidence/entrance.png), [bridge profile](evidence/bridge-side.png), [bridge deck](evidence/bridge.png), [hearth](evidence/hearth.png), [rear valley](evidence/camera-rear.png), [dusk](evidence/dusk.png) and [rain](evidence/rain.png). Captures use the final production modules at 1280×720; see [evidence provenance](evidence/README.md). Mountains, architecture, near foliage and traveler anatomy remain visibly procedural. The current 120-second high-tier sample averages about 45 fps at 720p, so added visual detail must be paired with profiling.
+Historical views from that feedback milestone: [entrance](evidence/entrance.png), [bridge profile](evidence/bridge-side.png), [bridge deck](evidence/bridge.png), [hearth](evidence/hearth.png), [rear valley](evidence/camera-rear.png), [dusk](evidence/dusk.png) and [rain](evidence/rain.png). Captures use that milestone's production modules at 1280×720; its high-tier profile averaged about 45 fps. They predate the colorful spirit/fantasy assets, softer shadows and water/activity pass. Use the newest [evidence index](evidence/README.md) and [release ledger](../../VILLAGE_BUILD.md#2026-09-26-main-release) for current visuals, performance and deployment proof.
 
 ## Earlier candidate milestone
 
@@ -48,7 +48,7 @@ The user selected this image explicitly. Its appeal comes from composition, mate
 
 ![Historical unfinished prototype before the systems and feedback passes](references/prototype-village.jpg)
 
-This second image preserves the older prototype, **not an alternative approved style or a current-build capture**. Compare the approved image with the latest [entrance evidence](evidence/entrance.png) when reviewing new work. Existing procedural art must not become the visual standard just because it already renders.
+This second image preserves the older prototype, **not an alternative approved style or a current-build capture**. Compare the approved composition with the latest [entrance evidence](evidence/polish-entrance.png), applying the superseding colorful spirit brief above. Existing procedural art must not become the visual standard just because it already renders.
 
 ### Art language
 
