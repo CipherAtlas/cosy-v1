@@ -7,7 +7,7 @@ A colorful third-person village for focus, music, breathing, mood check-ins, gra
 ## Direction and documentation
 
 - [Approved visual target](docs/village/references/approved-village.png): village composition, warm cottages, planting and scenery. The latest user direction supersedes its palette and traveler: vivid Genshin-inspired colors, Arkenfall atmosphere, and a cute white spirit.
-- [Live Cosy Village](https://cipheratlas.github.io/cosy-v1/): the current `main` release. The original Cosy v1 remains the functional baseline, preserved in the [baseline captures](docs/village/references/README.md); earlier local redesign experiments are not references for this work.
+- [Live Cosy Village](https://cosy.sabarg.com/): the current `main` release. The original Cosy v1 remains the functional baseline, preserved in the [baseline captures](docs/village/references/README.md); earlier local redesign experiments are not references for this work.
 - [Arkenfall](https://www.arkenfall.site/): a heavy reference for the immersive RPG experience, traversal, atmosphere and world sound.
 - [Art, lighting and asset production](docs/village/ART_AND_ASSETS.md): asset briefs, generation prompts, export/provenance requirements and visual acceptance.
 - [Movement and living world](docs/village/MOVEMENT_AND_WORLD.md): gliding, unlimited dashing, jumping, mouse/touch camera controls and coordinated wind.
@@ -58,12 +58,12 @@ Runtime asset attribution is in [public/village/CREDITS.txt](public/village/CRED
 
 ## GitHub Pages releases
 
-[Deploy to GitHub Pages](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml) runs on every push to `main` and can also be dispatched manually. It uses Node 20, installs the lockfile with `npm ci`, builds with `NEXT_PUBLIC_BASE_PATH=/cosy-v1`, and deploys `out` through GitHub's Pages artifact workflow. No separate publishing branch is used.
+[Deploy to GitHub Pages](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml) runs on every push to `main` and can also be dispatched manually. It uses Node 20, installs the lockfile with `npm ci`, builds with an empty `NEXT_PUBLIC_BASE_PATH` for `cosy.sabarg.com`, and deploys `out` through GitHub's Pages artifact workflow. No separate publishing branch is used.
 
-Before an authorized release, run the source checks above and verify the subpath export:
+Before an authorized release, run the source checks above and verify the root-path export:
 
 ```bash
-NEXT_PUBLIC_BASE_PATH=/cosy-v1 npm run build
+NEXT_PUBLIC_BASE_PATH= npm run build
 ```
 
-After pushing, confirm that both workflow jobs succeed for the pushed commit, then open [the live village](https://cipheratlas.github.io/cosy-v1/). Check arrival, loaded scene assets, an activity exit and villager chat. A successful build alone does not prove a working deployment. Local QA scripts, editable Blender source and documentation evidence remain outside the exported site.
+After pushing, confirm that both workflow jobs succeed for the pushed commit, then open [the live village](https://cosy.sabarg.com/). Check arrival, loaded scene assets, an activity exit and villager chat. A successful build alone does not prove a working deployment. GitHub Pages redirects the old `cipheratlas.github.io/cosy-v1` URL to the custom domain; browser data saved under the old origin does not transfer with that redirect. Local QA scripts, editable Blender source and documentation evidence remain outside the exported site.
