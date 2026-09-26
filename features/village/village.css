@@ -904,7 +904,7 @@ kbd {
   .v-interact {
     left: auto;
     right: 20px;
-    bottom: 38px;
+    bottom: max(145px, calc(env(safe-area-inset-bottom) + 120px));
     max-width: calc(100vw - 185px);
     white-space: normal;
     transform: none;
@@ -1061,13 +1061,29 @@ kbd {
 .v-energy meter { width: 100%; height: 8px; }
 .v-energy meter::-webkit-meter-bar { border: 1px solid #eee4c160; background: #1e302cbb; border-radius: 8px; }
 .v-energy meter::-webkit-meter-optimum-value { background: #d4c18b; border-radius: 8px; transition: width .1s linear; }
-.v-run-toggle { display: flex; align-items: center; gap: 7px; color: inherit; }
-.v-run-toggle[aria-pressed="true"] { color: #fff7d8; }
 .v-touch-actions { display: none; }
 @media (pointer: coarse), (max-width: 700px) {
   .v-touch-actions { position: absolute; right: 20px; bottom: max(25px, env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: 168px; }
   .v-touch-actions button { min-height: 46px; min-width: 66px; padding: 10px; border: 1px solid #f5e9ce50; border-radius: 50px; background: #23362dba; color: #fff0d6; touch-action: none; user-select: none; }
   .v-touch-actions button[aria-pressed="true"] { background: #786d43e6; }
-  .v-energy { bottom: 180px; }
+  .v-energy { bottom: max(220px, calc(env(safe-area-inset-bottom) + 195px)); }
 }
 @media (prefers-reduced-motion: reduce) { .v-energy, .v-energy meter::-webkit-meter-optimum-value { transition: none; } }
+
+.v-controls-button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #f6dfb752;
+  border-radius: 8px;
+  background: #20291fc9;
+  color: #fff1d7;
+  font: inherit;
+}
+.v-controls-button:hover { background: #4b543f; }
+.v-control-guide > p { margin: 18px 0 24px; color: #d5d0bf; line-height: 1.6; }
+.v-control-guide dl { margin: 0; }
+.v-control-guide dl > div { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 12px 0; border-top: 1px solid #eee0c91a; }
+.v-control-guide dt { flex-shrink: 0; }
+.v-control-guide dd { margin: 0; text-align: right; color: #e5ddcc; }
+.v-control-guide kbd { font: inherit; font-size: 13px; color: #ffdfa9; }
+@media (max-width: 600px) { .v-control-guide dl > div { gap: 12px; font-size: 14px; } }

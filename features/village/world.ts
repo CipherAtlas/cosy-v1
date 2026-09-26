@@ -2,8 +2,9 @@ import * as T from "three";
 import { makeFlame } from "./flame";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { withBasePath } from "@/lib/basePath";
+import { paintedTextures } from "./paintedTextures";
+import { buildCottage } from "./architecture";
+import { fantasyTreeGeometry } from "./fantasyTrees";
 import { BRIDGE, HEARTH, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
 export { groundY, riverX } from "./environment";
 
@@ -14,6 +15,8 @@ export type World = {
     transforms: T.Matrix4[];
     bounds: T.Sphere[];
   }[];
+  treeLod: T.InstancedMesh;
+  setWeather: (rain: number, dusk: number) => void;
   colliders: Collider[];
   flames: T.Mesh[];
   lanterns: T.Mesh[];
@@ -22,7 +25,6 @@ export type World = {
   vegetation: T.InstancedMesh[];
   dispose: () => void;
 };
-const assets = (s: string) => withBasePath(`/village/${s}`);
 let seed = 62025;
 function rnd() {
   seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
@@ -46,95 +48,65 @@ export async function buildWorld(
   const clearPlanting = (x: number, z: number) =>
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
     || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9;
-  const textureLoader = new T.TextureLoader();
-  const textures: T.Texture[] = [];
-  const renderTargets: T.WebGLRenderTarget[] = [];
-  async function tex(name: string, repeat: number) {
-    const t = await textureLoader.loadAsync(assets(`textures/${name}`));
-    t.name = name;
-    t.wrapS = t.wrapT = T.RepeatWrapping;
-    t.repeat.set(repeat, repeat);
-    t.anisotropy = 4;
-    textures.push(t);
-    return t;
-  }
-  const [
-    woodMap,
-    roofMap,
-    plasterMap,
-    stoneMap,
-    groundMap,
-    pathMap,
-    woodN,
-    stoneN,
-    roofN,
-  ] = await Promise.all([
-    tex("wood-color.jpg", 1),
-    tex("roof-color.jpg", 2),
-    tex("plaster-color.jpg", 1),
-    tex("stone-color.jpg", 2),
-    tex("ground-color.jpg", 125),
-    tex("path.png", 1),
-    tex("wood-normal.jpg", 1),
-    tex("stone-normal.jpg", 2),
-    tex("roof-normal.jpg", 2),
-  ]);
-  [woodMap, roofMap, plasterMap, stoneMap, groundMap, pathMap].forEach(
-    (t) => (t.colorSpace = T.SRGBColorSpace),
-  );
+  const painted = paintedTextures();
+  const textures = Object.values(painted);
+  const { wood: woodMap, roof: roofMap, plaster: plasterMap,
+    stone: stoneMap, meadow: groundMap, path: pathMap } = painted;
+  groundMap.repeat.set(48, 48);
+  const wetness = { value: 0 };
   const mat = {
     wood: new T.MeshStandardMaterial({
       map: woodMap,
-      normalMap: woodN,
-      color: "#c6ac87",
+      color: "#d7ac76",
       roughness: 0.95,
     }),
     darkWood: new T.MeshStandardMaterial({
       map: woodMap,
-      color: "#806849",
+      color: "#99806b",
       roughness: 0.94,
     }),
     plaster: new T.MeshStandardMaterial({
-      color: "#d3bd96",
+      color: "#fff2d3",
       bumpMap: plasterMap,
       bumpScale: 0.045,
       roughness: 1,
     }),
     roof: new T.MeshStandardMaterial({
       map: roofMap,
-      normalMap: roofN,
-      color: "#636e72",
+      color: "#53c4de",
       roughness: 0.91,
       side: T.DoubleSide,
     }),
     terra: new T.MeshStandardMaterial({
       map: roofMap,
-      normalMap: roofN,
-      color: "#94674c",
+      color: "#e99b7c",
       roughness: 0.91,
       side: T.DoubleSide,
     }),
     stone: new T.MeshStandardMaterial({
       map: stoneMap,
-      normalMap: stoneN,
-      color: "#a8a38b",
+      color: "#e7e3cc",
       roughness: 1,
     }),
     ground: new T.MeshStandardMaterial({
       map: groundMap,
-      color: "#a0b88c",
+      color: "#ffffff",
       vertexColors: true,
       roughness: 1,
     }),
     path: new T.MeshStandardMaterial({
       map: pathMap,
-      color: "#e0d2b4",
+      color: "#f3e5bd",
+      bumpMap: pathMap,
+      bumpScale: 0.025,
       roughness: 0.94,
     }),
     glass: new T.MeshStandardMaterial({
-      color: "#473320",
-      emissive: "#ff942f",
-      emissiveIntensity: 0.85,
+      map: painted.window,
+      emissiveMap: painted.window,
+      color: "#fff8e7",
+      emissive: "#ffd089",
+      emissiveIntensity: 0.12,
       roughness: 0.3,
     }),
     metal: new T.MeshStandardMaterial({
@@ -148,13 +120,35 @@ export async function buildWorld(
       side: T.DoubleSide,
     }),
     green: new T.MeshStandardMaterial({ color: "#506435", roughness: 1 }),
-    paper: new T.MeshStandardMaterial({ color: "#e4d5ae", roughness: 1 }),
+    paper: new T.MeshStandardMaterial({ color: "#fff0cd", roughness: 1 }),
+    trim: new T.MeshStandardMaterial({ color: "#f3d099", roughness: .7 }),
+    lilac: new T.MeshStandardMaterial({ map: roofMap, color: "#b6aceb", roughness: .86, side: T.DoubleSide }),
+    teal: new T.MeshStandardMaterial({ color: "#50afa8", roughness: .8 }),
+    rose: new T.MeshStandardMaterial({ color: "#e68f94", roughness: .85 }),
   };
-  mat.plaster.onBeforeCompile = shader => {
-    shader.uniforms.plasterDetail = { value: plasterMap };
-    shader.fragmentShader = "uniform sampler2D plasterDetail;\n" + shader.fragmentShader;
-    shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= .82 + texture2D(plasterDetail, vBumpMapUv).r * .45;");
-  };
+  mat.wood.name = "Village oak";
+  mat.stone.name = "Village limestone";
+  mat.plaster.bumpScale = .012;
+  // World-space wear keeps large merged batches from repeating the same flat tint.
+  for (const material of [mat.plaster, mat.wood, mat.darkWood, mat.stone, mat.roof, mat.terra, mat.lilac, mat.path, mat.ground]) {
+    material.onBeforeCompile = shader => {
+      shader.uniforms.wetness = wetness;
+      shader.vertexShader = "varying vec3 surfacePosition;\n" + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>",
+        "#include <begin_vertex>\nsurfacePosition=(modelMatrix*vec4(position,1.)).xyz;");
+      shader.fragmentShader = "varying vec3 surfacePosition; uniform float wetness;\n" + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `#include <color_fragment>
+        float grain=sin(surfacePosition.x*3.7+sin(surfacePosition.z*2.3))*sin(surfacePosition.y*4.1+surfacePosition.z*1.8);
+        float wear=.985+grain*.015;
+        float footShade=mix(.86,1.,smoothstep(.06,1.4,surfacePosition.y));
+        diffuseColor.rgb*=wear*${material === mat.plaster || material === mat.wood || material === mat.darkWood ? "footShade" : "1."};
+        diffuseColor.rgb*=1.-wetness*.16;
+      `);
+      shader.fragmentShader = shader.fragmentShader.replace("#include <roughnessmap_fragment>",
+        "#include <roughnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,max(.32,roughnessFactor*.57),wetness);");
+    };
+    material.customProgramCacheKey = () => `village-surface-${material.type}-${material === mat.plaster || material === mat.wood || material === mat.darkWood}`;
+  }
   const add = (
     geo: T.BufferGeometry,
     m: T.Material,
@@ -208,40 +202,80 @@ export async function buildWorld(
       z = pos.getZ(i);
     pos.setY(i, landscapeHeight(x, z));
     const patch = .5 + .5 * Math.sin(x * .12) * Math.sin(z * .09);
-    const c = new T.Color().setHSL(.24 + patch * .045, .26, .47 + patch * .18);
+    const c = new T.Color().setHSL(.235 + patch * .035, .54, .56 + patch * .13);
     colors.push(c.r, c.g, c.b);
   }
   terrain.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
   terrain.computeVertexNormals();
   const terrainMesh = add(terrain, mat.ground, 0, 0, 0);
   terrainMesh.castShadow = false;
+  const surfaceShader = mat.ground.onBeforeCompile;
+  mat.ground.onBeforeCompile = shader => {
+    surfaceShader(shader, renderer);
+    shader.fragmentShader = `
+      float meadowHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float meadowNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+        return mix(mix(meadowHash(i),meadowHash(i+vec2(1.,0.)),f.x),mix(meadowHash(i+vec2(0.,1.)),meadowHash(i+vec2(1.,1.)),f.x),f.y);}
+    ` + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace("#include <map_fragment>", `#include <map_fragment>
+      float meadow=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));
+      float meadowPatch=meadowNoise(surfacePosition.xz*.065)*.7+meadowNoise(surfacePosition.xz*.21)*.3;
+      diffuseColor.rgb=mix(vec3(.16,.28,.035),vec3(.38,.51,.10),meadowPatch)*(.68+meadow*1.8);
+    `);
+  };
+  mat.ground.customProgramCacheKey = () => "village-painted-meadow";
+  // An opaque soil-and-moss shoulder blends paving into the meadow without alpha overdraw.
+  const pathMaterial = mat.path.clone();
+  pathMaterial.vertexColors = true;
+  pathMaterial.onBeforeCompile = shader => {
+    mat.path.onBeforeCompile(shader, renderer);
+    shader.uniforms.shoulderMap = { value: groundMap };
+    shader.fragmentShader = "uniform sampler2D shoulderMap;\n" + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `
+      float edge=1.-vColor.r;
+      float breakup=sin(surfacePosition.x*19.+sin(surfacePosition.z*11.))*sin(surfacePosition.z*23.);
+      float blend=smoothstep(.1,.85,edge+breakup*.12);
+      float soilDetail=texture2D(shoulderMap,surfacePosition.xz*.3).g;
+      vec3 soil=vec3(.21,.31,.065)*(.75+soilDetail);
+      diffuseColor.rgb=mix(diffuseColor.rgb,soil,blend);
+    `);
+  };
+  pathMaterial.customProgramCacheKey = () => "village-path-shoulder";
   // Narrow, curved paths are geometry so their paving follows the village layout.
+  const pathSurfaces: { geometry: T.BufferGeometry; spine: T.Vector3[]; width: number }[] = [];
   function path(points: T.Vector3[], width: number) {
     const c = new T.CatmullRomCurve3(points);
     const vs: number[] = [],
       uv: number[] = [],
+      shoulderColors: number[] = [],
       indices: number[] = [];
     for (let i = 0; i <= 100; i++) {
       let p = c.getPoint(i / 100),
         t = c.getTangent(i / 100);
-      for (const s of [-1, 1]) {
+      for (const s of [-1.27, -1, -.73, .73, 1, 1.27]) {
         const shoulder = 1 + Math.sin(i * 0.71) * 0.055 + Math.sin(i * 1.37) * 0.025;
         let x = p.x + (t.z * width * s * shoulder) / 2,
           z = p.z - (t.x * width * s * shoulder) / 2;
-        vs.push(x, Math.max(landscapeHeight(x, z), 0) + 0.045, z);
-        uv.push(s === -1 ? 0 : width / 2, ((i / 100) * c.getLength()) / 2);
+        vs.push(x, Math.max(landscapeHeight(x, z), 0) + 0.045 + pathSurfaces.length*.002, z);
+        uv.push(x / 2, z / 2);
+        const center = Math.abs(s) < 1 ? 1 : Math.abs(s) > 1 ? 0 : .62;
+        shoulderColors.push(center, 1, 1);
       }
       if (i < 100) {
-        let a = i * 2;
-        indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
+        for (let strip=0; strip<5; strip++) {
+          const a=i*6+strip;
+          indices.push(a,a+6,a+1,a+1,a+6,a+7);
+        }
       }
     }
     const g = new T.BufferGeometry();
     g.setAttribute("position", new T.Float32BufferAttribute(vs, 3));
     g.setAttribute("uv", new T.Float32BufferAttribute(uv, 2));
+    g.setAttribute("color", new T.Float32BufferAttribute(shoulderColors, 3));
     g.setIndex(indices);
     g.computeVertexNormals();
-    add(g, mat.path, 0, 0, 0).castShadow = false;
+    add(g, pathMaterial, 0, 0, 0).castShadow = false;
+    pathSurfaces.push({ geometry: g, spine: c.getPoints(100), width });
   }
   path(
     [
@@ -273,14 +307,36 @@ export async function buildWorld(
     ],
     2.5,
   );
+  // At junctions, keep every overlapping ribbon paved; moss must never cut across a road.
+  // Shared world-space UVs also prevent texture seams where their surfaces overlap.
+  for (const surface of pathSurfaces) {
+    const positions = surface.geometry.attributes.position, colors = surface.geometry.attributes.color;
+    for (let vertex=0; vertex<positions.count; vertex++) {
+      if (colors.getX(vertex) === 1) continue;
+      const x=positions.getX(vertex), z=positions.getZ(vertex);
+      let paving=colors.getX(vertex);
+      for (const other of pathSurfaces) {
+        if (other === surface) continue;
+        let distance=Infinity;
+        for (let segment=1; segment<other.spine.length; segment++) {
+          const a=other.spine[segment-1], b=other.spine[segment];
+          const dx=b.x-a.x, dz=b.z-a.z;
+          const t=T.MathUtils.clamp(((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz),0,1);
+          distance=Math.min(distance,Math.hypot(x-a.x-t*dx,z-a.z-t*dz));
+        }
+        paving=Math.max(paving,1-T.MathUtils.smoothstep(distance,other.width*.36,other.width*.64));
+      }
+      colors.setX(vertex,paving);
+    }
+  }
   // Water occupies a shallow channel, with shader normals moving independently of the banks.
   const waterUniform = { time: { value: 0 } };
   const waterMat = new T.MeshStandardMaterial({
-    color: "#326d62",
+    color: "#42a49b",
     metalness: 0,
-    roughness: 0.78,
+    roughness: 0.3,
     transparent: true,
-    opacity: 0.83,
+    opacity: 0.86,
   });
   waterMat.onBeforeCompile = (s) => {
     s.uniforms.uTime = waterUniform.time;
@@ -357,183 +413,19 @@ export async function buildWorld(
       parent,
     ).rotation.y = Math.PI / 4;
   }
-  function gable(
-    w: number,
-    h: number,
-    d: number,
-    m: T.Material,
-    parent: T.Object3D,
-    y: number,
-  ) {
-    const shape = new T.Shape();
-    shape.moveTo(-w / 2, 0);
-    shape.lineTo(w / 2, 0);
-    shape.lineTo(0, h);
-    shape.closePath();
-    const g = new T.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    const mesh = add(g, m, 0, y, -d / 2, 1, 1, 1, parent);
-    return mesh;
-  }
-  function house(
-    x: number,
-    z: number,
-    w: number,
-    d: number,
-    h: number,
-    rot: number,
-    roofMat = mat.roof,
-  ) {
-    const house = new T.Group();
-    house.position.set(x, 0, z);
-    house.rotation.y = rot;
-    group.add(house);
-    colliders.push({
-      x,
-      z,
-      w: Math.abs(Math.cos(rot)) * w + Math.abs(Math.sin(rot)) * d,
-      d: Math.abs(Math.cos(rot)) * d + Math.abs(Math.sin(rot)) * w,
-    });
-    box(mat.stone, 0, 0.4, 0, w + 0.2, 0.8, d + 0.2, house);
-    box(mat.plaster, 0, h / 2 + 0.5, 0, w, h, d, house);
-    gable(w, 2.6, d, mat.plaster, house, h + 0.5);
-    const slope = Math.atan2(2.8, w / 2 + 0.5),
-      length = Math.hypot(w / 2 + 0.5, 2.8);
-    for (const s of [-1, 1]) {
-      const roof = box(
-        roofMat,
-        s * (w / 4 + 0.25),
-        h + 1.9,
-        0,
-        length,
-        0.16,
-        d + 1.15,
-        house,
-      );
-      roof.rotation.z = -s * slope;
-      for (const end of [-1, 1]) {
-        const b = box(
-          mat.darkWood,
-          s * (w / 4 + 0.25),
-          h + 1.8,
-          end * (d / 2 + 0.53),
-          length,
-          0.2,
-          0.16,
-          house,
-        );
-        b.rotation.z = -s * slope;
-      }
+  let houseIndex = 0;
+  function house(x: number, z: number, w: number, d: number, h: number, rot: number, roofMat = mat.roof) {
+    const index = houseIndex++;
+    const cottage = buildCottage({ ...mat, roof: index % 3 === 2 ? mat.lilac : roofMat }, w, d, h, index);
+    cottage.name = `Fantasy cottage ${index + 1}`;
+    cottage.position.set(x, 0, z); cottage.rotation.y = rot; group.add(cottage);
+    colliders.push({ x, z, w: Math.abs(Math.cos(rot)) * w + Math.abs(Math.sin(rot)) * d,
+      d: Math.abs(Math.cos(rot)) * d + Math.abs(Math.sin(rot)) * w });
+    lantern(.95, 1.6, d / 2 + .36, cottage);
+    if (index === 0) {
+      const lamp = new T.PointLight("#ffd19b", 3, 4, 2);
+      lamp.position.set(.95, 2, d / 2 + .7); cottage.add(lamp);
     }
-    if (z > -15) {
-      const rows = Math.ceil(length / 0.27), columns = Math.ceil((d + 1.15) / 0.34);
-      for (const side of [-1, 1]) for (let row = 0; row < rows; row++) {
-        const along = (row + 0.5) / rows * length;
-        for (let col = 0; col < columns; col++) {
-          const tile = box(roofMat,
-            side * ((w / 2 + 0.5) - along * Math.cos(slope)),
-            h + 0.55 + along * Math.sin(slope) + 0.055,
-            -d / 2 - 0.42 + (col + (row % 2) * 0.5) * (d + 0.85) / columns,
-            length / rows + 0.045, 0.065, (d + 1.15) / columns - 0.012, house);
-          tile.rotation.z = -side * slope;
-        }
-      }
-    }
-    box(mat.darkWood, 0, h + 3.34, 0, 0.2, 0.2, d + 1.3, house);
-    for (const xx of [-w / 2 + 0.08, 0, w / 2 - 0.08])
-      for (const zz of [-d / 2 - 0.01, d / 2 + 0.01])
-        box(mat.darkWood, xx, h / 2 + 0.5, zz, 0.17, h + 0.1, 0.16, house);
-    for (const yy of [0.85, h * 0.52 + 0.5, h + 0.48]) {
-      for (const zz of [-d / 2 - 0.03, d / 2 + 0.03])
-        box(mat.darkWood, 0, yy, zz, w, 0.18, 0.17, house);
-      for (const xx of [-w / 2 - 0.02, w / 2 + 0.02])
-        box(mat.darkWood, xx, yy, 0, 0.17, 0.18, d, house);
-    }
-    for (const s of [-1, 1])
-      beam(
-        new T.Vector3(s * (w / 2 - 0.1), h + 0.6, d / 2 + 0.1),
-        new T.Vector3(0, h + 2.9, d / 2 + 0.1),
-        0.16,
-        house,
-        mat.darkWood,
-      );
-    for (const zz of [-d / 2 - 0.09, d / 2 + 0.09]) {
-      for (const side of [-1, 1]) beam(
-        new T.Vector3(side * (w * 0.48), h * 0.52 + 0.6, zz),
-        new T.Vector3(side * (w * 0.27), h + 0.45, zz), 0.14, house, mat.darkWood);
-      for (let row = 0; row < 3; row++) for (let j = 0; j < Math.ceil(w / 0.5); j++) {
-        const rock = box(mat.stone, -w / 2 + (j + 0.5) * w / Math.ceil(w / 0.5),
-          0.13 + row * 0.24, zz, 0.46 + rnd() * 0.04, 0.2, 0.15 + rnd() * 0.06, house);
-        rock.rotation.z = (rnd() - 0.5) * 0.08;
-      }
-    }
-    // Working cottage entrance and framed warm windows.
-    box(mat.darkWood, 0, 1.12, d / 2 + 0.055, 1.25, 2.2, 0.16, house);
-    for (let i = 0; i < 6; i++)
-      box(
-        mat.wood,
-        -0.51 + i * 0.2,
-        1.08,
-        d / 2 + 0.16,
-        0.17,
-        2.06,
-        0.07,
-        house,
-      );
-    add(
-      sphereGeo,
-      mat.metal,
-      0.4,
-      1.1,
-      d / 2 + 0.24,
-      0.065,
-      0.065,
-      0.065,
-      house,
-    );
-    box(mat.stone, 0, 0.14, d / 2 + 0.42, 1.8, 0.25, 0.8, house);
-    for (const xx of [-w * 0.31, w * 0.31]) {
-      for (const yy of [1.85, h * 0.72 + 0.5]) {
-        box(mat.darkWood, xx, yy, d / 2 + 0.08, 1.23, 1.45, 0.16, house);
-        box(mat.glass, xx, yy, d / 2 + 0.18, 1.03, 1.22, 0.07, house);
-        box(mat.wood, xx, yy, d / 2 + 0.24, 0.055, 1.3, 0.06, house);
-        box(mat.wood, xx, yy, d / 2 + 0.24, 1.1, 0.07, 0.06, house);
-        box(mat.wood, xx, yy - 0.79, d / 2 + 0.35, 1.35, 0.16, 0.55, house);
-        for (const s of [-1, 1])
-          box(mat.wood, xx + s * 0.78, yy, d / 2 + 0.1, 0.25, 1.4, 0.08, house);
-      }
-    }
-    for (const s of [-1, 1]) {
-      box(mat.darkWood, s * (w / 2 + 0.08), 2.1, 0, 0.13, 1.6, 1.5, house);
-      box(mat.glass, s * (w / 2 + 0.16), 2.1, 0, 0.04, 1.35, 1.25, house);
-      box(mat.wood, s * (w / 2 + 0.2), 2.1, 0, 0.04, 1.4, 0.06, house);
-    }
-    box(mat.stone, w * 0.25, h + 2.6, -d * 0.25, 0.8, 2.8, 0.8, house);
-    box(mat.stone, w * 0.25, h + 4.08, -d * 0.25, 1, 0.2, 1, house);
-    if (z === 11) {
-      for (let i = 0; i <= 14; i++) {
-        const angle = i / 14 * Math.PI;
-        const voussoir = box(mat.stone, Math.cos(angle) * 0.83, 1.74 + Math.sin(angle) * 0.83,
-          d / 2 + 0.27, 0.21, 0.3, 0.3, house);
-        voussoir.rotation.z = angle - Math.PI / 2;
-      }
-      for (const side of [-1, 1]) for (let row = 0; row < 6; row++)
-        box(mat.stone, side * 0.83, 0.17 + row * 0.28, d / 2 + 0.24, 0.25, 0.25, 0.31, house);
-      // Substantial eave brackets and a slatted window box.
-      for (const side of [-1, 1]) {
-        beam(new T.Vector3(side * 1.6, 2.1, d / 2 + 0.2), new T.Vector3(side * 1.6, 2.95, d / 2 + 1.15), 0.13, house);
-        for (let j = 0; j < 9; j++) box(mat.wood, side * w * 0.31 - 0.61 + j * 0.15, 1.05,
-          d / 2 + 0.52, 0.12, 0.34, 0.09, house);
-      }
-      const lampLight = new T.PointLight("#ffbf72", 4, 5, 2);
-      lampLight.position.set(1.1, 2.1, d / 2 + 0.8); house.add(lampLight);
-    }
-    lantern(1.1, 1.6, d / 2 + 0.4, house);
-    // Porches add silhouette, depth, and a recognisable place to approach.
-    for (const s of [-1, 1])
-      box(mat.wood, s * 1.6, 1.45, d / 2 + 1.2, 0.15, 2.9, 0.15, house);
-    const porch = box(roofMat, 0, 3, d / 2 + 0.7, 3.7, 0.15, 1.8, house);
-    porch.rotation.x = 0.12;
-    return house;
   }
   house(10, 11, 6, 5.4, 4.2, -Math.PI / 2);
   house(10, -4, 5.8, 5.3, 3.8, -Math.PI / 2, mat.terra);
@@ -549,8 +441,8 @@ export async function buildWorld(
   tower.position.set(4, 0, -57);
   group.add(tower);
   add(
-    new T.CylinderGeometry(2.3, 2.6, 14, 8),
-    mat.stone,
+    new T.CylinderGeometry(2.3, 2.6, 14, 12),
+    mat.plaster,
     0,
     7,
     0,
@@ -559,7 +451,9 @@ export async function buildWorld(
     1,
     tower,
   );
-  add(new T.ConeGeometry(3.2, 7, 8), mat.roof, 0, 17, 0, 1, 1, 1, tower);
+  add(new T.LatheGeometry([new T.Vector2(3.2,13.7),new T.Vector2(2.75,14.1),new T.Vector2(1.55,16),new T.Vector2(.65,18.6),new T.Vector2(.05,20.5)],24),mat.roof,0,0,0,1,1,1,tower);
+  for(const y of [1,8,13.65]) add(new T.CylinderGeometry(2.48,2.48,.16,12),mat.trim,0,y,0,1,1,1,tower);
+  add(sphereGeo,mat.trim,0,20.6,0,.22,.34,.22,tower);
   for (let i = 0; i < 4; i++) {
     const a = (i * Math.PI) / 2;
     box(
@@ -697,7 +591,20 @@ export async function buildWorld(
             2,
           ),
         );
-      if (g.attributes.color) g.deleteAttribute("color");
+      if (o.material !== pathMaterial) {
+        const material = o.material as T.MeshStandardMaterial;
+        const count = g.attributes.position.count;
+        const tint = new T.Color();
+        const architectural = [mat.wood,mat.darkWood,mat.plaster,mat.stone,mat.roof,mat.terra,mat.lilac].includes(material);
+        if (architectural) {
+          material.vertexColors = true;
+          const variation = .92 + .12 * (.5+.5*Math.sin(o.matrixWorld.elements[12]*7.13+o.matrixWorld.elements[13]*17.7+o.matrixWorld.elements[14]*4.3));
+          tint.setRGB(variation,variation*.99,variation*.97);
+          const colors = new Float32Array(count*3);
+          for(let i=0;i<count;i++) colors.set([tint.r,tint.g,tint.b],i*3);
+          g.setAttribute("color",new T.BufferAttribute(colors,3));
+        } else if (g.attributes.color) g.deleteAttribute("color");
+      }
       const m = o.material as T.Material;
       if (!batches.has(m)) batches.set(m, []);
       batches.get(m)!.push(g);
@@ -710,7 +617,7 @@ export async function buildWorld(
     gs.forEach((g) => g.dispose());
     if (g) {
       const mesh = add(g, m, 0, 0, 0);
-      mesh.castShadow = m !== mat.ground && m !== mat.path;
+      mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial;
     }
   });
   // Wind-deformed instanced meadow: one geometry and one material for thousands of blades.
@@ -734,23 +641,29 @@ export async function buildWorld(
     return depth;
   }
   const grassMat = new T.MeshStandardMaterial({
-    color: "#81914a",
+    color: "#ffffff",
     side: T.DoubleSide,
     roughness: 1,
   });
   const grassGeo = new T.BufferGeometry();
-  grassGeo.setAttribute(
-    "position",
-    new T.Float32BufferAttribute(
-      [
-        -0.055, 0, 0, 0.055, 0, 0, 0.025, 0.55, 0, -0.04, 0, 0, 0.025, 0.55, 0,
-        0.045, 0.86, 0, 0, 0, -0.055, 0, 0, 0.055, 0.025, 0.6, 0,
-      ],
-      3,
-    ),
-  );
-  grassGeo.computeVertexNormals();
-  const grassCount = 30000;
+  const bladeVertices: number[] = [], bladeIndices: number[] = [], bladeColors: number[] = [];
+  for (let blade=0; blade<3; blade++) {
+    const angle=blade*2.399, height=.3+(blade%3)*.085, lean=.1+(blade%2)*.08;
+    const base=bladeVertices.length/3;
+    for (let row=0; row<=3; row++) {
+      const t=row/3, width=.029*(1-t)+.001;
+      for (const side of [-1,1]) {
+        bladeVertices.push(Math.cos(angle)*lean*t*t+Math.sin(angle)*width*side,
+          height*t, Math.sin(angle)*lean*t*t+Math.cos(angle)*width*side);
+        bladeColors.push(.43+t*.57,.52+t*.48,.3+t*.7);
+      }
+      if (row<3) {const a=base+row*2;bladeIndices.push(a,a+2,a+1,a+1,a+2,a+3);}
+    }
+  }
+  grassGeo.setAttribute("position",new T.Float32BufferAttribute(bladeVertices,3));
+  grassGeo.setAttribute("color",new T.Float32BufferAttribute(bladeColors,3));
+  grassGeo.setIndex(bladeIndices);grassGeo.computeVertexNormals();grassMat.vertexColors=true;
+  const grassCount = 23000;
   const grass = new T.InstancedMesh(grassGeo, grassMat, grassCount);
   let gi = 0;
   for (let attempt = 0; gi < grassCount && attempt < 450000; attempt++) {
@@ -759,7 +672,7 @@ export async function buildWorld(
     const river = Math.abs(x - riverX(z));
     if (
       river < 4 ||
-      Math.abs(x - roadX(z)) < 2.7 ||
+      Math.abs(x - roadX(z)) < 2.15 ||
       (Math.abs(z - 3) < 1.6 && x < 15) ||
       Math.hypot(x + 25, z + 17) < 8 ||
       colliders.some(
@@ -771,15 +684,15 @@ export async function buildWorld(
       continue;
     dummy.position.set(x, landscapeHeight(x, z), z);
     dummy.rotation.set(0, rnd() * 6.28, 0);
-    dummy.scale.set(0.6 + rnd() * 0.7, 0.2 + rnd() * 0.6, 0.6 + rnd() * 0.7);
+    dummy.scale.setScalar(0.55 + rnd() * .9);
     dummy.updateMatrix();
     grass.setMatrixAt(gi, dummy.matrix);
     grass.setColorAt(
       gi,
       new T.Color().setHSL(
-        0.19 + rnd() * 0.09,
-        0.28 + rnd() * 0.25,
-        0.25 + rnd() * 0.16,
+        0.22 + rnd() * 0.055,
+        0.48 + rnd() * 0.16,
+        0.48 + rnd() * 0.15,
       ),
     );
     gi++;
@@ -795,8 +708,8 @@ export async function buildWorld(
     "position",
     new T.Float32BufferAttribute(
       [
-        0, 0.015, -0.19, -0.07, 0, -0.03, 0, 0.025, 0, 0.07, 0, -0.03, 0, 0.005,
-        0.19,
+        0, 0.015, -0.11, -0.04, 0, -0.02, 0, 0.025, 0, 0.04, 0, -0.02, 0, 0.005,
+        0.11,
       ],
       3,
     ),
@@ -804,7 +717,7 @@ export async function buildWorld(
   leafGeo.setIndex([0, 1, 2, 0, 2, 3, 1, 4, 2, 2, 4, 3]);
   leafGeo.computeVertexNormals();
   const foliageParts: T.BufferGeometry[] = [];
-  for (let i = 0; i < 110; i++) {
+  for (let i = 0; i < 180; i++) {
     const a = rnd() * Math.PI * 2,
       r = Math.sqrt(rnd()),
       y = rnd();
@@ -824,7 +737,7 @@ export async function buildWorld(
   const bushes = new T.InstancedMesh(
     bushGeo,
     new T.MeshStandardMaterial({
-      color: "#6a8044",
+      color: "#c4d990",
       roughness: 1,
       side: T.DoubleSide,
     }),
@@ -852,7 +765,7 @@ export async function buildWorld(
     bushes.setMatrixAt(bushCount, dummy.matrix);
     bushes.setColorAt(
       bushCount++,
-      new T.Color().setHSL(0.21 + rnd() * 0.05, 0.35, 0.32 + rnd() * 0.15),
+      new T.Color().setHSL(0.23 + rnd() * 0.04, 0.48, 0.45 + rnd() * 0.16),
     );
   }
   bushes.count = bushCount;
@@ -905,7 +818,7 @@ export async function buildWorld(
   for (let i = 0; i < plantCount; i++) {
     const z = -32 + rnd() * 69,
       x = roadX(z) + (i % 2 ? 1 : -1) * (2.6 + rnd() * 4.2),
-      s = 0.4 + rnd() * 0.8;
+      s = 0.35 + rnd() * 0.6;
     if (clearPlanting(x, z)) continue;
     dummy.position.set(x, landscapeHeight(x, z), z);
     dummy.scale.setScalar(s);
@@ -917,7 +830,7 @@ export async function buildWorld(
     blossoms.setMatrixAt(flowerCount, dummy.matrix);
     blossoms.setColorAt(
       flowerCount++,
-      new T.Color(["#fff0c9", "#d6b05d", "#9298cc"][i % 3]),
+      new T.Color(["#fff3d2", "#ffc766", "#a798ec"][i % 3]),
     );
   }
   stems.count = blossoms.count = flowerCount;
@@ -927,39 +840,69 @@ export async function buildWorld(
   group.add(stems, blossoms);
   // A complete valley surrounds the playable space, including side and rear views.
   for (let band = 0; band < 3; band++) {
-    const ring = new T.PlaneGeometry(1, 1, 220, 18);
+    const ring = new T.PlaneGeometry(1, 1, 440, 36);
     const positions = ring.attributes.position, uv = ring.attributes.uv;
     for (let i = 0; i < positions.count; i++) {
       const angle = uv.getX(i) * Math.PI * 2;
       const across = uv.getY(i);
       const radius = 170 + band * 68 + across * 94;
       const x = Math.sin(angle) * radius, z = Math.cos(angle) * radius;
-      const silhouette = 42 + band * 11 + Math.sin(angle * 5 + band) * 18
-        + Math.abs(Math.sin(angle * 9 - band * 2)) ** 3 * 24 + Math.sin(angle * 23) * 4;
-      const envelope = Math.sin(across * Math.PI);
+      const silhouette = 29 + band * 10 + Math.sin(angle * 5 + band) * 10
+        + Math.abs(Math.sin(angle * 9 - band * 2)) ** 5 * 21 + Math.sin(angle * 23) * 5
+        + Math.sin(angle * 51 + band) * 2.4 + Math.sin(angle * 97) * 1.1;
+      const envelope = Math.sin(across * Math.PI) ** .85;
       const ridges = Math.sin(x * .11 + z * .045) * 2.6 + Math.cos(z * .16 - x * .09) * 1.8;
       positions.setXYZ(i, x, Math.max(-3, envelope * (silhouette + ridges)) - 3, z);
       uv.setXY(i, x / 16, z / 16);
     }
     ring.computeVertexNormals();
-    const material = new T.MeshStandardMaterial({ map: stoneMap,
-      color: ["#63796b", "#718794", "#899aa8"][band], roughness: 1, side: T.DoubleSide });
+    const mountainColors: number[] = [];
+    const rock = new T.Color(["#9dbca9", "#8aaec0", "#a0b8d1"][band]);
+    const meadow = new T.Color(["#83b977", "#89b6a4", "#a0bad2"][band]);
+    const normal = ring.attributes.normal;
+    for (let i=0;i<positions.count;i++) {
+      const slope = Math.abs(normal.getY(i));
+      const patch = Math.sin(positions.getX(i)*.034+Math.sin(positions.getZ(i)*.047))*.04;
+      const tint = rock.clone().lerp(meadow,T.MathUtils.smoothstep(slope,.5,.86)).multiplyScalar(.95+patch);
+      mountainColors.push(tint.r,tint.g,tint.b);
+    }
+    ring.setAttribute("color",new T.Float32BufferAttribute(mountainColors,3));
+    const material = new T.MeshStandardMaterial({ vertexColors:true, roughness:1, side:T.DoubleSide });
     add(ring, material, 0, 0, 0).castShadow = false;
   }
   const forestPlacements: { matrix: T.Matrix4; color: T.Color }[] = [];
-  for (let i = 0; i < 640; i++) {
+  for (let i = 0; i < 360; i++) {
     const angle = i * 2.39996, radius = 54 + Math.sqrt(rnd()) * 125;
     const x = Math.sin(angle) * radius, z = Math.cos(angle) * radius;
     const scale = .65 + rnd() * .8;
     dummy.position.set(x, landscapeHeight(x, z), z); dummy.rotation.set(0, rnd() * 6.28, 0);
     dummy.scale.set(scale, scale * (1 + rnd() * .35), scale); dummy.updateMatrix();
-    forestPlacements.push({ matrix: dummy.matrix.clone(), color: new T.Color().setHSL(.22 + rnd() * .05, .13 + rnd() * .12, .73 + rnd() * .2) });
+    forestPlacements.push({ matrix: dummy.matrix.clone(), color: new T.Color().setHSL(.24 + rnd() * .05, .15, .86 + rnd() * .1) });
   }
   // A small distant landmark, distinct from the village clock tower.
-  const castleMaterial = new T.MeshStandardMaterial({ color: "#777f72", roughness: 1 });
+  const castleMaterial = new T.MeshStandardMaterial({ color: "#e0e1c5", roughness: 1 });
   for (const [x, y, h] of [[-18, 11, 9], [-22, 10, 5], [-14, 9, 6]]) {
     add(new T.CylinderGeometry(.8, 1.15, h, 6), castleMaterial, x, y + h / 2, -158).castShadow = false;
     add(new T.ConeGeometry(1.05, h * .5, 6), mat.roof, x, y + h * 1.25, -158).castShadow = false;
+  }
+  // Distant suspended gardens are scenery, beyond the walkable village boundary.
+  const islandRock = new T.MeshStandardMaterial({ color:"#a6b7c0", roughness:1 });
+  const islandGrass = new T.MeshStandardMaterial({ color:"#91c89b", roughness:1 });
+  for(const [x,y,z,scale] of [[-64,44,-178,1],[88,57,-245,.7]]) {
+    const island=new T.Group();island.position.set(x,y,z);island.scale.setScalar(scale);group.add(island);
+    const crag = new T.CylinderGeometry(7.5,1,12,11,4);
+    const vertices = crag.attributes.position;
+    for(let i=0;i<vertices.count;i++) {
+      const angle=Math.atan2(vertices.getZ(i),vertices.getX(i)),y=vertices.getY(i);
+      const irregular=1+Math.sin(angle*5+.8)*.12+Math.cos(angle*3-y*.27)*.1;
+      vertices.setXYZ(i,vertices.getX(i)*irregular,y+Math.sin(angle*3)*.6,vertices.getZ(i)*irregular);
+    }
+    crag.computeVertexNormals();
+    add(crag,islandRock,0,-6,0,1,1,.8,island).castShadow=false;
+    add(new T.SphereGeometry(1,20,10),islandGrass,0,.1,0,7.7,.9,6.2,island).castShadow=false;
+    add(new T.CylinderGeometry(1.2,1.5,4.8,10),castleMaterial,0,2.7,0,1,1,1,island).castShadow=false;
+    add(new T.ConeGeometry(1.9,3.5,16),mat.lilac,0,6.7,0,1,1,1,island).castShadow=false;
+    add(new T.OctahedronGeometry(.7),mat.trim,0,9.5,0,1,1.7,1,island).castShadow=false;
   }
   // Authored weeping silhouettes: curved branches with narrow leaves, shared by two trees.
   const willowBarkParts: T.BufferGeometry[] = [], willowLeafParts: T.BufferGeometry[] = [];
@@ -973,6 +916,11 @@ export async function buildWorld(
     const tip = new T.Vector3(Math.cos(angle) * extent, 4.4 + rnd() * 1.9, Math.sin(angle) * extent);
     const curve = new T.CatmullRomCurve3([new T.Vector3(0, 2.7 + rnd() * 1.7, 0), tip.clone().multiply(new T.Vector3(.55, 1.1, .55)), tip]);
     willowBarkParts.push(new T.TubeGeometry(curve, 6, .035 + rnd() * .025, 5, false));
+    if (branch % 2 === 0) {
+      const canopy = new T.SphereGeometry(1,12,8);
+      canopy.scale(1.15,.65,1.15); canopy.translate(tip.x*.7,tip.y+.13,tip.z*.7); canopy.deleteAttribute("uv");
+      willowLeafParts.push(canopy);
+    }
     for (let strand = 0; strand < 7; strand++) {
       const top = curve.getPoint(.55 + strand * .067);
       const length = 1.8 + rnd() * 2.2;
@@ -988,8 +936,9 @@ export async function buildWorld(
   }
   const willowBark = mergeGeometries(willowBarkParts)!, willowLeaves = mergeGeometries(willowLeafParts)!;
   willowBarkParts.forEach(g => g.dispose()); willowLeafParts.forEach(g => g.dispose()); willowLeaf.dispose();
-  const willowLeafMaterial = new T.MeshStandardMaterial({ color: "#87934a", roughness: .9, side: T.DoubleSide });
-  for (const [geometry, material] of [[willowBark, mat.wood], [willowLeaves, willowLeafMaterial]] as const) {
+  const willowLeafMaterial = new T.MeshStandardMaterial({ color: "#a7c76b", roughness: .9, side: T.DoubleSide });
+  const willowWood = mat.wood.clone(); willowWood.vertexColors = false;
+  for (const [geometry, material] of [[willowBark, willowWood], [willowLeaves, willowLeafMaterial]] as const) {
     const mesh = new T.InstancedMesh(geometry, material, 2);
     [[-14, -7, 1.3], [-27, -19, 1.45]].forEach(([x, z, scale], i) => {
       dummy.position.set(x, groundY(x, z), z); dummy.rotation.set(0, i * 2, 0); dummy.scale.setScalar(scale); dummy.updateMatrix(); mesh.setMatrixAt(i, dummy.matrix);
@@ -1007,37 +956,8 @@ export async function buildWorld(
   ivy.customDepthMaterial = windMaterial(bushes.material as T.MeshStandardMaterial, .17);
   ivy.receiveShadow = true; group.add(ivy);
   onProgress(60);
-  const gltf = await new GLTFLoader().loadAsync(assets("models/birch.glb"));
-  gltf.scene.updateMatrixWorld(true);
-  const bounds = new T.Box3().setFromObject(gltf.scene),
-    size = bounds.getSize(new T.Vector3());
-  const factor = 8 / size.y;
-  // Bake our licensed birch into a transparent crossed-card LOD: natural canopy at four triangles per tree.
-  const bakeScene = new T.Scene(), bakeTree = gltf.scene.clone(true);
-  const bakeMaterials: T.Material[] = [];
-  bakeTree.traverse(node => {
-    if (!(node instanceof T.Mesh)) return;
-    const prepare = (m: T.Material) => {
-      const copy = m.clone();
-      if (copy instanceof T.MeshStandardMaterial) { copy.alphaTest = .3; copy.transparent = false; copy.side = T.DoubleSide; }
-      bakeMaterials.push(copy); return copy;
-    };
-    node.material = Array.isArray(node.material) ? node.material.map(prepare) : prepare(node.material);
-  });
-  bakeScene.add(bakeTree, new T.HemisphereLight(0xffffff, "#b4b8a6", 2.2));
-  const center = bounds.getCenter(new T.Vector3()), cardWidth = Math.max(size.x, size.z) * 1.08;
-  const bakeCamera = new T.OrthographicCamera(-cardWidth / 2, cardWidth / 2, size.y * .53, -size.y * .53, .01, size.y * 5);
-  bakeCamera.position.copy(center).add(new T.Vector3(0, 0, size.y * 2)); bakeCamera.lookAt(center);
-  const target = new T.WebGLRenderTarget(384, 512); target.texture.colorSpace = T.SRGBColorSpace;
-  const previousTarget = renderer.getRenderTarget(), previousTone = renderer.toneMapping;
-  const previousColor = renderer.getClearColor(new T.Color()), previousAlpha = renderer.getClearAlpha();
-  renderer.toneMapping = T.NoToneMapping; renderer.setRenderTarget(target); renderer.setClearColor(0, 0); renderer.clear(); renderer.render(bakeScene, bakeCamera);
-  renderer.setRenderTarget(previousTarget); renderer.setClearColor(previousColor, previousAlpha); renderer.toneMapping = previousTone;
-  bakeMaterials.forEach(m => m.dispose()); renderTargets.push(target);
-  const cards = [new T.PlaneGeometry(cardWidth * factor, 8.48), new T.PlaneGeometry(cardWidth * factor, 8.48)];
-  cards[1].rotateY(Math.PI / 2); cards.forEach(card => card.translate(0, 4, 0));
-  const forestGeometry = mergeGeometries(cards)!; cards.forEach(card => card.dispose());
-  const forestMaterial = new T.MeshStandardMaterial({ map: target.texture, alphaTest: .35, side: T.DoubleSide, roughness: 1 });
+  const nearGeometry = fantasyTreeGeometry(true), forestGeometry = fantasyTreeGeometry(false);
+  const forestMaterial = new T.MeshStandardMaterial({ color: "#ffffff", vertexColors: true, roughness: .95 });
   const forest = new T.InstancedMesh(forestGeometry, forestMaterial, forestPlacements.length);
   forestPlacements.forEach((p, i) => { forest.setMatrixAt(i, p.matrix); forest.setColorAt(i, p.color); });
   group.add(forest); vegetation.push(forest);
@@ -1071,55 +991,35 @@ export async function buildWorld(
     dummy.updateMatrix();
     return dummy.matrix.clone();
   });
+  const treeLod = new T.InstancedMesh(forestGeometry, forestMaterial, treePositions.length);
+  treeLod.frustumCulled = false;
+  treeLod.instanceMatrix.setUsage(T.DynamicDrawUsage);
+  treeLod.count = 0;
+  group.add(treeLod);
   const treeBounds = treePositions.map(
     ([x, z, s]) => new T.Sphere(new T.Vector3(x, landscapeHeight(x, z) + 4 * s, z), 8 * s),
   );
   const trees: World["trees"] = [];
-  gltf.scene.traverse((o) => {
-    if (!(o instanceof T.Mesh)) return;
-    const geometry = o.geometry.clone().applyMatrix4(o.matrixWorld);
-    geometry.translate(
-      -bounds.getCenter(new T.Vector3()).x,
-      -bounds.min.y,
-      -bounds.getCenter(new T.Vector3()).z,
-    );
-    geometry.scale(factor * 1.4, factor, factor * 1.4);
-    const materials = Array.isArray(o.material) ? o.material : [o.material];
-    materials.forEach((m) => {
-      if (m instanceof T.MeshStandardMaterial) {
-        m.roughness = 1;
-        m.envMapIntensity = 0.6;
-        if (
-          m.transparent ||
-          m.alphaMap ||
-          m.alphaTest > 0 ||
-          m.name.includes("leaves")
-        ) {
-          m.alphaTest = 0.25;
-          m.transparent = false;
-          m.side = T.DoubleSide;
-        }
-      }
-    });
-    const inst = new T.InstancedMesh(
-      geometry,
-      o.material,
-      treePositions.length,
-    );
-    treeTransforms.forEach((matrix, i) => inst.setMatrixAt(i, matrix));
-    inst.frustumCulled = false;
-    inst.instanceMatrix.setUsage(T.DynamicDrawUsage);
-    trees.push({ mesh: inst, transforms: treeTransforms, bounds: treeBounds });
-    if (!Array.isArray(inst.material) && inst.material instanceof T.MeshStandardMaterial)
-      inst.customDepthMaterial = windMaterial(inst.material, inst.material.name.includes("leaves") ? 0.3 : 0.1, true);
-    inst.castShadow = true;
-    inst.receiveShadow = true;
-    group.add(inst);
-  });
+  const nearMaterial = forestMaterial.clone();
+  const inst = new T.InstancedMesh(nearGeometry, nearMaterial, treePositions.length);
+  treeTransforms.forEach((matrix, i) => inst.setMatrixAt(i, matrix));
+  inst.frustumCulled = false; inst.instanceMatrix.setUsage(T.DynamicDrawUsage);
+  trees.push({ mesh: inst, transforms: treeTransforms, bounds: treeBounds });
+  inst.customDepthMaterial = windMaterial(nearMaterial, .11, true);
+  treeLod.customDepthMaterial = windMaterial(forestMaterial, .11, true);
+  // Crown colors carry their soft occlusion; self-shadowing intersecting lobes produces striping.
+  inst.castShadow = true; inst.receiveShadow = false; group.add(inst);
   onProgress(80);
   return {
     group,
     trees,
+    treeLod,
+    setWeather(rain: number, dusk: number) {
+      wetness.value = rain;
+      mat.glass.emissiveIntensity = .12 + dusk * 1.3 + rain * .22;
+      waterMat.roughness = .3 + rain * .28;
+      waterMat.color.setRGB(.045 + rain*.02, .34 - dusk*.17, .29 - dusk*.1);
+    },
     colliders,
     flames,
     lanterns,
@@ -1146,7 +1046,6 @@ export async function buildWorld(
         m.dispose();
       });
       textures.forEach((t) => t.dispose());
-      renderTargets.forEach(t => t.dispose());
     },
   };
 }

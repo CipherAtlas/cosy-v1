@@ -1,0 +1,27 @@
+{
+  "pass": true,
+  "checks": 20,
+  "results": [
+    "Approach stops with personal space at 30 fps",
+    "One resident approaches at a time at 30 fps",
+    "Approach stops with personal space at 60 fps",
+    "One resident approaches at a time at 60 fps",
+    "Resident settles without orbiting or shuffling",
+    "Resident returns to their original routine",
+    "Staying nearby does not repeatedly summon the same resident",
+    "Leaving and returning allows a new greeting",
+    "Opening a menu cancels the approach and returns the resident",
+    "Approach stops with personal space at 120 fps",
+    "One resident approaches at a time at 120 fps",
+    "Approach distance stays consistent across frame rates",
+    "Maple also walks over to greet the player",
+    "Moss also walks over to greet the player",
+    "Luma also walks over to greet the player",
+    "Residents do not approach through a wall",
+    "Approach planning rejects a river shortcut",
+    "Approach planning accepts the real bridge",
+    "Walking away ends pursuit and returns the resident",
+    "Arrival and activities do not attract villagers"
+  ],
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+}

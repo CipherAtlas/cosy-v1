@@ -4,10 +4,10 @@ import { VillageMovement } from './modules/features/village/movement.js';
 import { BRIDGE } from './modules/features/village/environment.js';
 
 export function checkResidents() {
-  const results = [], clips = ['Walk', 'Idle'].map(name => new T.AnimationClip(name, 1, []));
+  const results = [];
   const check = (condition, name) => { if (!condition) throw Error(name); results.push(name); };
   const create = (colliders = []) => {
-    const life = new VillageLife(new T.Group(), clips, colliders);
+    const life = new VillageLife(new T.Group(), colliders);
     life.residents.forEach((r, i) => {
       r.movement.settle(25 + i * 3, 25); r.root.position.set(25 + i * 3, 0, 25);
       r.route = [[25 + i * 3, 25]]; r.waypoint = 0; r.pause = 0;

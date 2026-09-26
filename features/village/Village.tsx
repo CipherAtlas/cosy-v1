@@ -50,7 +50,7 @@ export function Village() {
     [simple, setSimple] = useState(false);
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
-    [panel, setPanel] = useState<"places" | "sound" | "settings" | null>(null);
+    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | null>(null);
   const soundBusy = useRef(false);
   const [movement, setMovement] = useState<MovementStatus>({ stamina: 100, exhausted: false, gait: "idle", running: false });
   const [soundLoading, setSoundLoading] = useState(false);
@@ -363,21 +363,12 @@ export function Village() {
             <meter min={0} max={100} value={movement.stamina} aria-label={t("Sprint energy", "ダッシュの体力")} />
           </div>
           <footer className="v-walk-hints">
-            <span>
-              <kbd>W</kbd>
-              <kbd>A</kbd>
-              <kbd>S</kbd>
-              <kbd>D</kbd> {t("Walk", "移動")}
-            </span>
-            <button className="v-run-toggle" aria-pressed={movement.running} onClick={() => engine.current?.toggleRun()}>
-              <kbd>R</kbd> {movement.running ? t("Running", "走る") : t("Run", "走る")}
-            </button>
-            <span><kbd>Shift</kbd> {t("Sprint", "ダッシュ")}</span>
-            <span><kbd>Space</kbd> {t("Jump", "ジャンプ")}</span>
+            <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> {t("Glide", "移動")}</span>
             <span>{t("Drag to look", "ドラッグで見回す")}</span>
-            <span>
-              <kbd>M</kbd> {t("Places", "場所")}
-            </span>
+            <span>{t("Click to glide", "クリックで移動")}</span>
+            <button className="v-controls-button" onClick={() => setPanel("controls")}>
+              {t("Controls", "操作方法")}
+            </button>
           </footer>
           <div
             className="v-touch-pad"
@@ -394,7 +385,7 @@ export function Village() {
                 <button
                   key={key as string}
                   aria-label={t(
-                    `Walk ${{ w: "forward", a: "left", s: "backward", d: "right" }[key as "w" | "a" | "s" | "d"]}`,
+                    `Glide ${{ w: "forward", a: "left", s: "backward", d: "right" }[key as "w" | "a" | "s" | "d"]}`,
                     `移動 ${{ w: "前", a: "左", s: "後ろ", d: "右" }[key as "w" | "a" | "s" | "d"]}`,
                   )}
                   onPointerDown={(e) => {
@@ -413,11 +404,11 @@ export function Village() {
             })}
           </div>
           <div className="v-touch-actions">
-            <button aria-pressed={movement.running} onClick={() => engine.current?.toggleRun()}>{t("Run", "走る")}</button>
+            <button aria-pressed={movement.running} onClick={() => engine.current?.toggleRun()}>{t("Glide faster", "速く移動")}</button>
             <button onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); engine.current?.walkKey("shift", true); }}
               onPointerUp={() => engine.current?.walkKey("shift", false)}
               onPointerCancel={() => engine.current?.walkKey("shift", false)}
-              onLostPointerCapture={() => engine.current?.walkKey("shift", false)}>{t("Sprint", "ダッシュ")}</button>
+              onLostPointerCapture={() => engine.current?.walkKey("shift", false)}>{t("Dash", "ダッシュ")}</button>
             <button onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); engine.current?.walkKey(" ", true); }}
               onPointerUp={() => engine.current?.walkKey(" ", false)}
               onPointerCancel={() => engine.current?.walkKey(" ", false)}
@@ -509,14 +500,18 @@ export function Village() {
                 ? t("Where would you like to go?", "どこへ行きましょうか？")
                 : panel === "sound"
                   ? t("A little atmosphere.", "心地よい音を。")
-                  : t("Make it yours.", "お好みに。")}
+                  : panel === "controls"
+                    ? t("Getting around", "移動と操作")
+                    : t("Make it yours.", "お好みに。")}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
               {panel === "places"
                 ? "Travel directly to a village activity."
                 : panel === "sound"
                   ? "Music and ambience controls."
-                  : "Village appearance and accessibility settings."}
+                  : panel === "controls"
+                    ? "Gliding, camera and interaction controls."
+                    : "Village appearance and accessibility settings."}
             </Dialog.Description>
             <Dialog.Close
               className="v-dialog-close"
@@ -524,6 +519,25 @@ export function Village() {
             >
               <X size={22} />
             </Dialog.Close>
+            {panel === "controls" && (
+              <div className="v-control-guide">
+                <p>{t("Wander at your own pace, or use Places to settle straight into an activity.", "自分のペースでお散歩。場所メニューから、好きな場所へすぐに移動できます。")}</p>
+                <dl>
+                  {[
+                    ["W A S D / ↑ ↓ ← →", t("Glide", "浮かんで移動")],
+                    [t("Click / tap", "クリック / タップ"), t("Glide to a spot", "その場所へ移動")],
+                    [t("Drag", "ドラッグ"), t("Look around", "見回す")],
+                    [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
+                    ["R", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
+                    ["Shift", t("Hold to dash", "長押しでダッシュ")],
+                    ["Space", t("Jump", "ジャンプ")],
+                    ["E", t("Enjoy a nearby activity", "近くの場所に入る")],
+                    ["F", t("Chat with a villager", "村人とおしゃべり")],
+                    ["M / Esc", t("Places / close", "場所 / 閉じる")],
+                  ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
+                </dl>
+              </div>
+            )}
             {panel === "places" && (
               <div className="v-place-list">
                 {PLACES.map((p) => (
@@ -583,6 +597,9 @@ export function Village() {
             )}
             {panel === "settings" && (
               <div className="v-settings">
+                <button className="v-controls-button" onClick={() => setPanel("controls")}>
+                  {t("Gliding & camera controls", "移動とカメラの操作")}
+                </button>
                 <label>
                   {t("Time & weather", "時間と天気")}
                   <select

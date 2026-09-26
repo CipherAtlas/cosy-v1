@@ -2,15 +2,20 @@
 
 Updated: 2026-09-26. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
 
+## 2026-09-26 player update
+
+The player is now a floating white spirit. The existing speeds, stamina, bridge/deck collision, water boundaries, jumping and direct travel are preserved. UI language describes gliding and dashing. Hover, directional lean, idle facing, fin flutter and landing squash are runtime transforms; no humanoid clips are required. Residents now reuse the spirit form with pastel materials and original accessories. Their named routes, proximity visits, collisions, personal space and conversation timing are unchanged. Player footstep audio is suppressed; takeoff/landing events remain. This is ground-constrained hovering, not unrestricted vertical flight. Reduced motion disables decorative bob, roll, lean and fin flutter for player and residents. A click destination ring shows the active straight-line glide target; it does not imply pathfinding around obstacles.
+
+
 ## Implemented contracts
 
 `environment.ts` is the shared source of truth. `WorldContact` contains `kind` (footstep/takeoff/landing), position, surface, achieved speed, impact and foot. `MovementStatus` contains 0–100 stamina, exhausted flag, gait and run-toggle state; the shell receives changes at most 10 Hz. `EnvironmentFrame` carries listener position, camera-forward vector, gust strength, weather and shelter at about 12.5 Hz. The listener follows the traveler outdoors and the settled look target in an activity; simple view explicitly sets the destination's sound position.
 
-`VillageMovement` runs at 120 Hz with at most 100 ms catch-up. The starting tuning values below are now implemented. It resolves a radius-0.32 m, height-1.8 m proxy against authored boxes, respects water/parapets, handles bridge height from the shared `BRIDGE` definition, low-prop tops and overhead boxes. This is a small authored-world controller, not general rigid-body physics. It emits foot contacts at gait phase 0/0.5 based on achieved travel. `VillageEngine` synchronizes locomotion clip time to the same phase and blends jump/landing transitions separately.
+`VillageMovement` runs at 120 Hz with at most 100 ms catch-up. The starting tuning values below are now implemented. It resolves a radius-0.32 m, height-1.8 m proxy against authored boxes, respects water/parapets, handles bridge height from the shared `BRIDGE` definition, low-prop tops and overhead boxes. This is a small authored-world controller, not general rigid-body physics. It emits foot contacts at gait phase 0/0.5 based on achieved travel. `VillageEngine` presents those controller states through spirit hover, lean and jump/landing squash; no humanoid animation mixer is used.
 
-The candidate `traveller.glb` is skinned with 21 bones and clips `Idle`, `Walk`, `Run`, `Sprint`, `JumpStart`, `AirLoop`, `LandSoft`, `LandMoving`. Original editable source and export script are linked in the handoff. In-place strides are 1.65/2.8/3.5 m for walk/run/sprint. Natural anatomy, cloth detail and foot planting remain art/motion acceptance work.
+The archived, no-longer-loaded candidate `traveller.glb` is skinned with 21 bones and clips `Idle`, `Walk`, `Run`, `Sprint`, `JumpStart`, `AirLoop`, `LandSoft`, `LandMoving`. Original editable source and export script are linked in the handoff. In-place strides are 1.65/2.8/3.5 m for walk/run/sprint. These humanoid clips and anatomy are historical, superseded by the current spirit direction.
 
-Shared gusts now affect grass, bushes, tree canopies, willow leaves, scarf, water normals and wind gain. Foliage shadow shaders share the deformation; shadow refresh is bounded. Reduced motion disables secondary wind motion. No physical cloth solver, full acoustic occlusion, device acceptance or finished-art claim.
+Shared gusts now affect grass, bushes, tree canopies, willow leaves, water normals and wind gain. Foliage shadow shaders share the deformation; shadow refresh is bounded. Reduced motion disables secondary wind motion. No physical cloth solver, full acoustic occlusion, device acceptance or finished-art claim.
 
 Keyboard: WASD/arrows, R toggle run, Shift hold sprint, Space jump, E interact with a place, F chat with a nearby visible villager. Touch has explicit run/sprint/jump alongside the direction pad and a Chat button on speech bubbles. The native stamina meter fades at full; no frame-by-frame live announcements. Input clears on blur, canceled/lost pointers, dialogs and travel. See the evidence ledger for contract tests and recordings; the acceptance list at the bottom remains open.
 

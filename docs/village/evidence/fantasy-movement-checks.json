@@ -1,0 +1,21 @@
+{
+  "pass": true,
+  "recording": "motion.webm (canvas and master-bus audio before the output compressor)",
+  "gaits": [
+    "walk",
+    "run",
+    "sprint",
+    "air",
+    "idle"
+  ],
+  "contacts": {
+    "takeoff": 2,
+    "landing": 2
+  },
+  "energy": 46,
+  "stats": {
+    "fps": 94,
+    "draws": 140,
+    "triangles": 2105306
+  }
+}

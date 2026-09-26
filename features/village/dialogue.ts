@@ -8,7 +8,7 @@ const line = (en: string, ja: string): Line => ({ en, ja });
 
 export const VILLAGERS = [
   {
-    id: "pip", name: line("Pip", "ピップ"), color: "#708caf", ink: "#3f607e",
+    id: "pip", name: line("Pip", "ピップ"), color: "#a5dfef", ink: "#3f607e",
     greeting: line("Oh! A new walking buddy. Excellent.", "あっ！お散歩仲間だ。やったね。"),
     ambient: [
       line("That pebble looks like a potato. A keeper.", "この小石、じゃがいもみたい。宝物にしよう。"),
@@ -23,11 +23,11 @@ export const VILLAGERS = [
       line("If you get lost, find me. We can be lost together!", "迷ったら、ぼくを探して。一緒に迷子になろう！"),
       line("No grand adventures today? A little wander counts.", "大冒険じゃなくても、ちょっと歩けば立派な冒険だよ。"),
     ],
-    rain: line("Puddle season! My socks are less excited.", "水たまりの季節だ！靴下は喜んでないけど。"),
+    rain: line("Puddle season! Excellent splashing weather.", "水たまりの季節だ！水遊びにぴったりだね。"),
     dusk: line("First star gets a wish. I'm wishing for bigger pockets.", "一番星にお願いしよう。もっと大きなポケットを。"),
   },
   {
-    id: "maple", name: line("Maple", "メープル"), color: "#b17866", ink: "#945d49",
+    id: "maple", name: line("Maple", "メープル"), color: "#ffdab9", ink: "#945d49",
     greeting: line("There you are! I saved you the warmest bun.", "来てくれたのね！一番あったかいパン、とってあるよ。"),
     ambient: [
       line("Just checking on the bread. With my mouth.", "パンの様子を見なくちゃ。ひと口食べてね。"),
@@ -46,7 +46,7 @@ export const VILLAGERS = [
     dusk: line("Last batch! Well... last batch before the last batch.", "これが最後のひと焼き！の、その一つ前かな。"),
   },
   {
-    id: "moss", name: line("Moss", "モス"), color: "#919367", ink: "#586b40",
+    id: "moss", name: line("Moss", "モス"), color: "#c8e6a6", ink: "#586b40",
     greeting: line("Shh... the seedlings are napping. Hello, though.", "しーっ、苗がお昼寝中。こんにちは、小さな声でね。"),
     ambient: [
       line("Grow at your own pace, little sprout.", "小さな芽さん、自分のペースで育ってね。"),
@@ -65,7 +65,7 @@ export const VILLAGERS = [
     dusk: line("Tucking the garden in. Sleep well, little leaves.", "庭を寝かしつけてるの。葉っぱさん、おやすみ。"),
   },
   {
-    id: "luma", name: line("Luma", "ルマ"), color: "#ab869c", ink: "#80576f",
+    id: "luma", name: line("Luma", "ルマ"), color: "#d6c7fa", ink: "#80576f",
     greeting: line("Oh, lovely. The spare teacup was hoping for you.", "まあ、うれしい。空いてるカップも待ってたのよ。"),
     ambient: [
       line("Cloud report: one sleepy sheep, two dumplings.", "雲の観察日記。眠い羊が一匹、おだんごが二つ。"),

@@ -4,6 +4,20 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current candidate does not close those findings.
 
+## 2026-09-26 fantasy village pass
+
+The revised user brief extends the Genshin-inspired fantasy language to architecture, distant materials and NPCs. The local implementation now has swept colorful roofs, limestone arches, reflective glazing, flower boxes, rounded tree crowns, softer mountain colors, organic meadow patches and two floating skyline gardens. All four named residents are pastel spirits with distinct accessories; their approach and dialogue checks pass.
+
+Inspected [cottage details](docs/village/evidence/fantasy-cottage-exterior.png), [valley layers](docs/village/evidence/fantasy-valley-wide.png), [all five spirits together](docs/village/evidence/fantasy-spirit-villagers.png) and individual portraits. The group portrait uses QA staging; NPCs normally follow their retained routes. The previous photo-material/card-tree/humanoid mismatch is replaced with a consistent stylized kit. Foliage still uses rounded geometric clusters, house variants share a kit, and device/thermal acceptance remains open. The broader blocked verdict above is an AAA-quality gate, not a claim that these requested changes are unimplemented.
+
+## 2026-09-26 colorful spirit pass
+
+The latest user instruction replaces the muted realistic-human target with an Arkenfall/Genshin-inspired colorful village and an original cute white flying spirit. Judge the palette and player against that direction; retain the earlier concept as a composition/craft reference.
+
+Inspected the new [entrance](docs/village/evidence/art-entrance.png), [spirit face](docs/village/evidence/art-spirit-front.png), [cottage](docs/village/evidence/art-cottage-exterior.png), [interior](docs/village/evidence/art-cottage.png), bridge/hearth and golden/dusk/rain captures. The new smile, white silhouette, blue sky, greener meadow, roof color, water and cottage details are visible in the running engine. Player movement and existing villager/activity behavior have current verification in [the build ledger](VILLAGE_BUILD.md#2026-09-26-colorful-art-pass-and-spirit-player).
+
+Verdict: **the new player and palette are implemented; overall AAA art acceptance remains open.** Repeated building forms, sparse-looking near canopy in some views, discrete tree LOD changes and the simple interior are still apparent. The screenshots do not establish parity with Genshin or the earlier concept. No heavy postprocess blur or orange screen filter masks the remaining geometry/material work.
+
 ## 2026-09-26 villager interaction follow-up
 
 All four residents have distinct English/Japanese voices, overhead speech and click/F chat. The [dialogue suite](docs/village/evidence/villager-dialogue.json) passes 28 checks; desktop and 390×844 portrait bubbles, all four conversations and production language/menu behavior were inspected. The [approach suite](docs/village/evidence/villager-approach.json) passes 20 checks covering frame-rate agreement, personal space, blocked paths, returns and invitation suppression. [Integrated samples](docs/village/evidence/villager-approach-runtime.json) show animated Pip walking over, greeting at about 2.42 m and returning. These checks do not establish new performance numbers, physical-touch behavior or Firefox coverage for NPC interactions. See the [build ledger](VILLAGE_BUILD.md#2026-09-26-villager-approaches) for reproduction and limits.

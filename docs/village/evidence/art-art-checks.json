@@ -1,0 +1,28 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+  "buffer": [
+    1280,
+    720
+  ],
+  "player": [
+    "SpiritBody",
+    "SpiritCheeks",
+    "SpiritFace",
+    "SpiritFinL",
+    "SpiritFinR"
+  ],
+  "residentAnimations": [
+    "Idle",
+    "Walk"
+  ],
+  "triangles": 1631617,
+  "draws": 46,
+  "lighting": {
+    "sun": 4.099999999854384,
+    "fill": 1.049999999991687,
+    "environment": 0.339999999994178,
+    "exposure": 1.0200000000024956
+  },
+  "errors": [],
+  "limits": "Renderer-only views. UI, movement and device acceptance recorded separately."
+}

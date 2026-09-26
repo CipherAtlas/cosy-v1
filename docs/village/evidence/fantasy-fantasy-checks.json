@@ -1,0 +1,36 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+  "buffer": [
+    1280,
+    720
+  ],
+  "residents": [
+    {
+      "name": "Pip",
+      "form": "Pip spirit",
+      "fins": 2
+    },
+    {
+      "name": "Maple",
+      "form": "Maple spirit",
+      "fins": 2
+    },
+    {
+      "name": "Moss",
+      "form": "Moss spirit",
+      "fins": 2
+    },
+    {
+      "name": "Luma",
+      "form": "Luma spirit",
+      "fins": 2
+    }
+  ],
+  "scene": {
+    "fps": 120,
+    "draws": 148,
+    "triangles": 2152740
+  },
+  "errors": [],
+  "limits": "Renderer-only art views; floating gardens are non-traversable distant scenery."
+}

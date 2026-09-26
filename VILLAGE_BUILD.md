@@ -2,6 +2,64 @@
 
 Updated: 2026-09-26. Read [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md) for the canonical direction and future work. This file records implementation evidence and limits. The latest section below supersedes historical prototype descriptions; older results are retained under their original headings.
 
+## 2026-09-26 fantasy cottages, distant scenery and blob residents
+
+The user extended the colorful spirit direction to houses, far-away materials and NPCs. This is a local art implementation, preserving the previous uncommitted work. No dependencies, storage, deployment configuration or Git history changed.
+
+### Delivered
+
+- `architecture.ts`: an original cottage kit with curved teal/coral/lilac shingle roofs, warm trim, limestone door arches, reflective arched glazing, painted shutters, flower boxes and turret/chimney variants. All nine houses retain their prior placement and collision footprint. The village tower uses the same roof/trim vocabulary.
+- `paintedTextures.ts`: seven deterministic 512×512 painted surface maps for wood, roof, plaster, stone, meadow, path and window reflections. House/path photography and their high-frequency normal maps are no longer fetched. Existing cottage furniture inherits the painted wood/stone palette.
+- `fantasyTrees.ts` / `world.ts`: solid rounded crowns in matching near/far forms replace birch photography/cards. There are 360 distant trees; canopy self-shadow artifacts are avoided with baked vertex shading while the crowns still cast ground shadows. Willows have fuller crowns and independent bark materials. Mountain colors depend on slope, and meadow variation uses organic patches instead of repeating stripes. Two suspended gardens are distant scenery beyond the playable boundary.
+- `life.ts` / `VillageEngine.ts`: residents clone the original spirit mesh with independent pastel materials and accessories. Pip is sky blue with a scarf and pouch; Maple is peach with a baker hat and bow; Moss is mint with a sprout; Luma is lavender with a crescent and star collar. They hover, lean and flutter their fins, respecting reduced motion. The human model/mixers are no longer loaded. Routes, encounter states, colliders, personal space and dialogue remain; Pip's sock remark was adjusted for his new form.
+- Sources and credits for the earlier models/textures are retained. This pass adds no external assets or paid generation. The base spirit remains the original Blender asset from the preceding milestone.
+
+### Verification
+
+- Production build, TypeScript and whitespace checks passed; only the existing workspace-root, Browserslist and unrelated `RoomScene` image warnings remain.
+- Ten controller/composition checks and three bridge geometry/traversal checks passed. The resident fixture was updated for the new constructor without changing its behavioral assertions.
+- [20 approach checks](docs/village/evidence/fantasy-villager-approach.json), [28 dialogue checks](docs/village/evidence/fantasy-villager-dialogue.json) and [all six activity exits](docs/village/evidence/fantasy-activity-exits.json) passed with the updated world.
+- [Art inspection](docs/village/evidence/fantasy-fantasy-checks.json) and [weather inspection](docs/village/evidence/fantasy-art-checks.json) report no captured renderer/console errors. Inspected the [entrance](docs/village/evidence/fantasy-entrance.png), [cottage](docs/village/evidence/fantasy-cottage-exterior.png), [valley](docs/village/evidence/fantasy-valley-wide.png), [floating garden](docs/village/evidence/fantasy-distant-gardens.png), [four resident portraits](docs/village/evidence/README.md) and [spirit family](docs/village/evidence/fantasy-spirit-villagers.png). Family positioning is an explicit QA pose; ordinary residents retain their original routes.
+- [Movement recording](docs/village/evidence/fantasy-motion.webm) and [checks](docs/village/evidence/fantasy-movement-checks.json) pass: walk/run/sprint/air/idle reporting, two takeoffs/two landings, energy down to 46, and no footstep events for the hovering spirit.
+- [Two-minute profile](docs/village/evidence/fantasy-profile.json): local Chromium 153, detailed quality, DPR 1, 1280×720 drawing buffer; 14,402 frames, mean 8.33 ms (120 fps), p95 9.30 ms. Endpoint: 92 calls, 1.62M triangles, 86 geometries and 12 textures. This preceded the tea-garden return-camera adjustment; it is not a controlled before/after, 1080p, physical-phone or thermal benchmark.
+- The final production export at `http://127.0.0.1:3020/` was inspected on desktop and at 390×844. Arrival, Places, tea-garden return and explicit Luma chat worked; both spirit faces, speech, activity prompt and movement controls are visible. Activity exits now use clear default camera angles, with a slight side view toward Luma at the tea garden. All six exit and 28 dialogue checks were repeated after that adjustment. No captured production warning/error logs; the temporary viewport override was reset. Responsive browser inspection does not establish physical touch/device acceptance.
+
+The exported preview remains on port 3020; the temporary QA server was stopped after verification. Nothing from this art pass was committed, pushed or deployed.
+
+Reproduce with `python3 scripts/village/preview_qa.py --port 3024 --evidence-prefix fantasy-`, then **Load village**, **Review art pass**, **Review fantasy village**, and the named regression/profile buttons. Captures are 1280×720 renderer views without DOM overlays. Physical phone/thermal acceptance, a continuous long-session listening review and full AAA art acceptance remain open.
+
+## 2026-09-26 colorful art pass and spirit player
+
+Latest user direction supersedes the older realistic player brief: **Arkenfall atmosphere, vivid Genshin-inspired colors, and a cute white floating blob with a smile**. This is a local implementation; nothing was committed, pushed or deployed.
+
+### Delivered
+
+- Original white spirit with an integrated cartoon face, peach cheeks and small fins. It hovers, tilts while gliding, turns to face the camera after idling, and squashes on landing. Existing walking/run/sprint controller states now present as glide/quick glide/dash; collision, stamina, jumping and direct travel remain unchanged. Human residents retain their rig, personality, dialogue and approach behavior.
+- Blender 5.2.1 editable source at `assets/village/spirit.blend`, repeatable `scripts/village/create_spirit.py`, runtime GLB and [measured manifest](docs/village/spirit-manifest.json). 437,768 bytes, 22,464 triangles, three materials, zero texture images. SHA-256 verified against the manifest. Blender MCP was disconnected; an isolated background process generated the asset.
+- Clear blue sky, green meadow and foliage, turquoise water, blue-slate/terracotta roofs and cream plaster. Rain coordinates material wetness, sky, sun, fill, haze and water; dusk strengthens practical windows against cooler shadows. Lighting changes interpolate instead of switching instantly.
+- Moss/soil path shoulders, PBR path relief, curved grass clumps, smaller shrub leaves, colorful flowers, cottage attic glazing/window boxes/corner masonry and surface variation. The focus room has warmer oak, a terracotta rug and softer window emission.
+- The sun/shadow coverage follows the player; nearby trees use detailed geometry and trees beyond 32 m (22 m on low) use the existing shared crossed-card rendering. This is a discrete LOD with visible transition risk, not a complete production LOD pipeline.
+- Condensed exploration hints, a Controls guide on desktop and in Settings, glide/dash labels and a visible click destination ring. A click remains straight-line travel; it does not navigate around obstacles.
+
+### Verification
+
+- `npm run typecheck` and `npm run build` passed. Existing workspace-root, Browserslist and unrelated `RoomScene` image warnings remain.
+- Ten controller/composition checks and three bridge checks passed against compiled current modules.
+- [20 resident approach checks](docs/village/evidence/art-villager-approach.json), [28 dialogue checks](docs/village/evidence/art-villager-dialogue.json), and [all six activity exits](docs/village/evidence/art-activity-exits.json) passed in Chromium 153.
+- [Spirit movement checks](docs/village/evidence/art-movement-checks.json) passed: walk/run/sprint/air/idle states reported, energy fell from 100 to 46, two takeoffs/two landings, zero footstep events. The first recording exposed a lost HUD status callback during the player replacement; that callback was restored before the passing recording.
+- [Two-minute performance sample](docs/village/evidence/art-profile.json): Apple M4, Mac16,12, 16 GB memory; Chromium 153, high tier, DPR 1, 1280×720 drawing buffer. Mean 8.44 ms (118.5 fps), p95 9.30 ms; sample endpoint reports 84 calls and 1.91M triangles. This preceded the final path-junction UV/mask correction; the renderer/LOD settings are unchanged. It is not a 1080p, physical-phone or thermal result, and is not a controlled before/after benchmark against the historical 45 fps sample.
+- [Final art inspection](docs/village/evidence/art-art-checks.json) recorded no renderer/console errors. An earlier reserved GLSL identifier broke the meadow shader; it was fixed and the final terrain captures were checked again. Historical screenshots were preserved; `art-` files contain this pass.
+- Production export inspected at 1280×800 and 390×844: arrival, Controls guide, Settings access, English/Japanese guide layout, direct cottage entry and return all worked. The phone check exposed an activity prompt covering Dash/Jump; its position and the energy meter were moved above the movement controls, rebuilt and visually checked again. Dash and Jump each measure 66×46 pixels and remain unobstructed near the cottage. No captured production console warnings/errors. This is responsive browser coverage, not physical touch testing. English was restored and the temporary viewport override removed.
+- [Entrance](docs/village/evidence/art-entrance.png), [spirit face](docs/village/evidence/art-spirit-front.png), [spirit back](docs/village/evidence/art-spirit-back.png), [cottage exterior](docs/village/evidence/art-cottage-exterior.png), [interior](docs/village/evidence/art-cottage.png), [bridge](docs/village/evidence/art-bridge.png), [bridge profile](docs/village/evidence/art-bridge-side.png), [hearth](docs/village/evidence/art-hearth.png), [rain](docs/village/evidence/art-rain.png), [dusk](docs/village/evidence/art-dusk.png), and [movement with production audio](docs/village/evidence/art-motion.webm). Renderer-only captures use a 1280×720 drawing buffer.
+
+Reproduce the captures/checks with `python3 scripts/village/preview_qa.py --port 3023 --evidence-prefix art-`, then **Load village**, **Review art pass**, **Record movement**, and the named regression buttons. The evidence prefix preserves earlier milestone files.
+
+The final exported app is available locally at `http://127.0.0.1:3020/`, served from `out`. The temporary renderer QA server was stopped after verification. Check listener ownership before reusing either port in a later task.
+
+### Limits
+
+This delivers the revised palette and spirit direction; it does not certify AAA fidelity. Architecture, near planting and the interior remain procedural and need further authored art to reach that bar. No baked GI, general texture compression, physical phone/thermal validation, or new long-session listening certification was added. Hovering follows the existing terrain/bridge controller; there is no free vertical flight. Local build/test success is not deployment proof.
+
 ## 2026-09-26 release preparation
 
 The user authorized updating the relevant docs, committing/pushing the integrated village to `main`, and deploying it to GitHub Pages. This includes the previously uncommitted village foundation, runtime assets, editable source and QA evidence alongside the new resident interactions. The README, handoff, movement spec, design QA and evidence/reference indexes now describe the four personalities, speech/chat controls, proximity visits and current release process. Original Cosy v1 baseline captures remain historical references as the live URL advances to the village.

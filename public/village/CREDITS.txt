@@ -29,3 +29,16 @@ original scripted project artwork. Editable traveller source: assets/village/tra
 Footsteps, percussion, bass, birds and other new foley are original Web Audio synthesis.
 
 2026-09-25 additions: original procedural cloud sky, stone arch bridge, ambient resident routes and bird geometry. Distant birch cards are rendered at runtime from the licensed birch model above; they add no third-party source asset.
+
+2026-09-26 additions: original white smiling spirit, modeled in isolated Blender 5.2.1.
+Editable source: assets/village/spirit.blend; generator: scripts/village/create_spirit.py.
+Three PBR materials, no texture images or third-party character sources.
+Genshin Impact and Arkenfall inform art direction; no assets from either game are used.
+New palette, path shoulders, cottage details and spirit motion are original project work.
+
+2026-09-26 fantasy village pass: original swept-roof cottage kit, painted CanvasTexture
+surfaces, rounded tree geometry, vertex-painted mountain layers and suspended gardens.
+Sources: features/village/architecture.ts, paintedTextures.ts, fantasyTrees.ts, world.ts.
+Pastel blob residents reuse the original spirit mesh; accessories and animation are
+original runtime geometry/transforms in life.ts. Older traveller/birch models and
+photographic surfaces remain archived but are not loaded by the current village.

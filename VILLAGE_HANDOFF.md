@@ -4,11 +4,17 @@ Updated: 2026-09-26. **Status: integrated systems and villager-interaction miles
 
 Snapshot boundary: the feedback, activity-exit, villager-dialogue and villager-approach milestones are recorded in [the build ledger](VILLAGE_BUILD.md). Broader art, listening and device acceptance remains open.
 
+## Current art direction — 2026-09-26
+
+The user has superseded the earlier realistic traveler brief: use **Arkenfall atmosphere plus a strongly Genshin-inspired, colorful stylized palette**, with **a cute floating white spirit and a cartoon smile** as the player. Keep all artwork original. The approved village image still guides composition, scale and environmental craft, but its muted palette and human player are no longer requirements. Preserve the named villagers and their conversations.
+
+The latest user update extends the fantasy direction to houses, distant scenery and all four residents. The cottages now have swept colorful roofs, arched glazing, turrets, shutters and flower boxes. Original painted surfaces replace the photographic house/path materials. Rounded opaque tree crowns and vertex-painted mountain layers replace distant birch cards and repeated stone texture; two suspended gardens add fantasy landmarks. Pip, Maple, Moss and Luma reuse the spirit mesh with pastel colors, distinct accessories and hovering animation. The human traveler and birch remain archived assets and are no longer loaded by the village. Preserve the controller, six activities, weather, resident encounters and Controls guide. Current evidence is in the newest build/QA milestone.
+
 ## Start here in every new task
 
 1. Read applicable `AGENTS.md` instructions and inspect the current Git status. Preserve any uncommitted work; do not reset it or assume it is disposable.
 2. Read this document, then [the implementation evidence](VILLAGE_BUILD.md) and [design QA](design-qa.md).
-3. Open the [approved image](docs/village/references/approved-village.png) and [current entrance](docs/village/evidence/entrance.png), then inspect the [bridge](docs/village/evidence/bridge-side.png) and [movement recording](docs/village/evidence/motion.webm). Use the [evidence index](docs/village/evidence/README.md) for provenance. The older `references/prototype-*` captures are historical, not the current build.
+3. Open the [approved image](docs/village/references/approved-village.png) and [current entrance](docs/village/evidence/fantasy-entrance.png), then inspect the [cottage](docs/village/evidence/fantasy-cottage-exterior.png), [residents](docs/village/evidence/fantasy-spirit-villagers.png), [bridge](docs/village/evidence/fantasy-bridge-side.png) and [movement recording](docs/village/evidence/fantasy-motion.webm). Use the [evidence index](docs/village/evidence/README.md) for provenance. The unprefixed and `art-` captures are earlier milestones; `references/prototype-*` captures are historical.
 4. Read the relevant specification: [art, lighting, and assets](docs/village/ART_AND_ASSETS.md), [movement and living world](docs/village/MOVEMENT_AND_WORLD.md), or [music and sound](docs/village/MUSIC_AND_SOUND.md).
 5. Verify the relevant source before changing it. Historical test results are not evidence that a new change works. Update the status and evidence after each verified milestone.
 
@@ -23,10 +29,10 @@ The target is **as close to AAA craft as practical in a small browser world**: c
 | Reference | Authority and use |
 | --- | --- |
 | Latest user requirements | Better procedural music; jumping; fluid running/sprinting with energy; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers walking over to greet the player. |
-| [Approved village image](docs/village/references/approved-village.png) | Primary visual target: golden light, natural traveler proportions, detailed cottages, stream/bridge, lush planting, layered mountains, restrained UI. |
+| [Approved village image](docs/village/references/approved-village.png) | Composition and craft reference: detailed cottages, stream/bridge, planting, mountains and restrained UI. The latest colorful stylized palette and white spirit replace its palette/player brief. |
 | Original Cosy v1, preserved in [baseline captures](docs/village/references/README.md) | **Only functional baseline.** The [live Pages URL](https://cipheratlas.github.io/cosy-v1/) now tracks the village on `main`. Ignore earlier local redesign experiments as product/design references. The six activities remain the product. |
 | [Arkenfall](https://www.arkenfall.site/) | **Heavy experiential reference**, throughout development: sense of place, RPG traversal and camera feel, environmental atmosphere, wind, world sound, and immersion. Study the live experience; do not reduce this reference to a title-screen palette. |
-| Genshin Impact | User-requested inspiration for fluid running/sprinting, animation transitions, and a readable energy/stamina indicator. It is not a request for its characters, UI assets, combat, or a literal mechanic-for-mechanic clone. |
+| Genshin Impact | User-requested inspiration for the vivid stylized color palette and movement feel. Keep original characters and assets; do not import combat, proprietary UI or progression systems. |
 
 The approved image controls visual direction when other references differ. Arkenfall guides the feeling of inhabiting the world. Neither reference grants permission to extract proprietary models, music, textures, or code.
 
@@ -61,9 +67,9 @@ The detailed source contracts now live in the [movement/world spec](docs/village
 
 ### Next work
 
-1. Finish the existing entrance/cottage/bridge/hearth composition against the approved image: authored architecture, traveler, near foliage, terrain blending and light. Keep the working bridge and open hearth arrangement.
+1. Finish the existing entrance/cottage/bridge/hearth composition against the approved image: authored architecture, spirit residents, near foliage, terrain blending and light. Keep the working bridge and open hearth arrangement.
 2. Profile shadow passes, foliage overdraw, resident rigs and distant scenery before adding more scene detail; tune quality tiers with measured frame times. Then validate declared physical devices and cold loading.
-3. Review the existing movement/audio recordings, refine foot planting and camera occlusion, and complete long-session listening and physical-touch checks. Expand the remaining places only after the representative slice passes.
+3. Review the existing movement/audio recordings, refine spirit motion and camera occlusion, and complete long-session listening and physical-touch checks. Expand the remaining places only after the representative slice passes.
 
 ## What exists now
 
@@ -72,8 +78,8 @@ The root page uses raw Three.js inside the existing accessible React shell. The 
 | Area | Implemented now | Still required |
 | --- | --- | --- |
 | Movement | 120 Hz fixed simulation; walk/run/sprint; acceleration; jump/air/landing; buffered jump; stamina with recovery threshold; keyboard and touch controls | Motion polish, exhaustive collision/camera checks and physical-touch proof. |
-| Ambient life | Four named residents who walk over to greet nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer character art and behavior; ambient inhabitants currently reuse the original candidate rig. |
-| Traveler | Original 21-bone skinned candidate, woven textures, eight named clips; reproducible Blender source | Finished anatomy, hair, cloth, foot planting and LODs. This is still candidate art. |
+| Ambient life | Four named residents who walk over to greet nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer expressions and behavior; all four now use decorated pastel spirit forms. |
+| Player / residents | Original white spirit plus four pastel blob residents; hover, lean, fin flutter and character accessories; reproducible base Blender source | More expressive faces and motion refinement; no free vertical flight. |
 | Scene | Layered cottage detail, solid masonry bridge, willows, surrounding textured valley and distant tree LODs, open hearth with inward-facing benches, furnished cottage | Cohesive finished assets, natural terrain/material blending, much stronger entrance composition and background art. |
 | Lighting/wind | Procedural cloud sky and sunset HDR illumination; coordinated sun, fill and haze; practical cottage/window/fire lights; shared gusts across grass, bushes, trees, willow leaves, scarf, water and audio; bounded shadow refresh | Authored indirect light, smooth weather transitions, wind refinement and weather visual acceptance. |
 | Music | Seeded five-section/40-bar form, developing motif, voice-leading, rests, separate bass/percussion for lo-fi/jazz, bounded voices | Actual long-session listening, more seeds, equipment/browser coverage and musical refinement. |
@@ -88,7 +94,7 @@ All acceptance entries below remain **open**. MOVE-01, AUDIO-01/02, WIND-01 and 
 | ID | Priority | Work and definition of completion |
 | --- | --- | --- |
 | `VIS-01` | P1 | Rebuild the entrance's architecture, terrain, bridge, planting and skyline. Paired captures visibly approach the approved composition without obvious repeated blockout assets. |
-| `VIS-02` | P1 | Replace the traveler with a coherent modeled, textured, rigged character. Close and full-body motion views show natural proportions, cloth, hands, hair and convincing gait. |
+| `VIS-02` | P1 | Player is an original cute white flying spirit. Verify its smile, silhouette, gliding, hover, dash and jump in close/in-world views; retain four distinct animated blob residents and their conversations. |
 | `LIGHT-01` | P1 | Art-direct sunlight, indirect light, shadows, haze and practical lights. Golden/dusk/rain all remain readable and intentional; no blown-out water or uniformly flat illumination. |
 | `MOVE-01` | P1 | Implement walk/run/sprint, jump/air/landing and energy UI with collisions, smooth camera, keyboard and touch support. Meet [movement acceptance](docs/village/MOVEMENT_AND_WORLD.md#acceptance). |
 | `AUDIO-01` | P1 | Rework procedural composition and all three music identities. Demonstrate musical form, motif development, tasteful variation and listening quality over long sessions. |
@@ -101,7 +107,7 @@ All acceptance entries below remain **open**. MOVE-01, AUDIO-01/02, WIND-01 and 
 ### Milestones
 
 1. **Production contracts are integrated.** Preserve the implemented scale, rig/clip names and shared movement/audio/wind events. Asset delivery conventions and device budgets still need final validation. Do not recreate the controller or restart settled product discovery.
-2. **Finish a representative slice.** Produce the entrance, detailed traveler, focus cottage and nearby hearth/bridge. Assets and lighting are developed together. Review against the approved image before dressing the entire map.
+2. **Finish a representative slice.** Produce the entrance, expressive spirits, focus cottage and nearby hearth/bridge. Assets and lighting are developed together. Review against the approved image before dressing the entire map.
 3. **Polish the integrated experience.** Movement, stamina, camera, wind, procedural music and world sound are implemented. Refine their quality and verify them together before expansion.
 4. **Finish the remaining places.** Reuse a coherent art kit with authored variation, preserving every activity and persistence contract.
 5. **Optimize and prove completion.** Profile the finished assets, tune tiers, validate loading/recovery, record visual and audio evidence, and update the QA verdict. Publishing is a separate authorized action.
@@ -115,7 +121,7 @@ Lighting and performance should be checked throughout, not deferred until every 
 | [app/page.tsx](app/page.tsx), [app/layout.tsx](app/layout.tsx) | Root entry, metadata and fonts. |
 | [Village.tsx](features/village/Village.tsx) | React shell, engine lifecycle, preferences, dialogs, language, simple view, mobile controls and audio coordination. |
 | [VillageEngine.ts](features/village/VillageEngine.ts) | Three.js renderer, character/camera, input, collision, scene transitions, weather and frame loop. Main integration hotspot. |
-| [world.ts](features/village/world.ts), [flame.ts](features/village/flame.ts) | Procedural world, colliders, instancing, vegetation/water, flame shader. |
+| [world.ts](features/village/world.ts), [architecture.ts](features/village/architecture.ts), [paintedTextures.ts](features/village/paintedTextures.ts), [fantasyTrees.ts](features/village/fantasyTrees.ts), [flame.ts](features/village/flame.ts) | World placement/colliders, original cottage kit, painted materials, opaque tree geometry, vegetation/water and flames. |
 | [Activities.tsx](features/village/Activities.tsx), [useSession.ts](features/village/useSession.ts) | Activity controls and local persistence; deadline-based focus session. |
 | [places.ts](features/village/places.ts) | Stable place IDs, position/camera definitions, `Quality`, `Weather`, `AudioMix`. |
 | [audio.ts](features/village/audio.ts), [composition.ts](features/village/composition.ts) | Native Web Audio graph, lifecycle, spatial ambience/contact synthesis, deterministic phrase generator. Legacy Tone.js is not this route's engine. |

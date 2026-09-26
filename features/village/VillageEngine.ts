@@ -25,16 +25,15 @@ export class VillageEngine {
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
   private character?: T.Object3D;
-  private mixer?: T.AnimationMixer;
-  private actions: Record<string, T.AnimationAction> = {};
-  private currentAction = "";
   private movement?: VillageMovement;
   private running = false;
+  private idleTime = 0;
   private lastStatus = "";
   private statusTime = 0;
   private environmentTime = 0;
   private shadowTime = 0;
-  private scarf?: T.Bone;
+  private spiritFins: T.Object3D[] = [];
+  private spiritScale = 1;
   private audioForward = new T.Vector3();
   private keys = new Set<string>();
   private yaw = 0;
@@ -49,6 +48,8 @@ export class VillageEngine {
     startY: number;
   };
   private walkTarget?: T.Vector3;
+  private walkMarker = new T.Mesh(new T.RingGeometry(.16, .21, 40),
+    new T.MeshBasicMaterial({ color: "#ffe4a1", transparent: true, opacity: .85, depthWrite: false }));
   private lastTime = 0;
   private elapsed = 0;
   private resizeObserver: ResizeObserver;
@@ -63,8 +64,11 @@ export class VillageEngine {
   private statsTime = 0;
   private reducedMotion = false;
   private motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  private sun = new T.DirectionalLight("#ffd092", 3.4);
-  private fill = new T.HemisphereLight("#dce8ea", "#b4aa83", 1.4);
+  private sun = new T.DirectionalLight("#ffe0ad", 4.1);
+  private weatherBlend = { rain: 0, dusk: 0 };
+  private bounce = new T.DirectionalLight("#c4d9ef", .48);
+  private lightColor = new T.Color();
+  private fill = new T.HemisphereLight("#bdd7f2", "#6b6550", .9);
   private cameraGoal = new T.Vector3();
   private lookGoal = new T.Vector3();
   private currentLook = new T.Vector3();
@@ -204,33 +208,40 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to walk, R to toggle run, Shift to sprint, Space to jump, drag to look, E for activities, F to chat with a nearby villager. Places provides direct access to every activity.",
+      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump, drag to look, click to glide to a spot, E for activities, F to chat with a nearby villager. Places provides direct access to every activity.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
     this.scene.fog = new T.FogExp2("#c3c3a8", 0.004);
-    this.sun.position.set(-35, 26, -55);
+    this.sun.position.set(35, 28, -48);
+    this.bounce.position.set(-15, 12, 25);
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(2048, 2048);
     Object.assign(this.sun.shadow.camera, {
-      left: -40,
-      right: 40,
-      top: 45,
-      bottom: -45,
+      left: -24,
+      right: 24,
+      top: 27,
+      bottom: -27,
       near: 1,
       far: 130,
     });
     this.sun.shadow.bias = -0.0003;
-    this.sun.shadow.normalBias = 0.035;
+    this.sun.shadow.normalBias = 0.025;
+    this.sun.shadow.radius = 2;
+    this.scene.add(this.sun.target);
     this.scene.add(
       this.sun,
       this.fill,
+      this.bounce,
       this.indoorLight,
-      new T.AmbientLight("#fff1d6", 0.18),
+      new T.AmbientLight("#e9d9ba", 0.08),
     );
     this.player.position.set(0.3, 0, 20);
-    this.player.rotation.y = Math.PI;
+    this.player.rotation.y = 0;
     this.scene.add(this.player);
+    this.walkMarker.rotation.x = -Math.PI / 2;
+    this.walkMarker.visible = false;
+    this.scene.add(this.walkMarker);
     this.camera.position.set(0.3, 2.0, 23.8);
     this.currentLook.set(0.3, 1.35, 20);
     this.camera.lookAt(this.currentLook);
@@ -255,7 +266,7 @@ export class VillageEngine {
     const [world, gltf] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
-        withBasePath("/village/models/traveller.glb"),
+        withBasePath("/village/models/spirit.glb?v=1"),
       ),
     ]);
     if (this.disposed) {
@@ -263,7 +274,10 @@ export class VillageEngine {
       return;
     }
     this.world = world;
-    this.movement = new VillageMovement(world.colliders, this.callbacks.contact);
+    this.movement = new VillageMovement(world.colliders, event => {
+      // A floating spirit has no footfalls; jump/landing events retain the movement contract.
+      if (event.kind !== "footstep") this.callbacks.contact(event);
+    });
     this.scene.add(world.group);
     try {
       const texture = await new HDRLoader().loadAsync(
@@ -289,61 +303,19 @@ export class VillageEngine {
     const root = gltf.scene;
     const b = new T.Box3().setFromObject(root),
       height = b.getSize(new T.Vector3()).y;
-    root.scale.setScalar(1.8 / height);
-    root.position.y = -b.min.y * (1.8 / height);
+    this.spiritScale = .95 / height;
+    root.scale.setScalar(this.spiritScale);
+    root.position.y = .62 - b.min.y * this.spiritScale;
     root.traverse((o) => {
-      if (o instanceof T.Bone && o.name === "Scarf") this.scarf = o;
+      if (o.name.startsWith("SpiritFin")) this.spiritFins.push(o);
       if (o instanceof T.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
       }
     });
-    // Merge static pieces under each animated limb while retaining its pivot.
-    const parents: T.Object3D[] = [];
-    root.traverse((node) => {
-      if (node.children.some((child) => child instanceof T.Mesh && !(child instanceof T.SkinnedMesh)))
-        parents.push(node);
-    });
-    for (const parent of parents) {
-      const batches = new Map<T.Material, T.Mesh[]>();
-      for (const child of parent.children) {
-        if (!(child instanceof T.Mesh) || child instanceof T.SkinnedMesh || Array.isArray(child.material))
-          continue;
-        const meshes = batches.get(child.material) || [];
-        meshes.push(child);
-        batches.set(child.material, meshes);
-      }
-      batches.forEach((meshes, material) => {
-        if (meshes.length < 2) return;
-        const parts = meshes.map((mesh) => {
-          mesh.updateMatrix();
-          return mesh.geometry.clone().applyMatrix4(mesh.matrix);
-        });
-        const geometry = mergeGeometries(parts);
-        parts.forEach((part) => part.dispose());
-        if (!geometry) return;
-        meshes.forEach((mesh) => {
-          parent.remove(mesh);
-          mesh.geometry.dispose();
-        });
-        const combined = new T.Mesh(geometry, material);
-        combined.castShadow = true;
-        combined.receiveShadow = true;
-        parent.add(combined);
-      });
-    }
     this.player.add(root);
     this.character = root;
-    this.mixer = new T.AnimationMixer(root);
-    gltf.animations.forEach((c) => {
-      this.actions[c.name] = this.mixer!.clipAction(c);
-      if (["JumpStart", "LandSoft", "LandMoving"].includes(c.name)) {
-        this.actions[c.name].setLoop(T.LoopOnce, 1);
-        this.actions[c.name].clampWhenFinished = true;
-      }
-    });
-    this.animateCharacter("Idle");
-    this.life = new VillageLife(root, gltf.animations, world.colliders);
+    this.life = new VillageLife(root, world.colliders);
     this.scene.add(this.life.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys);
     this.dialogue.setLanguage(this.language);
@@ -389,26 +361,30 @@ export class VillageEngine {
       if (o instanceof T.Mesh && !Array.isArray(o.material))
         materials.push(o.material);
     });
-    const wooden =
+    const woodSource =
       materials.find(
         (m) =>
           m instanceof T.MeshStandardMaterial &&
-          m.map?.name === "wood-color.jpg",
+          m.name === "Village oak",
       ) || new T.MeshStandardMaterial({ color: "#644d32" });
-    const stone =
+    const stoneSource =
       materials.find(
         (m) =>
           m instanceof T.MeshStandardMaterial &&
-          m.map?.name === "stone-color.jpg",
+          m.name === "Village limestone",
       ) || new T.MeshStandardMaterial({ color: "#888374" });
+    const wooden = (woodSource as T.MeshStandardMaterial).clone();
+    wooden.vertexColors = false; wooden.color.set("#efd5aa"); wooden.roughness = .82;
+    const stone = (stoneSource as T.MeshStandardMaterial).clone();
+    stone.vertexColors = false; stone.color.set("#dbceb2");
     const plaster = new T.MeshStandardMaterial({
       color: "#b2a081",
       roughness: 1,
     });
     const glow = new T.MeshStandardMaterial({
-      color: "#edb261",
-      emissive: "#ed9c3a",
-      emissiveIntensity: 2,
+      color: "#b0d5dd",
+      emissive: "#c6e3df",
+      emissiveIntensity: .55,
     });
     const cube = (
       m: T.Material,
@@ -482,7 +458,7 @@ export class VillageEngine {
       f.userData.interior = true;
       this.world?.flames.push(f);
     }
-    const cloth = new T.MeshStandardMaterial({ color: "#aa7958", roughness: 1 });
+    const cloth = new T.MeshStandardMaterial({ color: "#b26756", roughness: 1 });
     const linen = new T.MeshStandardMaterial({ color: "#c6ba97", roughness: 1, side: T.DoubleSide });
     cube(cloth, -.6, .006, .1, 4.8, .018, 3.2);
     for (const z of [-1.37, -1.25, 1.42, 1.54]) cube(linen, -.6, .021, z, 4.6, .012, .025);
@@ -535,18 +511,6 @@ export class VillageEngine {
     this.camera.updateProjectionMatrix();
     this.dialogue?.resize(w, h);
   }
-  private animateCharacter(name: string) {
-    if (this.currentAction === name) return;
-    const next = this.actions[name] || this.actions.Idle;
-    if (!next) {
-      this.actions[this.currentAction]?.fadeOut(0.25);
-      this.currentAction = name;
-      return;
-    }
-    this.actions[this.currentAction]?.fadeOut(0.16);
-    next.reset().fadeIn(name === "JumpStart" || name.startsWith("Land") ? 0.065 : 0.16).play();
-    this.currentAction = name;
-  }
   setBlocked(v: boolean) {
     this.blocked = v;
     this.dialogue?.setEnabled(!v && !this.place);
@@ -582,23 +546,32 @@ export class VillageEngine {
   setWeather(w: Weather) {
     this.weather = w;
     this.renderer.shadowMap.needsUpdate = true;
-    const dusk = w === "dusk",
-      rain = w === "rain";
-    this.scene.backgroundIntensity = dusk ? 0.13 : rain ? 0.35 : 0.65;
-    this.sun.color.set(dusk ? "#d9926c" : rain ? "#d9e2dd" : "#ffdaa0");
-    this.sun.intensity = dusk ? 0.7 : rain ? 0.85 : 3.8;
-    this.fill.intensity = dusk ? 0.78 : rain ? 1.3 : 1.65;
-    this.fill.color.set(dusk ? "#7b94c5" : rain ? "#b0c0c4" : "#aecbe9");
-    this.fill.groundColor.set(dusk ? "#484f48" : "#879565");
-    this.scene.environmentIntensity = dusk ? .17 : rain ? .4 : .48;
-    this.renderer.toneMappingExposure = dusk ? 1 : 1.08;
+  }
+  private updateLighting(dt: number) {
+    const speed = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 2.4);
+    this.weatherBlend.rain = T.MathUtils.lerp(this.weatherBlend.rain, this.weather === "rain" ? 1 : 0, speed);
+    this.weatherBlend.dusk = T.MathUtils.lerp(this.weatherBlend.dusk, this.weather === "dusk" ? 1 : 0, speed);
+    const { rain, dusk } = this.weatherBlend;
+    const blendColor = (color: T.Color, golden: string, evening: string, overcast: string) => {
+      color.set(golden).lerp(this.lightColor.set(evening), dusk).lerp(this.lightColor.set(overcast), rain);
+    };
+    blendColor(this.sun.color, "#ffe5b2", "#efa885", "#cedbe2");
+    this.sun.intensity = 4.1 - dusk * 3.5 - rain * 3.35;
+    this.fill.intensity = 1.05 - dusk * .2 + rain * .37;
+    blendColor(this.fill.color, "#bfd8ef", "#7b97d0", "#b3c6cf");
+    blendColor(this.fill.groundColor, "#7a7351", "#424c56", "#6f7c70");
+    this.bounce.intensity = .65 - dusk*.19 - rain*.14;
+    this.scene.environmentIntensity = .34 - dusk*.14 + rain*.05;
+    this.renderer.toneMappingExposure = 1.02 + dusk*.06;
     const fog = this.scene.fog as T.FogExp2;
-    fog.color.set(dusk ? "#69758e" : rain ? "#a3b3b1" : "#b9c9c4");
-    fog.density = rain ? 0.009 : 0.0035;
+    blendColor(fog.color, "#bfd9da", "#8894bf", "#a3b8bd");
+    fog.density = .0046 + rain * .005 + dusk * .001;
+    this.world?.setWeather(rain, dusk);
+    this.atmosphere.setWeather(rain, dusk);
   }
   setPlace(id: PlaceId | null) {
     this.dialogue?.setEnabled(!id && !this.blocked);
-    const wasSettled = this.place !== null;
+    const previousPlace = this.place;
     this.renderer.shadowMap.needsUpdate = true;
     this.place = id;
     if (this.world) this.world.group.visible = id !== "focus";
@@ -613,7 +586,9 @@ export class VillageEngine {
     }
     this.clearKeys();
     this.movement?.settle();
-    if (!id && wasSettled) {
+    if (!id && previousPlace !== null) {
+      // Authored return angles keep residents and nearby walls out of the foreground.
+      this.yaw = previousPlace === "mood" ? -Math.PI + .4 : 0;
       this.updateWalkingCamera();
       this.camera.position.copy(this.cameraGoal);
       this.currentLook.copy(this.lookGoal);
@@ -626,7 +601,6 @@ export class VillageEngine {
       if (f.userData.interior) f.visible = id === "focus";
     });
     if (!id) {
-      this.animateCharacter("Idle");
       this.callbacks.near(this.near);
     }
   }
@@ -707,12 +681,25 @@ export class VillageEngine {
     movement.update(dt, { x: this.direction.x, z: this.direction.z, run: this.running,
       sprint: this.keys.has("shift"), blocked: this.blocked || this.place !== null });
     this.player.position.set(movement.position.x, movement.position.y, movement.position.z);
+    this.walkMarker.visible = !!this.walkTarget && !this.blocked && !this.place;
+    if (this.walkTarget) {
+      this.walkMarker.position.set(this.walkTarget.x, floorHeight(this.walkTarget.x, this.walkTarget.z) + .065, this.walkTarget.z);
+      this.walkMarker.scale.setScalar(this.reducedMotion ? 1 : 1 + Math.sin(this.elapsed*4)*.08);
+    }
     const moving = movement.speed > 0.12;
     if (moving) {
       const angle = Math.atan2(movement.velocity.x, movement.velocity.z);
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 14));
-    } else if (this.walkTarget && this.direction.lengthSq() > 0) this.walkTarget = undefined;
+      this.idleTime = 0;
+    } else {
+      if (this.walkTarget && this.direction.lengthSq() > 0) this.walkTarget = undefined;
+      this.idleTime += dt;
+      if (this.idleTime > 1.4 && !this.blocked && !this.place) {
+        const turn = T.MathUtils.euclideanModulo(this.yaw - this.player.rotation.y + Math.PI, Math.PI*2)-Math.PI;
+        this.player.rotation.y += turn * (1-Math.exp(-dt*2.5));
+      }
+    }
     if (!this.blocked && !this.place) {
       let near: PlaceId | null = null,
         dist = 4;
@@ -731,19 +718,16 @@ export class VillageEngine {
         this.callbacks.near(near);
       }
     }
-    const clip = movement.takeoff > 0 ? "JumpStart" : !movement.grounded ? "AirLoop"
-      : movement.landing > 0 ? moving ? "LandMoving" : "LandSoft"
-      : movement.gait === "sprint" ? "Sprint" : movement.gait === "run" ? "Run" : moving ? "Walk" : "Idle";
-    this.animateCharacter(clip);
-    this.mixer?.update(this.blocked ? 0 : dt);
-    const action = this.actions[clip];
-    if (action && ["Walk", "Run", "Sprint"].includes(clip)) {
-      action.time = (movement.phase % 1) * action.getClip().duration;
-      this.mixer?.update(0);
-    }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
-    if (this.scarf && !this.reducedMotion)
-      this.scarf.rotation.y += Math.sin(this.elapsed * 2.3) * windAt(this.elapsed, this.weather) * .13;
+    if (this.character) {
+      const bob = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*2.8)*.065;
+      this.character.position.y = .62 + bob;
+      this.character.rotation.x = T.MathUtils.lerp(this.character.rotation.x, this.reducedMotion ? 0 : movement.speed*.022, 1-Math.exp(-dt*8));
+      this.character.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*1.7)*.035;
+      const squash = this.reducedMotion ? 0 : movement.landing>0 ? -.1 : movement.takeoff>0 ? .09 : 0;
+      this.character.scale.set(this.spiritScale*(1-squash*.4),this.spiritScale*(1+squash),this.spiritScale*(1-squash*.4));
+      this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
+    }
     if (this.place === "focus") {
       this.cameraGoal.set(110.2, 2.25, 2.8);
       this.lookGoal.set(110, 1.8, -3.8);
@@ -772,7 +756,8 @@ export class VillageEngine {
     this.currentLook.lerp(this.lookGoal, blend);
     this.camera.lookAt(this.currentLook);
     const t = this.reducedMotion ? 0 : this.elapsed;
-    this.atmosphere.update(t, this.weather, this.camera.position);
+    this.updateLighting(dt);
+    this.atmosphere.update(t, this.camera.position);
     if (this.place !== "focus") this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place);
     this.world.wind.time.value = t;
     this.world.wind.strength.value = this.reducedMotion ? 0 : windAt(t, this.weather);
@@ -797,18 +782,30 @@ export class VillageEngine {
         this.camera.matrixWorldInverse,
       );
       this.treeFrustum.setFromProjectionMatrix(this.viewProjection);
+      const nearTrees: number[] = [], farTrees: number[] = [];
+      const treeSource = this.world.trees[0];
+      treeSource?.bounds.forEach((bounds, index) => {
+        const distance = Math.hypot(bounds.center.x - this.player.position.x, bounds.center.z - this.player.position.z);
+        if (distance < (this.quality === "low" ? 22 : 32)) nearTrees.push(index);
+        else if (this.treeFrustum.intersectsSphere(bounds)) farTrees.push(index);
+      });
       for (const batch of this.world.trees) {
-        let count = 0;
-        batch.bounds.forEach((bounds, index) => {
-          if (this.treeFrustum.intersectsSphere(bounds) || bounds.center.distanceToSquared(this.player.position) < 32 * 32)
-            batch.mesh.setMatrixAt(count++, batch.transforms[index]);
-        });
-        batch.mesh.count = count;
+        nearTrees.forEach((index, i) => batch.mesh.setMatrixAt(i, batch.transforms[index]));
+        batch.mesh.count = nearTrees.length;
         batch.mesh.instanceMatrix.needsUpdate = true;
+      }
+      if (treeSource) {
+        farTrees.forEach((index, i) => this.world!.treeLod.setMatrixAt(i, treeSource.transforms[index]));
+        this.world.treeLod.count = farTrees.length;
+        this.world.treeLod.instanceMatrix.needsUpdate = true;
       }
     }
     // Bound moving foliage/character shadow work; stationary weather still has animated casters.
     if (now - this.shadowTime > (this.quality === "low" ? 180 : 100) && (!this.reducedMotion || moving)) {
+      const x = Math.round(this.player.position.x / 2) * 2, z = Math.round(this.player.position.z / 2) * 2;
+      this.sun.position.set(x + 35, 28, z - 48);
+      this.sun.target.position.set(x, 0, z);
+      this.sun.target.updateMatrixWorld();
       this.renderer.shadowMap.needsUpdate = true; this.shadowTime = now;
     }
     this.renderer.render(this.scene, this.camera);
@@ -846,7 +843,6 @@ export class VillageEngine {
     el.removeEventListener("pointercancel", this.clearKeys);
     el.removeEventListener("wheel", this.onWheel);
     el.removeEventListener("webglcontextlost", this.onLost);
-    this.mixer?.stopAllAction();
     this.dialogue?.dispose();
     this.life?.dispose();
     this.world?.group.removeFromParent();

@@ -1,8 +1,18 @@
 # Art direction, lighting, and asset production
 
-Updated: 2026-09-25. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
+Updated: 2026-09-26. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
 
-## Current feedback fixes
+## Latest direction — colorful fantasy and a white spirit
+
+The 2026-09-26 user update takes precedence over the older realistic art briefs below. Art direction is **Arkenfall + Genshin Impact**, with an explicitly vivid Genshin-inspired palette: clear blue sky, lively meadow greens, turquoise water, cream plaster, blue slate/terracotta, warm practicals and cool shadows. Avoid a uniform brown or grey cast. This is original art inspired by the references, with no copied game assets.
+
+The player is a **cute flying white blob with a cartoon smile**, replacing the adult traveler requirement. Source: `assets/village/spirit.blend`; generator: `scripts/village/create_spirit.py`; runtime: `public/village/models/spirit.glb`; [measured manifest](spirit-manifest.json). It floats above the existing collision controller, leans while gliding, flutters its small fins, and squashes on landing. At rest it turns toward the camera so its face is visible. All four residents now use this base spirit with cloned materials and original accessories: sky-blue Pip with scarf/pouch, peach Maple with a baker hat and bow, mint Moss with a sprout, and lavender Luma with a crescent and star collar. Their controllers and conversations are preserved; humanoid clips are no longer used.
+
+The fantasy world pass uses original 512×512 CanvasTexture maps for timber, shingles, plaster, limestone, meadow, paving and window reflections. `architecture.ts` provides nine swept-roof cottages with cream facades, arched doors/windows, shutters, flower boxes, turrets/chimneys and warm trim. `fantasyTrees.ts` creates matching near/far opaque crowns; 360 distant trees replace photographic crossed cards. Mountain colors are baked to vertices according to slope, with organic meadow patches replacing distance stripes. Two floating gardens are skyline scenery outside the playable area. Rain still changes roughness and practical lights. The existing smooth sky/sun/fill/fog weather transitions remain.
+
+The older human-player and photographic-tree specifications below are archived context. Neither model is loaded by the current village; retain their sources and credits for provenance. No new dependencies, copied game assets or paid services were used. Current evidence is linked from the newest [design QA](../../design-qa.md) and [build ledger](../../VILLAGE_BUILD.md) sections. This is not a baked-GI, ray-tracing or production AAA claim.
+
+## Earlier feedback fixes (before the fantasy asset pass)
 
 The runtime now uses `atmosphere.ts` for an animated cloud sky, with golden/dusk/rain states and the existing HDR retained only for illumination. A 650 m textured terrain mesh and three mountain bands surround the village. The 640 distant birches use four-triangle crossed cards baked at runtime from the existing licensed model; this is a specific foliage LOD, not a general asset compression pipeline.
 

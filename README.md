@@ -1,12 +1,12 @@
 # Cosy Village
 
-A small third-person village for focus, music, breathing, mood check-ins, gratitude and kind notes. Traversal, procedural music and spatial world sound are integrated. The scene remains candidate art; reference fidelity, long-session listening and target-device performance are unfinished.
+A colorful third-person village for focus, music, breathing, mood check-ins, gratitude and kind notes. You explore as a small smiling white spirit. Traversal, procedural music and spatial world sound are integrated. The scene remains candidate art; reference fidelity, long-session listening and target-device performance are unfinished.
 
 **New agents and new tasks: start with [VILLAGE_HANDOFF.md](VILLAGE_HANDOFF.md).** It contains the agreed scope, current gaps, priorities, code boundaries, preservation requirements and copyable task brief.
 
 ## Direction and documentation
 
-- [Approved visual target](docs/village/references/approved-village.png): detailed golden-hour village, natural traveler, warm cottages, lush planting and layered scenery.
+- [Approved visual target](docs/village/references/approved-village.png): village composition, warm cottages, planting and scenery. The latest user direction supersedes its palette and traveler: vivid Genshin-inspired colors, Arkenfall atmosphere, and a cute white spirit.
 - [Live Cosy Village](https://cipheratlas.github.io/cosy-v1/): the current `main` release. The original Cosy v1 remains the functional baseline, preserved in the [baseline captures](docs/village/references/README.md); earlier local redesign experiments are not references for this work.
 - [Arkenfall](https://www.arkenfall.site/): a heavy reference for the immersive RPG experience, traversal, atmosphere and world sound.
 - [Art, lighting and asset production](docs/village/ART_AND_ASSETS.md): asset briefs, generation prompts, export/provenance requirements and visual acceptance.
@@ -22,7 +22,7 @@ The root page uses [features/village/Village.tsx](features/village/Village.tsx).
 
 The six activities are available by exploring, direct travel, or a simple activity view. Notes, preferences and focus sessions are stored locally. English/Japanese controls and reduced-motion support are present. Audio requires user interaction.
 
-Walking/running/sprinting, jumping/landing, stamina, shared gusts, spatial ambience and contact effects are now integrated with a candidate skinned traveler. Procedural music has distinct arrangements and phrase development. Art fidelity, long-session listening, physical touch and target-device acceptance remain open; see the handoff and evidence ledger.
+Gliding, quick gliding/dashing, jumping, stamina, shared gusts and spatial ambience are integrated with an original floating white spirit. Pip, Maple, Moss and Luma are pastel blob spirits with distinct accessories, conversations and greeting behavior. Procedural music has distinct arrangements and phrase development. Art fidelity, long-session listening, physical touch and target-device acceptance remain open; see the handoff and evidence ledger.
 
 The latest feedback pass rebuilt the bridge as a solid, traversable stone arch, widened vertical camera movement, fixed Firefox audio startup, added clouds and surrounding scenery, introduced four ambient residents and twelve birds, and moved the hearth off the road with inward-facing benches. [Current evidence](docs/village/evidence/README.md) includes bridge crossings, camera views and Firefox audio output. The final two-minute 1280×720 desktop sample averaged about 45 fps (p95 frame interval 33.4 ms); sustained 60 fps is not established.
 
@@ -31,6 +31,8 @@ A subsequent activity-exit fix provides a visible **Back to village** button at 
 The four villagers have floating speech bubbles and their own little personalities: **Pip** collects tiny treasures, **Maple** bakes and fusses over her sourdough, **Moss** quietly cares for the garden, and **Luma** shares tea and daydreams. Click **Chat** or press **F** nearby for more conversation; all dialogue supports English and Japanese, with rain and dusk remarks.
 
 While you explore, a nearby villager can walk over to greet you. They approach one at a time over clear ground, leave comfortable space, and return to their routine after a short visit. Menus and activities pause invitations; leaving the area and a cooldown prevent repeated greetings. See the [approach and dialogue evidence](VILLAGE_BUILD.md#2026-09-26-villager-approaches).
+
+The current local art pass adds swept teal/coral/lilac cottage roofs, limestone arches, painted glazing, flower boxes, rounded tree crowns, soft mountain layers and two distant floating gardens. Houses, paths and wood share original painted materials; the photo-based birch cards and human residents are no longer loaded. A compact **Controls** guide explains gliding and the click destination ring. Spirit modeling source and measurements are in [the spirit manifest](docs/village/spirit-manifest.json); new captures and verification are in [the build ledger](VILLAGE_BUILD.md). This local pass has not been published.
 
 ## Local development and verification
 

@@ -1,5 +1,4 @@
 import * as T from "three";
-import { clone } from "three/addons/utils/SkeletonUtils.js";
 import { VillageMovement } from "./movement";
 import { roadX, type Collider } from "./environment";
 import { VILLAGERS } from "./dialogue";
@@ -8,7 +7,7 @@ import { VILLAGERS } from "./dialogue";
 export class VillageLife {
   readonly group = new T.Group();
   readonly residents: {
-    root: T.Object3D; mixer: T.AnimationMixer; walk: T.AnimationAction; idle: T.AnimationAction;
+    root: T.Object3D; spirit: T.Object3D; fins: T.Object3D[]; phase: number;
     movement: VillageMovement; route: [number, number][]; waypoint: number; pause: number; walking: boolean; chatting: boolean;
     encounter: {
       state: "roam" | "approach" | "visit" | "return";
@@ -23,7 +22,7 @@ export class VillageLife {
   private wing = new T.Object3D();
   private approachScan = 0;
 
-  constructor(source: T.Object3D, clips: T.AnimationClip[], colliders: Collider[]) {
+  constructor(source: T.Object3D, colliders: Collider[]) {
     const routes: [number, number][][] = [
       [[roadX(7) + .7, 7], [roadX(26) + .7, 26]],
       [[-5, 3], [-19, 3]],
@@ -31,29 +30,31 @@ export class VillageLife {
       [[13.8, -6.8]],
     ];
     routes.forEach((route, i) => {
-      const root = clone(source);
+      const root = source.clone(true);
+      root.name = `${VILLAGERS[i].name.en} spirit`;
+      root.position.y = .55;
+      const fins: T.Object3D[] = [], materials = new Map<T.Material, T.Material>();
       root.traverse(node => {
+        if (node.name.startsWith("SpiritFin")) fins.push(node);
         if (!(node instanceof T.Mesh)) return;
         const tint = (material: T.Material) => {
-          const m = material.clone();
-          if (m instanceof T.MeshStandardMaterial && /Moss|Terracotta|Olive/.test(m.name)) {
-            m.map = null; m.color.set(VILLAGERS[i].color);
-            if (/Terracotta/.test(m.name)) m.color.set("#c1ad87");
+          if (materials.has(material)) return materials.get(material)!;
+          const copy = material.clone();
+          if (copy instanceof T.MeshStandardMaterial && material.name === "Pearl white spirit") {
+            copy.color.set(VILLAGERS[i].color); copy.emissive.copy(copy.color); copy.emissiveIntensity = .09;
           }
-          return m;
+          materials.set(material, copy); return copy;
         };
         node.material = Array.isArray(node.material) ? node.material.map(tint) : tint(node.material);
       });
-      const actor = new T.Group(); actor.add(root); actor.scale.setScalar(.93 + i * .025);
-      const mixer = new T.AnimationMixer(root);
-      const walk = mixer.clipAction(clips.find(c => c.name === "Walk")!);
-      const idle = mixer.clipAction(clips.find(c => c.name === "Idle")!); idle.play();
+      this.dressSpirit(root, i);
+      const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1][i]);
       const movement = new VillageMovement(colliders, () => {});
       movement.settle(...route[0]);
       actor.position.set(movement.position.x, movement.position.y, movement.position.z);
       this.group.add(actor);
       actor.name = VILLAGERS[i].name.en;
-      this.residents.push({ root: actor, mixer, walk, idle, movement, route, waypoint: route.length > 1 ? 1 : 0,
+      this.residents.push({ root: actor, spirit: root, fins, phase: i * 1.7, movement, route, waypoint: route.length > 1 ? 1 : 0,
         pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38][i],
         encounter: { state: "roam", path: [], time: 0, noticed: false, cooldown: 0, checkIn: 0 } });
     });
@@ -136,12 +137,12 @@ export class VillageLife {
         r.root.rotation.y += turn * (1 - Math.exp(-delta * 4));
       }
       const walking = r.movement.speed > .1;
-      if (walking !== r.walking) {
-        (walking ? r.idle : r.walk).fadeOut(.3);
-        (walking ? r.walk : r.idle).reset().fadeIn(.3).play(); r.walking = walking;
-      }
-      r.mixer.update(delta);
-      if (walking) { r.walk.time = (r.movement.phase % 1) * r.walk.getClip().duration; r.mixer.update(0); }
+      r.walking = walking;
+      r.spirit.position.y = .55 + (reduced ? 0 : Math.sin(elapsed * 2.5 + r.phase) * .065);
+      r.spirit.rotation.x = reduced ? 0 : r.movement.speed * .035;
+      r.spirit.rotation.z = reduced ? 0 : Math.sin(elapsed * 1.6 + r.phase) * .035;
+      r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(elapsed * (walking ? 7 : 3) + r.phase + i * Math.PI) * .18; });
+
     }
     const t = reduced ? 0 : elapsed;
     for (let i = 0; i < 12; i++) {
@@ -158,5 +159,43 @@ export class VillageLife {
     }
     for (const mesh of [this.bodies, this.leftWings, this.rightWings]) mesh.instanceMatrix.needsUpdate = true;
   }
-  dispose() { this.residents.forEach(r => r.mixer.stopAllAction()); }
+  private dressSpirit(root: T.Object3D, index: number) {
+    const cream = new T.MeshStandardMaterial({ color: "#fff2d1", roughness: .75 });
+    const gold = new T.MeshStandardMaterial({ color: "#ffd36f", roughness: .55 });
+    const accent = new T.MeshStandardMaterial({ color: ["#318c9b", "#de8e9b", "#6f9d52", "#7772b5"][index], roughness: .8 });
+    const sphere = new T.SphereGeometry(1, 16, 10);
+    const add = (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number, sx=1, sy=1, sz=1) => {
+      const mesh = new T.Mesh(geometry, material); mesh.position.set(x,y,z); mesh.scale.set(sx,sy,sz);
+      mesh.castShadow = mesh.receiveShadow = true; root.add(mesh); return mesh;
+    };
+    const star = new T.Shape();
+    for (let i=0;i<10;i++) { const a=i*Math.PI/5+Math.PI/2, r=i%2?.042:.09; if(i===0)star.moveTo(Math.cos(a)*r,Math.sin(a)*r);else star.lineTo(Math.cos(a)*r,Math.sin(a)*r); }
+    star.closePath();
+    const starGeometry = new T.ExtrudeGeometry(star,{depth:.025,bevelEnabled:false});
+    if (index === 0) {
+      add(new T.TorusGeometry(.33,.055,8,32),accent,0,.27,0).rotation.x=Math.PI/2;
+      add(sphere,accent,.22,.25,.275,.1,.16,.06);
+      add(starGeometry,gold,.22,.26,.335);
+      add(sphere,cream,-.27,.29,.26,.08,.08,.04);
+    } else if (index === 1) {
+      add(new T.CylinderGeometry(.22,.23,.09,24),accent,0,1.005,0);
+      for (let i=0;i<4;i++) add(sphere,cream,Math.cos(i*Math.PI/2)*.125,1.13,Math.sin(i*Math.PI/2)*.09,.16,.125,.14);
+      add(sphere,accent,-.16,.29,.29,.1,.055,.035).rotation.z=-.25;
+      add(sphere,accent,.02,.29,.31,.1,.055,.035).rotation.z=.25;
+      add(sphere,gold,-.065,.29,.335,.04,.04,.025);
+    } else if (index === 2) {
+      add(new T.CylinderGeometry(.018,.025,.19,8),accent,.06,1.07,0).rotation.z=-.2;
+      for(const side of [-1,1]) add(sphere,accent,.06+side*.105,1.15,.02,.15,.045,.075).rotation.z=side*.4;
+      add(sphere,cream,.17,.3,.3,.105,.11,.045);
+      add(starGeometry,gold,.17,.31,.35).scale.setScalar(.55);
+    } else {
+      const crescent = new T.Shape();
+      crescent.absarc(0,0,.15,Math.PI*.32,Math.PI*1.68,false);
+      crescent.absarc(.082,0,.133,-Math.PI*.56,Math.PI*.56,true);crescent.closePath();
+      add(new T.ExtrudeGeometry(crescent,{depth:.025,bevelEnabled:false}),gold,0,1.06,.05).rotation.z=-.35;
+      add(new T.TorusGeometry(.33,.047,8,32),accent,0,.27,0).rotation.x=Math.PI/2;
+      add(starGeometry,gold,0,.3,.345);
+    }
+  }
+  dispose() { this.residents.forEach(r => r.chatting = false); }
 }

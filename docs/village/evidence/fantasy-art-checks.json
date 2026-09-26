@@ -1,0 +1,46 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+  "buffer": [
+    1280,
+    720
+  ],
+  "player": [
+    "SpiritBody",
+    "SpiritCheeks",
+    "SpiritFace",
+    "SpiritFinL",
+    "SpiritFinR"
+  ],
+  "residents": [
+    {
+      "name": "Pip",
+      "form": "Pip spirit",
+      "fins": 2
+    },
+    {
+      "name": "Maple",
+      "form": "Maple spirit",
+      "fins": 2
+    },
+    {
+      "name": "Moss",
+      "form": "Moss spirit",
+      "fins": 2
+    },
+    {
+      "name": "Luma",
+      "form": "Luma spirit",
+      "fins": 2
+    }
+  ],
+  "triangles": 1529244,
+  "draws": 54,
+  "lighting": {
+    "sun": 4.099999999293609,
+    "fill": 1.049999999959677,
+    "environment": 0.33999999997175817,
+    "exposure": 1.0200000000121052
+  },
+  "errors": [],
+  "limits": "Renderer-only views. UI, movement and device acceptance recorded separately."
+}
