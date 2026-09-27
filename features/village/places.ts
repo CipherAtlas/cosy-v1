@@ -101,7 +101,7 @@ export const DEFAULT_MIX: AudioMix = {
   music: 0.6,
   rain: 0.12,
   fire: 0.35,
-  master: 0.65,
+  master: 0.5,
   ambience: 0.5,
   effects: 0.6,
   vibe: "piano",

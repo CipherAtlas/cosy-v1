@@ -63,19 +63,19 @@ export function Village() {
   const [soundLoading, setSoundLoading] = useState(false);
   const [sound, setSound] = useState(false),
     [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
-    [quality, setQuality] = useState<Quality>("auto"),
+    [quality, setQuality] = useState<Quality>("high"),
     [weather, setWeather] = useState<Weather>("golden"),
     [language, setLanguage] = useState<"en" | "ja">("en"),
     [showStats, setShowStats] = useState(false),
     [stats, setStats] = useState({ fps: 0, draws: 0, triangles: 0 });
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const preferences = useRef({ quality, weather, language });
   preferences.current = { quality, weather, language };
   const [notice, setNotice] = useState("");
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
-  const loaded = useRef(false),
-    enterRef = useRef(false);
+  const enterRef = useRef(false);
   const ja = language === "ja",
     t = (en: string, jp: string) => (ja ? jp : en);
   const focus = useSession(() => {
@@ -175,7 +175,7 @@ export function Village() {
           });
       }
     } catch {}
-    loaded.current = true;
+    setPreferencesLoaded(true);
     return () => audio.current?.dispose();
   }, []);
   useEffect(() => {
@@ -270,14 +270,14 @@ export function Village() {
     audio.current?.setMix(mix);
   }, [mix]);
   useEffect(() => {
-    if (!loaded.current) return;
+    if (!preferencesLoaded) return;
     try {
       localStorage.setItem(
         "cosy-village-preferences",
         JSON.stringify({ mix, quality, weather, language }),
       );
     } catch {}
-  }, [mix, quality, weather, language]);
+  }, [mix, quality, weather, language, preferencesLoaded]);
   useEffect(() => {
     if (!notice) return;
     const id = setTimeout(() => setNotice(""), 7000);
@@ -300,32 +300,29 @@ export function Village() {
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, [place, entered, panel, leave]);
-  async function toggleSound() {
+  async function enableSound() {
+    if (soundBusy.current || sound) return;
+    try {
+      soundBusy.current = true;
+      setSoundLoading(true);
+      const result = await audio.current?.start();
+      setSound(true);
+      if (result && !result.ambience) setNotice(t("Some nature recordings could not load. Music is still available; turn sound off and on to retry.", "環境音の一部を読み込めませんでした。音楽は再生できます。音をオフにして再度お試しください。"));
+    } catch {
+      audio.current?.stop();
+      setSound(false);
+      setNotice(t("Audio could not start. Please try again.", "音を再生できませんでした。もう一度お試しください。"));
+    } finally {
+      soundBusy.current = false;
+      setSoundLoading(false);
+    }
+  }
+  function toggleSound() {
     if (soundBusy.current) return;
     if (sound) {
       audio.current?.stop();
       setSound(false);
-    } else {
-      try {
-        soundBusy.current = true;
-        setSoundLoading(true);
-        const result = await audio.current?.start();
-        setSound(true);
-        if (result && !result.ambience) setNotice(t("Some nature recordings could not load. Music is still available; turn sound off and on to retry.", "環境音の一部を読み込めませんでした。音楽は再生できます。音をオフにして再度お試しください。"));
-      } catch {
-        audio.current?.stop();
-        setSound(false);
-        setNotice(
-          t(
-            "Audio could not start. Please try again.",
-            "音を再生できませんでした。もう一度お試しください。",
-          ),
-        );
-      } finally {
-        soundBusy.current = false;
-        setSoundLoading(false);
-      }
-    }
+    } else void enableSound();
   }
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
@@ -416,6 +413,7 @@ export function Village() {
               <button
                 className="v-button v-primary v-enter-button"
                 onClick={() => {
+                  void enableSound();
                   setEntered(true);
                   setPanel(simple ? "places" : null);
                 }}
@@ -427,6 +425,7 @@ export function Village() {
             <button
               className="v-text-button"
               onClick={() => {
+                void enableSound();
                 setSimple(true);
                 setEntered(true);
                 setPanel("places");
@@ -667,6 +666,7 @@ export function Village() {
                   <button
                     key={p.id}
                     onClick={() => {
+                      if (!entered) void enableSound();
                       setEntered(true);
                       openPlace(p.id);
                     }}
