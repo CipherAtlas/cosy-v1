@@ -284,7 +284,7 @@ export class VillageAudio {
     if (!centered && Math.hypot(position[0] - x, position[1] - y, position[2] - z) > 23) return;
     let buffer = this.gardenSounds.get(kind);
     if (!buffer) {
-      const duration = kind === "water" || kind === "pour" ? 1.15 : kind === "splash" ? .6 : kind === "duck" ? .38 : .25;
+      const duration = kind === "water" || kind === "pour" ? 1.15 : kind === "splash" ? .6 : kind === "duck" ? .38 : kind === "coo" ? .95 : .25;
       buffer = c.createBuffer(1, Math.ceil(c.sampleRate * duration), c.sampleRate);
       const data = buffer.getChannelData(0); let filtered = 0, phase = 0;
       for (let i = 0; i < data.length; i++) {
@@ -292,7 +292,11 @@ export class VillageAudio {
         filtered = filtered * .78 + noise * .22;
         const envelope = Math.min(1, t * 60) * Math.pow(1 - u, kind === "water" || kind === "pour" ? .7 : 2);
         let sample: number;
-        if (kind === "duck") {
+        if (kind === "coo") {
+          const syllable = t % .48, breath = Math.sin(Math.min(1, syllable / .4) * Math.PI) ** 2;
+          phase += (460 - syllable * 150 + Math.sin(t * 22) * 7) * Math.PI * 2 / c.sampleRate;
+          sample = (Math.sin(phase) * .8 + Math.sin(phase * 2) * .12) * breath;
+        } else if (kind === "duck") {
           phase += (330 - u * 140 + Math.sin(t * 32) * 22) * Math.PI * 2 / c.sampleRate;
           sample = (Math.sin(phase) + Math.sin(phase * 3) * .35 + filtered * .2) * (.55 + Math.sin(t * 43) * .28);
         } else if (kind === "pluck") sample = Math.sin(t * (850 - u * 340) * Math.PI * 2) * .65 + filtered * .25;
@@ -306,7 +310,7 @@ export class VillageAudio {
       this.gardenSounds.set(kind, buffer);
     }
     const source = c.createBufferSource(), gain = c.createGain(); source.buffer = buffer;
-    source.playbackRate.value = .96 + Math.random() * .08; gain.gain.value = kind === "duck" ? .19 : .34;
+    source.playbackRate.value = .96 + Math.random() * .08; gain.gain.value = kind === "duck" || kind === "coo" ? .19 : .34;
     const pan = this.panner(centered ? this.environment.listener : position, 3);
     source.connect(gain).connect(pan).connect(this.effects!);
     if (this.track(source, [gain, pan], c.currentTime + buffer.duration / .96, true)) source.start();

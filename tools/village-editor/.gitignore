@@ -1,0 +1,4 @@
+__pycache__/
+layouts/*.json
+layouts/.history/
+layouts/.saving-*

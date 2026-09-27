@@ -74,3 +74,10 @@ Editable source: assets/village/garden-pond.blend. Runtime: models/garden-pond.g
 Named pivots are animated by the village runtime; no third-party models or textures.
 Planting, watering, picking, pouring, bread crumbs, splashes and duck calls are
 original procedural Web Audio effects. Existing recorded soundtrack credits above apply.
+
+White dove and bird clearing (2026-09-27) — original project artwork.
+Dove authored in Blender 5.2.1 LTS: assets/village/dove.blend;
+runtime models/dove.glb; generator scripts/village/create_dove.py.
+White plumage, scalloped wings, rosy cheeks and tiny peach feet use vertex colors.
+Wren uses the original spirit with original flower/scarf/pouch accessories.
+No third-party models or textures. The two-note coo is an original Web Audio effect.

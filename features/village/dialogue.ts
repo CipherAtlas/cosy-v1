@@ -25,7 +25,7 @@ export class VillagerDialogue {
   private bubbles;
 
   constructor(host: HTMLElement, life: VillageLife, colliders: Collider[], private onTalk: () => void,
-    private actions?: { companion: (id: string) => void; crumbs: () => void; visitTea?: () => void }) {
+    private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void }) {
     this.layer.className = "v-villager-dialogue";
     this.layer.hidden = true;
     this.layer.setAttribute("role", "group");
@@ -64,7 +64,7 @@ export class VillagerDialogue {
       const crumbs = document.createElement("button"); crumbs.type = "button";
       crumbs.addEventListener("click", () => this.bread(index));
       crumbs.setAttribute("aria-keyshortcuts", "B");
-      if (profile.id === "maple") actions.append(crumbs);
+      if (profile.id === "maple" || profile.id === "wren") actions.append(crumbs);
       if (profile.id === "luma") {
         const tea = document.createElement("button"); tea.type = "button"; tea.dataset.tea = "true";
         tea.addEventListener("click", () => { this.onTalk(); this.actions?.visitTea?.(); }); actions.append(tea);
@@ -109,7 +109,7 @@ export class VillagerDialogue {
     b.companion.setAttribute("aria-pressed", String(b.resident.following));
     const tea = b.actions.querySelector("[data-tea]");
     if (tea) tea.textContent = ja ? "収穫を持ってお茶をしよう" : "Share your harvest over tea";
-    b.crumbs.textContent = ja ? "パンくずをもらう · B" : "Ask for bread crumbs · B";
+    b.crumbs.textContent = b.profile.id === "wren" ? (ja ? "サワードウのパンくずをもらう · B" : "Ask for sourdough crumbs · B") : ja ? "パンくずをもらう · B" : "Ask for bread crumbs · B";
   }
   invite(index = this.nearest) {
     const b = this.bubbles[index];
@@ -119,9 +119,9 @@ export class VillagerDialogue {
   }
   bread(index = this.nearest) {
     const b = this.bubbles[index];
-    if (!this.enabled || !b?.visible || b.distance > 4.5 || b.profile.id !== "maple" || !this.actions) return;
-    this.onTalk(); this.actions.crumbs();
-    this.say(index, line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 10);
+    if (!this.enabled || !b?.visible || b.distance > 4.5 || !["maple", "wren"].includes(b.profile.id) || !this.actions) return;
+    this.onTalk(); this.actions.crumbs(b.profile.id);
+    this.say(index, b.profile.id === "wren" ? b.profile.chat[0] : line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 10);
     this.announcement.textContent = b.line[this.language];
   }
 
@@ -148,6 +148,7 @@ export class VillagerDialogue {
   talk(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || index !== this.nearest) return;
+    if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 10; b.resident.chatting = true; return; }
     this.onTalk();
     this.say(index, b.profile.chat[b.chat++ % b.profile.chat.length], 10);
     b.talkingUntil = this.clock + 10;

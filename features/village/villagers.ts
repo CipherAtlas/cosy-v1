@@ -78,4 +78,16 @@ export const VILLAGERS = [
     rain: line("The rain is stirring the pond. How thoughtful.", "雨が池をかき混ぜてる。気が利くわね。"),
     dusk: line("A cup for me, a cup for you, and one for the moon.", "私に一杯、あなたに一杯、お月さまにも一杯。"),
   },
+  {
+    id: "wren", name: line("Wren", "レン"), color: "#f4c3d4", ink: "#86596c",
+    greeting: line("Hello, lovely! Our little clouds will be down for crumbs soon.", "こんにちは！小さな雲みたいな鳥たち、もうすぐ降りてくるよ。"),
+    ambient: [
+      line("Twelve little beaks. I count them every time.", "小さなくちばしが十二。毎回、数えちゃう。"),
+      line("One lap of the village, then a tiny picnic.", "村をひと回りしたら、小さなピクニック。"),
+      line("They always remember to say thank you.", "みんな、ありがとうを忘れないの。"),
+    ],
+    chat: [line("Here, some sourdough crumbs. Scatter a little and watch their wings!", "サワードウのパンくずをどうぞ。少し撒いて、羽を見ていてね！")],
+    rain: line("A little rain makes their feathers look like pearls.", "雨にぬれると、羽が真珠みたいね。"),
+    dusk: line("One last picnic before the stars come out.", "星が出る前に、もう一度ピクニック。"),
+  },
 ];

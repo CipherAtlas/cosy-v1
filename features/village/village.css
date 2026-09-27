@@ -1268,7 +1268,6 @@ kbd {
 .v-garden-bed span { display: block; color: #657562; font-size: 12px; line-height: 1.5; margin-top: 4px; }
 .v-garden-bed-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .v-garden-bed-actions .v-button { font-size: 12px; padding: 9px 12px; }
-.v-basket { color: #4c6d4f; font-size: 13px; line-height: 1.5; margin: 17px 0 0; }
 .v-garden-flowers { display: flex; flex-direction: column; gap: 10px; }
 .v-garden-flowers p,.v-garden-ritual p { font-size: 13px; line-height: 1.55; color: #64745e; margin: 8px 0; }
 .v-garden-ritual { padding: 4px 0 16px; margin-bottom: 18px; border-bottom: 1px solid #cdd6bd; }
@@ -1291,3 +1290,31 @@ kbd {
   .v-garden-bed-actions .v-button { flex: 1; }
   .v-friend-name strong { font-size: 20px; }
 }
+
+.v-harvest-inventory > p { color: #60745e; font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
+.v-harvest-inventory dl { margin: 0; }
+.v-harvest-inventory dl > div { display: flex; justify-content: space-between; gap: 20px; padding: 17px 0; border-bottom: 1px solid #d4dcc6; }
+.v-harvest-inventory dt { font: 21px Georgia, serif; }
+.v-harvest-inventory dd { margin: 0; font-size: 18px; font-variant-numeric: tabular-nums; color: #36573d; }
+.v-garden-ritual > .v-text-button { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; }
+
+
+.v-bird-bubble {
+  width: max-content;
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -100%);
+  max-width: min(270px, calc(100vw - 24px));
+  padding: 12px 18px;
+  border: 1px solid #f6d6dc;
+  border-radius: 20px;
+  background: #fff8ed;
+  color: #665058;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 18px;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 5px 18px #253e3020;
+}
+.v-bird-bubble[hidden] { display: none; }
+.v-bird-activity [role="status"] { min-height: 3em; }

@@ -1,25 +1,28 @@
 import * as T from "three";
 import { VillageMovement } from "./movement";
-import { type Collider } from "./environment";
+import { BIRD_CLEARING, type Collider } from "./environment";
 import { VILLAGERS } from "./villagers";
 import { VillageNavigation } from "./navigation";
 import { ACTIVITY_STAGES } from "./activityScene";
 import type { PlaceId } from "./places";
 import { CROP_MODELS, type Crop, type GardenAction } from "./garden";
+import { CompanionWalk } from "./companionWalk";
 
 const COMPANION_STAGES: Record<PlaceId, [number, number, number][]> = {
-  focus: [[107.6, .1, -.45], [109.8, .1, -.3], [107.3, .1, 1], [109.2, .1, 1.1]],
-  music: [[-6.8, .4, -16.1], [-4.8, .4, -16.1], [-5, .4, -21.9], [-6.7, .4, -21.9]],
-  breathe: [[-21.9, .24, -5.6], [-20.8, .24, -5.5], [-22.5, .24, -4.9], [-21.2, .24, -4.9]],
-  mood: [[13.9, .4, -10.85], [13.9, .4, -9.15], [16.5, .1, -8.5], [16.5, .1, -11.5]],
-  gratitude: [[-18.1, .05, 5.2], [-17, .05, 6.6], [-18.1, .05, 7.8], [-17, .05, 8.1]],
-  compliment: [[2, .05, .5], [4.1, .05, .5], [2.5, .05, 1.6], [3.8, .05, 1.6]],
-  garden: [[24.4, .05, -7.3], [20, .05, -7.5], [28.3, .05, -7.4], [25, .05, -3]],
+  focus: [[107.6, .1, -.45], [109.8, .1, -.3], [107.3, .1, 1], [109.2, .1, 1.1], [110.6,.1,1.1]],
+  music: [[-6.8, .4, -16.1], [-4.8, .4, -16.1], [-5, .4, -21.9], [-6.7, .4, -21.9], [-7.5,.05,-19]],
+  breathe: [[-21.9, .24, -5.6], [-20.8, .24, -5.5], [-22.5, .24, -4.9], [-21.2, .24, -4.9], [-20,.1,-5]],
+  mood: [[13.9, .4, -10.85], [13.9, .4, -9.15], [16.5, .1, -8.5], [16.5, .1, -11.5], [17,.1,-10]],
+  gratitude: [[-18.1, .05, 5.2], [-17, .05, 6.6], [-18.1, .05, 7.8], [-17, .05, 8.1], [-16,.05,7.8]],
+  compliment: [[2, .05, .5], [4.1, .05, .5], [2.5, .05, 1.6], [3.8, .05, 1.6], [4.8,.05,1.6]],
+  birds: [[-25.5,.05,-27.8],[-22.5,.05,-27.8],[-26.8,.05,-28.4],[-21.2,.05,-28.4],[-27,.05,-31.5]],
+  garden: [[24.4, .05, -7.3], [20, .05, -7.5], [28.3, .05, -7.4], [25, .05, -3], [29,.05,-4]],
 };
 
-/** A few residents on authored safe routes, and an economical flock over the valley. */
+/** Residents wander safe routes, join activities and tend their village rituals. */
 export class VillageLife {
   readonly group = new T.Group();
+  readonly companionWalk: CompanionWalk;
   readonly residents: {
     root: T.Object3D; spirit: T.Object3D; fins: T.Object3D[]; phase: number;
     movement: VillageMovement; route: [number, number][]; waypoint: number; pause: number; walking: boolean; chatting: boolean;
@@ -31,11 +34,7 @@ export class VillageLife {
     following: boolean; companionPath: [number, number][]; replan: number;
     goal: [number, number]; returning: boolean; cup: T.Group; wateringCan?: T.Object3D;
   }[] = [];
-  private bodies: T.InstancedMesh;
-  private leftWings: T.InstancedMesh;
-  private rightWings: T.InstancedMesh;
-  private bird = new T.Object3D();
-  private wing = new T.Object3D();
+  private birdFeedAt = -100;
   private approachScan = 0;
   private navigation: VillageNavigation;
   private activity: PlaceId | null = null;
@@ -51,6 +50,7 @@ export class VillageLife {
 
   constructor(source: T.Object3D, colliders: Collider[], props?: T.Object3D) {
     this.navigation = new VillageNavigation(colliders);
+    this.companionWalk = new CompanionWalk(colliders);
     const routes: [number, number][][] = [
       // Cottage lane and the entrance meadow.
       [[1.4, 7], [3.8, 10.8], [4.7, 13.5], [3.8, 19], [1.8, 30], [-.7, 28], [-.8, 18], [-.6, 7]],
@@ -63,6 +63,7 @@ export class VillageLife {
       // Tea garden, central junction and the open garden perimeter.
       [[13.8, -6.8], [12.8, -7.5], [9, -7.8], [6.5, -7.8], [4, -3], [.5, 1],
         [-1.2, -3], [-.8, -9], [4, -10], [8, -10], [12, -14.5], [18, -14.5], [19, -7.5], [17, -5.8]],
+      [[-27, -31.5], [-27.2, -33], [-25.8, -33.5], [-27, -31.5]],
     ];
     routes.forEach((route, i) => {
       const root = source.clone(true);
@@ -83,25 +84,25 @@ export class VillageLife {
         node.material = Array.isArray(node.material) ? node.material.map(tint) : tint(node.material);
       });
       this.dressSpirit(root, i);
-      const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1][i]);
+      const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1,.96][i]);
       const movement = new VillageMovement(colliders, () => {});
       movement.settle(...route[0]);
       actor.position.set(movement.position.x, movement.position.y, movement.position.z);
       this.group.add(actor);
       actor.name = VILLAGERS[i].name.en;
       const cup = new T.Group(); cup.visible = false; actor.add(cup);
-      const porcelain = new T.MeshStandardMaterial({ color: ["#a5dfef", "#ffdab9", "#c8e6a6", "#d6c7fa"][i], roughness: .5 });
+      const porcelain = new T.MeshStandardMaterial({ color: ["#a5dfef", "#ffdab9", "#c8e6a6", "#d6c7fa", "#f4c3d4"][i], roughness: .5 });
       const bowl = new T.Mesh(new T.CylinderGeometry(.105, .08, .14, 16), porcelain); cup.add(bowl);
       const handle = new T.Mesh(new T.TorusGeometry(.054, .012, 6, 12), porcelain); handle.position.x = .11; cup.add(handle);
       const wateringCan = props?.getObjectByName("WateringCan")?.clone(true);
       if (wateringCan) { wateringCan.scale.multiplyScalar(.5); wateringCan.visible = false; actor.add(wateringCan); }
       this.residents.push({ root: actor, spirit: root, fins, phase: i * 1.7, movement, route, waypoint: route.length > 1 ? 1 : 0,
-        pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38][i],
+        pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38, .32][i],
         following: false, companionPath: [], replan: 0, goal: [0, 0], returning: false, cup, wateringCan,
         encounter: { state: "roam", path: [], time: 0, noticed: false, cooldown: 0, checkIn: 0 } });
     });
     const luma = this.residents[3].root;
-    for (const crop of ["carrot", "radish", "mint", "daisy"] as const) {
+    for (const crop of ["carrot", "radish", "mint", "daisy", "sunflower"] as const) {
       const template = props?.getObjectByName(CROP_MODELS[crop]);
       if (template) { const gift = template.clone(true); gift.visible = false; luma.add(gift); this.giftProps.set(crop, gift); }
     }
@@ -110,18 +111,13 @@ export class VillageLife {
     heart.bezierCurveTo(.1, .44, .35, .48, .42, .26); heart.bezierCurveTo(.5, .02, .2, -.15, 0, -.4);
     this.giftHeart.add(new T.Mesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#f7a6c0", side: T.DoubleSide })));
     this.giftHeart.name = "Luma's thank-you heart"; this.giftHeart.visible = false; this.group.add(this.giftHeart);
-    const material = new T.MeshStandardMaterial({ color: "#343f40", roughness: 1, side: T.DoubleSide });
-    const body = new T.SphereGeometry(.12, 8, 4); body.scale(.7, .7, 2);
-    const wing = new T.BufferGeometry();
-    wing.setAttribute("position", new T.Float32BufferAttribute([0, 0, -.08, .64, 0, .12, .36, 0, -.19, 0, 0, .12], 3));
-    wing.setIndex([0, 1, 2, 0, 3, 1]); wing.computeVertexNormals();
-    this.bodies = new T.InstancedMesh(body, material, 12);
-    this.leftWings = new T.InstancedMesh(wing, material, 12);
-    this.rightWings = new T.InstancedMesh(wing, material, 12);
-    for (const mesh of [this.bodies, this.leftWings, this.rightWings]) {
-      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); mesh.frustumCulled = false; this.group.add(mesh);
-    }
   }
+  get caretakerPresent() {
+    const wren = this.residents[4];
+    return !wren.following && !wren.returning && Math.hypot(wren.root.position.x - BIRD_CLEARING.x, wren.root.position.z - BIRD_CLEARING.z) < 4.5;
+  }
+  feedBirds() { this.birdFeedAt = this.lastTime; }
+
   setCompanions(ids: string[]) {
     this.residents.forEach((r, i) => {
       const following = ids.includes(VILLAGERS[i].id);
@@ -144,7 +140,7 @@ export class VillageLife {
       if (!r.following) return;
       r.chatting = false; r.companionPath = []; r.replan = 0;
       if (arrival) {
-        const offsets = [[-1, 1.1], [1, 1.1], [-1, 2.2], [1, 2.2]];
+        const offsets = [[-1, 1.1], [1, 1.1], [-1, 2.2], [1, 2.2], [0, 3.3]];
         const target: [number, number] = [arrival[0] + offsets[i][0], arrival[1] + offsets[i][1]];
         if (r.movement.clear(...target)) r.movement.settle(...target);
         else r.movement.settle(...arrival);
@@ -182,24 +178,32 @@ export class VillageLife {
     }
     r.cup.visible = false;
     if (r.wateringCan) r.wateringCan.visible = false;
-    const offsets = [[-1.2, 1.4], [1.2, 1.4], [-1.2, 2.7], [1.2, 2.7]];
-    const target: [number, number] = r.returning ? r.route[r.waypoint] : [player.x + offsets[index][0], player.z + offsets[index][1]];
+    const slot = this.residents.filter(resident => resident.following).indexOf(r);
+    const target: [number, number] = r.returning ? r.route[r.waypoint]
+      : this.companionWalk.avoidPlayer(r.movement.position, this.companionWalk.target(slot));
+    const direct = !r.returning && Math.hypot(target[0] - r.movement.position.x, target[1] - r.movement.position.z) < 2.5 && r.movement.canWalkTo(...target);
     r.replan -= delta;
-    if (r.replan <= 0 && (Math.hypot(target[0] - r.goal[0], target[1] - r.goal[1]) > .6 || !r.companionPath.length)) {
-      r.goal = target; r.replan = 1 + index * .11;
+    if (direct) { r.goal = target; r.companionPath = [target]; }
+    else if (r.replan <= 0 && (Math.hypot(target[0] - r.goal[0], target[1] - r.goal[1]) > .25 || !r.companionPath.length)) {
+      r.goal = target; r.replan = r.returning ? 1 + index * .11 : .35;
       r.companionPath = this.navigation.path([r.movement.position.x, r.movement.position.z], target);
     }
     let waypoint = r.companionPath[0];
-    if (waypoint && Math.hypot(waypoint[0] - r.movement.position.x, waypoint[1] - r.movement.position.z) < .18) { r.companionPath.shift(); waypoint = r.companionPath[0]; }
+    if (!direct && waypoint && Math.hypot(waypoint[0] - r.movement.position.x, waypoint[1] - r.movement.position.z) < .18) { r.companionPath.shift(); waypoint = r.companionPath[0]; }
     const dx = waypoint ? waypoint[0] - r.movement.position.x : 0, dz = waypoint ? waypoint[1] - r.movement.position.z : 0, length = Math.hypot(dx, dz);
-    const moving = length > .12 && (!r.chatting || r.root.position.distanceTo(player) > 4);
+    const moving = length > .12 && (r.following || !r.chatting || r.root.position.distanceTo(player) > 4);
     const distance = r.root.position.distanceTo(player), pace = r.returning ? .55 : Math.min(1, Math.max(.45, length / 1.4));
-    r.movement.update(delta, { x: moving ? dx / length * pace : 0, z: moving ? dz / length * pace : 0, run: !r.returning && distance > 3, sprint: !r.returning && distance > 5, blocked: false });
+    if (direct) {
+      // Match the player's velocity while closing the formation error, so hands stay together.
+      const velocity = this.companionWalk.velocity.clone().add(new T.Vector2(dx, dz).multiplyScalar(4)).clampLength(0, 6);
+      r.movement.update(delta, { x: velocity.x / 6, z: velocity.y / 6, run: false, sprint: true, blocked: false });
+    } else r.movement.update(delta, { x: moving ? dx / length * pace : 0, z: moving ? dz / length * pace : 0, run: !r.returning && distance > 3, sprint: !r.returning && distance > 5, blocked: false });
     r.root.position.set(r.movement.position.x, r.movement.position.y, r.movement.position.z);
     if (moving && r.movement.speed < .03) { r.companionPath = []; r.replan = Math.min(r.replan, .2); }
-    if (moving) {
-      const turn = T.MathUtils.euclideanModulo(Math.atan2(dx, dz) - r.root.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
-      r.root.rotation.y += turn * (1 - Math.exp(-delta * 5));
+    if (moving || direct) {
+      const angle = direct && length < .5 ? this.companionWalk.heading : Math.atan2(dx, dz);
+      const turn = T.MathUtils.euclideanModulo(angle - r.root.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+      r.root.rotation.y += turn * (1 - Math.exp(-delta * 10));
     }
     r.walking = r.movement.speed > .1;
     r.spirit.position.y = .55 + (reduced ? 0 : Math.sin(time * 2.5 + r.phase) * .065);
@@ -208,13 +212,14 @@ export class VillageLife {
     r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(time * (r.walking ? 7 : 3) + r.phase + i * Math.PI) * .18; });
     if (r.returning && Math.hypot(target[0] - r.root.position.x, target[1] - r.root.position.z) < .4) { r.returning = false; r.pause = 2; }
   }
-  update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, canApproach = true, cameraRotation?: T.Quaternion) {
+  update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, canApproach = true, cameraRotation?: T.Quaternion, playerHeading?: number) {
     this.lastTime = elapsed;
+    if (!this.activity) this.companionWalk.update(delta, player, this.residents.filter(r => r.following).length, playerHeading);
     this.approachScan -= delta;
     if (canApproach && this.approachScan <= 0) {
       this.approachScan = .4;
       if (!this.residents.some(r => r.encounter.state === "approach" || r.encounter.state === "visit" || r.chatting)) {
-        const nearby = this.residents.filter(r => !r.following && !r.returning && r.encounter.state === "roam" && !r.encounter.noticed
+        const nearby = this.residents.filter(r => r !== this.residents[4] && !r.following && !r.returning && r.encounter.state === "roam" && !r.encounter.noticed
           && r.encounter.cooldown === 0 && r.root.position.distanceTo(player) < 6)
           .sort((a, b) => a.root.position.distanceToSquared(player) - b.root.position.distanceToSquared(player));
         const r = nearby.find(r => r.movement.canWalkTo(player.x, player.z));
@@ -289,7 +294,6 @@ export class VillageLife {
       r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(elapsed * (walking ? 7 : 3) + r.phase + i * Math.PI) * .18; });
 
     }
-    const t = reduced ? 0 : elapsed;
     const age = elapsed - this.giftAt, thanking = this.activity === "mood" && age < 4.8;
     const luma = this.residents[3];
     this.giftProps.forEach((gift, crop) => {
@@ -307,24 +311,19 @@ export class VillageLife {
       this.giftHeart.scale.setScalar(reduced ? .42 : Math.min(1, age * 5, (4.8 - age) * 3) * .52);
       if (cameraRotation) this.giftHeart.quaternion.copy(cameraRotation);
     }
-    for (let i = 0; i < 12; i++) {
-      const a = t * .1 + i * .13 + Math.floor(i / 6) * Math.PI;
-      this.bird.position.set(-10 + Math.sin(a) * (22 + i * .5), 10 + i * .55 + Math.sin(a * 2) * 1.4, -4 + Math.cos(a) * 26);
-      this.bird.rotation.set(0, Math.atan2(Math.cos(a) * 23, -Math.sin(a) * 26), -.12 * Math.cos(a));
-      this.bird.updateMatrix(); this.bodies.setMatrixAt(i, this.bird.matrix);
-      const flap = Math.sin(t * 9 + i * 1.3) * .6;
-      for (const side of [-1, 1]) {
-        this.wing.position.set(0, 0, 0); this.wing.rotation.set(0, 0, side * flap);
-        this.wing.scale.set(side, 1, 1); this.wing.updateMatrix();
-        (side === -1 ? this.leftWings : this.rightWings).setMatrixAt(i, this.wing.matrix.premultiply(this.bird.matrix));
-      }
+    const wren = this.residents[4], feeding = elapsed - this.birdFeedAt;
+    if (this.caretakerPresent && feeding < 2.5) {
+      wren.root.rotation.y = Math.atan2(BIRD_CLEARING.x - wren.root.position.x, BIRD_CLEARING.z - wren.root.position.z);
+      wren.spirit.rotation.x = reduced ? .1 : Math.sin(feeding / 2.5 * Math.PI) * .2;
+      wren.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(feeding * 5 + i) * .5; });
+      wren.pause = Math.max(wren.pause, .1);
     }
-    for (const mesh of [this.bodies, this.leftWings, this.rightWings]) mesh.instanceMatrix.needsUpdate = true;
   }
+
   private dressSpirit(root: T.Object3D, index: number) {
     const cream = new T.MeshStandardMaterial({ color: "#fff2d1", roughness: .75 });
     const gold = new T.MeshStandardMaterial({ color: "#ffd36f", roughness: .55 });
-    const accent = new T.MeshStandardMaterial({ color: ["#318c9b", "#de8e9b", "#6f9d52", "#7772b5"][index], roughness: .8 });
+    const accent = new T.MeshStandardMaterial({ color: ["#318c9b", "#de8e9b", "#6f9d52", "#7772b5", "#6c9290"][index], roughness: .8 });
     const sphere = new T.SphereGeometry(1, 16, 10);
     const add = (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number, sx=1, sy=1, sz=1) => {
       const mesh = new T.Mesh(geometry, material); mesh.position.set(x,y,z); mesh.scale.set(sx,sy,sz);
@@ -350,6 +349,12 @@ export class VillageLife {
       for(const side of [-1,1]) add(sphere,accent,.06+side*.105,1.15,.02,.15,.045,.075).rotation.z=side*.4;
       add(sphere,cream,.17,.3,.3,.105,.11,.045);
       add(starGeometry,gold,.17,.31,.35).scale.setScalar(.55);
+    } else if (index === 4) {
+      add(new T.TorusGeometry(.3,.045,8,24),accent,0,.28,0).rotation.x=Math.PI/2;
+      add(sphere,accent,-.28,.15,.27,.14,.18,.08);
+      add(sphere,gold,-.28,.2,.35,.065,.035,.025);
+      for(let i=0;i<5;i++) { const a=i*Math.PI*2/5; add(sphere,cream,.2+Math.cos(a)*.067,.91+Math.sin(a)*.067,.2,.055,.055,.025); }
+      add(sphere,gold,.2,.91,.235,.033,.033,.02);
     } else {
       const crescent = new T.Shape();
       crescent.absarc(0,0,.15,Math.PI*.32,Math.PI*1.68,false);

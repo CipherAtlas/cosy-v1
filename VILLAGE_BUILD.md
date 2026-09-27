@@ -1,5 +1,42 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-27 local layout studio
+
+A private standalone editor runs at `http://127.0.0.1:3040` with `npm run dev:editor`. The implementation is in `tools/village-editor/`, using existing Three.js/TypeScript and Python's standard library. Optional capture hooks in `world.ts` expose reusable assets while preserving normal public-world batching. No dependency changes, Git writes or deployment were performed by this task; the public export contains no editor route.
+
+The studio supports asset thumbnails, search, direct picking and ground placement, move/rotate/scale handles, numeric transforms, multiple selection, world/local axes, snapping, locks, visibility, duplicate/delete, curved paths with editable points, scenery extensions, undo/redo and three light previews. Named layouts save locally with revision checks, atomic replacement and retained previous versions; automatic browser drafts and JSON import/export provide recovery. Preview has a visible return button and Escape exit.
+
+The current default was refreshed at the user's explicit request to include the latest garden, bird-clearing scenery, five residents and twelve doves: 252 objects. The earlier 231-object original remains archived. Current village, riverside, meadow and original presets all open as independent copies. Their transforms are preserved; appearance uses the current shared artwork.
+
+Validation: `npm run typecheck`, `git diff --check`, six server tests, forty Chrome 154 browser assertions, ten movement/composition contracts and three bridge regressions pass. Full `npm run build` also passed in an isolated source copy to avoid replacing other tasks' live `.next`/`out` files; all 22 static pages exported with no editor route. Existing Browserslist-age and unrelated RoomScene image warnings remain. Browser checks use a temporary layout directory, actual gizmo dragging and keyboard/click input, downloaded JSON, save/reload, protected defaults, malformed imports and text injection. Desktop 1600×1000, tablet 1024×768 and phone 390×844 views were inspected; no JavaScript/renderer errors were recorded.
+
+[Reproduction guide](tools/village-editor/README.md#verification), [results and screenshots](docs/village/evidence/layout-studio/README.md). These are Chrome desktop/emulated-size checks, not Firefox/Safari, physical-touch or sustained performance certification. This is visual authoring: collision surfaces, walkable bridges, activity locations and resident routes are not automatically rewritten from saved designs. The public game retains its authored map until a separate integration pass.
+
+## 2026-09-27 bird clearing
+
+Local implementation only; no Git writes or deployment. New bird clearing/Wren/Blender doves are described in the [canonical handoff](VILLAGE_HANDOFF.md#2026-09-27--white-doves-and-wrens-bird-clearing). Flight takes 30 active simulation seconds, then a separate feeding/rest interval (10 seconds after a meal, or 18 seconds without one). Hidden tabs pause the simulation. Wren feeds after 2.5 seconds on the ground when the visitor is away, or gives a nearby visitor 12 seconds to feed first. Simple view offers the same crumb gift and feeding response without requiring WebGL.
+
+The original dove is 240,928 bytes, 6,980 source triangles, with a shared vertex-color material and four independently animated parts. [Manifest](docs/village/dove-manifest.json), [Blender preview](docs/village/evidence/bird-clearing/dove-blender.png), [desktop](docs/village/evidence/bird-clearing/app-chrome.png), [phone](docs/village/evidence/bird-clearing/app-phone.png), [close view](docs/village/evidence/bird-clearing/doves-chrome.png).
+
+Validation:
+- `npm run typecheck`, full static `npm run build`, and `git diff --check` pass. Existing workspace-root and RoomScene image warnings remain.
+- [Chrome scene checks](docs/village/evidence/bird-clearing/checks-chrome.json) and [Firefox scene checks](docs/village/evidence/bird-clearing/checks-firefox.json) cover 12 birds/four draws, dry landing spots, the curved approach, the 30-second flight boundary, queued feeding, duplicate input, hearts and exact speech, translated/reduced-motion feedback, crumb save preservation, Wren's absence, and all eight activities with a fifth resident.
+- [Chrome app](docs/village/evidence/bird-clearing/ui-chrome.json) and [Firefox app](docs/village/evidence/bird-clearing/ui-firefox.json) cover real flight/feeding, Wren's gift, saved crumbs after reload, E/exit/Escape, companion selection, Japanese and simple view. Chrome also checks 390×844 feeding/exit bounds and speech clearance. The Chrome real cycle waited 34.3 seconds from scattering to thanks.
+- [Existing regressions](docs/village/evidence/bird-clearing/regressions-chrome.json): 32 nearby interaction, 92 garden/pond/companion, 43 duck/activity-camera, 29 dialogue, 20 encounter and 50 roaming/road-clearance checks pass. All five companions follow and return at 30/60/120 FPS. Only the caretaker's deliberately short job route differs from the four broad roaming circuits.
+
+[24 editor checks](docs/village/evidence/bird-clearing/editor-checks.json) pass for previews, selecting/placing all seven new assets, position/rotation/scale controls, file saves and browser reloads. The baseline preset stays byte-identical. [Editor dove view](docs/village/evidence/bird-clearing/editor-dove.png). Tests use a separate localhost port and temporary layout directory; the existing editor server and user layouts are untouched. `tools/village-editor/tests/birds.cjs` reproduces this with `EDITOR_URL`, `PLAYWRIGHT_PATH` and `OUTPUT_DIR`. Editor changes remain layout authoring; they do not retarget runtime gameplay anchors.
+
+Reproduce with the existing external Playwright installation; no dependency was added:
+
+```sh
+python3 scripts/village/preview_qa.py --port 3045
+PLAYWRIGHT_PATH=/path/to/playwright OUTPUT_DIR=/tmp/cosy-birds node scripts/village/tests/birds.cjs chrome
+python3 -m http.server 3046 --bind 127.0.0.1 --directory out
+PLAYWRIGHT_PATH=/path/to/playwright OUTPUT_DIR=/tmp/cosy-birds node scripts/village/tests/birds-ui.cjs chrome
+```
+
+For Firefox use `firefox` and `BROWSER_EXECUTABLE` pointing to a compatible installed browser. Module tests advance the simulation for boundary coverage; app tests wait for an actual cycle. Phone dimensions are browser emulation, not physical-touch proof. No target-device performance, thermal or subjective speaker/listening acceptance is claimed. The coo effect uses the existing opt-in spatial audio/effects mixer. [Three audio checks](docs/village/evidence/bird-clearing/coo-audio.json) confirm silence before consent, a finite non-clipping 0.95-second buffer, and stopping audio. The runtime GLB and exported copy match the manifest SHA-256 byte-for-byte.
+
 ## 2026-09-27 tea seating and daisy growing
 
 The tea activity previously checked only the 4 m circle around its arrival point `(15.6,-6.8)`, missing the west/back bench approach shown in the user's screenshot. A second interaction anchor at `(14.7,-10)` covers the seating and pergola approaches; either area offers the same E/click action. Arrival/exit positions and other place ranges are unchanged.

@@ -154,7 +154,7 @@ export async function checkGarden(engine, capture, save) {
   localStorage.setItem(GARDEN_KEY, JSON.stringify(state));
   checks(JSON.stringify(readGarden(localStorage.getItem(GARDEN_KEY))) === JSON.stringify(state), 'Garden inventory and beds round-trip through browser storage');
   for (const invalid of ['null', '{}', '[]', 'broken', '{"mint":-4,"carrots":1e99,"beds":[null]}']) {
-    const restored = readGarden(invalid); checks(restored.beds.length === 6 && restored.mint >= 0 && Number.isSafeInteger(restored.carrots), `Safe optional garden recovery: ${invalid}`);
+    const restored = readGarden(invalid); checks(restored.beds.length === BEDS.length && restored.mint >= 0 && Number.isSafeInteger(restored.carrots), `Safe optional garden recovery: ${invalid}`);
   }
   checks(POND.rx * POND.rz > 2 * 7.7 * 7, 'Pond water area is more than twice the previous footprint');
   checks(!engine.world.colliders.some(c => c.x === -24 && c.z === -5), 'Pond-front cottage collision is removed');
@@ -189,11 +189,11 @@ export async function checkGarden(engine, capture, save) {
   const followSamples = [];
   for (const fps of [30, 60, 120]) {
     const life = new VillageLife(new T.Group(), engine.world.colliders);
-    life.setCompanions(['pip', 'maple', 'moss', 'luma']);
+    life.setCompanions(['pip', 'maple', 'moss', 'luma', 'wren']);
     const player = new T.Vector3(-19, 0, 0);
     for (let frame = 0; frame < 75 * fps; frame++) life.update(1 / fps, frame / fps, player, false, false);
     const distances = life.residents.map(r => r.root.position.distanceTo(player));
-    checks(distances.every(d => d < 4.3), `All four companions route across the village and bridge at ${fps} fps`);
+    checks(distances.every(d => d < 4.3), `All five companions route across the village and bridge at ${fps} fps`);
     checks(life.residents.every(r => r.movement.clear(r.movement.position.x, r.movement.position.z)), `Companions finish on safe ground at ${fps} fps`);
     followSamples.push({ fps, distances });
     const walk = navigation.path([player.x, player.z], [24.6, -3]);
@@ -208,7 +208,7 @@ export async function checkGarden(engine, capture, save) {
       life.update(1 / fps, 75 + frame / fps, player, false, false);
       if (frame % fps === 0) safe &&= life.residents.every(r => r.movement.clear(r.movement.position.x, r.movement.position.z));
     }
-    checks(waypoint === walk.length && life.residents.every(r => r.root.position.distanceTo(player) < 4.3), `All four track a moving player across the bridge and around cottages at ${fps} fps`);
+    checks(waypoint === walk.length && life.residents.every(r => r.root.position.distanceTo(player) < 4.3), `All five track a moving player across the bridge and around cottages at ${fps} fps`);
     checks(safe, `Moving companions respect collision and water bounds at ${fps} fps`);
     life.setCompanions([]);
     for (let frame = 0; frame < 90 * fps; frame++) life.update(1 / fps, 130 + frame / fps, player, false, false);
@@ -218,7 +218,7 @@ export async function checkGarden(engine, capture, save) {
     life.group.traverse(o => { if (o.isMesh) { geometries.add(o.geometry); materials.add(o.material); } });
     materials.forEach(m => m.dispose()); geometries.forEach(g => g.dispose());
   }
-  engine.setCompanions(['pip', 'maple', 'moss', 'luma']);
+  engine.setCompanions(['pip', 'maple', 'moss', 'luma', 'wren']);
   for (const place of PLACES) {
     engine.travel(place.id); await delay(80);
     checks(engine.life.residents.every(r => r.root.visible && r.root.position.distanceTo(engine.player.position) < 7), `${place.name}: all companions join the activity`);
@@ -260,7 +260,7 @@ export async function recordGarden(engine, save) {
   const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 2200000 });
   const stopped = new Promise(resolve => { recorder.ondataavailable = e => chunks.push(e.data); recorder.onstop = resolve; });
   const samples = [];
-  engine.setCompanions(['pip', 'maple', 'moss', 'luma']); engine.setBlocked(true); engine.setQuality('high');
+  engine.setCompanions(['pip', 'maple', 'moss', 'luma', 'wren']); engine.setBlocked(true); engine.setQuality('high');
   const measure = async (place, actions) => {
     engine.travel(place); await delay(1000);
     const times = []; let previous = performance.now(), active = true, frame;
@@ -439,7 +439,7 @@ export async function checkGardenDetails(engine, capture, save) {
     check(growthTimeLeft(bed, start + GROWTH_MS[crop] + 10000) === '0:00', `${crop}: countdown never becomes negative`);
   }
   const garden = engine.garden;
-  check(garden.labels.length === 8 && garden.labels.every(label => label.text), 'All six growing beds and two decorative flower borders have named wooden labels');
+  check(garden.labels.length === 8 && garden.labels.every(label => label.text), 'All seven growing beds and the iris border have named wooden labels');
   engine.setLanguage('ja');
   check(garden.labels[MINT_BED].text === 'ミント・お茶の葉' && garden.labels.some(label => label.text === 'ひまわり'), 'Mint and flower labels follow the Japanese setting');
   engine.setLanguage('en');

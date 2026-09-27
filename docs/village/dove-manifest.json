@@ -1,0 +1,16 @@
+{
+  "id": "dove-v1",
+  "creator": "Original project artwork, Blender 5.2.1 LTS",
+  "source": "assets/village/dove.blend",
+  "runtime": "public/village/models/dove.glb",
+  "bytes": 240928,
+  "sha256": "ee6d5c28cf781087cad44e9bf812a40f02d4035d5b2d07d5ff2dbc2743d353bb",
+  "triangles": 6980,
+  "parts": [
+    "DoveBody",
+    "DoveHead",
+    "DoveWingLeft",
+    "DoveWingRight"
+  ],
+  "license": "Original project artwork; no third-party models, textures or generators."
+}

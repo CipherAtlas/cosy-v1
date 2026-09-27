@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "Friends invites Pip",
+    "Walking retains the selected companion",
+    "Phone companion controls fit",
+    "Phone can dismiss the companion"
+  ],
+  "errors": []
+}

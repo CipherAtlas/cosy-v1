@@ -4,6 +4,16 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current release does not close those findings.
 
+## 2026-09-27 local layout studio
+
+The private studio uses the village's actual 3D assets in an ivory/green workspace with rendered library thumbnails, a large canvas, compact transform toolbar and precise inspector. Inspected the village overview, cottage gizmo, four-preset chooser, new bird clearing, tablet and phone layouts. Forty browser assertions pass, including real pointer manipulation, local saving/reload, copy-only presets and visible preview exits. [Images and scope](docs/village/evidence/layout-studio/README.md).
+
+The latest default includes the garden and bird work at the user's request; the earlier snapshot remains. Browser tests cover Chrome on macOS with emulated smaller viewports. Gameplay integration, physical-touch behavior and sustained performance are not certified by these checks. This local editor milestone does not change the broader village-art acceptance verdict.
+
+## 2026-09-27 bird clearing
+
+White Blender doves, Wren and the northern pond feeding clearing are integrated locally. Inspected the Blender render, actual flock close-up, exported desktop and phone views. The final approach avoids the pond bench and water; phone bird speech clears the visible exit. Feeding, hearts and exact thanks complete after a real flight cycle. [Verification and images](VILLAGE_BUILD.md#2026-09-27-bird-clearing). No deployment or broader art/device acceptance is implied.
+
 ## 2026-09-27 tea seating and growing daisies
 
 The wider tea-seating approach and raised daisy bed are verified in the running renderer. Chrome/Firefox pass the exported-app tea entry/exit, real three-minute daisy grow/harvest cycle, reload persistence and Luma's held-daisy reaction; Chrome phone dimensions retain readable controls and an explicit exit. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing). The broader art/device verdict remains unchanged.

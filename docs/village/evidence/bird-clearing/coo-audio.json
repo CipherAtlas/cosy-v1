@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Coo stays silent before audio consent",
+    "Two-note coo has finite non-clipping samples and expected duration",
+    "Audio stop disables further calls"
+  ],
+  "duration": 0.95,
+  "peak": 0.24014681577682495,
+  "rms": 0.06549591220871394
+}

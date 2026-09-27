@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "Friends invites Pip",
+    "Walking retains the selected companion",
+    "Friends dismisses Pip"
+  ],
+  "errors": []
+}

@@ -1,4 +1,4 @@
-export type Crop = "carrot" | "radish" | "mint" | "daisy";
+export type Crop = "carrot" | "radish" | "mint" | "daisy" | "sunflower";
 export type GardenBed = { crop: Crop; stage: "empty" | "sprout" | "growing" | "grown"; wateredAt?: number };
 export type GardenState = {
   beds: GardenBed[];
@@ -6,6 +6,7 @@ export type GardenState = {
   carrots: number;
   radishes: number;
   daisies: number;
+  sunflowers: number;
   mintTea: number;
   crumbPouch: boolean;
 };
@@ -13,19 +14,20 @@ export type GardenAction =
   | { kind: "plant"; bed: number; crop: Crop }
   | { kind: "water" | "harvest"; bed: number }
   | { kind: "gift"; crop: Crop }
-  | { kind: "flowers" | "drink" | "crumbs" | "feed" };
-export type GardenSound = "water" | "pluck" | "plant" | "pour" | "crumbs" | "splash" | "duck";
+  | { kind: "flowers" | "drink" | "crumbs" | "feed" | "basket" | "birdCrumbs" | "feedBirds" };
+export type GardenSound = "water" | "pluck" | "plant" | "pour" | "crumbs" | "splash" | "duck" | "coo";
 
 export const GARDEN_KEY = "cosy-village-garden-v1";
-export const GROWTH_MS: Record<Crop, number> = { radish: 120_000, mint: 180_000, carrot: 300_000, daisy: 180_000 };
-export const CROP_NAMES = { carrot: { en: "Carrots", ja: "ニンジン" }, radish: { en: "Radishes", ja: "ラディッシュ" }, mint: { en: "Mint", ja: "ミント" }, daisy: { en: "Daisies", ja: "デイジー" } };
-export const CROP_INVENTORY = { carrot: "carrots", radish: "radishes", mint: "mint", daisy: "daisies" } as const;
-export const CROP_MODELS = { carrot: "Carrot", radish: "Radish", mint: "Mint", daisy: "Daisy" } as const;
+export const GROWTH_MS: Record<Crop, number> = { radish: 120_000, mint: 180_000, carrot: 300_000, daisy: 180_000, sunflower: 300_000 };
+export const CROP_NAMES = { carrot: { en: "Carrots", ja: "ニンジン" }, radish: { en: "Radishes", ja: "ラディッシュ" }, mint: { en: "Mint", ja: "ミント" }, daisy: { en: "Daisies", ja: "デイジー" }, sunflower: { en: "Sunflowers", ja: "ひまわり" } };
+export const CROP_INVENTORY = { carrot: "carrots", radish: "radishes", mint: "mint", daisy: "daisies", sunflower: "sunflowers" } as const;
+export const CROP_MODELS = { carrot: "Carrot", radish: "Radish", mint: "Mint", daisy: "Daisy", sunflower: "Sunflower" } as const;
 export const HARVEST_COMPLIMENTS = {
   carrot: { en: "Luma: You grew this? What a lovely little carrot. You have such a gentle touch!", ja: "ルマ：育てたの？なんてかわいいニンジン。あなたの優しさが伝わるね！" },
   radish: { en: "Luma: A rosy little radish! You make this garden feel loved. Thank you.", ja: "ルマ：ばら色のラディッシュ！あなたのおかげで、庭が幸せそう。ありがとう。" },
   mint: { en: "Luma: It smells wonderful! You grew a little cup of happiness. This special mint tea is for you.", ja: "ルマ：いい香り！小さな幸せを育ててくれたね。特別なミントティーをどうぞ。" },
   daisy: { en: "Luma: A daisy for me? What a lovely little piece of your garden. Thank you!", ja: "ルマ：デイジーをくれるの？あなたの庭から届いた、小さな宝物だね。ありがとう！" },
+  sunflower: { en: "Luma: A sunflower! It's like a little bit of sunshine from your garden. Thank you!", ja: "ルマ：ひまわり！あなたの庭のお日さまみたい。ありがとう！" },
 };
 export const GARDEN = { x: 25, z: -7, width: 12, depth: 12 };
 export const MINT_POSITION = [22.2, 0, -1] as const;
@@ -35,16 +37,20 @@ export const BEDS = [
   { x: 22.2, z: -5.5 }, { x: 27.2, z: -5.5 },
   { x: MINT_POSITION[0], z: MINT_POSITION[2] },
   { x: 27.2, z: -1 },
+  { x: 24.7, z: -12.7 },
 ] as const;
 export const MINT_BED = 4;
 export const DAISY_BED = 5;
+export const SUNFLOWER_BED = 6;
+export const HARVEST_BASKET = [17.3, 0, -3.2] as const;
 export function cropsForBed(bed: number): readonly Crop[] {
-  return bed === MINT_BED ? ["mint"] : bed === DAISY_BED ? ["daisy"] : ["carrot", "radish"];
+  return bed === MINT_BED ? ["mint"] : bed === DAISY_BED ? ["daisy"] : bed === SUNFLOWER_BED ? ["sunflower"] : ["carrot", "radish"];
 }
-export const FLOWER_POSITION = [24.7, 0, -12.7] as const;
+export const FLOWER_POSITION = [30.1, 0, -7.3] as const;
 export const FEED_POSITION = [-23.2, .24, -5.5] as const;
 export const GARDEN_TARGETS = [
-  ...BEDS.map((bed, i) => ({ id: `bed-${i}`, x: bed.x, z: bed.z, radius: i === MINT_BED ? 2 : i === DAISY_BED ? 2.4 : 2.7 })),
+  ...BEDS.map((bed, i) => ({ id: `bed-${i}`, x: bed.x, z: bed.z, halfWidth: i === SUNFLOWER_BED ? 4.95 : 0, radius: i === SUNFLOWER_BED ? 1.8 : i === MINT_BED ? 2 : i === DAISY_BED ? 2.4 : 2.7 })),
+  { id: "basket", x: HARVEST_BASKET[0], z: HARVEST_BASKET[2], radius: 2.3 },
   { id: "flowers", x: FLOWER_POSITION[0], z: FLOWER_POSITION[2], radius: 2.4 },
   { id: "feed", x: FEED_POSITION[0], z: FEED_POSITION[2], radius: 2 },
   { id: "tea", x: 15.2, z: -10, radius: 2.5 },
@@ -68,7 +74,7 @@ export function nearbyGardenAction(id: string, state: GardenState): GardenAction
     if (!value || value.stage === "growing") return null;
     return value.stage === "empty" ? { kind: "plant", bed, crop: value.crop } : { kind: value.stage === "sprout" ? "water" : "harvest", bed };
   }
-  if (id === "flowers" || id === "feed") return { kind: id };
+  if (id === "flowers" || id === "feed" || id === "basket") return { kind: id };
   if (id === "tea" && state.mintTea > 0) return { kind: "drink" };
   return null;
 }
@@ -78,7 +84,8 @@ export const freshGarden = (): GardenState => ({
     { crop: "carrot", stage: "empty" }, { crop: "radish", stage: "empty" },
     { crop: "mint", stage: "sprout" },
     { crop: "daisy", stage: "grown" },
-  ], mint: 0, carrots: 0, radishes: 0, daisies: 0, mintTea: 0, crumbPouch: false,
+    { crop: "sunflower", stage: "grown" },
+  ], mint: 0, carrots: 0, radishes: 0, daisies: 0, sunflowers: 0, mintTea: 0, crumbPouch: false,
 });
 
 export function readGarden(raw: string | null, now = Date.now()): GardenState {
@@ -99,7 +106,7 @@ export function readGarden(raw: string | null, now = Date.now()): GardenState {
       }
       return { crop: value.crop, stage: value.stage };
     });
-    for (const key of ["mint", "carrots", "radishes", "daisies", "mintTea"] as const) {
+    for (const key of ["mint", "carrots", "radishes", "daisies", "sunflowers", "mintTea"] as const) {
       if (Number.isSafeInteger(saved[key]) && saved[key] >= 0) result[key] = Math.min(saved[key], 9999);
     }
     result.crumbPouch = saved.crumbPouch === true;
@@ -110,8 +117,8 @@ export function readGarden(raw: string | null, now = Date.now()): GardenState {
 export function gardenActionAllowed(state: GardenState, action: GardenAction) {
   if (action.kind === "gift") return state[CROP_INVENTORY[action.crop]] > 0 && (action.crop !== "mint" || state.mintTea < 9999);
   if (action.kind === "drink") return state.mintTea > 0;
-  if (action.kind === "feed") return state.crumbPouch;
-  if (action.kind === "flowers" || action.kind === "crumbs") return true;
+  if (action.kind === "feed" || action.kind === "feedBirds") return state.crumbPouch;
+  if (action.kind === "flowers" || action.kind === "crumbs" || action.kind === "birdCrumbs" || action.kind === "basket") return true;
   if (!("bed" in action)) return false;
   const bed = state.beds[action.bed];
   return !!bed && (action.kind !== "plant" || cropsForBed(action.bed).includes(action.crop))
@@ -133,6 +140,6 @@ export function gardenAction(state: GardenState, action: GardenAction, now = Dat
     return { ...state, [inventory]: state[inventory] - 1, mintTea: state.mintTea + (action.crop === "mint" ? 1 : 0) };
   }
   if (action.kind === "drink") return { ...state, mintTea: state.mintTea - 1 };
-  if (action.kind === "crumbs") return { ...state, crumbPouch: true };
+  if (action.kind === "crumbs" || action.kind === "birdCrumbs") return { ...state, crumbPouch: true };
   return state;
 }

@@ -7,8 +7,8 @@ import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { fantasyTreeGeometry } from "./fantasyTrees";
 import { buildWayfinding } from "./wayfinding";
-import { BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
-import { GARDEN_COURT } from "./garden";
+import { BIRD_CLEARING, BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
+import { GARDEN_COURT, HARVEST_BASKET } from "./garden";
 export { groundY, riverX } from "./environment";
 
 /** Optional authoring hook; the public village keeps its existing merged render path. */
@@ -61,6 +61,8 @@ export async function buildWorld(
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
     || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9
     || pondDistance(x, z) < 1.12
+    || Math.hypot(x - BIRD_CLEARING.x, z - BIRD_CLEARING.z) < 4.35
+    || Math.hypot(x - HARVEST_BASKET[0], z - HARVEST_BASKET[2]) < 1.25
     || teaCourtyardDistance(x, z) < 1.16
     || gardenPathClearance.has(plantingCell(x, z))
     || (x > 12.5 && x < 18.5 && z > -13.5 && z < -7.5)
@@ -280,7 +282,7 @@ export async function buildWorld(
   pathMaterial.customProgramCacheKey = () => "village-path-shoulder";
   // Narrow, curved paths are geometry so their paving follows the village layout.
   const pathSurfaces: { geometry: T.BufferGeometry; spine: T.Vector3[]; width: number }[] = [];
-  function path(points: T.Vector3[], width: number) {
+  function path(points: T.Vector3[], width: number, name?: string) {
     const c = new T.CatmullRomCurve3(points);
     const vs: number[] = [],
       uv: number[] = [],
@@ -312,7 +314,7 @@ export async function buildWorld(
     g.setIndex(indices);
     g.computeVertexNormals();
     const ribbon = add(g, pathMaterial, 0, 0, 0); ribbon.castShadow = false;
-    capture?.(`path-${pathSurfaces.length + 1}`, `Village path ${pathSurfaces.length + 1}`, "Paths", [ribbon], c.getPoint(.5).toArray() as [number, number, number]);
+    capture?.(`path-${pathSurfaces.length + 1}`, name ?? `Village path ${pathSurfaces.length + 1}`, "Paths", [ribbon], c.getPoint(.5).toArray() as [number, number, number]);
     pathSurfaces.push({ geometry: g, spine: c.getPoints(100), width });
   }
   path(
@@ -337,6 +339,10 @@ export async function buildWorld(
     ],
     2,
   );
+
+  path([new T.Vector3(-18.4, 0, -5.5), new T.Vector3(-16.55, 0, -5.5),
+    new T.Vector3(-16.55, 0, -8.7), new T.Vector3(-17.15, 0, -13),
+    new T.Vector3(-17.8, 0, -20), new T.Vector3(-19, 0, -26), new T.Vector3(-21.2, 0, -29)], 1.05, "Bird clearing approach");
   // Enter below the cottage, then branch through the tea clearing into the garden aisles.
   path([new T.Vector3(-.6, 0, -9), new T.Vector3(4, 0, -9),
     new T.Vector3(8.6, 0, -9.3), new T.Vector3(11.8, 0, -11.3), new T.Vector3(14.8, 0, -12)], 2.1);
@@ -352,6 +358,7 @@ export async function buildWorld(
     ],
     2.5,
   );
+
   // A rounded terrace shares the paths' paving scale and moss shoulder.
   const terracePositions: number[] = [], terraceUV: number[] = [], terraceColors: number[] = [], terraceIndices: number[] = [];
   const terraceRings = [0, .84, 1, 1.1], terraceSegments = 64;
@@ -577,6 +584,36 @@ export async function buildWorld(
       box(mat.wood, 0, 1.05 + i * 0.23, -0.32, 2.2, 0.18, 0.1, b);
     capture?.(`bench-${++benchIndex}`, `Oak bench ${benchIndex}`, "Furnishings", [b], [x, 0, z]);
   }
+  // A feeding clearing on the dry northern bank; all furnishings stay off its approach.
+  layoutStart = group.children.length;
+  const clearing = new T.CircleGeometry(BIRD_CLEARING.radius, 64); clearing.rotateX(-Math.PI / 2);
+  const cp = clearing.attributes.position, cuv = clearing.attributes.uv;
+  for (let i = 0; i < cp.count; i++) cuv.setXY(i, (cp.getX(i) + BIRD_CLEARING.x) / 3, (cp.getZ(i) + BIRD_CLEARING.z) / 3);
+  add(clearing, mat.path, BIRD_CLEARING.x, .1, BIRD_CLEARING.z).castShadow = false;
+  capture?.("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [-24, 0, -31]);
+  layoutStart = group.children.length;
+  const rim = new T.TorusGeometry(.72, .07, 8, 40); rim.rotateX(-Math.PI / 2);
+  add(rim, mat.stone, -24, .17, -31);
+  add(new T.CylinderGeometry(.67,.67,.025,40), mat.wood, -24, .13, -31).castShadow = false;
+  capture?.("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [-24, 0, -31]);
+  layoutStart = group.children.length;
+  // A low bench faces the birds, leaving the eastern entrance completely open.
+  box(mat.wood, -24, .4, -27.8, 2.5, .14, .65);
+  box(mat.wood, -24, .87, -27.48, 2.5, .48, .1);
+  for (const x of [-24.9, -23.1]) for (const z of [-28.03, -27.57]) box(mat.darkWood, x, .2, z, .11, .4, .11);
+  colliders.push({x:-24,z:-27.75,w:2.6,d:.85,top:1.12});
+  capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [-24, 0, -27.8]);
+  layoutStart = group.children.length;
+  const leaf = new T.MeshStandardMaterial({color:'#6d9959',roughness:1});
+  const petal = new T.MeshStandardMaterial({color:'#fff9e9',roughness:.85});
+  const flowerGold = new T.MeshStandardMaterial({color:'#e4b958',roughness:.8});
+  for (let i = 0; i < 28; i++) {
+    const angle = 1.25 + i / 27 * 3.8, x = -24 + Math.cos(angle) * 3.75, z = -31 + Math.sin(angle) * 3.75;
+    add(cylGeo, leaf, x, .22, z, .015, .4, .015);
+    for (let p=0;p<5;p++) { const a=p*Math.PI*2/5; add(sphereGeo,petal,x+Math.cos(a)*.072,.44,z+Math.sin(a)*.072,.066,.028,.066); }
+    add(sphereGeo,flowerGold,x,.465,z,.04,.025,.04);
+  }
+  capture?.("bird-clearing-flowers", "Dove clearing flower border", "Nature", group.children.slice(layoutStart), [-24, 0, -31]);
   // Seats face the fire; the main village path stays unobstructed.
   bench(HEARTH.x, HEARTH.z + 2.9, Math.PI);
   bench(HEARTH.x, HEARTH.z - 2.9, 0);

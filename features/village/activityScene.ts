@@ -11,6 +11,7 @@ export const ACTIVITY_STAGES: Record<PlaceId, { actor: [number,number,number]; y
   mood: { actor:[13.9,.4,-10],yaw:Math.PI/2,camera:[11.6,2.6,-12.2],look:[15.9,1.2,-10] },
   gratitude: { actor:[-18.2,.05,6.6],yaw:-Math.PI/2,camera:[-16.5,2.8,7.7],look:[-19.1,1.2,6.5] },
   compliment: { actor:[3.05,.05,.35],yaw:Math.PI,camera:[5.2,2.4,-3.2],look:[3,1.25,-.4] },
+  birds: { actor:[-24,.4,-27.8],yaw:Math.PI,camera:[-18,4.5,-24],look:[-24,.7,-31] },
   garden: { actor:[24.6,.05,-5.4],yaw:Math.PI,camera:[30.5,5.8,1.5],look:[24.7,.6,-7] },
 };
 

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosy · Layout Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232c5144'/%3E%3Cpath d='M10 28Q6 9 30 9Q30 32 10 28M10 28L25 15' fill='%23e6e9cb' stroke='%232c5144' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/editor.css">
+  <script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Cosy Layout Studio"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26C2 8 18 5 27 5c1 13-5 23-21 21Z"/><path d="m6 26 15-15"/></svg><span>Cosy<span class="brand-detail">Layout Studio</span></span></a>
+    <div class="document"><input id="layout-name" aria-label="Layout name" value="My village" maxlength="100"><span id="save-state">Preparing your village…</span></div>
+    <nav aria-label="Layout actions"><button id="layouts">Layouts <span>⌄</span></button><button id="undo" class="icon-button" title="Undo (⌘Z)" aria-label="Undo" disabled>↶</button><button id="redo" class="icon-button" title="Redo (⇧⌘Z)" aria-label="Redo" disabled>↷</button><button id="preview">Preview</button><button id="save" class="primary">Save layout <span>↗</span></button><button id="more" class="icon-button" aria-label="Import and export" title="Import and export">•••</button></nav>
+  </header>
+  <main>
+    <aside class="library panel" id="library-panel" aria-label="Asset library">
+      <div class="panel-heading"><h1>Make it yours.</h1><p>A little place, just as you imagined.</p></div>
+      <div class="tabs" role="tablist" aria-label="Browse"><button role="tab" id="assets-tab" aria-controls="assets-panel" aria-selected="true">Assets</button><button role="tab" id="scene-tab" aria-controls="scene-panel" aria-selected="false">Scene <span id="object-count">0</span></button></div>
+      <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><input id="search" type="search" placeholder="Find something lovely…" aria-label="Search assets and scene"></div>
+      <div id="categories" class="categories" aria-label="Asset categories"></div>
+      <section id="assets-panel" role="tabpanel" aria-labelledby="assets-tab"><div id="asset-grid" class="asset-grid"></div></section>
+      <section id="scene-panel" role="tabpanel" aria-labelledby="scene-tab" hidden><div id="scene-list" class="scene-list"></div></section>
+      <div class="library-foot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v12H5z"/></svg><span>Only on your Mac.<br><small>Your original village is preserved.</small></span></div>
+    </aside>
+    <section id="viewport" aria-label="Village layout canvas">
+      <div class="view-top"><div class="view-toggle"><button id="view-perspective" aria-pressed="true">Perspective</button><button id="view-top" aria-pressed="false">Top down</button></div><div class="view-tools"><button id="home-view" title="Frame village (Home)" aria-label="Frame village">⌂</button><button id="grid" aria-pressed="false" title="Toggle ground grid">▦</button><button id="help" title="Controls and shortcuts" aria-label="Controls and shortcuts">?</button></div></div>
+      <div class="toolbar" role="toolbar" aria-label="Edit tools">
+        <button data-tool="select" aria-pressed="true" title="Select (V)"><svg viewBox="0 0 24 24"><path d="m5 3 14 10-7 1-3 7z"/></svg><span>Select</span><kbd>V</kbd></button>
+        <button data-tool="translate" aria-pressed="false" title="Move (W)"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18m-12-6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3"/></svg><span>Move</span><kbd>W</kbd></button>
+        <button data-tool="rotate" aria-pressed="false" title="Rotate (E)"><svg viewBox="0 0 24 24"><path d="M19 9a8 8 0 1 0 0 7M19 3v6h-6"/></svg><span>Rotate</span><kbd>E</kbd></button>
+        <button data-tool="scale" aria-pressed="false" title="Scale (R)"><svg viewBox="0 0 24 24"><path d="M13 4h7v7m0-7-9 9M9 8H4v12h12v-5"/></svg><span>Scale</span><kbd>R</kbd></button>
+        <span class="tool-divider"></span><button id="draw-path" aria-label="Draw path" title="Draw a curved path (P)"><svg viewBox="0 0 24 24"><path d="M4 21c0-10 16-8 16-17M9 21C9 12 15 12 15 4"/></svg><span>Path</span><kbd>P</kbd></button>
+      </div>
+      <div id="placement" class="placement" hidden><span id="placement-text"></span><button id="finish-path">Finish path</button><button id="cancel-placement">Cancel <kbd>Esc</kbd></button></div>
+      <div class="view-bottom"><span id="view-hint">Click to select · drag to orbit · right-drag to pan · scroll to zoom</span><div id="coordinates">X 0.0 · Z 0.0</div></div>
+      <div id="loading" class="loading"><div class="loading-card"><div class="leaf-loader">❧</div><h2>Opening your little world</h2><p id="loading-text">Gathering the village…</p><progress max="100" value="0"></progress></div></div>
+      <button id="leave-preview" class="primary leave-preview" hidden>← Back to editor <kbd>Esc</kbd></button>
+    </section>
+    <aside class="inspector panel" id="inspector-panel" aria-label="Object inspector">
+      <div id="selection-empty"><div class="empty-illustration"><svg viewBox="0 0 100 90" aria-hidden="true"><path d="M15 70 50 87 86 70 50 52Z"/><path d="M31 55V32L50 17 69 32v23L50 65Z"/><path d="m24 35 26-23 26 23M44 61V43h12v18M38 34h7v7h-7M57 34h7v7h-7"/></svg></div><h2>Every detail has a place.</h2><p>Select something in your village to move, turn, or make it your own.</p><button id="start-house">Try a cottage</button></div>
+      <div id="selection-controls" hidden>
+        <div class="selection-heading"><h2 id="selection-title">Selection</h2><p id="selection-category"></p><span id="selection-meta"></span></div>
+        <label class="field-label">Name<input id="object-name" maxlength="100"></label>
+        <div class="selection-actions"><button id="focus-object" title="Frame selection (F)">Focus</button><button id="duplicate" title="Duplicate (⌘D)">Duplicate</button><button id="delete" class="danger" title="Delete selection">Remove</button></div>
+        <div class="section-title"><h3>Transform</h3><select id="space" aria-label="Transform space"><option value="world">World</option><option value="local">Local</option></select></div>
+        <div class="transform-group"><span>Position <small>m</small></span><div class="xyz" id="position-fields"></div></div>
+        <div class="transform-group"><span>Rotation <small>°</small></span><div class="xyz" id="rotation-fields"></div></div>
+        <div class="quick-rotate"><button data-turn="-45">↶ 45°</button><button data-turn="45">↷ 45°</button><button data-turn="90">↷ 90°</button></div>
+        <div class="transform-group"><span>Scale <label class="inline-check"><input id="uniform" type="checkbox" checked> Uniform</label></span><div class="xyz" id="scale-fields"></div></div>
+        <button id="ground" class="wide">↓ Set on ground</button>
+        <div class="toggles"><label><input id="object-visible" type="checkbox" checked> Visible</label><label><input id="object-locked" type="checkbox"> Locked</label></div>
+        <div id="path-settings" hidden><h3>Path shape</h3><label class="field-label">Width (metres)<input id="path-width" type="number" min=".3" max="20" step=".1"></label><div id="path-points"></div><button id="path-add-point">Add control point</button></div>
+        <div id="overlap-warning" class="notice" hidden></div>
+      </div>
+      <div class="settings"><h3>Placement</h3><label class="setting-row">Grid snapping<select id="snap"><option value="0">Off</option><option value="0.25">0.25 m</option><option value="0.5" selected>0.5 m</option><option value="1">1 m</option><option value="2">2 m</option></select></label><label class="setting-row">Rotation snapping<select id="angle-snap"><option value="0">Off</option><option value="5">5°</option><option value="15" selected>15°</option><option value="45">45°</option><option value="90">90°</option></select></label><label class="setting-row">Light<select id="lighting"><option value="day">Soft daylight</option><option value="golden">Golden hour</option><option value="dusk">Evening glow</option></select></label></div>
+    </aside>
+  </main>
+  <footer class="statusbar"><span class="local-dot"></span><span>Local workspace</span><span class="status-separator">/</span><span id="status-message" role="status" aria-live="polite">Loading…</span><span class="status-right" id="render-stats"></span></footer>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="layout-dialog"><div class="dialog-heading"><h2>Your little worlds</h2><button class="close-dialog icon-button" aria-label="Close layouts">×</button></div><p>Start with a preserved layout, or return to a saved design.</p><h3>Default layouts <span>Always open as a copy</span></h3><div id="preset-list" class="preset-list"></div><h3>Saved on this Mac</h3><div id="saved-list"></div><div class="dialog-actions"><button id="save-copy">Save current as a new copy</button><button id="export">Export JSON</button><button id="import">Import JSON</button></div></dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>A few gentle shortcuts</h2><button class="close-dialog icon-button" aria-label="Close help">×</button></div><div class="shortcut-list"><p><kbd>Click</kbd><span>Select an object</span></p><p><kbd>Shift + click</kbd><span>Select several objects</span></p><p><kbd>Drag</kbd><span>Orbit the camera</span></p><p><kbd>Right-drag</kbd><span>Pan the camera</span></p><p><kbd>Scroll</kbd><span>Zoom in and out</span></p><p><kbd>V / W / E / R</kbd><span>Select / move / rotate / scale</span></p><p><kbd>F</kbd><span>Frame the selection</span></p><p><kbd>Arrow keys</kbd><span>Nudge selection; Shift for larger steps</span></p><p><kbd>⌘ D / ⌘ Z / ⇧ ⌘ Z</kbd><span>Duplicate / undo / redo (Ctrl on Windows)</span></p><p><kbd>⌘ S</kbd><span>Save to a local layout file</span></p><p><kbd>P / Enter / Esc</kbd><span>Draw path / finish / cancel</span></p></div><p class="help-note">Choose an asset, then click the ground to place it. Hold Shift when placing to keep adding. Locked scenery can be selected in Scene and unlocked in the inspector. Preview is a free camera view of your design; activity locations and game collisions are not changed.</p></dialog>
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
+  <script type="module" src="/modules/tools/village-editor/editor.js"></script>
+</body>
+</html>

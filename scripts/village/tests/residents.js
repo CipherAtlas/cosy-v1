@@ -116,8 +116,9 @@ export function checkRoaming(engine) {
       journeys.forEach((journey, i) => {
         check(journey.reached.size === life.residents[i].route.length && journey.laps >= 2,
           `${journey.name}: completes every waypoint and repeats the circuit at ${fps} fps`);
-        check(journey.maxX - journey.minX > 4 && journey.maxZ - journey.minZ > 12,
-          `${journey.name}: explores a wider area in both directions at ${fps} fps`);
+        check(i === 4 ? journey.maxX - journey.minX < 4 && journey.maxZ - journey.minZ < 4
+          : journey.maxX - journey.minX > 4 && journey.maxZ - journey.minZ > 12,
+          `${journey.name}: keeps the authored ${i === 4 ? 'caretaker' : 'village'} circuit at ${fps} fps`);
       });
       samples.push({ fps, residents: journeys.map(j => ({ name: j.name, laps: j.laps, waypoints: j.reached.size,
         width: j.maxX - j.minX, depth: j.maxZ - j.minZ })) });

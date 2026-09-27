@@ -6,7 +6,9 @@ import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 import { buildWorld, type World } from "./world";
 import { VillageMovement } from "./movement";
 import { createAtmosphere } from "./atmosphere";
+import { BirdFlock, type BirdStatus } from "./birds";
 import { VillageLife } from "./life";
+import { CompanionHands } from "./companionWalk";
 import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
@@ -24,6 +26,9 @@ export class VillageEngine {
   private camera = new T.PerspectiveCamera(55, 1, 0.12, 1100);
   private atmosphere = createAtmosphere();
   private life?: VillageLife;
+  private companionHands = new CompanionHands();
+  private birds?: BirdFlock;
+  private birdFeedAt = -100;
   private dialogue?: VillagerDialogue;
   private activities?: VillageActivities;
   private garden?: GardenScene;
@@ -271,7 +276,8 @@ export class VillageEngine {
       environment: (frame: EnvironmentFrame) => void;
       mouseLook?: (mode: "free" | "locked" | "drag") => void;
       companion?: (id: string) => void;
-      crumbs?: () => void;
+      crumbs?: (id: string) => void;
+      birds?: (status: BirdStatus) => void;
       visitTea?: () => void;
       gardenSound?: (kind: GardenSound, position: [number, number, number]) => void;
       nearGarden?: (id: string | null) => void;
@@ -292,7 +298,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to garden or enter activities, F to chat, C to invite a nearby villager, B to ask Maple for bread crumbs. Places provides direct access to every activity.",
+      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to garden or enter activities, F to chat, C to invite a nearby villager, B to ask Maple or Wren for bread crumbs. Places provides direct access to every activity.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -349,12 +355,13 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const [world, gltf, gardenKit] = await Promise.all([
+    const [world, gltf, gardenKit, dove] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
         withBasePath("/village/models/spirit.glb?v=1"),
       ),
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
+      new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -403,7 +410,7 @@ export class VillageEngine {
     });
     this.player.add(root);
     this.character = root;
-    this.garden = new GardenScene(gardenKit.scene, world.colliders, (kind, position) => this.callbacks.gardenSound?.(kind, position), world.gardenSurfaces);
+    this.garden = new GardenScene(gardenKit.scene, world.colliders, (kind, position) => this.callbacks.gardenSound?.(kind, position), world.gardenSurfaces, this.sun.position.clone().sub(this.sun.target.position));
     this.garden.setLanguage(this.language);
     this.garden.sync(this.gardenState); world.group.add(this.garden.group);
     this.activities=new VillageActivities(this.world.colliders);
@@ -411,8 +418,16 @@ export class VillageEngine {
     this.life = new VillageLife(root, world.colliders, gardenKit.scene);
     this.life.setCompanions(this.companions);
     this.scene.add(this.life.group);
+    this.birds = new BirdFlock(dove.scene, this.host, status => {
+      this.callbacks.birds?.(status);
+      if (status === "happy") this.callbacks.gardenSound?.("coo", [-24, .6, -31]);
+    }, caretaker => {
+      if (caretaker) this.life?.feedBirds();
+      this.callbacks.gardenSound?.("crumbs", [-24, .4, -31]);
+    });
+    this.scene.add(this.birds.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
-      companion: id => this.callbacks.companion?.(id), crumbs: () => this.callbacks.crumbs?.(), visitTea: () => this.callbacks.visitTea?.(),
+      companion: id => this.callbacks.companion?.(id), crumbs: id => this.callbacks.crumbs?.(id), visitTea: () => this.callbacks.visitTea?.(),
     });
     this.dialogue.setLanguage(this.language);
     this.dialogue.setEnabled(!this.blocked && !this.place);
@@ -610,6 +625,7 @@ export class VillageEngine {
     }
     this.camera.updateProjectionMatrix();
     this.dialogue?.resize(w, h);
+    this.birds?.resize(w, h);
   }
   setBlocked(v: boolean) {
     this.blocked = v;
@@ -622,6 +638,7 @@ export class VillageEngine {
   setLanguage(language: "en" | "ja") {
     this.language = language;
     this.dialogue?.setLanguage(language);
+    this.birds?.setLanguage(language);
     this.world?.setLanguage(language);
     this.garden?.setLanguage(language);
   }
@@ -695,11 +712,17 @@ export class VillageEngine {
   }
   setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); }
   gardenAction(action: GardenAction) {
-    if (action.kind === "crumbs") this.callbacks.gardenSound?.("crumbs", [this.player.position.x, this.player.position.y, this.player.position.z]);
+    if (action.kind === "feedBirds") {
+      const accepted = this.gardenState.crumbPouch && (this.birds?.feed() ?? false);
+      if (accepted) this.birdFeedAt = this.elapsed;
+      return accepted;
+    }
+    if (action.kind === "crumbs" || action.kind === "birdCrumbs") this.callbacks.gardenSound?.("crumbs", [this.player.position.x, this.player.position.y, this.player.position.z]);
     else this.garden?.act(action);
     this.life?.gardenMoment(action);
     if (action.kind === "gift" && action.crop === "mint" || action.kind === "drink") this.activities?.setMintTea(true);
     if (action.kind === "drink") this.setActivityMoment({ kind: "tea" });
+    return true;
   }
   setCompanions(ids: string[]) {
     this.companions = ids; this.life?.setCompanions(ids); this.life?.setActivity(this.place);
@@ -718,6 +741,7 @@ export class VillageEngine {
     this.place = id;
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = true;
+    if (this.birds) this.birds.group.visible = id !== "focus";
     const arrival = this.movement?.position;
     this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
@@ -783,6 +807,9 @@ export class VillageEngine {
       this.lookGoal.set(15.2, 1.35, -10.7);
       this.cameraGoal.x = this.lookGoal.x + (this.cameraGoal.x - this.lookGoal.x) * 1.8;
       this.cameraGoal.z = this.lookGoal.z + (this.cameraGoal.z - this.lookGoal.z) * 1.8;
+    } else if (this.compactView && place === "birds") {
+      this.lookGoal.set(-24, .3, -31);
+      this.cameraGoal.set(-17, 7.3, -20.5);
     } else if(this.compactView) {
       this.temp.fromArray(stage.actor).y+=1.1;
       this.lookGoal.lerp(this.temp,.7);
@@ -892,11 +919,14 @@ export class VillageEngine {
         this.near = near;
         this.callbacks.near(near);
       }
-      const target = GARDEN_TARGETS.filter(p => Math.hypot(p.x - this.player.position.x, p.z - this.player.position.z) < p.radius)
-        .sort((a, b) => Math.hypot(a.x - this.player.position.x, a.z - this.player.position.z) - Math.hypot(b.x - this.player.position.x, b.z - this.player.position.z))[0]?.id ?? null;
+      const target = GARDEN_TARGETS.map(p => ({
+        id: p.id, radius: p.radius,
+        distance: Math.hypot(Math.max(0, Math.abs(p.x - this.player.position.x) - ("halfWidth" in p ? p.halfWidth : 0)), p.z - this.player.position.z),
+      })).filter(p => p.distance < p.radius).sort((a, b) => a.distance - b.distance)[0]?.id ?? null;
       if (target !== this.nearGarden) { this.nearGarden = target; this.callbacks.nearGarden?.(target); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
+    this.companionHands.reset();
     if (this.character) {
       const bob = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*2.8)*.065;
       this.character.position.y = .62 + bob;
@@ -907,6 +937,11 @@ export class VillageEngine {
       this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
     }
     this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
+    const scatterAge = this.elapsed - this.birdFeedAt;
+    if (this.character && scatterAge < 1.6 && !this.reducedMotion) {
+      this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
+      this.spiritFins.forEach((fin, i) => { fin.rotation.z = Math.sin(scatterAge * 5 + i) * .4; });
+    }
     if (this.place) {
       this.updateActivityCamera(this.place);
     } else this.updateWalkingCamera();
@@ -932,7 +967,9 @@ export class VillageEngine {
     const t = this.reducedMotion ? 0 : this.elapsed;
     this.updateLighting(dt);
     this.atmosphere.update(t, this.camera.position);
-    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place, this.camera.quaternion);
+    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place, this.camera.quaternion, this.player.rotation.y);
+    if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),
+      !this.place && !this.blocked && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
     if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);
     this.world.wind.time.value = t;
     this.world.wind.strength.value = this.reducedMotion ? 0 : windAt(t, this.weather);
@@ -986,6 +1023,7 @@ export class VillageEngine {
       this.sun.target.updateMatrixWorld();
       this.renderer.shadowMap.needsUpdate = true; this.shadowTime = now;
     }
+    this.birds?.update(dt, this.elapsed, this.reducedMotion, this.camera, this.player.position, this.life?.caretakerPresent ?? false, this.place !== "focus" && !this.blocked);
     this.renderer.render(this.scene, this.camera);
     this.dialogue?.update(dt, this.camera, this.player.position, this.weather);
     this.frameSum += frameDelta;
@@ -1036,6 +1074,7 @@ export class VillageEngine {
     el.removeEventListener("webglcontextlost", this.onLost);
     this.dialogue?.dispose();
     this.life?.dispose();
+    this.birds?.dispose();
     this.garden?.dispose();
     this.world?.group.removeFromParent();
     this.world?.dispose();

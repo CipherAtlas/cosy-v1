@@ -72,9 +72,19 @@ export const PLACES = [
     look: [24.7, .6, -7],
     prompt: "Wander into the garden",
   },
+  {
+    id: "birds",
+    name: "Bird clearing",
+    activity: "Feed the birds",
+    description: "A little sourdough, a chorus of coos.",
+    position: [-20.5, 0, -28.5],
+    camera: [-18, 4.5, -24],
+    look: [-24, .7, -31],
+    prompt: "Visit the bird clearing",
+  },
 ] as const;
 export type PlaceId = (typeof PLACES)[number]["id"];
-export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト", "小さな菜園"];
+export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト", "小さな菜園", "小鳥の広場"];
 export type Quality = "auto" | "high" | "low";
 export type Weather = "golden" | "dusk" | "rain";
 export type AudioMix = {

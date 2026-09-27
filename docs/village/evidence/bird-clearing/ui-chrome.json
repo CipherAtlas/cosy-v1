@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Clearing is directly reachable from Places",
+    "Talking to Wren gives sourdough crumbs with her dialogue",
+    "Repeated feeding is disabled while crumbs are queued or being eaten",
+    "World speech appears after the real flight and feeding cycle",
+    "Clearing has a directly clickable exit",
+    "Phone bird speech stays below the exit control",
+    "Phone feeding and exit controls fit the viewport",
+    "Phone feeding and exit controls fit the viewport",
+    "Leaving returns to exploration",
+    "E enters the clearing from its arrival point",
+    "Escape leaves the clearing",
+    "Wren’s crumb pouch survives reload",
+    "Wren can join as a companion",
+    "Switching to Japanese simple view completes queued feeding and translates the thanks",
+    "Japanese simple view keeps the exit visible",
+    "No application errors"
+  ],
+  "realWaitSeconds": 34.327,
+  "errors": []
+}

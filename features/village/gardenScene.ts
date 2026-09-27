@@ -1,7 +1,7 @@
 import * as T from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { floorHeight, POND, type Collider } from "./environment";
-import { BEDS, CROP_NAMES, CROP_MODELS, FEED_POSITION, FLOWER_POSITION, MINT_POSITION, MINT_BED, DAISY_BED, growthProgress, growthTimeLeft, freshGarden, type GardenAction, type GardenSound, type GardenState } from "./garden";
+import { BEDS, CROP_NAMES, CROP_MODELS, CROP_INVENTORY, HARVEST_BASKET, SUNFLOWER_BED, FEED_POSITION, FLOWER_POSITION, MINT_POSITION, MINT_BED, DAISY_BED, growthProgress, growthTimeLeft, freshGarden, type Crop, type GardenAction, type GardenSound, type GardenState } from "./garden";
 
 /** Original Blender kit, instanced planting, and bounded pools for water/feeding effects. */
 export class GardenScene {
@@ -11,7 +11,7 @@ export class GardenScene {
   private foliage: T.MeshStandardMaterial;
   private wind = { value: 0 };
   private breeze = { value: 1 };
-  private beds: { root: T.Group; sprout: T.InstancedMesh; carrot: T.InstancedMesh; radish: T.InstancedMesh; mint: T.InstancedMesh; daisy: T.InstancedMesh; scale: number }[] = [];
+  private beds: { root: T.Group; sprout: T.InstancedMesh; carrot: T.InstancedMesh; radish: T.InstancedMesh; mint: T.InstancedMesh; daisy: T.InstancedMesh; sunflower: T.InstancedMesh | null; scale: number }[] = [];
   private birds: { root: T.Object3D; head?: T.Object3D; wings: T.Object3D[]; phase: number; swan: boolean }[] = [];
   private fish: { root: T.Object3D; tail?: T.Object3D; jumping: boolean }[] = [];
   private ripples: T.InstancedMesh;
@@ -22,6 +22,7 @@ export class GardenScene {
   private teapot: T.Object3D;
   private teaMint: T.Object3D;
   private harvest: T.Object3D;
+  private basketContents: { crop: Crop; root: T.Object3D }[] = [];
   private dummy = new T.Object3D();
   private state = freshGarden();
   private time = 0;
@@ -37,7 +38,7 @@ export class GardenScene {
   private labels: { canvas: HTMLCanvasElement; texture: T.CanvasTexture; bed?: number; en: string; ja: string; text: string }[] = [];
   private clocks: { canvas: HTMLCanvasElement; texture: T.CanvasTexture; sprite: T.Sprite; text: string }[] = [];
 
-  constructor(private source: T.Object3D, colliders: Collider[], private sound: (kind: GardenSound, position: [number, number, number]) => void, surfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial }) {
+  constructor(private source: T.Object3D, colliders: Collider[], private sound: (kind: GardenSound, position: [number, number, number]) => void, surfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial }, private sunDirection = new T.Vector3(35, 28, -48)) {
     this.group.name = "Kitchen garden and pond life";
     source.updateMatrixWorld(true);
     let material: T.MeshStandardMaterial | undefined;
@@ -88,25 +89,6 @@ export class GardenScene {
       const bounds = new T.Box3().setFromObject(root), size = bounds.getSize(new T.Vector3());
       colliders.push({ x, z, w: size.x, d: size.z, top: bounds.max.y });
     };
-    BEDS.forEach((bed, index) => {
-      box(soil, bed.x, .13, bed.z, 3.2, .25, 2.5);
-      for (const z of [-1.28, 1.28]) box(wood, bed.x, .2, bed.z + z, 3.45, .38, .14);
-      for (const x of [-1.65, 1.65]) box(wood, bed.x + x, .2, bed.z, .14, .38, 2.7);
-      colliders.push({ x: bed.x, z: bed.z, w: 3.5, d: 2.8, top: .45 });
-      const root = new T.Group(); root.position.set(bed.x, .25, bed.z); root.name = `Garden bed ${index + 1}`; this.group.add(root);
-      const positions = Array.from({ length: 9 }, (_, i) => [(i % 3 - 1) * .92, 0, (Math.floor(i / 3) - 1) * .7, 1] as const);
-      const sprout = this.plant("Sprout", positions, root), carrot = this.plant("Carrot", positions, root), radish = this.plant("Radish", positions, root);
-      const mint = this.plant("Mint", positions, root);
-      const daisies = Array.from({ length: 20 }, (_, i) => [-1.24 + (i % 5) * .62, 0, .9 - Math.floor(i / 5) * .55, .75 + (i % 3) * .08] as const);
-      const daisy = this.plant("Daisy", daisies, root);
-      this.beds.push({ root, sprout, carrot, radish, mint, daisy, scale: 1 });
-      sign(bed.x + .25, bed.z + 1.23, index === MINT_BED ? "Mint · Tea leaves" : "", index === MINT_BED ? "ミント・お茶の葉" : "", index);
-      const canvas = document.createElement("canvas"); canvas.width = canvas.height = 192;
-      const texture = new T.CanvasTexture(canvas); texture.colorSpace = T.SRGBColorSpace;
-      const sprite = new T.Sprite(new T.SpriteMaterial({ map: texture, depthWrite: false }));
-      sprite.name = `Bed ${index + 1} growth countdown`; sprite.position.set(bed.x - 1.05, 1.05, bed.z + 1.23); sprite.scale.set(.65, .65, 1);
-      sprite.visible = false; this.group.add(sprite); this.clocks.push({ canvas, texture, sprite, text: "" });
-    });
     // The same limestone and world-space texture scale as the footpaths edge the planting.
     const flowerBed = (x: number, z: number, width: number, depth: number) => {
       // Include the stone edging so walking and companion routes keep the planting clear.
@@ -117,13 +99,48 @@ export class GardenScene {
         box(paving, x + edge * width / 2, .12, z, .15, .12, depth);
       }
     };
-    flowerBed(24.7, -12.7, 9.9, 1.1);
+    BEDS.forEach((bed, index) => {
+      const isSunflower = index === SUNFLOWER_BED;
+      if (isSunflower) flowerBed(bed.x, bed.z, 9.9, 1.1);
+      else {
+        box(soil, bed.x, .13, bed.z, 3.2, .25, 2.5);
+        for (const z of [-1.28, 1.28]) box(wood, bed.x, .2, bed.z + z, 3.45, .38, .14);
+        for (const x of [-1.65, 1.65]) box(wood, bed.x + x, .2, bed.z, .14, .38, 2.7);
+        colliders.push({ x: bed.x, z: bed.z, w: 3.5, d: 2.8, top: .45 });
+      }
+      const root = new T.Group(); root.position.set(bed.x, isSunflower ? .13 : .25, bed.z); root.name = `Garden bed ${index + 1}`; this.group.add(root);
+      const positions = isSunflower
+        ? Array.from({ length: 13 }, (_, i) => [-4.62 + i * .77, 0, Math.sin(i * 1.5) * .08, .9 + (i % 3) * .09] as const)
+        : Array.from({ length: 9 }, (_, i) => [(i % 3 - 1) * .92, 0, (Math.floor(i / 3) - 1) * .7, 1] as const);
+      const sprout = this.plant("Sprout", positions, root), carrot = this.plant("Carrot", positions, root), radish = this.plant("Radish", positions, root);
+      const mint = this.plant("Mint", positions, root);
+      const daisies = Array.from({ length: 20 }, (_, i) => [-1.24 + (i % 5) * .62, 0, .9 - Math.floor(i / 5) * .55, .75 + (i % 3) * .08] as const);
+      const daisy = this.plant("Daisy", daisies, root);
+      const sunflower = isSunflower ? this.plant("Sunflower", positions, root) : null;
+      this.beds.push({ root, sprout, carrot, radish, mint, daisy, sunflower, scale: 1 });
+      const labelZ = bed.z + (isSunflower ? .45 : 1.23);
+      sign(bed.x + .25, labelZ, index === MINT_BED ? "Mint · Tea leaves" : "", index === MINT_BED ? "ミント・お茶の葉" : "", index);
+      const canvas = document.createElement("canvas"); canvas.width = canvas.height = 192;
+      const texture = new T.CanvasTexture(canvas); texture.colorSpace = T.SRGBColorSpace;
+      const sprite = new T.Sprite(new T.SpriteMaterial({ map: texture, depthWrite: false }));
+      sprite.name = `Bed ${index + 1} growth countdown`; sprite.position.set(bed.x - 1.05, 1.05, labelZ); sprite.scale.set(.65, .65, 1);
+      sprite.visible = false; this.group.add(sprite); this.clocks.push({ canvas, texture, sprite, text: "" });
+    });
     flowerBed(30.1, -7.3, .85, 9.5);
-    const sunflowers = Array.from({ length: 13 }, (_, i) => [20.08 + i * .77, .13, -12.7 + Math.sin(i * 1.5) * .08, .9 + (i % 3) * .09] as const);
-    this.plant("Sunflower", sunflowers);
     this.plant("Iris", Array.from({ length: 12 }, (_, i) => [30.1 + Math.sin(i * 2.4) * .2, .13, -11.3 + i * .74, .75] as const));
-    sign(24.7, -12.25, "Sunflowers", "ひまわり");
     sign(29.78, -7.3, "Irises", "アイリス", undefined, -Math.PI / 2);
+    const basket = this.model("Basket", HARVEST_BASKET, 1.5);
+    basket.name = "Harvest basket"; basket.rotation.y = Math.PI / 2;
+    const basketBounds = new T.Box3().setFromObject(basket);
+    basket.position.y += floorHeight(HARVEST_BASKET[0], HARVEST_BASKET[2]) - basketBounds.min.y;
+    basketBounds.setFromObject(basket);
+    const basketSize = basketBounds.getSize(new T.Vector3());
+    colliders.push({ x: HARVEST_BASKET[0], z: HARVEST_BASKET[2], w: basketSize.x, d: basketSize.z, top: basketBounds.max.y });
+    for (const [i, crop] of (["carrot", "radish", "mint", "daisy", "sunflower"] as const).entries()) {
+      const root = this.model(CROP_MODELS[crop], [HARVEST_BASKET[0] + (i % 3 - 1) * .22, basket.position.y + .42, HARVEST_BASKET[2] + (Math.floor(i / 3) - .5) * .24], crop === "sunflower" ? .32 : .55);
+      root.name = `Stored ${crop}`; root.rotation.z = (i - 2) * .14; root.visible = false;
+      this.basketContents.push({ crop, root });
+    }
     this.can = this.model("WateringCan", [0, 0, 0]); this.can.visible = false;
     this.model("BreadPouch", [-23.8, .25, -4.9], .75);
     this.teapot = this.model("Teapot", [15, 1.28, -10.3], 1);
@@ -202,7 +219,7 @@ export class GardenScene {
     }
     const mesh = new T.InstancedMesh(geometry, windy ? this.foliage : this.material, positions.length);
     positions.forEach(([x, y, z, scale], i) => {
-      this.dummy.position.set(x, y, z); this.dummy.rotation.set(0, Math.sin(i * 7.3) * .3, 0); this.dummy.scale.setScalar(scale); this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.position.set(x, y, z); this.dummy.rotation.set(0, name === "Sunflower" ? Math.atan2(this.sunDirection.x, this.sunDirection.z) : Math.sin(i * 7.3) * .3, 0); this.dummy.scale.setScalar(scale); this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
     });
     mesh.receiveShadow = true; parent.add(mesh); return mesh;
   }
@@ -216,7 +233,9 @@ export class GardenScene {
       bed.radish.visible = leafy && state.beds[i].crop === "radish";
       bed.mint.visible = leafy && i === MINT_BED;
       bed.daisy.visible = leafy && i === DAISY_BED;
+      if (bed.sunflower) bed.sunflower.visible = leafy && i === SUNFLOWER_BED;
     });
+    this.basketContents.forEach(({ crop, root }) => { root.visible = state[CROP_INVENTORY[crop]] > 0; });
     this.updateLabels();
   }
 
@@ -236,6 +255,7 @@ export class GardenScene {
   }
 
   act(action: GardenAction) {
+    if (action.kind === "basket") return;
     this.action = action; this.actionAt = this.time;
     let sound: GardenSound = "pluck";
     let position: [number, number, number] = [...MINT_POSITION];
@@ -353,7 +373,7 @@ export class GardenScene {
       const crop = this.state.beds[(action as { bed: number }).bed].crop;
       const name = CROP_MODELS[crop];
       if (this.harvest.name !== name) { this.harvest.removeFromParent(); this.harvest = this.model(name, origin); }
-      this.harvest.position.set(T.MathUtils.lerp(origin[0], 25, f), .6 + Math.sin(f * Math.PI) * 1.5, T.MathUtils.lerp(origin[2], -.6, f)); this.harvest.rotation.y = age * 2;
+      this.harvest.position.set(T.MathUtils.lerp(origin[0], HARVEST_BASKET[0], f), .6 + Math.sin(f * Math.PI) * 1.5, T.MathUtils.lerp(origin[2], HARVEST_BASKET[2], f)); this.harvest.rotation.y = age * 2;
     }
     const teaAge = time - this.teaAt, pour = teaAge < 2.5 && !reduced ? Math.sin(teaAge / 2.5 * Math.PI) : 0;
     this.teapot.position.set(15 + pour * .04, 1.28 + pour * .25, -10.3 + pour * .25); this.teapot.rotation.z = -pour * .6;

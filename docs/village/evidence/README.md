@@ -1,5 +1,9 @@
 # Village implementation evidence — updated 2026-09-27
 
+## Local layout studio
+
+[Studio evidence and limits](layout-studio/README.md) records forty Chrome checks, desktop/tablet/phone screenshots, the updated 252-object default and preserved earlier snapshot. The editor runs only on its own loopback port. Saved designs do not yet retarget public gameplay systems.
+
 ## Tea seating and growing daisies
 
 [Live publication checks](tea-daisy-publication.json) verify the successful application deployment, 17 asset responses and the live tea/daisy flows.

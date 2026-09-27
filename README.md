@@ -60,6 +60,12 @@ For deterministic controller/bridge checks and repeatable scene/audio captures, 
 
 Runtime asset attribution is in [public/village/CREDITS.txt](public/village/CREDITS.txt). Bundled [reference images](docs/village/references/README.md) are documentation evidence, not part of the application's runtime payload.
 
+## Local layout studio
+
+Run `npm run dev:editor` and open [the local studio](http://127.0.0.1:3040) to arrange cottages, bridges, paths, planting and scenery. The updated village is a protected default, including the latest garden and bird clearing; edits start on a copy. Riverside, meadow and earlier-snapshot presets are included. The editor runs on its own loopback port, saves local JSON layouts, and adds no public route.
+
+See [the studio guide](tools/village-editor/README.md) for placement controls, save/recovery, asset registration and verification. Studio layouts are visual designs; applying them to the playable game still requires connecting collision surfaces, activity anchors and resident routes.
+
 ## GitHub Pages releases
 
 [Deploy to GitHub Pages](https://github.com/CipherAtlas/cosy-v1/actions/workflows/deploy-pages.yml) runs on every push to `main` and can also be dispatched manually. It uses Node 20, installs the lockfile with `npm ci`, builds with an empty `NEXT_PUBLIC_BASE_PATH` for `cosy.sabarg.com`, and deploys `out` through GitHub's Pages artifact workflow. No separate publishing branch is used.

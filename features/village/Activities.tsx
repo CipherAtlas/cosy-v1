@@ -13,7 +13,7 @@ import {
 import type { AudioMix, PlaceId } from "./places";
 import type { ActivityMoment } from "./environment";
 import type { FocusSession } from "./useSession";
-import { GardenActivity, MintTea, PondFeeding, type GardenControls } from "./GardenActivities";
+import { BirdActivity, GardenActivity, MintTea, PondFeeding, type GardenControls } from "./GardenActivities";
 
 type Props = {
   place: PlaceId;
@@ -57,6 +57,7 @@ export function Activities(p: Props) {
     if (place === "focus") onMoment({kind:"focus",running:session.running,progress:Math.max(0,Math.min(1,1-session.remaining/duration))});
     if (place === "music") onMoment({kind:"music",playing:sound});
   }, [place,session.running,session.remaining,duration,sound,onMoment]);
+  if (p.place === "birds") return <BirdActivity {...p.gardenControls} />;
   if (p.place === "focus")
     return (
       <section

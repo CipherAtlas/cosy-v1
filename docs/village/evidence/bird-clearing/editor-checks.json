@@ -1,0 +1,31 @@
+{
+  "checks": [
+    "White dove has a library preview",
+    "White dove supports selection, placement, rotation and scale",
+    "Wren · bird caretaker has a library preview",
+    "Wren · bird caretaker supports selection, placement, rotation and scale",
+    "Bird clearing terrace has a library preview",
+    "Bird clearing terrace supports selection, placement, rotation and scale",
+    "Sourdough feeding dish has a library preview",
+    "Sourdough feeding dish supports selection, placement, rotation and scale",
+    "Birdwatching bench has a library preview",
+    "Birdwatching bench supports selection, placement, rotation and scale",
+    "Dove clearing flower border has a library preview",
+    "Dove clearing flower border supports selection, placement, rotation and scale",
+    "Bird clearing approach has a library preview",
+    "Bird clearing approach supports selection, placement, rotation and scale",
+    "White dove transform survives file save",
+    "Wren · bird caretaker transform survives file save",
+    "Bird clearing terrace transform survives file save",
+    "Sourdough feeding dish transform survives file save",
+    "Birdwatching bench transform survives file save",
+    "Dove clearing flower border transform survives file save",
+    "Bird clearing approach transform survives file save",
+    "Working-copy transforms survive a browser reload",
+    "Preserved default layout stays byte-identical",
+    "No editor application errors"
+  ],
+  "errors": [],
+  "baselineSha256": "61af56ad3b2c9f6794fb4c79cf9247bf1f834fd04a8d85c87efd152abe6e76f0",
+  "savedLayout": "layout-5c2fc63b-be91-4c07-b42c-bd3c7f3f747e"
+}

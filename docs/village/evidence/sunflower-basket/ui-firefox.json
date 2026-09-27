@@ -1,0 +1,22 @@
+{
+  "browser": "firefox",
+  "version": "142.0.1",
+  "checks": [
+    "Empty basket is explained",
+    "Inventory shows all five crops with zero quantities",
+    "Harvesting different crops increments the matching inventory rows",
+    "Walking along the garden path offers the basket",
+    "E beside the basket opens the inventory",
+    "The nearby click control opens the same inventory",
+    "Sunflower countdown ticks in the exported app",
+    "Watered sunflowers continue growing after reload",
+    "Stored inventory survives reload",
+    "Completed sunflower growth yields another stored harvest",
+    "Sunflowers can be shared with Luma",
+    "Japanese simple view shows the saved inventory after gifting",
+    "Japanese simple view keeps an accessible close action",
+    "No application errors were captured"
+  ],
+  "errors": [],
+  "growthTiming": "UI ticking/reload plus a shortened saved timestamp; no real five-minute wait"
+}

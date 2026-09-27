@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:editor": "python3 tools/village-editor/server.py"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
