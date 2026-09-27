@@ -3,6 +3,7 @@ import type { EnvironmentFrame, Surface, WorldContact } from "./environment";
 import { HEARTH, riverX } from "./environment";
 import { RecordedSoundtrack, soundtrackFor } from "./soundtrack";
 import { withBasePath } from "@/lib/basePath";
+import type { GardenSound } from "./garden";
 
 type Voice = { source: AudioScheduledSourceNode; nodes: AudioNode[]; end: number; effect: boolean };
 
@@ -36,6 +37,7 @@ export class VillageAudio {
   private voices = new Set<Voice>();
   private nextDetail = 0;
   private steps = new Map<Surface, AudioBuffer[]>();
+  private gardenSounds = new Map<GardenSound, AudioBuffer>();
   private lastStep = -1;
   private onVisibility = () => this.apply();
 
@@ -275,6 +277,40 @@ export class VillageAudio {
     source.connect(gain).connect(panner).connect(this.ambience!);
     if (this.track(source, [gain, panner], now + .22, true)) { source.start(); source.stop(now + .22); }
   }
+  gardenEffect(kind: GardenSound, position: [number, number, number], centered = false) {
+    const c = this.context;
+    if (!this.enabled || !c || c.state !== "running" || document.hidden || this.mix.master === 0 || this.mix.effects === 0) return;
+    const [x, y, z] = this.environment.listener;
+    if (!centered && Math.hypot(position[0] - x, position[1] - y, position[2] - z) > 23) return;
+    let buffer = this.gardenSounds.get(kind);
+    if (!buffer) {
+      const duration = kind === "water" || kind === "pour" ? 1.15 : kind === "splash" ? .6 : kind === "duck" ? .38 : .25;
+      buffer = c.createBuffer(1, Math.ceil(c.sampleRate * duration), c.sampleRate);
+      const data = buffer.getChannelData(0); let filtered = 0, phase = 0;
+      for (let i = 0; i < data.length; i++) {
+        const t = i / c.sampleRate, u = t / duration, noise = Math.random() * 2 - 1;
+        filtered = filtered * .78 + noise * .22;
+        const envelope = Math.min(1, t * 60) * Math.pow(1 - u, kind === "water" || kind === "pour" ? .7 : 2);
+        let sample: number;
+        if (kind === "duck") {
+          phase += (330 - u * 140 + Math.sin(t * 32) * 22) * Math.PI * 2 / c.sampleRate;
+          sample = (Math.sin(phase) + Math.sin(phase * 3) * .35 + filtered * .2) * (.55 + Math.sin(t * 43) * .28);
+        } else if (kind === "pluck") sample = Math.sin(t * (850 - u * 340) * Math.PI * 2) * .65 + filtered * .25;
+        else if (kind === "plant" || kind === "crumbs") sample = filtered * (kind === "plant" ? 1.1 : .8);
+        else {
+          const drip = Math.max(0, Math.sin(t * (kind === "pour" ? 91 : 63))) ** 12;
+          sample = filtered * .7 + Math.sin(t * (1250 - (t * 7 % 1) * 700) * Math.PI * 2) * drip * .3;
+        }
+        data[i] = sample * envelope * .45;
+      }
+      this.gardenSounds.set(kind, buffer);
+    }
+    const source = c.createBufferSource(), gain = c.createGain(); source.buffer = buffer;
+    source.playbackRate.value = .96 + Math.random() * .08; gain.gain.value = kind === "duck" ? .19 : .34;
+    const pan = this.panner(centered ? this.environment.listener : position, 3);
+    source.connect(gain).connect(pan).connect(this.effects!);
+    if (this.track(source, [gain, pan], c.currentTime + buffer.duration / .96, true)) source.start();
+  }
   chime() {
     if (!this.enabled || !this.context || document.hidden) return;
     const c = this.context;
@@ -292,6 +328,7 @@ export class VillageAudio {
     this.disposed = true; this.stop(); clearTimeout(this.suspension); this.loadAbort.abort();
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.clearVoices(); this.loops.forEach(s => { s.stop(); s.disconnect(); }); this.recordings.clear(); this.steps.clear(); this.soundtrack?.dispose();
+    this.gardenSounds.clear();
     void this.context?.close();
   }
 }

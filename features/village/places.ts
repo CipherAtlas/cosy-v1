@@ -26,9 +26,9 @@ export const PLACES = [
     name: "Willow pond",
     activity: "Breathe",
     description: "Follow the water. Find your breath.",
-    position: [-19, 0, -7],
-    camera: [-19, 2.4, -7],
-    look: [-25, 0, -18],
+    position: [-18.3, 0, -4.5],
+    camera: [-18.5, 3.7, -2],
+    look: [-27, 0, -10],
     prompt: "Sit by the pond",
   },
   {
@@ -36,7 +36,7 @@ export const PLACES = [
     name: "Tea garden",
     activity: "Check in",
     description: "Come exactly as you are.",
-    position: [14, 0, -9],
+    position: [15.6, 0, -6.8],
     camera: [16.5, 2.4, -6],
     look: [15, 1.2, -12],
     prompt: "Take a quiet moment",
@@ -61,9 +61,19 @@ export const PLACES = [
     look: [3, 1.5, -1],
     prompt: "Read a kind note",
   },
+  {
+    id: "garden",
+    name: "Kitchen garden",
+    activity: "Garden",
+    description: "A sprout, a sunflower, a little mint.",
+    position: [24.6, 0, -2.7],
+    camera: [30.5, 5.8, 1.5],
+    look: [24.7, .6, -7],
+    prompt: "Wander into the garden",
+  },
 ] as const;
 export type PlaceId = (typeof PLACES)[number]["id"];
-export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト"];
+export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト", "小さな菜園"];
 export type Quality = "auto" | "high" | "low";
 export type Weather = "golden" | "dusk" | "rain";
 export type AudioMix = {

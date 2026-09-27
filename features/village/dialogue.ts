@@ -3,87 +3,9 @@ import type { VillageLife } from "./life";
 import type { Collider } from "./environment";
 import type { Weather } from "./places";
 
-type Line = { en: string; ja: string };
+import { VILLAGERS, type Line } from "./villagers";
+export { VILLAGERS } from "./villagers";
 const line = (en: string, ja: string): Line => ({ en, ja });
-
-export const VILLAGERS = [
-  {
-    id: "pip", name: line("Pip", "ピップ"), color: "#a5dfef", ink: "#3f607e",
-    greeting: line("Oh! A new walking buddy. Excellent.", "あっ！お散歩仲間だ。やったね。"),
-    ambient: [
-      line("That pebble looks like a potato. A keeper.", "この小石、じゃがいもみたい。宝物にしよう。"),
-      line("Taking the scenic route. Again.", "また、景色のいい遠回り。"),
-      line("One day I'll learn to whistle. Not today.", "いつか口笛を吹けるはず。今日はまだだけど。"),
-      line("Maple says my pockets are a tiny museum.", "メープルがね、ぼくのポケットは小さな博物館だって。"),
-    ],
-    chat: [
-      line("I found a heart-shaped leaf! You can have it. I've got six.", "ハートの葉っぱ、見つけた！あげるよ。あと六枚あるから。"),
-      line("I'm mapping all the best puddles. Very important work.", "すてきな水たまりの地図を作ってるの。大事なお仕事だよ。"),
-      line("Moss named a snail after me. We've become quite close.", "モスがカタツムリにぼくの名前をつけたんだ。もう親友だよ。"),
-      line("If you get lost, find me. We can be lost together!", "迷ったら、ぼくを探して。一緒に迷子になろう！"),
-      line("No grand adventures today? A little wander counts.", "大冒険じゃなくても、ちょっと歩けば立派な冒険だよ。"),
-    ],
-    rain: line("Puddle season! Excellent splashing weather.", "水たまりの季節だ！水遊びにぴったりだね。"),
-    dusk: line("First star gets a wish. I'm wishing for bigger pockets.", "一番星にお願いしよう。もっと大きなポケットを。"),
-  },
-  {
-    id: "maple", name: line("Maple", "メープル"), color: "#ffdab9", ink: "#945d49",
-    greeting: line("There you are! I saved you the warmest bun.", "来てくれたのね！一番あったかいパン、とってあるよ。"),
-    ambient: [
-      line("Just checking on the bread. With my mouth.", "パンの様子を見なくちゃ。ひと口食べてね。"),
-      line("A wonky biscuit is still a good biscuit.", "形がへんでも、おいしいビスケットだよ。"),
-      line("Pip asked for a pocket-sized pie. Challenge accepted.", "ピップがポケットに入るパイだって。作ってみよう！"),
-      line("A pinch of cinnamon. A rather large pinch.", "シナモンをひとつまみ。大きめのひとつまみ。"),
-    ],
-    chat: [
-      line("My sourdough starter is called Crumb. He's very dramatic.", "パン種の名前はクラム。とっても気分屋さんなの。"),
-      line("The secret ingredient is butter. The other secret is more butter.", "隠し味はバター。もう一つの隠し味もバター。"),
-      line("Luma brings the tea, I bring the biscuits. A perfect little treaty.", "ルマがお茶、私がビスケット。すてきな約束でしょ。"),
-      line("You don't need a reason to sit by the fire. Or a second bun.", "焚き火で休むのに理由はいらないよ。パンのおかわりにもね。"),
-      line("Today's loaf came out sideways. We're calling it rustic.", "今日のパン、横にふくらんじゃった。素朴な味ってことで。"),
-    ],
-    rain: line("Rain on the roof, bread in the oven. That's a good day.", "屋根には雨、オーブンにはパン。いい一日だね。"),
-    dusk: line("Last batch! Well... last batch before the last batch.", "これが最後のひと焼き！の、その一つ前かな。"),
-  },
-  {
-    id: "moss", name: line("Moss", "モス"), color: "#c8e6a6", ink: "#586b40",
-    greeting: line("Shh... the seedlings are napping. Hello, though.", "しーっ、苗がお昼寝中。こんにちは、小さな声でね。"),
-    ambient: [
-      line("Grow at your own pace, little sprout.", "小さな芽さん、自分のペースで育ってね。"),
-      line("That's not a weed. That's a surprise guest.", "雑草じゃないよ。ふらっと来たお客さま。"),
-      line("The fern has a new leaf. I am very proud.", "シダに新しい葉っぱが。とっても誇らしい。"),
-      line("Dear snails: please use the path. Love, Moss.", "カタツムリさんへ。道を歩いてね。モスより。"),
-    ],
-    chat: [
-      line("I say good morning to every plant. It takes until lunch.", "全部の植物におはようって言うと、お昼になるんだ。"),
-      line("This is my brave face. A butterfly landed on my nose earlier.", "これ、勇敢な顔。さっき鼻にチョウが止まったから。"),
-      line("Pip brings me odd little stones. The thyme seems to like them.", "ピップが変な形の石をくれるの。タイムも気に入ったみたい。"),
-      line("You can just be here, you know. The trees do it all day.", "ただここにいてもいいんだよ。木は一日中そうしてる。"),
-      line("I planted one strawberry for me and twelve for the birds. Fair enough.", "イチゴは自分に一つ、鳥たちに十二。ちょうどいいね。"),
-    ],
-    rain: line("The garden ordered a drink. Excellent service.", "庭がお水を頼んだの。すばらしいサービスだね。"),
-    dusk: line("Tucking the garden in. Sleep well, little leaves.", "庭を寝かしつけてるの。葉っぱさん、おやすみ。"),
-  },
-  {
-    id: "luma", name: line("Luma", "ルマ"), color: "#d6c7fa", ink: "#80576f",
-    greeting: line("Oh, lovely. The spare teacup was hoping for you.", "まあ、うれしい。空いてるカップも待ってたのよ。"),
-    ambient: [
-      line("Cloud report: one sleepy sheep, two dumplings.", "雲の観察日記。眠い羊が一匹、おだんごが二つ。"),
-      line("This tea needs a biscuit-shaped companion.", "このお茶には、ビスケットの形をしたお友だちが必要ね。"),
-      line("A very busy afternoon of doing very little.", "何もしないことで、とっても忙しい午後。"),
-      line("The kettle is singing in a key of its own.", "やかんが自分だけの音階で歌ってる。"),
-    ],
-    chat: [
-      line("Today's tea is called 'just five more minutes.' Refills encouraged.", "今日のお茶は『あと五分だけ』。おかわり大歓迎よ。"),
-      line("Moss apologizes to the mint before picking it. I do too, now.", "モスはミントを摘む前にごめんねって。私も言うようになったの。"),
-      line("I tried reading tea leaves. Mine said: wash the cup.", "茶葉で占ってみたの。結果は『カップを洗いましょう』。"),
-      line("You may borrow my favourite cloud. Please return it by sunset.", "お気に入りの雲、貸してあげる。日暮れまでに返してね。"),
-      line("Stay a little. You don't have to have anything clever to say.", "もう少しここにいて。気の利いた話なんて、なくていいの。"),
-    ],
-    rain: line("The rain is stirring the pond. How thoughtful.", "雨が池をかき混ぜてる。気が利くわね。"),
-    dusk: line("A cup for me, a cup for you, and one for the moon.", "私に一杯、あなたに一杯、お月さまにも一杯。"),
-  },
-];
 
 /** DOM bubbles follow world anchors without sending frame updates through React. */
 export class VillagerDialogue {
@@ -102,7 +24,8 @@ export class VillagerDialogue {
   private boxes: T.Box3[];
   private bubbles;
 
-  constructor(host: HTMLElement, life: VillageLife, colliders: Collider[], private onTalk: () => void) {
+  constructor(host: HTMLElement, life: VillageLife, colliders: Collider[], private onTalk: () => void,
+    private actions?: { companion: (id: string) => void; crumbs: () => void; visitTea?: () => void }) {
     this.layer.className = "v-villager-dialogue";
     this.layer.hidden = true;
     this.layer.setAttribute("role", "group");
@@ -134,11 +57,23 @@ export class VillagerDialogue {
         }
       });
       footer.append(name, button);
-      element.append(text, footer);
+      const actions = document.createElement("div"); actions.className = "v-villager-actions";
+      const companion = document.createElement("button"); companion.type = "button";
+      companion.addEventListener("click", () => this.invite(index));
+      companion.setAttribute("aria-keyshortcuts", "C"); actions.append(companion);
+      const crumbs = document.createElement("button"); crumbs.type = "button";
+      crumbs.addEventListener("click", () => this.bread(index));
+      crumbs.setAttribute("aria-keyshortcuts", "B");
+      if (profile.id === "maple") actions.append(crumbs);
+      if (profile.id === "luma") {
+        const tea = document.createElement("button"); tea.type = "button"; tea.dataset.tea = "true";
+        tea.addEventListener("click", () => { this.onTalk(); this.actions?.visitTea?.(); }); actions.append(tea);
+      }
+      element.append(text, footer, actions);
       this.layer.append(element);
-      return { resident, profile, element, text, name, button, buttonLabel, line: profile.greeting,
+      return { resident, profile, element, text, name, button, buttonLabel, companion, crumbs, actions, line: profile.greeting,
         greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0,
-        visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "" };
+        visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "", actionState: "" };
     });
     this.layer.append(this.announcement);
     host.append(this.layer);
@@ -161,7 +96,33 @@ export class VillagerDialogue {
       b.buttonLabel.textContent = language === "ja" ? "話す" : "Chat";
       b.button.setAttribute("aria-label", language === "ja" ? `${b.profile.name.ja}と話す` : `Chat with ${b.profile.name.en}`);
       b.button.setAttribute("aria-keyshortcuts", "F");
+      this.actionLabels(b);
     });
+  }
+  private actionLabels(b: typeof this.bubbles[number]) {
+    const state = `${this.language}:${b.resident.following}`;
+    if (b.actionState === state) return;
+    b.actionState = state;
+    const ja = this.language === "ja";
+    b.companion.textContent = b.resident.following ? (ja ? "またね · C" : "See you later · C") : (ja ? "一緒に歩く · C" : "Walk with me · C");
+    b.companion.setAttribute("aria-label", b.resident.following ? (ja ? `${b.profile.name.ja}と別れる` : `Let ${b.profile.name.en} wander`) : (ja ? `${b.profile.name.ja}を誘う` : `Invite ${b.profile.name.en} to walk with you`));
+    b.companion.setAttribute("aria-pressed", String(b.resident.following));
+    const tea = b.actions.querySelector("[data-tea]");
+    if (tea) tea.textContent = ja ? "収穫を持ってお茶をしよう" : "Share your harvest over tea";
+    b.crumbs.textContent = ja ? "パンくずをもらう · B" : "Ask for bread crumbs · B";
+  }
+  invite(index = this.nearest) {
+    const b = this.bubbles[index];
+    if (!this.enabled || !b?.visible || b.distance > 4.5 || !this.actions) return;
+    this.onTalk(); this.actions.companion(b.profile.id); this.actionLabels(b); b.measured = "";
+    this.say(index, b.resident.following ? line("A little company? I'd love that.", "一緒にお散歩？うれしいな。") : line("See you around. I'll be right here in the village.", "またね。村でのんびりしてるね。"), 5);
+  }
+  bread(index = this.nearest) {
+    const b = this.bubbles[index];
+    if (!this.enabled || !b?.visible || b.distance > 4.5 || b.profile.id !== "maple" || !this.actions) return;
+    this.onTalk(); this.actions.crumbs();
+    this.say(index, line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 10);
+    this.announcement.textContent = b.line[this.language];
   }
 
   setEnabled(enabled: boolean) {
@@ -235,8 +196,10 @@ export class VillagerDialogue {
       const b = this.bubbles[index];
       const canChat = index === this.nearest;
       b.button.hidden = !canChat;
+      b.actions.hidden = !canChat || !this.actions;
+      this.actionLabels(b);
       b.element.hidden = false;
-      const measureKey = `${this.language}:${b.line.en}:${canChat}`;
+      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}`;
       if (b.measured !== measureKey) {
         b.width = b.element.offsetWidth; b.height = b.element.offsetHeight; b.measured = measureKey;
       }

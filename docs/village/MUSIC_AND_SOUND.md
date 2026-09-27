@@ -1,6 +1,12 @@
 # Recorded music and world sound
 
-Updated: 2026-09-26. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+Updated: 2026-09-27. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+
+## Garden and pond effects — 2026-09-27
+
+The local addition uses seven original cached procedural effects in `VillageAudio.gardenEffect`: planting, watering, picking, pouring mint tea, crumbs, splash and a soft duck call. They use the existing effects/master buses, explicit Sound activation, visibility guard, distance attenuation and 16-voice effect budget; simple view uses centered output. Fish landing and occasional nearby ducks can play effects while wandering. The recorded music above is unchanged.
+
+[Sound checks](evidence/garden-garden-audio.json) verify non-silent output for all seven effects plus activation/mute/off/disposal and voice limits. [Short preview](evidence/garden-garden-sounds.webm) records the production master bus. Perceptual headphone/speaker balance and physical-phone sound remain unreviewed.
 
 ## The requirement
 

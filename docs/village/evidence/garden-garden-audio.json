@@ -1,0 +1,50 @@
+{
+  "pass": true,
+  "checks": 12,
+  "results": [
+    "Garden sounds never create audio before explicit activation",
+    "plant: non-silent signal through the production effects and master buses",
+    "water: non-silent signal through the production effects and master buses",
+    "pluck: non-silent signal through the production effects and master buses",
+    "pour: non-silent signal through the production effects and master buses",
+    "crumbs: non-silent signal through the production effects and master buses",
+    "splash: non-silent signal through the production effects and master buses",
+    "duck: non-silent signal through the production effects and master buses",
+    "Effects mute does not schedule garden voices",
+    "Rapid repeated interactions respect the 16-voice effects budget",
+    "Sound off prevents new garden effects",
+    "Disposal releases cached garden sound buffers"
+  ],
+  "signal": [
+    {
+      "kind": "plant",
+      "rms": 0.000976891874426338
+    },
+    {
+      "kind": "water",
+      "rms": 0.00597094484496118
+    },
+    {
+      "kind": "pluck",
+      "rms": 0.009753797181691908
+    },
+    {
+      "kind": "pour",
+      "rms": 0.006741193824638628
+    },
+    {
+      "kind": "crumbs",
+      "rms": 0.003196450274232568
+    },
+    {
+      "kind": "splash",
+      "rms": 0.004471880085946352
+    },
+    {
+      "kind": "duck",
+      "rms": 0.006025853443996468
+    }
+  ],
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "limits": "Signal/lifecycle evidence and a preview recording; not a subjective listening or phone-audio review."
+}

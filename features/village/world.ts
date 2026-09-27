@@ -7,8 +7,12 @@ import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { fantasyTreeGeometry } from "./fantasyTrees";
 import { buildWayfinding } from "./wayfinding";
-import { BRIDGE, HEARTH, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
+import { BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, groundY, landscapeHeight, riverX, roadX, type Collider } from "./environment";
+import { GARDEN_COURT } from "./garden";
 export { groundY, riverX } from "./environment";
+
+/** Optional authoring hook; the public village keeps its existing merged render path. */
+export type WorldLayoutCapture = (id: string, name: string, category: string, objects: T.Object3D[], pivot?: [number, number, number]) => void;
 
 export type World = {
   group: T.Group;
@@ -26,6 +30,7 @@ export type World = {
   water: T.Mesh;
   wind: { time: { value: number }; strength: { value: number } };
   vegetation: T.InstancedMesh[];
+  gardenSurfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial };
   dispose: () => void;
 };
 let seed = 62025;
@@ -40,6 +45,7 @@ const dummy = new T.Object3D();
 export async function buildWorld(
   onProgress: (v: number) => void,
   renderer: T.WebGLRenderer,
+  capture?: WorldLayoutCapture,
 ): Promise<World> {
   seed = 62025;
   const group = new T.Group();
@@ -48,9 +54,17 @@ export async function buildWorld(
     lanterns: T.Mesh[] = [];
   const wind = { time: { value: 0 }, strength: { value: 0.3 } };
   const vegetation: T.InstancedMesh[] = [];
+  const gardenPathClearance = new Set<number>();
+  const plantingCell = (x: number, z: number) => (Math.floor(x * 2) + 256) * 1024 + Math.floor(z * 2) + 256;
+  const teaCourtyardDistance = (x: number, z: number) => Math.hypot((x - 15.5) / 3.8, (z + 10.4) / 3.2);
   const clearPlanting = (x: number, z: number) =>
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
-    || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9;
+    || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9
+    || pondDistance(x, z) < 1.12
+    || teaCourtyardDistance(x, z) < 1.16
+    || gardenPathClearance.has(plantingCell(x, z))
+    || (x > 12.5 && x < 18.5 && z > -13.5 && z < -7.5)
+    || (x > GARDEN_COURT.left - .7 && x < GARDEN_COURT.right + .7 && z > GARDEN_COURT.back - .7 && z < GARDEN_COURT.front + .7);
   const painted = paintedTextures();
   const textures = Object.values(painted);
   const { wood: woodMap, roof: roofMap, plaster: plasterMap,
@@ -203,7 +217,7 @@ export async function buildWorld(
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i),
       z = pos.getZ(i);
-    pos.setY(i, landscapeHeight(x, z));
+    pos.setY(i, pondDistance(x, z) < 1.35 ? Math.min(-.85, landscapeHeight(x, z)) : landscapeHeight(x, z));
     const patch = .5 + .5 * Math.sin(x * .12) * Math.sin(z * .09);
     const c = new T.Color().setHSL(.235 + patch * .035, .54, .56 + patch * .13);
     colors.push(c.r, c.g, c.b);
@@ -212,6 +226,26 @@ export async function buildWorld(
   terrain.computeVertexNormals();
   const terrainMesh = add(terrain, mat.ground, 0, 0, 0);
   terrainMesh.castShadow = false;
+  capture?.("terrain", "Valley ground", "Landscape", [terrainMesh]);
+  // The valley grid is coarse; a local shoreline gives the larger pond a continuous bank.
+  const shoreGeometry = new T.RingGeometry(.78, 1.65, 128, 18);
+  shoreGeometry.rotateX(-Math.PI / 2);
+  const shorePositions = shoreGeometry.attributes.position, shoreColors: number[] = [];
+  for (let i = 0; i < shorePositions.count; i++) {
+    const x = POND.x + shorePositions.getX(i) * POND.rx, z = POND.z + shorePositions.getZ(i) * POND.rz;
+    const d = pondDistance(x, z), river = Math.abs(x - riverX(z));
+    const bank = -.72 + Math.max(0, Math.min(1, (d - .93) / .11)) * .72;
+    const y = d < 1.04 ? Math.min(bank, river < 4 ? -.85 + river * .15 : 0) : landscapeHeight(x, z);
+    shorePositions.setXYZ(i, x, y + .007, z);
+    shoreGeometry.attributes.uv.setXY(i, x / 650 + .5, .5 - z / 650);
+    const patch = .5 + .5 * Math.sin(x * .12) * Math.sin(z * .09);
+    const c = new T.Color().setHSL(.235 + patch * .035, .54, .56 + patch * .13);
+    shoreColors.push(c.r, c.g, c.b);
+  }
+  shoreGeometry.setAttribute("color", new T.Float32BufferAttribute(shoreColors, 3));
+  shoreGeometry.computeVertexNormals();
+  const shoreMesh = add(shoreGeometry, mat.ground, 0, 0, 0); shoreMesh.castShadow = false;
+  capture?.("shore", "Willow pond bank", "Landscape", [shoreMesh], [POND.x, 0, POND.z]);
   const surfaceShader = mat.ground.onBeforeCompile;
   mat.ground.onBeforeCompile = shader => {
     surfaceShader(shader, renderer);
@@ -277,7 +311,8 @@ export async function buildWorld(
     g.setAttribute("color", new T.Float32BufferAttribute(shoulderColors, 3));
     g.setIndex(indices);
     g.computeVertexNormals();
-    add(g, pathMaterial, 0, 0, 0).castShadow = false;
+    const ribbon = add(g, pathMaterial, 0, 0, 0); ribbon.castShadow = false;
+    capture?.(`path-${pathSurfaces.length + 1}`, `Village path ${pathSurfaces.length + 1}`, "Paths", [ribbon], c.getPoint(.5).toArray() as [number, number, number]);
     pathSurfaces.push({ geometry: g, spine: c.getPoints(100), width });
   }
   path(
@@ -293,15 +328,22 @@ export async function buildWorld(
   path([new T.Vector3(-34, 0, 4), new T.Vector3(-23, 0, 3),
     new T.Vector3(BRIDGE.x - BRIDGE.length / 2, 0, BRIDGE.z)], 2.8);
   path([new T.Vector3(BRIDGE.x + BRIDGE.length / 2, 0, BRIDGE.z),
-    new T.Vector3(-2, 0, 3), new T.Vector3(0, 0, 2), new T.Vector3(17, 0, -9)], 2.8);
+    new T.Vector3(-2, 0, 3), new T.Vector3(0, 0, 2)], 2.8);
   path(
     [
       new T.Vector3(-21, 0, 5),
-      new T.Vector3(-20, 0, -3),
-      new T.Vector3(-20, 0, -10),
+      new T.Vector3(-18.2, 0, -1),
+      new T.Vector3(-18.4, 0, -5.5),
     ],
     2,
   );
+  // Enter below the cottage, then branch through the tea clearing into the garden aisles.
+  path([new T.Vector3(-.6, 0, -9), new T.Vector3(4, 0, -9),
+    new T.Vector3(8.6, 0, -9.3), new T.Vector3(11.8, 0, -11.3), new T.Vector3(14.8, 0, -12)], 2.1);
+  path([new T.Vector3(17, 0, -10), new T.Vector3(18.5, 0, -9.2),
+    new T.Vector3(19.6, 0, -7.75), new T.Vector3(20.2, 0, -7.75)], 1.5);
+  path([new T.Vector3(16.4, 0, -7.7), new T.Vector3(19, 0, -5.2),
+    new T.Vector3(19.2, 0, -2), new T.Vector3(19.6, 0, .25), new T.Vector3(20.2, 0, .25)], 1.8);
   path(
     [
       new T.Vector3(0, 0, 13),
@@ -310,6 +352,56 @@ export async function buildWorld(
     ],
     2.5,
   );
+  // A rounded terrace shares the paths' paving scale and moss shoulder.
+  const terracePositions: number[] = [], terraceUV: number[] = [], terraceColors: number[] = [], terraceIndices: number[] = [];
+  const terraceRings = [0, .84, 1, 1.1], terraceSegments = 64;
+  for (let ring = 0; ring < terraceRings.length; ring++) {
+    for (let segment = 0; segment <= terraceSegments; segment++) {
+      const a = segment / terraceSegments * Math.PI * 2, radius = terraceRings[ring];
+      const x = 15.5 + Math.cos(a) * 3.8 * radius, z = -10.4 + Math.sin(a) * 3.2 * radius;
+      terracePositions.push(x, Math.max(landscapeHeight(x, z), 0) + .072, z);
+      terraceUV.push(x / 2, z / 2); terraceColors.push(ring < 2 ? 1 : ring === 2 ? .62 : 0, 1, 1);
+      if (ring < terraceRings.length - 1 && segment < terraceSegments) {
+        const i = ring * (terraceSegments + 1) + segment, next = i + terraceSegments + 1;
+        terraceIndices.push(i, i + 1, next, i + 1, next + 1, next);
+      }
+    }
+  }
+  const terrace = new T.BufferGeometry();
+  terrace.setAttribute("position", new T.Float32BufferAttribute(terracePositions, 3));
+  terrace.setAttribute("uv", new T.Float32BufferAttribute(terraceUV, 2));
+  terrace.setAttribute("color", new T.Float32BufferAttribute(terraceColors, 3));
+  terrace.setIndex(terraceIndices); terrace.computeVertexNormals();
+  const teaTerrace = add(terrace, pathMaterial, 0, 0, 0); teaTerrace.castShadow = false;
+  capture?.("tea-terrace", "Tea courtyard paving", "Paths", [teaTerrace], [15.5, 0, -10.4]);
+  // One continuous level surface gives the rectangular beds even, seam-free aisles.
+  const court = GARDEN_COURT, shoulder = .45;
+  const courtCoverage = (x: number, z: number) => 1 - T.MathUtils.smoothstep(
+    Math.max(court.left - x, x - court.right, court.back - z, z - court.front), 0, shoulder);
+  const courtGeometry = new T.PlaneGeometry(court.right - court.left + shoulder * 2, court.front - court.back + shoulder * 2, 48, 60);
+  courtGeometry.rotateX(-Math.PI / 2); courtGeometry.translate((court.left + court.right) / 2, .095, (court.back + court.front) / 2);
+  const courtPosition = courtGeometry.getAttribute("position"), courtUV = courtGeometry.getAttribute("uv");
+  const courtColors = new Float32Array(courtPosition.count * 3);
+  for (let i = 0; i < courtPosition.count; i++) {
+    const x = courtPosition.getX(i), z = courtPosition.getZ(i);
+    courtUV.setXY(i, x / 2, z / 2);
+    let coverage = courtCoverage(x, z);
+    for (const surface of pathSurfaces) for (const p of surface.spine)
+      coverage = Math.max(coverage, 1 - T.MathUtils.smoothstep(Math.hypot(x - p.x, z - p.z), surface.width * .36, surface.width * .64));
+    courtColors.set([coverage, 1, 1], i * 3);
+  }
+  courtGeometry.setAttribute("color", new T.BufferAttribute(courtColors, 3));
+  const gardenCourt = add(courtGeometry, pathMaterial, 0, 0, 0);
+  gardenCourt.name = "Continuous kitchen garden paving"; gardenCourt.castShadow = false;
+  capture?.("garden-paving", "Kitchen garden paving", "Paths", [gardenCourt], [24.7, 0, -6]);
+  // Reserve the full ribbons and shoulders before scattering meadow plants.
+  for (const surface of pathSurfaces) for (const p of surface.spine) {
+    if (p.x < 2 || p.z > 2) continue;
+    const radius = surface.width * .68 + .38;
+    for (let x = Math.floor((p.x - radius) * 2); x <= Math.ceil((p.x + radius) * 2); x++)
+      for (let z = Math.floor((p.z - radius) * 2); z <= Math.ceil((p.z + radius) * 2); z++)
+        if (Math.hypot(x / 2 - p.x, z / 2 - p.z) <= radius + .36) gardenPathClearance.add(plantingCell(x / 2, z / 2));
+  }
   // At junctions, keep every overlapping ribbon paved; moss must never cut across a road.
   // Shared world-space UVs also prevent texture seams where their surfaces overlap.
   for (const surface of pathSurfaces) {
@@ -317,7 +409,7 @@ export async function buildWorld(
     for (let vertex=0; vertex<positions.count; vertex++) {
       if (colors.getX(vertex) === 1) continue;
       const x=positions.getX(vertex), z=positions.getZ(vertex);
-      let paving=colors.getX(vertex);
+      let paving=Math.max(colors.getX(vertex), 1 - T.MathUtils.smoothstep(teaCourtyardDistance(x, z), .84, 1.1), courtCoverage(x, z));
       for (const other of pathSurfaces) {
         if (other === surface) continue;
         let distance=Infinity;
@@ -330,6 +422,15 @@ export async function buildWorld(
         paving=Math.max(paving,1-T.MathUtils.smoothstep(distance,other.width*.36,other.width*.64));
       }
       colors.setX(vertex,paving);
+    }
+  }
+  // Keep terrace seams paved where an approach crosses its soft edge.
+  const terraceColor = terrace.getAttribute("color"), terracePosition = terrace.getAttribute("position");
+  for (let i = 0; i < terracePosition.count; i++) {
+    const x = terracePosition.getX(i), z = terracePosition.getZ(i);
+    for (const surface of pathSurfaces) for (const p of surface.spine) {
+      const coverage = 1 - T.MathUtils.smoothstep(Math.hypot(x - p.x, z - p.z), surface.width * .36, surface.width * .64);
+      if (coverage > terraceColor.getX(i)) terraceColor.setX(i, coverage);
     }
   }
   // Water occupies a shallow channel, with shader normals moving independently of the banks.
@@ -348,10 +449,14 @@ export async function buildWorld(
   const water = add(wg, waterMat, 0, 0, 0);
   water.castShadow = false;
   water.userData.time = waterUniform.time;
-  const pondGeo = new T.RingGeometry(0, 7, 80, 8);
+  const pondGeo = new T.CircleGeometry(1, 96);
   pondGeo.rotateX(-Math.PI / 2);
-  const pond = add(pondGeo, pondSurface.material, -25, -0.3, -17, 1.1, 1, 1);
+  const pond = add(pondGeo, pondSurface.material, POND.x, POND.y, POND.z, POND.rx, 1, POND.rz);
+  pond.name = "Willow pond water";
   pond.castShadow = false;
+  capture?.("river", "Flowing river", "Landscape", [water]);
+  capture?.("pond", "Willow pond", "Landscape", [pond], [POND.x, 0, POND.z]);
+  let layoutStart = group.children.length;
   // River stones, a shallow arch bridge, and rustic railings.
   for (let i = 0; i < 240; i++) {
     let z = -65 + rnd() * 125,
@@ -370,7 +475,9 @@ export async function buildWorld(
     );
     o.rotation.set(rnd(), rnd(), rnd());
   }
-  group.add(buildBridge(mat.stone, mat.path, colliders));
+  capture?.("river-stones", "Riverbank stones", "Landscape", group.children.slice(layoutStart));
+  const bridge = buildBridge(mat.stone, mat.path, colliders); group.add(bridge);
+  capture?.("bridge", "Stone arch bridge", "Bridges", [bridge], [BRIDGE.x, 0, BRIDGE.z]);
   function lantern(
     x: number,
     y: number,
@@ -409,13 +516,14 @@ export async function buildWorld(
       const lamp = new T.PointLight("#ffd19b", 3, 4, 2);
       lamp.position.set(.95, 2, d / 2 + .7); cottage.add(lamp);
     }
+    capture?.(`cottage-${index + 1}`, ["Bluebell cottage", "Rosewood cottage", "Lilac cottage", "Waterside cottage", "", "", "Hilltop cottage", "Orchard cottage", "Meadow cottage"][index], "Buildings", [cottage], [x, 0, z]);
   }
   house(10, 11, 6, 5.4, 4.2, -Math.PI / 2);
   house(10, -4, 5.8, 5.3, 3.8, -Math.PI / 2, mat.terra);
   house(9, -27, 6.4, 6, 4.3, 0.3);
   house(-23, 8, 5.4, 5.5, 3.5, Math.PI / 2, mat.terra);
-  house(-24, -5, 5.2, 5, 3.4, Math.PI / 2);
-  house(-23, -31, 5.7, 5.2, 4.3, 0.25);
+  // Both pond cottages are removed; retain the other houses' authored variants.
+  houseIndex += 2;
   house(1, -38, 6.5, 6, 4.6, 0, mat.terra);
   house(21, -24, 6.5, 6, 4.4, 0.25);
   house(-31, 25, 5.5, 5.2, 4.3, -0.3);
@@ -450,6 +558,8 @@ export async function buildWorld(
       tower,
     ).rotation.y = a;
   }
+  capture?.("tower", "Village spire", "Buildings", [tower], [4, 0, -57]);
+  let benchIndex = 0;
   function bench(x: number, z: number, rot: number) {
     const b = new T.Group();
     b.position.set(x, 0, z);
@@ -465,13 +575,15 @@ export async function buildWorld(
       box(mat.wood, 0, 0.65, -0.22 + i * 0.22, 2.2, 0.1, 0.18, b);
     for (let i = 0; i < 2; i++)
       box(mat.wood, 0, 1.05 + i * 0.23, -0.32, 2.2, 0.18, 0.1, b);
+    capture?.(`bench-${++benchIndex}`, `Oak bench ${benchIndex}`, "Furnishings", [b], [x, 0, z]);
   }
   // Seats face the fire; the main village path stays unobstructed.
   bench(HEARTH.x, HEARTH.z + 2.9, Math.PI);
   bench(HEARTH.x, HEARTH.z - 2.9, 0);
   bench(HEARTH.x - 2.7, HEARTH.z, Math.PI / 2);
-  bench(15.2, -11.65, 0);
-  bench(-20, -9, Math.PI / 2);
+  bench(13.9, -10, Math.PI / 2);
+  bench(-17.8, -7.6, Math.PI / 2);
+  layoutStart = group.children.length;
   // Hearth with glowing embers and gently animated flame geometry.
   for (let i = 0; i < 16; i++) {
     let a = (i / 16) * Math.PI * 2;
@@ -515,13 +627,19 @@ export async function buildWorld(
   const hearthLight = new T.PointLight("#ffad54", 9, 8, 2);
   hearthLight.position.set(HEARTH.x, 1, HEARTH.z); group.add(hearthLight);
   fire.userData.light=hearthLight;fire.userData.coal=coal;
+  capture?.("hearth", "Hearth clearing", "Furnishings", group.children.slice(layoutStart), [HEARTH.x, 0, HEARTH.z]);
+  layoutStart = group.children.length;
   // Pond dock.
-  for (let i = 0; i < 18; i++)
-    box(mat.wood, -20.8 - i * 0.2, 0.15, -10.5, 0.18, 0.18, 3.3);
-  for (const x of [-21, -24])
-    for (const z of [-9, -12])
+  for (let i = 0; i < 28; i++) {
+    const x = POND_DOCK.x + POND_DOCK.w / 2 - .1 - i * .196;
+    box(mat.wood, x, dockHeight(x) - .09, POND_DOCK.z, .18, .18, POND_DOCK.d);
+  }
+  for (const x of [-19.1, -24.1])
+    for (const z of [-6.4, -4.6])
       add(cylGeo, mat.darkWood, x, 0.05, z, 0.13, 1.2, 0.13);
-  lantern(-23.7, 0.3, -9.2);
+  lantern(-24.1, 0.3, -4.6);
+  capture?.("dock", "Willow fishing dock", "Bridges", group.children.slice(layoutStart), [POND_DOCK.x, 0, POND_DOCK.z]);
+  layoutStart = group.children.length;
   // Tea garden pergola.
   for (const x of [13, 18])
     for (const z of [-8, -13]) box(mat.wood, x, 1.75, z, 0.18, 3.5, 0.18);
@@ -529,32 +647,52 @@ export async function buildWorld(
     box(mat.wood, 12.8 + i * 0.78, 3.45, -10.5, 0.14, 0.16, 5.6);
   box(mat.wood, 15.5, 3.3, -8, 5.7, 0.2, 0.2);
   box(mat.wood, 15.5, 3.3, -13, 5.7, 0.2, 0.2);
+  lantern(13, 2.35, -13);
+  lantern(18, 2.35, -13);
+  // Low planted pots frame the back corners without narrowing the entrances.
+  for (const [x, z] of [[12.3, -13.4], [18.8, -13.4]]) {
+    add(new T.CylinderGeometry(.35, .25, .45, 12), mat.terra, x, .22, z);
+    add(new T.TorusGeometry(.35, .04, 6, 16), mat.terra, x, .45, z).rotation.x = Math.PI / 2;
+    for (let i = 0; i < 5; i++) {
+      const a = i * 2.4;
+      add(sphereGeo, mat.green, x + Math.cos(a) * .19, .53 + i % 2 * .1, z + Math.sin(a) * .19, .22, .24, .22);
+      add(sphereGeo, i % 2 ? mat.rose : mat.paper, x + Math.cos(a) * .22, .76 + i % 2 * .1, z + Math.sin(a) * .22, .1, .065, .1);
+    }
+  }
   add(cylGeo, mat.wood, 15.2, 0.6, -10, 0.12, 1.2, 0.12);
   add(cylGeo, mat.wood, 15.2, 1.2, -10, 0.8, 0.12, 0.8);
+  capture?.("pergola", "Tea garden pergola", "Furnishings", group.children.slice(layoutStart), [15.5, 0, -10.5]);
+  layoutStart = group.children.length;
   // Postbox and hand-lettered sign geometry use readable DOM labels on approach.
   box(mat.wood, 3, 0.7, -1, 0.16, 1.4, 0.16);
   box(mat.wood, 3, 1.6, -1, 0.6, 0.7, 0.45);
   box(mat.metal, 3, 1.7, -0.765, 0.38, 0.06, 0.02);
   add(new T.ConeGeometry(0.49, 0.3, 4), mat.terra, 3, 2.1, -1).rotation.y =
     Math.PI / 4;
+  capture?.("postbox", "Little postbox", "Furnishings", group.children.slice(layoutStart), [3, 0, -1]);
   // Fences and lamps guide movement without a HUD full of markers.
   for (const side of [-1, 1])
     for (let z = 18; z < 39; z += 2.4) {
+      layoutStart = group.children.length;
       const x = roadX(z) + side * 3.2;
       box(mat.wood, x, 0.7, z, 0.13, 1.4, 0.13);
       for (const y of [0.45, 0.95])
         box(mat.wood, x, y, z + 1.2, 0.09, 0.11, 2.5);
+      capture?.(`fence-${side}-${Math.round(z * 10)}`, "Oak fence", "Furnishings", group.children.slice(layoutStart), [x, 0, z + 1.2]);
     }
   for (const z of [20, 0, -27]) {
+    layoutStart = group.children.length;
     box(mat.darkWood, -3.1, 1.7, z, 0.13, 3.4, 0.13);
     box(mat.darkWood, -2.8, 3.35, z, 0.75, 0.1, 0.1);
     lantern(-2.5, 2.55, z);
+    capture?.(`lamp-${z}`, "Hanging lantern", "Furnishings", group.children.slice(layoutStart), [-3.1, 0, z]);
   }
   onProgress(45);
   // Static architectural geometry is merged per material into a handful of draw calls.
+  if (!capture) {
   group.updateMatrixWorld(true);
   const batches = new Map<T.Material, T.BufferGeometry[]>();
-  const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh]);
+  const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh, shoreMesh]);
   const remove: T.Object3D[] = [];
   group.traverse((o) => {
     if (o instanceof T.Mesh && !keep.has(o)) {
@@ -600,6 +738,7 @@ export async function buildWorld(
       mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial;
     }
   });
+  }
   // Wind-deformed instanced meadow: one geometry and one material for thousands of blades.
   function windMaterial(material: T.MeshStandardMaterial, scale: number, tree = false) {
     const deform = (shader: { uniforms: Record<string, unknown>; vertexShader: string }) => {
@@ -654,7 +793,7 @@ export async function buildWorld(
       river < 4 ||
       Math.abs(x - roadX(z)) < 2.15 ||
       (Math.abs(z - 3) < 1.6 && x < 15) ||
-      Math.hypot(x + 25, z + 17) < 8 ||
+      pondDistance(x, z) < 1.1 ||
       colliders.some(
         (c) =>
           Math.abs(x - c.x) < c.w / 2 + 1 && Math.abs(z - c.z) < c.d / 2 + 1,
@@ -682,6 +821,7 @@ export async function buildWorld(
   vegetation.push(grass);
   grass.receiveShadow = true;
   group.add(grass);
+  capture?.("meadow-grass", "Meadow grass", "Landscape", [grass]);
   // Bushes use a shared, irregular leaf canopy rather than solid green volumes.
   const leafGeo = new T.BufferGeometry();
   leafGeo.setAttribute(
@@ -754,6 +894,7 @@ export async function buildWorld(
   bushes.receiveShadow = true;
   bushes.castShadow = true;
   group.add(bushes);
+  capture?.("bushes", "Leafy shrub", "Nature", [bushes]);
   // Daisies and lavender have stems, leaves, and petal silhouettes at walking distance.
   const plantParts: T.BufferGeometry[] = [];
   const stem = new T.CylinderGeometry(0.012, 0.016, 0.68, 4);
@@ -818,6 +959,7 @@ export async function buildWorld(
   stems.receiveShadow = true;
   blossoms.receiveShadow = true;
   group.add(stems, blossoms);
+  capture?.("wildflowers", "Lane wildflowers", "Landscape", [stems, blossoms]);
   // A complete valley surrounds the playable space, including side and rear views.
   for (let band = 0; band < 3; band++) {
     const ring = new T.PlaneGeometry(1, 1, 440, 36);
@@ -848,7 +990,8 @@ export async function buildWorld(
     }
     ring.setAttribute("color",new T.Float32BufferAttribute(mountainColors,3));
     const material = new T.MeshStandardMaterial({ vertexColors:true, roughness:1, side:T.DoubleSide });
-    add(ring, material, 0, 0, 0).castShadow = false;
+    const mountain = add(ring, material, 0, 0, 0); mountain.castShadow = false;
+    capture?.(`mountain-${band}`, ["Near mountain ridge", "Blue mountain ridge", "Distant mountain ridge"][band], "Landscape", [mountain]);
   }
   const forestPlacements: { matrix: T.Matrix4; color: T.Color }[] = [];
   for (let i = 0; i < 360; i++) {
@@ -860,11 +1003,13 @@ export async function buildWorld(
     forestPlacements.push({ matrix: dummy.matrix.clone(), color: new T.Color().setHSL(.24 + rnd() * .05, .15, .86 + rnd() * .1) });
   }
   // A small distant landmark, distinct from the village clock tower.
+  layoutStart = group.children.length;
   const castleMaterial = new T.MeshStandardMaterial({ color: "#e0e1c5", roughness: 1 });
   for (const [x, y, h] of [[-18, 11, 9], [-22, 10, 5], [-14, 9, 6]]) {
     add(new T.CylinderGeometry(.8, 1.15, h, 6), castleMaterial, x, y + h / 2, -158).castShadow = false;
     add(new T.ConeGeometry(1.05, h * .5, 6), mat.roof, x, y + h * 1.25, -158).castShadow = false;
   }
+  capture?.("castle", "Distant castle", "Buildings", group.children.slice(layoutStart), [-18, 10, -158]);
   // Distant suspended gardens are scenery, beyond the walkable village boundary.
   const islandRock = new T.MeshStandardMaterial({ color:"#a6b7c0", roughness:1 });
   const islandGrass = new T.MeshStandardMaterial({ color:"#91c89b", roughness:1 });
@@ -883,6 +1028,7 @@ export async function buildWorld(
     add(new T.CylinderGeometry(1.2,1.5,4.8,10),castleMaterial,0,2.7,0,1,1,1,island).castShadow=false;
     add(new T.ConeGeometry(1.9,3.5,16),mat.lilac,0,6.7,0,1,1,1,island).castShadow=false;
     add(new T.OctahedronGeometry(.7),mat.trim,0,9.5,0,1,1.7,1,island).castShadow=false;
+    capture?.(`island-${x}`, "Floating garden", "Landscape", [island], [x,y,z]);
   }
   // Authored weeping silhouettes: curved branches with narrow leaves, shared by two trees.
   const willowBarkParts: T.BufferGeometry[] = [], willowLeafParts: T.BufferGeometry[] = [];
@@ -918,14 +1064,16 @@ export async function buildWorld(
   willowBarkParts.forEach(g => g.dispose()); willowLeafParts.forEach(g => g.dispose()); willowLeaf.dispose();
   const willowLeafMaterial = new T.MeshStandardMaterial({ color: "#a7c76b", roughness: .9, side: T.DoubleSide });
   const willowWood = mat.wood.clone(); willowWood.vertexColors = false;
+  layoutStart = group.children.length;
   for (const [geometry, material] of [[willowBark, willowWood], [willowLeaves, willowLeafMaterial]] as const) {
     const mesh = new T.InstancedMesh(geometry, material, 2);
-    [[-14, -7, 1.3], [-27, -19, 1.45]].forEach(([x, z, scale], i) => {
+    [[-14, -7, 1.3], [-36.5, -17, 1.45]].forEach(([x, z, scale], i) => {
       dummy.position.set(x, groundY(x, z), z); dummy.rotation.set(0, i * 2, 0); dummy.scale.setScalar(scale); dummy.updateMatrix(); mesh.setMatrixAt(i, dummy.matrix);
     });
     if (material === willowLeafMaterial) mesh.customDepthMaterial = windMaterial(material, .48, true);
     mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
   }
+  capture?.("willow", "Weeping willow", "Nature", group.children.slice(layoutStart));
   // Ivy climbs the two visible cottage faces with gaps around the entrance.
   const ivy = new T.InstancedMesh(bushGeo, bushes.material, 18);
   for (let i = 0; i < 18; i++) {
@@ -935,12 +1083,14 @@ export async function buildWorld(
   }
   ivy.customDepthMaterial = windMaterial(bushes.material as T.MeshStandardMaterial, .17);
   ivy.receiveShadow = true; group.add(ivy);
+  capture?.("ivy", "Cottage ivy", "Nature", [ivy]);
   onProgress(60);
   const nearGeometry = fantasyTreeGeometry(true), forestGeometry = fantasyTreeGeometry(false);
   const forestMaterial = new T.MeshStandardMaterial({ color: "#ffffff", vertexColors: true, roughness: .95 });
   const forest = new T.InstancedMesh(forestGeometry, forestMaterial, forestPlacements.length);
   forestPlacements.forEach((p, i) => { forest.setMatrixAt(i, p.matrix); forest.setColorAt(i, p.color); });
   group.add(forest); vegetation.push(forest);
+  capture?.("forest", "Distant forest", "Landscape", [forest]);
 
   const treePositions: [number, number, number][] = [
     [-5, 22, 0.78],
@@ -948,11 +1098,11 @@ export async function buildWorld(
     [-7, 15, 1.15],
     [16, 19, 1.2],
     [-18, -20, 1.3],
-    [-32, -10, 1.1],
+    [-37, -8, 1.1],
     [20, -16, 1.3],
     [-31, 15, 1],
     [-25, 29, 1.1],
-    [22, 1, 1],
+    [35, 12, 1],
     [-3, -32, 1],
     [13, -41, 1.1],
   ];
@@ -989,8 +1139,10 @@ export async function buildWorld(
   treeLod.customDepthMaterial = windMaterial(forestMaterial, .11, true);
   // Crown colors carry their soft occlusion; self-shadowing intersecting lobes produces striping.
   inst.castShadow = true; inst.receiveShadow = false; group.add(inst);
+  capture?.("tree", "Round canopy tree", "Nature", [inst]);
   const wayfinding = buildWayfinding(colliders);
   group.add(wayfinding.group);
+  capture?.("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);
   onProgress(80);
   return {
     group,
@@ -1008,6 +1160,7 @@ export async function buildWorld(
     water,
     wind,
     vegetation,
+    gardenSurfaces: { paving: mat.path, wood: mat.wood, ground: mat.ground },
     dispose() {
       const geometries = new Set<T.BufferGeometry>(),
         materials = new Set<T.Material>();

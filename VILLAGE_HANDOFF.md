@@ -1,6 +1,44 @@
 # Cosy Village — canonical handoff
 
-Updated: 2026-09-26. **Status: controls/layout/dialogue release published at `https://cosy.sabarg.com/`; full art, movement, listening and device acceptance remain open.** Implementation history is in [VILLAGE_BUILD.md](VILLAGE_BUILD.md); current contracts below supersede earlier milestone descriptions.
+## 2026-09-27 — garden labels and visible countdowns
+
+The latest request explicitly adds a small visual countdown: each growing crop has a sage circular ring with minutes/seconds beside its wooden bed label and in the activity panel. The ring advances once per second, resumes after reload and disappears when ready; ripe crops still wait indefinitely. All five crop beds and three flower beds have English/Japanese wooden signs, with crop labels following replanted choices. The front-left mint bed is labeled “Mint · Tea leaves”; the original Blender asset now has upright stems, serrated green blades and veins.
+
+The mint and daisy beds align with the vegetable columns and 4.5 m row spacing. One continuous level limestone surface with shared footpath UVs replaces the overlapping inner path ribbons. The tea approach joins it without the leftover internal grass strip; meadow scattering clears paving, and flower soil sits above it. Separate ongoing world-layout capture hooks are preserved.
+
+Verified locally: typecheck/full static export/diff checks, 19 focused assertions (including 224 clear aisle samples) and 89 garden/pond/companion regressions. Exported UI checks cover desktop/390×844 countdowns, real ticking, mint identification, and resumed time after reload, with no captured app warning/error logs. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-garden-labels-countdowns-and-ground). Preview remains `http://127.0.0.1:3030/`; no Git writes or deployment.
+
+## 2026-09-27 — pond-end cottage and garden paths
+
+Side-conversation layout request implemented in `world.ts`: removed the second pond cottage at `(-23,-31)`, preserving all other house variants; rerouted the tea approach around the cottage at `(10,-4)`; added a rounded limestone tea terrace, two lanterns, planted pots, a tea-to-vegetable connection, central garden aisle and mint/flower loop. The stone texture scale and moss shoulders match existing footpaths. Meadow scattering now clears the full new routes. No farming, NPC, camera or save logic was edited by this layout task.
+
+Typecheck, an isolated full static build and diff checks passed. Eight layout assertions include 1,212 collision samples across the four routes and clear tea/garden exits. [Images and evidence](docs/village/evidence/README.md#tea-courtyard-and-garden-paths). The separate exported preview is at `http://127.0.0.1:3034/`; the main thread's `3030` output was left untouched. Local only; no Git writes or deployment.
+
+## 2026-09-27 — timed growing and harvest gifts
+
+The latest request supersedes instant growth: watering starts radishes at 2 minutes, mint at 3, and carrots at 5. Plants visibly grow, continue while away and stay ripe indefinitely. Mint now occupies a fifth reusable bed with the same plant → water → grow → pick cycle. Saved watering timestamps and prepared mint tea are additive fields under `cosy-village-garden-v1`; old beds and inventory remain readable.
+
+Bring harvests to Luma through the tea panel, Friends or her conversation button. Each vegetable earns its own compliment and a held-harvest, flutter and heart animation. Mint earns a saved cup of special tea, with green tea/leaves and an explicit sip action. Luma hosts without changing companion selection. The player sits on the bench facing the garden; a four-second entry pan yields to manual dragging, and reduced motion skips the pan. Phone framing keeps both characters above the controls. Garden beds share the world's painted soil/oak and limestone footpath surfaces.
+
+Verification complete locally: TypeScript, full static export, 43 focused growth/gift checks, 82 garden/companion checks and 39 duck/camera regressions pass. Exported UI checks include actual radish/mint waits, harvesting, compliments, saved tea after reload and drinking; desktop/390×844 composition, native tea dragging and Japanese simple-view mint planting/watering were inspected. [Evidence and boundaries](VILLAGE_BUILD.md#2026-09-27-gentle-growth-and-lumas-tea). Preview: `http://127.0.0.1:3030/`. No Git writes or deployment.
+
+## 2026-09-27 — happy ducks, activity cameras and feedback spacing
+
+After eating, the ducks and ducklings give a short wing flutter, bob and wiggle, with floating pink hearts and a soft duck call. Reduced motion keeps still hearts. Dragging the scene with a mouse or touch now orbits every settled activity, including the fireplace and pond; the player remains seated, release stops dragging, and a new visit restores the authored view. Notices and interaction/activity controls share vertical flow with a 12 px gap, fixing the reported overlap on desktop, phone and simple view.
+
+All 39 focused controller/animation checks, TypeScript and static export pass. Native mouse dragging was inspected at the pond and hearth; exported UI spacing was checked at 1280×720 and 390×844, including simple view. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras). Local only, not committed or deployed.
+
+## 2026-09-27 — garden, pond and companions implemented locally
+
+The kitchen garden is the seventh place, beside the tea courtyard. The initial addition used four reusable vegetable beds and instant **plant → water → pick** growth. The timed-growth milestone above supersedes that behavior; no wilting, limited supplies, deadlines or daily upkeep were added. Sunflowers, daisies, irises and mint complete the garden. The newer mint bed and Luma exchange above replace the original instant mint picking and brewing. Beds, vegetables, mint and Maple's reusable bread-crumb pouch use the independent `cosy-village-garden-v1` key; older notes/preferences remain intact.
+
+Willow pond is now an ellipse at `(-27,-14)` with radii `(9,12)`, over twice its former water area. The cottage at `(-24,-5)` is removed. A walkable east dock, smooth planted bank, reeds/irises/lilies, four jumping fish, a swan, an adult duck and four ducklings replace it. Maple gives crumbs through his nearby bubble or Friends; feeding brings the ducks to the dock. Original editable Blender artwork and seven procedural interaction sounds are included.
+
+**C** toggles a nearby resident's company; **Friends → Invite everyone** brings all four. Any subset can follow, cross the bridge using shared collision rules, join all seven activities and return to roaming when dismissed. Tea cups, garden watering cans and activity gestures animate with the player. Invitations last for this visit; they do not create persistent obligations. **E** handles nearby plants/mint/duck feeding; **B** asks nearby Maple for crumbs. All actions also have click/tap controls, with English/Japanese and simple view.
+
+Local verification: 80 feature assertions, 12 sound assertions, 43 roaming/street assertions, 20 approach assertions, 28 dialogue assertions, and 13 movement/bridge contracts pass. Typecheck and static export pass. Exported-app flows were exercised at phone dimensions, including persistence, planting/watering/harvesting, mint tea, invitations and dismissal; Japanese simple view was checked. Renderer images, motion recording and a short 720p profile are indexed in [the evidence](docs/village/evidence/README.md#garden-pond-and-companions). Physical touch, other browser engines, subjective sound listening and sustained target-device performance remain unverified for this addition.
+
+**Status:** local implementation complete; no commit, push or deployment performed. The published release below is the prior village. Current source contracts include seven places; historical six-place evidence remains historical. See [the build milestone](VILLAGE_BUILD.md#2026-09-27-garden-pond-and-companions) before changing these systems.
 
 Published application: [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit/738e4085de1c88a3fbe5f1d26ef48f0b5b68f57b) through successful [Pages run 36245251354](https://github.com/CipherAtlas/cosy-v1/actions/runs/36245251354). Includes wider resident circuits, three timber fingerposts, clear hearth seating, adjusted tea-garden seating, unlimited dashing without an energy bar, desktop mouse-look, and restyled dialogue. Local and live verification are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release).
 
@@ -16,7 +54,7 @@ The prior performance release caps drawing-buffer pixels at 1080p/720p/540p by t
 
 The user has superseded the earlier realistic traveler brief: use **Arkenfall atmosphere plus a strongly Genshin-inspired, colorful stylized palette**, with **a cute floating white spirit and a cartoon smile** as the player. Keep all artwork original. The approved village image still guides composition, scale and environmental craft, but its muted palette and human player are no longer requirements. Preserve the named villagers and their conversations.
 
-The latest user update extends the fantasy direction to houses, distant scenery and all four residents. The cottages now have swept colorful roofs, arched glazing, turrets, shutters and flower boxes. Original painted surfaces replace the photographic house/path materials. Rounded opaque tree crowns and vertex-painted mountain layers replace distant birch cards and repeated stone texture; two suspended gardens add fantasy landmarks. Pip, Maple, Moss and Luma reuse the spirit mesh with pastel colors, distinct accessories and hovering animation. The human traveler and birch remain archived assets and are no longer loaded by the village. Preserve the controller, six activities, weather, resident encounters and Controls guide. Current evidence is in the newest build/QA milestone.
+The latest user update extends the fantasy direction to houses, distant scenery and all four residents. The cottages now have swept colorful roofs, arched glazing, turrets, shutters and flower boxes. Original painted surfaces replace the photographic house/path materials. Rounded opaque tree crowns and vertex-painted mountain layers replace distant birch cards and repeated stone texture; two suspended gardens add fantasy landmarks. Pip, Maple, Moss and Luma reuse the spirit mesh with pastel colors, distinct accessories and hovering animation. The human traveler and birch remain archived assets and are no longer loaded by the village. Preserve the controller, original six activities plus the garden, weather, resident encounters and Controls guide. Current evidence is in the newest build/QA milestone.
 
 The earlier polish removed the player’s automatic idle turn toward the camera and softened shadows. Its nine-sign layout is superseded by the current three timber fingerposts. Music now uses four complete licensed recordings selected by location/scenery; stream, fire and rain are recordings too. The prior art state was committed/pushed first at `7642527`; the following polish is bundled with the water/activity release. Read [the current milestone](VILLAGE_BUILD.md#2026-09-26-orientation-shadows-wayfinding-and-recorded-soundtrack) and [recorded audio specification](docs/village/MUSIC_AND_SOUND.md) before changing these systems.
 
@@ -40,9 +78,9 @@ The target is **as close to AAA craft as practical in a small browser world**: c
 
 | Reference | Authority and use |
 | --- | --- |
-| Latest user requirements | Natural flowing water and lively fireplaces; visible, animated activities that belong in the world; warmer, clearer UI; recorded music matched to scenery and location; player retains heading when idle; smooth shadows; three restrained roadside fingerposts; clear roads and hearth seating; wider NPC roaming; jumping; unlimited gliding/dashing without energy; desktop mouse-look; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers approaching to greet the player. |
+| Latest user requirements | Stress-free vegetable gardening, flowers/sunflowers/mint and mint tea; expanded planted pond, jumping fish, swan/ducklings and Maple's crumbs; any/all resident companions joining activities.  Natural flowing water and lively fireplaces; visible, animated activities that belong in the world; warmer, clearer UI; recorded music matched to scenery and location; player retains heading when idle; smooth shadows; three restrained roadside fingerposts; clear roads and hearth seating; wider NPC roaming; jumping; unlimited gliding/dashing without energy; desktop mouse-look; wind and world sound; richer art/light; useful vertical camera range, clouds and distant scenery, residents/birds, working Firefox sound, sensible hearth seating and a traversable bridge; MMO-style overhead dialogue, distinct cute personalities and nearby villagers approaching to greet the player. |
 | [Approved village image](docs/village/references/approved-village.png) | Composition and craft reference: detailed cottages, stream/bridge, planting, mountains and restrained UI. The latest colorful stylized palette and white spirit replace its palette/player brief. |
-| Original Cosy v1, preserved in [baseline captures](docs/village/references/README.md) | **Only functional baseline.** The [live Pages URL](https://cosy.sabarg.com/) tracks the village on `main`. Ignore earlier local redesign experiments as product/design references. The six activities remain the product. |
+| Original Cosy v1, preserved in [baseline captures](docs/village/references/README.md) | **Only functional baseline.** The [live Pages URL](https://cosy.sabarg.com/) tracks the village on `main`. Ignore earlier local redesign experiments as product/design references. The original six activities remain, with the kitchen garden added on 2026-09-27. |
 | [Arkenfall](https://www.arkenfall.site/) | **Heavy experiential reference**, throughout development: sense of place, RPG traversal and camera feel, environmental atmosphere, wind, world sound, and immersion. Study the live experience; do not reduce this reference to a title-screen palette. |
 | Genshin Impact | User-requested inspiration for the vivid stylized color palette and movement feel. Keep original characters and assets; do not import combat, proprietary UI or progression systems. |
 
@@ -64,6 +102,7 @@ Keep the stable place IDs in [places.ts](features/village/places.ts). Improve th
 | `mood` / Tea garden | Mood check-in and suggested next activity | Intimate planted courtyard, tea setting, dappled light; gentle transitions to suggested places. |
 | `gratitude` / Writing nook | Local notes, history, confirmed deletion | Riverside writing spot, paper and wood detail, distant water; readable notes with a calm stationary background. |
 | `compliment` / Little postbox | Another kind note and Keep | Handcrafted postbox, small garden, soft paper/latch feedback; warm, understated delivery. |
+| `garden` / Kitchen garden | Plant, water, pick; flowers and mint | Four vegetable beds and a mint bed beside tea; 2–5 minute growth after watering, endless seeds/water and no decay. |
 
 The entrance, cottage, stream/bridge, and hearth should form one convincing first scene. Distant landmarks provide orientation and depth; they do not require a large explorable map.
 
@@ -89,7 +128,7 @@ The detailed source contracts now live in the [movement/world spec](docs/village
 
 ## What exists now
 
-The root page uses raw Three.js inside the existing accessible React shell. The six activities, storage keys, direct travel and simple view remain intact. Current implementation:
+The root page uses raw Three.js inside the existing accessible React shell. The original six activities and their storage keys remain intact; the seventh garden place has its own save. Direct travel and simple view cover all seven. Current implementation:
 
 | Area | Implemented now | Still required |
 | --- | --- | --- |
@@ -97,7 +136,7 @@ The root page uses raw Three.js inside the existing accessible React shell. The 
 | Ambient life | Four named residents on wider multi-point circuits who approach nearby players, with overhead dialogue, click/F chat and weather remarks; twelve animated birds | Richer expressions and behavior; all four now use decorated pastel spirit forms. |
 | Player / residents | Original white spirit plus four pastel blob residents; hover, lean, fin flutter and character accessories; reproducible base Blender source | More expressive faces and motion refinement; no free vertical flight. |
 | Scene | Colorful swept-roof cottages, painted materials, stone bridge, rounded tree crowns, mountain layers/floating gardens, three roadside timber fingerposts, flowing water and layered indoor/outdoor fire | More authored variation, terrain/material blending and composition refinement. |
-| Activities / UI | Visible spirit at all six stations; state-driven hourglass, breathing rings, tea, quill and letters; warm paper panels, portrait bottom sheet, Enjoy the view toggle | Further environmental craft and physical-touch/long-session usability review. |
+| Activities / UI | Visible spirit and optional companions at all seven stations; state-driven hourglass, breathing rings, tea, quill and letters; warm paper panels, portrait bottom sheet, Enjoy the view toggle | Further environmental craft and physical-touch/long-session usability review. |
 | Lighting/wind | Cloud sky and sunset HDR illumination; coordinated sun, fill and haze; practical lights; shared gusts across foliage, water and audio; weighted 16-tap PCF with detailed shadows updated each frame | Authored indirect light, smooth weather transitions, wind refinement and weather visual acceptance. |
 | Music | Four complete Holizna recordings, scenery/location selection, four-second crossfades, manual override and two streaming decks; generated score archived | Long-session listening, Firefox streaming and physical-device/network coverage. |
 | World audio | Recorded spatial stream/fire and rain; synthesized wind, sparse birds, takeoff/landing and interaction effects; separate mixer controls; hovering suppresses footsteps | Perceptual mix/positioning review, richer foley, occlusion and physical output-device review. |

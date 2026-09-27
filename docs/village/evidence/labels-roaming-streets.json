@@ -1,0 +1,151 @@
+{
+  "pass": true,
+  "checks": 43,
+  "results": [
+    "Pip: every route segment clears buildings, furniture and water",
+    "Maple: every route segment clears buildings, furniture and water",
+    "Moss: every route segment clears buildings, furniture and water",
+    "Luma: every route segment clears buildings, furniture and water",
+    "Pip: completes every waypoint and repeats the circuit at 30 fps",
+    "Pip: explores a wider area in both directions at 30 fps",
+    "Maple: completes every waypoint and repeats the circuit at 30 fps",
+    "Maple: explores a wider area in both directions at 30 fps",
+    "Moss: completes every waypoint and repeats the circuit at 30 fps",
+    "Moss: explores a wider area in both directions at 30 fps",
+    "Luma: completes every waypoint and repeats the circuit at 30 fps",
+    "Luma: explores a wider area in both directions at 30 fps",
+    "Pip: completes every waypoint and repeats the circuit at 60 fps",
+    "Pip: explores a wider area in both directions at 60 fps",
+    "Maple: completes every waypoint and repeats the circuit at 60 fps",
+    "Maple: explores a wider area in both directions at 60 fps",
+    "Moss: completes every waypoint and repeats the circuit at 60 fps",
+    "Moss: explores a wider area in both directions at 60 fps",
+    "Luma: completes every waypoint and repeats the circuit at 60 fps",
+    "Luma: explores a wider area in both directions at 60 fps",
+    "Pip: completes every waypoint and repeats the circuit at 120 fps",
+    "Pip: explores a wider area in both directions at 120 fps",
+    "Maple: completes every waypoint and repeats the circuit at 120 fps",
+    "Maple: explores a wider area in both directions at 120 fps",
+    "Moss: completes every waypoint and repeats the circuit at 120 fps",
+    "Moss: explores a wider area in both directions at 120 fps",
+    "Luma: completes every waypoint and repeats the circuit at 120 fps",
+    "Luma: explores a wider area in both directions at 120 fps",
+    "Wayfinding is limited to three useful junctions",
+    "All three hearth benches and sign footprints are checked",
+    "Clearance checks use the rendered streets including their shoulders",
+    "Entrance fingerpost: physical footprint exists",
+    "Entrance fingerpost: entire footprint stays at least 35 cm off the street",
+    "Bridge and garden fingerpost: physical footprint exists",
+    "Bridge and garden fingerpost: entire footprint stays at least 35 cm off the street",
+    "Waterside fingerpost: physical footprint exists",
+    "Waterside fingerpost: entire footprint stays at least 35 cm off the street",
+    "Hearth bench 1: physical footprint exists",
+    "Hearth bench 1: entire footprint stays at least 35 cm off the street",
+    "Hearth bench 2: physical footprint exists",
+    "Hearth bench 2: entire footprint stays at least 35 cm off the street",
+    "Hearth bench 3: physical footprint exists",
+    "Hearth bench 3: entire footprint stays at least 35 cm off the street"
+  ],
+  "samples": [
+    {
+      "fps": 30,
+      "residents": [
+        {
+          "name": "Pip",
+          "laps": 4,
+          "waypoints": 8,
+          "width": 5.422977226305685,
+          "depth": 22.784575472851557
+        },
+        {
+          "name": "Maple",
+          "laps": 3,
+          "waypoints": 13,
+          "width": 22.041614209181276,
+          "depth": 15.738939154427907
+        },
+        {
+          "name": "Moss",
+          "laps": 4,
+          "waypoints": 10,
+          "width": 5.964066446505025,
+          "depth": 23.887762928097267
+        },
+        {
+          "name": "Luma",
+          "laps": 3,
+          "waypoints": 14,
+          "width": 20.070647167646744,
+          "depth": 15.320312504468871
+        }
+      ]
+    },
+    {
+      "fps": 60,
+      "residents": [
+        {
+          "name": "Pip",
+          "laps": 4,
+          "waypoints": 8,
+          "width": 5.414686727796055,
+          "depth": 22.787878761787553
+        },
+        {
+          "name": "Maple",
+          "laps": 3,
+          "waypoints": 13,
+          "width": 22.035785735160268,
+          "depth": 15.721435648463416
+        },
+        {
+          "name": "Moss",
+          "laps": 4,
+          "waypoints": 10,
+          "width": 5.958761695453078,
+          "depth": 23.871055692732487
+        },
+        {
+          "name": "Luma",
+          "laps": 3,
+          "waypoints": 14,
+          "width": 20.061327497059132,
+          "depth": 15.300258965070352
+        }
+      ]
+    },
+    {
+      "fps": 120,
+      "residents": [
+        {
+          "name": "Pip",
+          "laps": 4,
+          "waypoints": 8,
+          "width": 5.413520798053387,
+          "depth": 22.774325289749555
+        },
+        {
+          "name": "Maple",
+          "laps": 3,
+          "waypoints": 13,
+          "width": 22.032571675320852,
+          "depth": 15.70624194524879
+        },
+        {
+          "name": "Moss",
+          "laps": 4,
+          "waypoints": 10,
+          "width": 5.957765961852103,
+          "depth": 23.869759103671992
+        },
+        {
+          "name": "Luma",
+          "laps": 3,
+          "waypoints": 14,
+          "width": 20.06133001643878,
+          "depth": 15.291937592466716
+        }
+      ]
+    }
+  ],
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0"
+}

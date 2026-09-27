@@ -51,6 +51,11 @@
 .v-villager-footer button[hidden] {
   display: none;
 }
+.v-villager-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+.v-villager-actions[hidden] { display: none; }
+.v-villager-actions button { pointer-events: auto; min-height: 44px; border: 1px solid #f5e8c84d; border-radius: 7px; background: #fff4dc0d; color: #fff4dc; padding: 8px 10px; font: 13px var(--font-outfit),sans-serif; }
+.v-villager-actions button:hover { background: #fff4dc24; }
+.v-villager-actions button:focus-visible { outline: 2px solid #fff4dc; outline-offset: 2px; }
 .v-villager-bubble {
   position: absolute;
   top: 0;
@@ -360,10 +365,6 @@ kbd {
   color: inherit;
 }
 .v-interact {
-  position: absolute;
-  left: 50%;
-  bottom: 95px;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 13px;
@@ -923,10 +924,6 @@ kbd {
     grid-row: 2;
   }
   .v-interact {
-    left: auto;
-    right: 20px;
-    bottom: max(145px, calc(env(safe-area-inset-bottom) + 120px));
-    max-width: calc(100vw - 185px);
     white-space: normal;
     transform: none;
     padding: 12px;
@@ -1018,6 +1015,39 @@ kbd {
   .v-simple-places h1 {
     font-size: 29px;
   }
+}
+
+/* Feedback and actions share flow, so translated or wrapped messages never cover buttons. */
+.v-world-feedback {
+  position: absolute; z-index: 4; left: 50%; bottom: 95px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  width: max-content; max-width: min(420px,calc(100vw - 40px)); pointer-events: none;
+}
+.v-world-feedback:empty { display: none; }
+.v-world-feedback .v-interact { pointer-events: auto; max-width: 100%; white-space: normal; }
+.v-world-feedback .v-notice, #v-activity-panel .v-notice {
+  position: static; transform: none; width: auto; max-width: 100%; margin: 0;
+  box-sizing: border-box; flex: 0 0 auto; pointer-events: none;
+}
+#v-activity-panel {
+  position: absolute; z-index: 3; right: 28px; bottom: 78px;
+  width: min(388px,calc(100vw - 48px)); max-height: calc(100dvh - 180px);
+  display: flex; flex-direction: column; gap: 12px; pointer-events: none;
+}
+#v-activity-panel[hidden] { display: none; }
+.village #v-activity-panel > .v-activity {
+  position: relative; inset: auto; transform: none; width: 100%; max-height: none;
+  box-sizing: border-box; min-height: 0; flex: 0 1 auto; pointer-events: auto;
+}
+.village.v-simple #v-activity-panel {
+  left: 50%; right: auto; top: 50%; bottom: auto; transform: translate(-50%,-50%);
+  width: min(520px,calc(100vw - 48px)); max-height: calc(100dvh - 170px);
+}
+@media (max-width: 700px) {
+  .v-world-feedback { left: 14px; right: 14px; bottom: 76px; transform: none; width: auto; max-width: none; }
+  .v-world-feedback.is-walking { left: 168px; right: 20px; bottom: max(145px,calc(env(safe-area-inset-bottom) + 120px)); align-items: stretch; }
+  #v-activity-panel { left: 12px; right: 12px; bottom: 70px; width: auto; max-height: 49dvh; }
+  .village.v-simple #v-activity-panel { left: 12px; right: 12px; top: 140px; bottom: 18px; width: auto; max-height: none; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .village *,
@@ -1223,4 +1253,41 @@ kbd {
 @media (prefers-reduced-motion:reduce) {
   .village .v-activity,.v-music-waves.is-playing i,.v-activity.v-letter blockquote { animation: none; }
   .v-breath-orbit.is-running { transform: none; }
+}
+
+.v-garden-tabs { display: flex; gap: 8px; margin: 18px 0 10px; }
+.v-garden-tabs .v-chip { min-height: 44px; }
+.v-garden-bed { padding: 15px 0; border-bottom: 1px solid #cdd6bd; }
+.v-garden-bed strong { display: block; font: 20px Georgia,serif; }
+.v-garden-bed-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.v-growth-clock { position: relative; flex: 0 0 56px; height: 56px; }
+.v-growth-clock svg { width: 56px; height: 56px; fill: none; stroke-width: 3; }
+.v-growth-track { stroke: #dce2cc; }
+.v-growth-progress { stroke: #537850; stroke-linecap: round; }
+.v-garden-bed .v-growth-clock span { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font-size: 12px; font-variant-numeric: tabular-nums; color: #36573d; }
+.v-garden-bed span { display: block; color: #657562; font-size: 12px; line-height: 1.5; margin-top: 4px; }
+.v-garden-bed-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.v-garden-bed-actions .v-button { font-size: 12px; padding: 9px 12px; }
+.v-basket { color: #4c6d4f; font-size: 13px; line-height: 1.5; margin: 17px 0 0; }
+.v-garden-flowers { display: flex; flex-direction: column; gap: 10px; }
+.v-garden-flowers p,.v-garden-ritual p { font-size: 13px; line-height: 1.55; color: #64745e; margin: 8px 0; }
+.v-garden-ritual { padding: 4px 0 16px; margin-bottom: 18px; border-bottom: 1px solid #cdd6bd; }
+.v-garden-ritual .v-button { width: 100%; }
+.v-friends > p { color: #60745e; font-size: 14px; line-height: 1.6; margin: 0 0 18px; }
+.v-friends .v-button { min-height: 44px; padding: 10px 14px; font-size: 13px; }
+.v-friend { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px; border-top: 1px solid #d4dcc6; padding: 18px 0; margin-top: 10px; }
+.v-friend-name { display: flex; align-items: center; gap: 10px; }
+.v-friend-name strong { font: 22px Georgia,serif; }
+.v-friend-name > span { width: 19px; height: 22px; border-radius: 50% 50% 45% 45%; border: 1px solid #4a68452b; }
+.v-friend button[aria-pressed="true"] { background: #dfead5; border-color: #809a79; }
+.v-maple-gift { grid-column: 1 / -1; padding-left: 29px; }
+.v-maple-gift p { font-size: 13px; color: #6f7b61; line-height: 1.5; margin: 0 0 10px; }
+.v-maple-gift .v-text-button { display: block; color: #466f52; margin-top: 10px; min-height: 44px; }
+.v-save-warning { position: absolute; bottom: 14px; left: 20px; max-width: 350px; padding: 10px 15px; background: #fff4d9; color: #685536; border-radius: 8px; font-size: 13px; z-index: 5; }
+@media (max-width: 700px) {
+  .v-header nav { gap: 5px; }
+  .v-header nav > button { padding-inline: 9px; }
+  .v-garden-bed { padding: 12px 0; }
+  .v-garden-bed-actions .v-button { flex: 1; }
+  .v-friend-name strong { font-size: 20px; }
 }

@@ -15,6 +15,7 @@ import {
   SpeakerHigh,
   SpeakerSlash,
   X,
+  UsersThree,
 } from "@phosphor-icons/react";
 import {
   PLACES,
@@ -32,6 +33,8 @@ import type { ActivityMoment, MovementStatus } from "./environment";
 import type { VillageEngine } from "./VillageEngine";
 import "./village.css";
 import { withBasePath } from "@/lib/basePath";
+import { VILLAGERS } from "./villagers";
+import { GARDEN_KEY, CROP_NAMES, HARVEST_COMPLIMENTS, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
 
 export function Village() {
   const canvas = useRef<HTMLDivElement>(null),
@@ -44,7 +47,11 @@ export function Village() {
     [simple, setSimple] = useState(false);
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
-    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | null>(null);
+    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "friends" | null>(null);
+  const [garden, setGarden] = useState(freshGarden);
+  const gardenRef = useRef(garden);
+  const [companions, setCompanions] = useState<string[]>([]);
+  const companionsRef = useRef(companions);
   const [activityCompact,setActivityCompact]=useState(false);
   const onMoment=useCallback((moment:ActivityMoment)=>engine.current?.setActivityMoment(moment),[]);
   const soundBusy = useRef(false);
@@ -61,6 +68,8 @@ export function Village() {
   const preferences = useRef({ quality, weather, language });
   preferences.current = { quality, weather, language };
   const [notice, setNotice] = useState("");
+  const [gardenStorageError, setGardenStorageError] = useState(false);
+  const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
   const loaded = useRef(false),
     enterRef = useRef(false);
@@ -85,10 +94,44 @@ export function Village() {
       ?? canvas.current?.parentElement?.querySelector<HTMLButtonElement>(".v-wordmark");
     target?.focus();
   }, []);
+  const toggleCompanion = useCallback((id: string) => {
+    if (!VILLAGERS.some(v => v.id === id)) return;
+    const next = companionsRef.current.includes(id) ? companionsRef.current.filter(value => value !== id) : [...companionsRef.current, id];
+    companionsRef.current = next; setCompanions(next); engine.current?.setCompanions(next);
+  }, []);
+  const onGardenAction = useCallback((action: GardenAction) => {
+    const previous = growGarden(gardenRef.current);
+    if (!gardenActionAllowed(previous, action)) return;
+    const next = gardenAction(previous, action);
+    gardenRef.current = next; setGarden(next); engine.current?.setGarden(next);
+    engine.current?.gardenAction(action);
+    if (!engine.current) audio.current?.gardenEffect(action.kind === "drink" || action.kind === "gift" ? "pour" : action.kind === "plant" ? "plant" : action.kind === "water" || action.kind === "flowers" ? "water" : action.kind === "feed" || action.kind === "crumbs" ? "crumbs" : "pluck", [0, 0, 0], true);
+    try { localStorage.setItem(GARDEN_KEY, JSON.stringify(next)); setGardenStorageError(false); }
+    catch { setGardenStorageError(true); }
+    const messages = {
+      plant: ["A new little sprout. Water it whenever you like.", "小さな芽が出ました。好きなときに水をどうぞ。"],
+      water: ["A little water. Now it can grow while you wander.", "お水を少し。あとは、お散歩している間に育ちます。"],
+      harvest: ["Something lovely for your basket.", "かごに小さな収穫を。"],
+      flowers: ["A little shower for the flowers.", "お花たちに小さなシャワー。"],
+      drink: ["Fresh from your garden. A warm sip, a quiet moment.", "あなたの庭から、あたたかいひと口。ほっとするひととき。"],
+      crumbs: ["Maple gave you a little pouch of bread crumbs. Take it to the pond whenever you like.", "メープルからパンくずの袋をもらいました。好きなときに池へどうぞ。"],
+      feed: ["Here come the little duckies.", "小さなアヒルたちがやってきました。"],
+    };
+    setNotice(action.kind === "gift" ? HARVEST_COMPLIMENTS[action.crop][preferences.current.language] : messages[action.kind][preferences.current.language === "ja" ? 1 : 0]);
+  }, []);
+  const interactGarden = useCallback((id: string) => {
+    const action = nearbyGardenAction(id, gardenRef.current);
+    if (!action) return;
+    if (action.kind === "feed" && !gardenRef.current.crumbPouch) { setPanel("friends"); return; }
+    if (action.kind === "drink") { openPlace("mood"); }
+    onGardenAction(action);
+  }, [onGardenAction, openPlace]);
   useEffect(() => {
     audio.current = new VillageAudio(() => setNotice(preferences.current.language === "ja"
       ? "音楽を切り替えられませんでした。音をオフにして、もう一度お試しください。"
       : "The music couldn't change. Turn sound off and on to retry."));
+    try { const saved = readGarden(localStorage.getItem(GARDEN_KEY)); gardenRef.current = saved; setGarden(saved); }
+    catch { setGardenStorageError(true); }
     try {
       const p = JSON.parse(
         localStorage.getItem("cosy-village-preferences") || "null",
@@ -117,6 +160,19 @@ export function Village() {
     return () => audio.current?.dispose();
   }, []);
   useEffect(() => {
+    const refresh = () => {
+      const next = growGarden(gardenRef.current);
+      if (next === gardenRef.current) return;
+      gardenRef.current = next; setGarden(next); engine.current?.setGarden(next);
+      try { localStorage.setItem(GARDEN_KEY, JSON.stringify(next)); setGardenStorageError(false); }
+      catch { setGardenStorageError(true); }
+    };
+    const interval = setInterval(refresh, 1000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { clearInterval(interval); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+  }, []);
+  useEffect(() => {
     if (!canvas.current || simple) return;
     let cancelled = false;
     let local: VillageEngine | undefined;
@@ -127,6 +183,12 @@ export function Village() {
           progress: setProgress,
           movement: setMovement,
           mouseLook: setMouseLook,
+          companion: toggleCompanion,
+          crumbs: () => onGardenAction({ kind: "crumbs" }),
+          visitTea: () => openPlace("mood"),
+          gardenSound: (kind, position) => audio.current?.gardenEffect(kind, position),
+          nearGarden: setNearGarden,
+          gardenInteract: interactGarden,
           contact: event => audio.current?.contact(event),
           environment: frame => audio.current?.setEnvironment(frame),
           ready: () => {
@@ -141,6 +203,8 @@ export function Village() {
           stats: (fps, draws, triangles) => setStats({ fps, draws, triangles }),
         });
         engine.current = local;
+        local.setGarden(gardenRef.current);
+        local.setCompanions(companionsRef.current);
         local.setBlocked(!enterRef.current);
         await local.load();
         if (!cancelled) {
@@ -245,6 +309,15 @@ export function Village() {
   }
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
+  const showWorldInteraction = entered && !place && !simple;
+  const showActivityPanel = entered && place && (!activityCompact || simple);
+  const nearbyAction = nearGarden ? nearbyGardenAction(nearGarden, garden) : null;
+  const nearbyLabel = nearbyAction?.kind === "plant" ? t(`Plant ${CROP_NAMES[nearbyAction.crop].en.toLowerCase()}`, "種を植える")
+    : nearbyAction?.kind === "water" ? t("Water the sprouts", "芽に水をあげる")
+    : nearbyAction?.kind === "harvest" ? t("Pick your harvest", "収穫する")
+    : nearbyAction?.kind === "flowers" ? t("Water the flowers", "お花に水をあげる")
+    : nearbyAction?.kind === "feed" ? garden.crumbPouch ? t("Feed the little duckies", "アヒルたちにパンくずをあげる") : t("Ask Maple for bread crumbs", "メープルにパンくずをもらう")
+    : t("Enjoy your mint tea", "ミントティーを楽しむ");
   const placeName = (id: PlaceId) =>
     ja
       ? japaneseNames[PLACES.findIndex((p) => p.id === id)]
@@ -289,6 +362,9 @@ export function Village() {
             {sound ? <SpeakerHigh size={20} /> : <SpeakerSlash size={20} />}
             <span>{t("Sound", "音")}</span>
           </button>
+          {entered && <button aria-label={t("Friends", "仲間")} onClick={() => setPanel("friends")}>
+            <UsersThree size={21} /><span>{t("Friends", "仲間")}{companions.length > 0 ? ` · ${companions.length}` : ""}</span>
+          </button>}
           <button
             disabled={!ready && !simple}
             aria-label={t("Settings", "設定")}
@@ -352,16 +428,6 @@ export function Village() {
                   : t("A rainy afternoon", "雨の午後")}
             </span>
           </div>
-          {nearPlace && (
-            <button
-              className="v-interact"
-              onClick={() => openPlace(nearPlace.id)}
-            >
-              <kbd>E</kbd>
-              {ja ? placeName(nearPlace.id) : nearPlace.prompt}
-              <ArrowUpRight size={16} />
-            </button>
-          )}
           <footer className="v-walk-hints">
             <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> {t("Glide", "移動")}</span>
             <span>{mouseLook === "locked" ? t("Mouse to look · Esc to release", "マウスで見回す · Escで解除")
@@ -419,6 +485,7 @@ export function Village() {
       )}
       {entered && place && (
         <div id="v-activity-panel" hidden={activityCompact && !simple}>
+        {notice && <div className="v-notice" role="status">{notice}</div>}
         <Activities
           key={place}
           onMoment={onMoment}
@@ -431,6 +498,7 @@ export function Village() {
           toggleSound={toggleSound}
           travel={openPlace}
           language={language}
+          gardenControls={{ garden, onGardenAction, language, travel: openPlace, meetMaple: () => setPanel("friends") }}
         />
         </div>
       )}
@@ -466,11 +534,15 @@ export function Village() {
           </button>
         </div>
       )}
-      {notice && (
-        <div className="v-notice" role="status">
-          {notice}
-        </div>
-      )}
+      {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}`}>
+        {notice && <div className="v-notice" role="status">{notice}</div>}
+        {showWorldInteraction && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
+        {showWorldInteraction && nearPlace && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
+          <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
+        </button>}
+      </div>}
+      {gardenStorageError && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
+      {entered && companions.length > 0 && <div className="sr-only" role="status">{t("With you", "一緒にいる仲間")}: {VILLAGERS.filter(v => companions.includes(v.id)).map(v => v.name[language]).join(", ")}</div>}
       {showStats && (
         <output className="v-stats">
           {stats.fps} fps · {stats.draws} calls ·{" "}
@@ -497,6 +569,8 @@ export function Village() {
                 ? t("Where would you like to go?", "どこへ行きましょうか？")
                 : panel === "sound"
                   ? t("A little atmosphere.", "心地よい音を。")
+                  : panel === "friends"
+                    ? t("A little company.", "誰かと一緒に。")
                   : panel === "controls"
                     ? t("Getting around", "移動と操作")
                     : t("Make it yours.", "お好みに。")}
@@ -506,6 +580,8 @@ export function Village() {
                 ? "Travel directly to a village activity."
                 : panel === "sound"
                   ? "Music and ambience controls."
+                  : panel === "friends"
+                    ? "Invite villagers to walk and share activities."
                   : panel === "controls"
                     ? "Gliding, camera and interaction controls."
                     : "Village appearance and accessibility settings."}
@@ -516,6 +592,22 @@ export function Village() {
             >
               <X size={22} />
             </Dialog.Close>
+            {panel === "friends" && <div className="v-friends">
+              <p>{t("Invite anyone you like, or bring everyone. They'll wander with you and join you when you settle in.", "誰でも、みんなでも。一緒にお散歩して、ひと休みもできます。")}</p>
+              <button className="v-button" onClick={() => {
+                const next = companions.length === VILLAGERS.length ? [] : VILLAGERS.map(v => v.id);
+                companionsRef.current = next; setCompanions(next); engine.current?.setCompanions(next);
+              }}>{companions.length === VILLAGERS.length ? t("Let everyone wander", "みんなと別れる") : t("Invite everyone", "みんなを誘う")}</button>
+              {VILLAGERS.map(v => <div className="v-friend" key={v.id}>
+                <div className="v-friend-name"><span style={{ background: v.color }} aria-hidden="true" /><strong>{v.name[language]}</strong></div>
+                <button className="v-button" aria-pressed={companions.includes(v.id)} aria-label={companions.includes(v.id) ? t(`Let ${v.name.en} wander`, `${v.name.ja}と別れる`) : t(`Invite ${v.name.en}`, `${v.name.ja}を誘う`)} onClick={() => toggleCompanion(v.id)}>{companions.includes(v.id) ? t("See you later", "またね") : t("Walk with me", "一緒に歩く")}</button>
+                {v.id === "luma" && <button className="v-text-button" onClick={() => openPlace("mood")}>{t("Share your harvest over tea", "収穫を持ってお茶をしよう")}</button>}
+                {v.id === "maple" && <div className="v-maple-gift"><p>{t("Our baker has a little something for the duckies.", "パン屋さんから、アヒルたちへ小さな贈りもの。")}</p>
+                  <button className="v-button" onClick={() => onGardenAction({ kind: "crumbs" })}>{garden.crumbPouch ? t("A few more crumbs, Maple?", "メープル、もう少しパンくずを？") : t("Ask Maple for bread crumbs", "メープルにパンくずをもらう")}</button>
+                  {garden.crumbPouch && <button className="v-text-button" onClick={() => openPlace("breathe")}>{t("Take the crumbs to the pond", "パンくずを池へ持っていく")}</button>}
+                </div>}
+              </div>)}
+            </div>}
             {panel === "controls" && (
               <div className="v-control-guide">
                 <p>{t("Wander at your own pace, or use Places to settle straight into an activity.", "自分のペースでお散歩。場所メニューから、好きな場所へすぐに移動できます。")}</p>
@@ -525,12 +617,15 @@ export function Village() {
                     [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
                     ["Esc", t("Release the mouse / close", "マウスを解除 / 閉じる")],
                     [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
+                    [t("Drag while settled", "ひと休み中にドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
                     ["R", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
                     ["Shift", t("Hold to dash", "長押しでダッシュ")],
                     ["Space", t("Jump", "ジャンプ")],
-                    ["E", t("Enjoy a nearby activity", "近くの場所に入る")],
+                    ["E", t("Garden / enjoy a nearby activity", "庭のお世話 / 近くの場所に入る")],
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
+                    ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
+                    ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
                     ["M", t("Places", "場所")],
                   ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
                 </dl>
@@ -546,7 +641,7 @@ export function Village() {
                       openPlace(p.id);
                     }}
                   >
-                    <span className="v-place-icon" aria-hidden="true">{[<Timer key="focus" size={23}/>,<Fire key="music" size={23}/>,<Drop key="breathe" size={23}/>,<Coffee key="mood" size={23}/>,<BookOpen key="gratitude" size={23}/>,<EnvelopeSimple key="compliment" size={23}/>][PLACES.findIndex(a=>a.id===p.id)]}</span>
+                    <span className="v-place-icon" aria-hidden="true">{[<Timer key="focus" size={23}/>,<Fire key="music" size={23}/>,<Drop key="breathe" size={23}/>,<Coffee key="mood" size={23}/>,<BookOpen key="gratitude" size={23}/>,<EnvelopeSimple key="compliment" size={23}/>,<Leaf key="garden" size={23}/>][PLACES.findIndex(a=>a.id===p.id)]}</span>
                     <div>
                       <strong>{placeName(p.id)}</strong>
                       <span>
@@ -558,6 +653,7 @@ export function Village() {
                               "気持ち",
                               "感謝",
                               "やさしい言葉",
+                              "野菜、お花とミント",
                             ][PLACES.findIndex((a) => a.id === p.id)]
                           : p.description}
                       </span>

@@ -39,14 +39,25 @@ export const riverX = (z: number) => -11 + Math.sin(z * 0.052) * 3;
 export const roadX = (z: number) => Math.sin(z * 0.048) * 2;
 export const HEARTH = { x: -5.8, z: -19, radius: 1 };
 export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3 };
+export const POND = { x: -27, z: -14, rx: 9, rz: 12, y: -.3 };
+export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
+export function pondDistance(x: number, z: number) {
+  return Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz);
+}
+export function onPondDock(x: number, z: number) {
+  return Math.abs(x - POND_DOCK.x) <= POND_DOCK.w / 2 && Math.abs(z - POND_DOCK.z) <= POND_DOCK.d / 2;
+}
+export function dockHeight(x: number) {
+  return .24 * Math.max(0, Math.min(1, (POND_DOCK.x + POND_DOCK.w / 2 - x) / .7));
+}
 export function bridgeHeight(x: number) {
   const t = Math.max(0, Math.min(1, (x - BRIDGE.x) / BRIDGE.length + 0.5));
   return 0.08 + Math.sin(t * Math.PI) ** 2 * 1.1;
 }
 export function groundY(x: number, z: number) {
   const river = Math.abs(x - riverX(z));
-  const pond = Math.hypot((x + 25) * 0.85, z + 17);
-  return Math.min(river < 4 ? -0.85 + river * 0.15 : 0, pond < 7 ? -0.6 : 0)
+  const pond = pondDistance(x, z);
+  return Math.min(river < 4 ? -0.85 + river * 0.15 : 0, pond < 1 ? -.72 : 0)
     + Math.sin(x * 0.18) * Math.sin(z * 0.12) * 0.08;
 }
 export function landscapeHeight(x: number, z: number) {
@@ -60,14 +71,14 @@ export function onBridge(x: number, z: number) {
 }
 export function surfaceAt(x: number, z: number): Surface {
   if (Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.6) return "stone";
-  if (x < -20.8 && x > -24.4 && z < -8.85 && z > -12.15) return "wood";
+  if (onPondDock(x, z)) return "wood";
   if (onBridge(x, z) || Math.abs(x - roadX(z)) < 1.75 || (Math.abs(z - 3) < 1.25 && x < 1)) return "stone";
   if (Math.abs(x - roadX(z)) < 2.4) return "soil";
   return "grass";
 }
 export function floorHeight(x: number, z: number) {
   if (onBridge(x, z)) return bridgeHeight(x);
-  if (surfaceAt(x, z) === "wood") return 0.24;
+  if (surfaceAt(x, z) === "wood") return dockHeight(x);
   return Math.max(landscapeHeight(x, z), surfaceAt(x, z) === "stone" ? 0.05 : 0);
 }
 export function windAt(time: number, weather: Weather) {

@@ -65,3 +65,12 @@ Excerpts, mono downmix, normalization and MP3 transcodes; overlapping loop bound
 Detailed file provenance, duration and SHA-256: audio/recordings.json.
 The village no longer schedules procedural musical notes or loads the Salamander
 piano samples. Those earlier assets and credits are retained as historical sources.
+
+Garden and pond kit (2026-09-27) — original project artwork.
+17 models authored in Blender: flowers, sunflower, mint, vegetables, reeds,
+lily, swan, duck, duckling, fish, watering can, basket, bread pouch and teapot.
+Mint v2 adds original serrated green leaves and veins; bed signs and countdowns are authored in the runtime.
+Editable source: assets/village/garden-pond.blend. Runtime: models/garden-pond.glb.
+Named pivots are animated by the village runtime; no third-party models or textures.
+Planting, watering, picking, pouring, bread crumbs, splashes and duck calls are
+original procedural Web Audio effects. Existing recorded soundtrack credits above apply.

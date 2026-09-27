@@ -9,6 +9,8 @@ import { createAtmosphere } from "./atmosphere";
 import { VillageLife } from "./life";
 import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
+import { GardenScene } from "./gardenScene";
+import { GARDEN_TARGETS, freshGarden, type GardenState, type GardenAction, type GardenSound } from "./garden";
 import type { ActivityMoment } from "./environment";
 import { softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
@@ -24,6 +26,10 @@ export class VillageEngine {
   private life?: VillageLife;
   private dialogue?: VillagerDialogue;
   private activities?: VillageActivities;
+  private garden?: GardenScene;
+  private gardenState = freshGarden();
+  private companions: string[] = [];
+  private nearGarden: string | null = null;
   private walkingHeading = Math.PI;
   private language: "en" | "ja" = "en";
   private world?: World;
@@ -44,6 +50,11 @@ export class VillageEngine {
   private yaw = 0;
   private pitch = 0.15;
   private distance = 3.8;
+  private teaPanAt = -100;
+  private teaPan = 1;
+  private teaPanHeld = false;
+  private activityOrbit = { yaw: 0, pitch: 0 };
+  private orbit = new T.Spherical();
   private pointer?: {
     id: number;
     x: number;
@@ -111,12 +122,18 @@ export class VillageEngine {
     if (e.key === " " && !e.repeat) this.movement?.jump();
     if (e.key.toLowerCase() === "r" && !e.repeat) this.toggleRun();
     if (e.key.toLowerCase() === "f" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.talk();
-    if (e.key.toLowerCase() === "e" && this.near && !this.place)
-      this.callbacks.interact(this.near);
+    if (e.key.toLowerCase() === "c" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.invite();
+    if (e.key.toLowerCase() === "b" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.bread();
+    if (e.key.toLowerCase() === "e" && !e.repeat && !this.place) {
+      if (this.nearGarden) this.callbacks.gardenInteract?.(this.nearGarden);
+      else if (this.near) this.callbacks.interact(this.near);
+    }
   };
   private onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.key.toLowerCase());
   private clearKeys = () => {
     this.keys.clear();
+    if (this.pointer && this.renderer.domElement.hasPointerCapture(this.pointer.id))
+      this.renderer.domElement.releasePointerCapture(this.pointer.id);
     this.pointer = undefined;
     this.movement?.pause();
   };
@@ -135,7 +152,7 @@ export class VillageEngine {
     this.reducedMotion = this.motionQuery.matches;
   };
   private onDown = (e: PointerEvent) => {
-    if (this.blocked || this.place || e.button !== 0 || this.pointer) return;
+    if (this.blocked || e.button !== 0 || this.pointer) return;
     this.renderer.domElement.focus({ preventScroll: true });
     if (document.pointerLockElement === this.renderer.domElement) return;
     this.pointer = {
@@ -143,21 +160,29 @@ export class VillageEngine {
       x: e.clientX,
       y: e.clientY,
     };
-    if (e.pointerType === "mouse") this.captureMouse();
+    if (e.pointerType === "mouse" && !this.place) this.captureMouse();
     else this.renderer.domElement.setPointerCapture(e.pointerId);
   };
   private onMove = (e: PointerEvent) => {
-    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked || this.place
-      || (e.pointerType === "mouse" && this.mouseLook !== "drag")) return;
+    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked
+      || (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag")) return;
     const dx = e.clientX - this.pointer.x,
       dy = e.clientY - this.pointer.y;
-    this.yaw -= dx * 0.004;
-    this.pitch = T.MathUtils.clamp(this.pitch + dy * 0.004, -0.85, 1.35);
+    if (this.place) {
+      this.teaPanHeld = true;
+      this.activityOrbit.yaw = T.MathUtils.euclideanModulo(this.activityOrbit.yaw - dx * .004 + Math.PI, Math.PI * 2) - Math.PI;
+      this.activityOrbit.pitch = T.MathUtils.clamp(this.activityOrbit.pitch + dy * .004, -.8, .9);
+    } else {
+      this.yaw -= dx * 0.004;
+      this.pitch = T.MathUtils.clamp(this.pitch + dy * 0.004, -0.85, 1.35);
+    }
     this.pointer.x = e.clientX;
     this.pointer.y = e.clientY;
   };
   private onUp = (e: PointerEvent) => {
-    if (this.pointer?.id === e.pointerId) this.pointer = undefined;
+    if (this.pointer?.id !== e.pointerId) return;
+    this.pointer = undefined;
+    if (this.renderer.domElement.hasPointerCapture(e.pointerId)) this.renderer.domElement.releasePointerCapture(e.pointerId);
   };
   private onMouseMove = (e: MouseEvent) => {
     if (document.pointerLockElement !== this.renderer.domElement || this.blocked || this.place) return;
@@ -245,6 +270,12 @@ export class VillageEngine {
       contact: (event: WorldContact) => void;
       environment: (frame: EnvironmentFrame) => void;
       mouseLook?: (mode: "free" | "locked" | "drag") => void;
+      companion?: (id: string) => void;
+      crumbs?: () => void;
+      visitTea?: () => void;
+      gardenSound?: (kind: GardenSound, position: [number, number, number]) => void;
+      nearGarden?: (id: string | null) => void;
+      gardenInteract?: (id: string) => void;
     },
   ) {
     this.renderer = new T.WebGLRenderer({
@@ -261,7 +292,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. On touch screens, drag to look and use the movement buttons. E for activities, F to chat with a nearby villager. Places provides direct access to every activity.",
+      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to garden or enter activities, F to chat, C to invite a nearby villager, B to ask Maple for bread crumbs. Places provides direct access to every activity.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -318,11 +349,12 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const [world, gltf] = await Promise.all([
+    const [world, gltf, gardenKit] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
         withBasePath("/village/models/spirit.glb?v=1"),
       ),
+      new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -371,15 +403,21 @@ export class VillageEngine {
     });
     this.player.add(root);
     this.character = root;
-    this.life = new VillageLife(root, world.colliders);
+    this.garden = new GardenScene(gardenKit.scene, world.colliders, (kind, position) => this.callbacks.gardenSound?.(kind, position), world.gardenSurfaces);
+    this.garden.setLanguage(this.language);
+    this.garden.sync(this.gardenState); world.group.add(this.garden.group);
+    this.activities=new VillageActivities(this.world.colliders);
+    this.world.group.add(this.activities.outdoor);this.scene.add(this.activities.indoor);
+    this.life = new VillageLife(root, world.colliders, gardenKit.scene);
+    this.life.setCompanions(this.companions);
     this.scene.add(this.life.group);
-    this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys);
+    this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
+      companion: id => this.callbacks.companion?.(id), crumbs: () => this.callbacks.crumbs?.(), visitTea: () => this.callbacks.visitTea?.(),
+    });
     this.dialogue.setLanguage(this.language);
     this.dialogue.setEnabled(!this.blocked && !this.place);
     this.resize();
     this.buildInterior();
-    this.activities=new VillageActivities(this.world.colliders);
-    this.world.group.add(this.activities.outdoor);this.scene.add(this.activities.indoor);
     softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
       rainPositions = new Float32Array(1200 * 6);
@@ -585,6 +623,7 @@ export class VillageEngine {
     this.language = language;
     this.dialogue?.setLanguage(language);
     this.world?.setLanguage(language);
+    this.garden?.setLanguage(language);
   }
   setQuality(q: Quality) {
     this.quality = q;
@@ -654,17 +693,33 @@ export class VillageEngine {
     this.world?.setWeather(rain, dusk);
     this.atmosphere.setWeather(rain, dusk);
   }
-  setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); }
+  setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); }
+  gardenAction(action: GardenAction) {
+    if (action.kind === "crumbs") this.callbacks.gardenSound?.("crumbs", [this.player.position.x, this.player.position.y, this.player.position.z]);
+    else this.garden?.act(action);
+    this.life?.gardenMoment(action);
+    if (action.kind === "gift" && action.crop === "mint" || action.kind === "drink") this.activities?.setMintTea(true);
+    if (action.kind === "drink") this.setActivityMoment({ kind: "tea" });
+  }
+  setCompanions(ids: string[]) {
+    this.companions = ids; this.life?.setCompanions(ids); this.life?.setActivity(this.place);
+  }
+  setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
   setPlace(id: PlaceId | null) {
     this.releaseMouseLook();
     this.dialogue?.setEnabled(!id && !this.blocked);
     const previousPlace = this.place;
+    this.activityOrbit.yaw = this.activityOrbit.pitch = 0;
+    this.teaPanAt = this.elapsed; this.teaPan = 0; this.teaPanHeld = false;
     if (id && !previousPlace) this.walkingHeading=this.player.rotation.y;
     this.activities?.enter(id);
+    if (id === "mood") this.activities?.setMintTea(this.gardenState.mintTea > 0);
     this.renderer.shadowMap.needsUpdate = true;
     this.place = id;
     if (this.world) this.world.group.visible = id !== "focus";
-    if (this.life) this.life.group.visible = id !== "focus";
+    if (this.life) this.life.group.visible = true;
+    const arrival = this.movement?.position;
+    this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
       this.updateActivityCamera(id);
       this.camera.position.copy(this.cameraGoal);
@@ -715,9 +770,47 @@ export class VillageEngine {
     const stage=ACTIVITY_STAGES[place];
     this.cameraGoal.fromArray(stage.camera);
     this.lookGoal.fromArray(stage.look);
-    if(this.compactView) {
+    if (place === "mood") {
+      if (!this.teaPanHeld) this.teaPan = this.reducedMotion ? 1 : T.MathUtils.smoothstep(this.elapsed - this.teaPanAt, 0, 4);
+      this.cameraGoal.lerp(this.temp.set(11.6, 2.6, -8.3), 1 - this.teaPan);
+    }
+    if (this.companions.length) {
+      this.cameraGoal.sub(this.lookGoal).multiplyScalar(place === "focus" ? 1.28 : 1.15).add(this.lookGoal);
+      this.cameraGoal.y += .2;
+    }
+    if (this.compactView && place === "mood") {
+      // Keep both the gardener and Luma above the phone's activity sheet.
+      this.lookGoal.set(15.2, 1.35, -10.7);
+      this.cameraGoal.x = this.lookGoal.x + (this.cameraGoal.x - this.lookGoal.x) * 1.8;
+      this.cameraGoal.z = this.lookGoal.z + (this.cameraGoal.z - this.lookGoal.z) * 1.8;
+    } else if(this.compactView) {
       this.temp.fromArray(stage.actor).y+=1.1;
       this.lookGoal.lerp(this.temp,.7);
+    }
+    if (this.activityOrbit.yaw === 0 && this.activityOrbit.pitch === 0) return;
+    this.orbit.setFromVector3(this.temp.subVectors(this.cameraGoal, this.lookGoal));
+    this.orbit.theta += this.activityOrbit.yaw;
+    this.orbit.phi = T.MathUtils.clamp(this.orbit.phi - this.activityOrbit.pitch, .2, Math.PI / 2 - .04);
+    this.cameraGoal.copy(this.lookGoal).add(this.temp.setFromSpherical(this.orbit));
+    if (place === "focus") {
+      // Keep the orbit inside the cottage walls and below its ceiling.
+      this.cameraGoal.set(T.MathUtils.clamp(this.cameraGoal.x, 105.9, 114.1),
+        T.MathUtils.clamp(this.cameraGoal.y, .45, 4.5), T.MathUtils.clamp(this.cameraGoal.z, -4, 4.1));
+    } else {
+      this.cameraRay.origin.copy(this.lookGoal);
+      this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
+      for (const c of this.world?.colliders ?? []) {
+        this.collisionBox.min.set(c.x - c.w / 2 - .25, c.bottom ?? 0, c.z - c.d / 2 - .25);
+        this.collisionBox.max.set(c.x + c.w / 2 + .25, c.top ?? 8, c.z + c.d / 2 + .25);
+        // The activity's own table or prop can contain the authored look point.
+        if (this.collisionBox.containsPoint(this.lookGoal)) continue;
+        if (this.cameraRay.intersectBox(this.collisionBox, this.cameraHit)) {
+          const distance = this.cameraHit.distanceTo(this.lookGoal);
+          if (distance < this.cameraGoal.distanceTo(this.lookGoal))
+            this.cameraGoal.copy(this.lookGoal).addScaledVector(this.cameraRay.direction, Math.max(.55, distance - .2));
+        }
+      }
+      this.cameraGoal.y = Math.max(this.cameraGoal.y, floorHeight(this.cameraGoal.x, this.cameraGoal.z) + .35);
     }
   }
   private updateWalkingCamera() {
@@ -796,6 +889,9 @@ export class VillageEngine {
         this.near = near;
         this.callbacks.near(near);
       }
+      const target = GARDEN_TARGETS.filter(p => Math.hypot(p.x - this.player.position.x, p.z - this.player.position.z) < p.radius)
+        .sort((a, b) => Math.hypot(a.x - this.player.position.x, a.z - this.player.position.z) - Math.hypot(b.x - this.player.position.x, b.z - this.player.position.z))[0]?.id ?? null;
+      if (target !== this.nearGarden) { this.nearGarden = target; this.callbacks.nearGarden?.(target); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
     if (this.character) {
@@ -833,7 +929,8 @@ export class VillageEngine {
     const t = this.reducedMotion ? 0 : this.elapsed;
     this.updateLighting(dt);
     this.atmosphere.update(t, this.camera.position);
-    if (this.place !== "focus") this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place);
+    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place, this.camera.quaternion);
+    if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);
     this.world.wind.time.value = t;
     this.world.wind.strength.value = this.reducedMotion ? 0 : windAt(t, this.weather);
     if (now - this.environmentTime > 80) {
@@ -936,6 +1033,7 @@ export class VillageEngine {
     el.removeEventListener("webglcontextlost", this.onLost);
     this.dialogue?.dispose();
     this.life?.dispose();
+    this.garden?.dispose();
     this.world?.group.removeFromParent();
     this.world?.dispose();
     this.scene.traverse((object) => {

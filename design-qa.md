@@ -4,6 +4,26 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current release does not close those findings.
 
+## 2026-09-27 garden readability and ground follow-up
+
+Added growing-crop circular countdowns in the world and activity controls, bilingual wooden labels for all eight planting beds, and recognizable serrated green mint leaves. Aligned the mint/daisy row and replaced inconsistent inner paths/grass patches with a continuous paved court joined to tea. Inspected front, activity and mint-detail views; desktop and 390×844 UI show readable ticking rings, including resumed progress after reload. Typecheck/static export, 19 focused checks with 224 walking samples, and 89 garden/companion regressions pass. [Evidence and boundaries](VILLAGE_BUILD.md#2026-09-27-garden-labels-countdowns-and-ground). Local only; broader art/device acceptance remains open.
+
+## 2026-09-27 timed garden and tea follow-up
+
+Plants now grow over 2–5 minutes, including mint, and stay ready indefinitely. Harvest gifts produce Luma’s compliment and held-crop/heart animation; mint produces saved, drinkable special tea. The bench and gentle camera pan look toward the garden, with manual dragging retained. Shared footpath limestone, painted soil and oak replace the garden’s mismatched ground. Visual checks corrected green soil, black bed edges, tea exit collision and phone framing.
+
+TypeScript/static export, 43 focused checks, 82 garden/companion regressions and 39 duck/camera checks pass. Actual UI checks include real radish/mint waits, harvest gifts, saved tea after reload, sipping, native tea dragging, desktop/390×844 layout and Japanese simple-view mint planting/watering. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-gentle-growth-and-lumas-tea). This addition is complete locally; broader art/device acceptance and deployment status remain unchanged.
+
+## 2026-09-27 happy ducks and activity camera follow-up
+
+Added post-feeding hearts and happy duck gestures, dragging at every activity, and shared-flow feedback spacing. All 39 focused checks pass; inspected the duck reaction, native pond/hearth dragging and exported desktop/phone/simple-view layouts. Notices and controls have a measured 12 px gap. TypeScript and static export pass, with no warnings/errors in the inspected browser tab. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras). Local only; broader art/device acceptance remains unchanged.
+
+## 2026-09-27 garden, pond and companions
+
+The requested addition is implemented locally, with original Blender plants/animals/props and animated gardening, mint tea, duck feeding and companions. Garden framing, shoreline shape, duck spacing and shared activity cameras were visually corrected. Eighty feature assertions plus existing resident/movement regressions and twelve sound checks pass; phone-sized and Japanese/simple-view app flows were exercised. See [the build milestone](VILLAGE_BUILD.md#2026-09-27-garden-pond-and-companions) and [new evidence](docs/village/evidence/README.md#garden-pond-and-companions).
+
+This addition is not deployed. Physical touch, cross-browser checks for the new features, subjective sound quality and sustained device performance are still open; the broader historical art acceptance verdict above is unchanged.
+
 ## 2026-09-26 controls/layout release review
 
 Reviewed and published the complete change set: wider roaming, reduced roadside signs, hearth/tea seating, unlimited dash, mouse-look and dark green dialogue panels. Updated current documentation to remove stale energy, nine-sign and click-to-move requirements. Release verification and deployment status are recorded in [the release ledger](VILLAGE_BUILD.md#2026-09-26-village-controls-and-layout-release). This review does not close the broader art/device acceptance verdict above.

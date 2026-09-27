@@ -1,4 +1,36 @@
-# Village implementation evidence — updated 2026-09-26
+# Village implementation evidence — updated 2026-09-27
+
+## Garden labels, countdowns and ground
+
+Current local screenshot follow-up: [front alignment and plant signs](labels-garden-front-alignment.png), [recognizable mint and its countdown](labels-mint-leaf-detail.png), and [growing garden](labels-garden-labels-countdown.png). These use the production renderer at 1280×720 in the isolated Chromium harness, without DOM controls.
+
+[19 focused assertions](labels-garden-details.json) include 224 walking-clearance samples, countdown timing and ready-state behavior, translated/dynamic labels, aligned beds and continuous level paving. [89 garden/pond/companion regressions](labels-garden-checks.json) pass. [The build ledger](../../../VILLAGE_BUILD.md#2026-09-27-garden-labels-countdowns-and-ground) records desktop/phone-size UI and reload verification, preliminary interrupted Firefox work and remaining boundaries. No deployment or physical-device claim.
+
+## Gentle growth and Luma’s tea
+
+Local 2026-09-27 follow-up using the production-module harness at 3032 and exported React app at 3030. Renderer stills omit DOM controls. The [build ledger](../../../VILLAGE_BUILD.md#2026-09-27-gentle-growth-and-lumas-tea) distinguishes injected-time boundary checks from real radish/mint UI waits, and records phone-size, Japanese/simple-view and saved-tea verification.
+
+- [43 growth/gift assertions](growth-gentle-growth.json), [82 garden/companion regressions](growth-garden-checks.json), [39 duck/camera regressions](growth-cosy-feedback.json).
+- [Bench looking toward the garden](growth-tea-garden-view.png), [Luma thanking the gardener](growth-luma-harvest.png), [special mint tea sip](growth-mint-tea-sip.png), [growing vegetables and mint](growth-growing-garden.png).
+
+These files supersede the earlier instant-growth and tea camera evidence. The final phone framing was checked in the exported app after the harness captures. No deployment, physical-touch or sustained performance claim.
+
+## Tea courtyard and garden paths
+
+Side-conversation layout pass, independent of the ongoing growth/tea verification. [Garden connections](courtyard-garden-overview.png), [tea terrace and approach](courtyard-activity-mood.png), and [open pond end](courtyard-pond-overview.png) show the actual production renderer. [Eight layout assertions](courtyard-garden-checks.json) verify cottage visual/collider removal, 1,212 clear walking samples along four curved routes, and tea/garden exits. The temporary QA extension ran on port 3033; the isolated static export is served on 3034. TypeScript, full static build and diff checks passed. No deployment or physical-device acceptance is claimed.
+
+## Happy ducks and settled cameras
+
+Local follow-up: [39 controller/animation checks](cosy-feedback-cosy-feedback.json) and [happy duck reaction](cosy-feedback-happy-ducks.png). The renderer image includes all five hearts after feeding; it omits DOM controls. Native pond/hearth dragging and exported desktop/phone/simple-view spacing observations are recorded in [the build ledger](../../../VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras). These are local checks, not deployment or physical-device evidence.
+
+## Garden, pond and companions
+
+Local 2026-09-27 implementation evidence, not deployment evidence. `garden-` files use the production-module QA harness on port 3031, Chrome 154 on macOS, detailed 1280×720 rendering. Renderer captures omit DOM controls; exported React UI observations at 390×844 and in English/Japanese/simple view are in [the build ledger](../../../VILLAGE_BUILD.md#2026-09-27-garden-pond-and-companions).
+
+- [Garden](garden-garden-overview.png), [watering with friends](garden-garden-watering.png), [expanded pond](garden-pond-overview.png), [duck feeding](garden-pond-ducks.png), [tea with friends](garden-companions-tea.png), [focus cottage with friends](garden-companions-focus.png).
+- [Animation preview](garden-garden-motion.webm): gardening and shared watering, mint tea and pond feeding/fish motion; renderer-only VP9, no audio. [Short detailed-tier profile](garden-garden-profile.json) records frame intervals/draw counts during those scenes with all four companions. It is not a sustained or target-device benchmark.
+- [80 garden/pond/companion assertions](garden-garden-checks.json), [43 roaming/street checks](garden-roaming-streets.json), [20 approach checks](garden-villager-approach.json), [28 dialogue checks](garden-villager-dialogue.json).
+- [12 sound checks](garden-garden-audio.json), [seven-effect audio preview](garden-garden-sounds.webm). Signal and lifecycle evidence, not subjective listening acceptance.
 
 ## Published application release
 

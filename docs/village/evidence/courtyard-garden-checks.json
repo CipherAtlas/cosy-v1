@@ -1,0 +1,38 @@
+{
+  "pass": true,
+  "checks": 8,
+  "results": [
+    "Pond-end cottage collider removed",
+    "Pond-end cottage visual removed",
+    "Tea approach has 0.6 m of clear walking width",
+    "Tea to vegetable aisle has 0.6 m of clear walking width",
+    "Garden centre aisle has 0.6 m of clear walking width",
+    "Mint and flower loop has 0.6 m of clear walking width",
+    "Tea exit remains clear",
+    "Garden exit remains clear"
+  ],
+  "failures": [],
+  "bounds": [
+    {
+      "name": "Tea approach",
+      "samples": 303,
+      "blocked": []
+    },
+    {
+      "name": "Tea to vegetable aisle",
+      "samples": 303,
+      "blocked": []
+    },
+    {
+      "name": "Garden centre aisle",
+      "samples": 303,
+      "blocked": []
+    },
+    {
+      "name": "Mint and flower loop",
+      "samples": 303,
+      "blocked": []
+    }
+  ],
+  "limits": "Local renderer layout and collision checks; independent of the ongoing farming verification."
+}

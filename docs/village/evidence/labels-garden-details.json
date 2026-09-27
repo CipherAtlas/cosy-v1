@@ -1,0 +1,28 @@
+{
+  "pass": true,
+  "checks": 19,
+  "results": [
+    "carrot: countdown starts at its full growth duration",
+    "carrot: partial seconds round up until ready",
+    "carrot: countdown never becomes negative",
+    "radish: countdown starts at its full growth duration",
+    "radish: partial seconds round up until ready",
+    "radish: countdown never becomes negative",
+    "mint: countdown starts at its full growth duration",
+    "mint: partial seconds round up until ready",
+    "mint: countdown never becomes negative",
+    "All five crop beds and three flower beds have named wooden labels",
+    "Mint and flower labels follow the Japanese setting",
+    "A bed label follows the chosen crop",
+    "Only growing beds show a world countdown",
+    "World countdown visibly advances with real elapsed time",
+    "Mint aligns with the left column and equal row spacing",
+    "More than 200 walking samples keep labels and bed borders out of garden aisles",
+    "All garden aisles share one level continuous paving surface: [0.09499999880790622,0.09499999880790622,0.0949999988079071,0.0949999988079071,0.09499999880790799,0.0949999988079071]",
+    "New mint has full upright leafy stems",
+    "Countdowns disappear when crops become ready"
+  ],
+  "walkingSamples": 224,
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "limits": "Production-renderer and desktop browser evidence; no physical-device claim."
+}

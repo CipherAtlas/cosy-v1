@@ -13,6 +13,7 @@ import {
 import type { AudioMix, PlaceId } from "./places";
 import type { ActivityMoment } from "./environment";
 import type { FocusSession } from "./useSession";
+import { GardenActivity, MintTea, PondFeeding, type GardenControls } from "./GardenActivities";
 
 type Props = {
   place: PlaceId;
@@ -25,6 +26,7 @@ type Props = {
   travel: (id: PlaceId) => void;
   language: "en" | "ja";
   onMoment: (moment: ActivityMoment) => void;
+  gardenControls: GardenControls;
 };
 const phrases = [
   "You are allowed to rest without earning it.",
@@ -202,9 +204,10 @@ export function Activities(p: Props) {
         <details className="v-mix-details"><summary>{t("Balance the sounds", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
       </section>
     );
-  if (p.place === "breathe") return <Breathing language={p.language} onMoment={p.onMoment} />;
+  if (p.place === "garden") return <GardenActivity {...p.gardenControls} />;
+  if (p.place === "breathe") return <Breathing language={p.language} onMoment={p.onMoment} gardenControls={p.gardenControls} />;
   if (p.place === "mood")
-    return <Mood travel={p.travel} language={p.language} onMoment={p.onMoment} />;
+    return <Mood travel={p.travel} language={p.language} onMoment={p.onMoment} gardenControls={p.gardenControls} />;
   if (p.place === "gratitude") return <Journal language={p.language} onMoment={p.onMoment} />;
   return <KindNote language={p.language} onMoment={p.onMoment} />;
 }
@@ -260,7 +263,7 @@ export function MixSliders({
     </div>
   );
 }
-function Breathing({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
+function Breathing({ language, onMoment, gardenControls }: { language: "en" | "ja"; onMoment: Props["onMoment"]; gardenControls: GardenControls }) {
   const ja = language === "ja";
   const [pattern, setPattern] = useState(0),
     [running, setRunning] = useState(false),
@@ -298,6 +301,7 @@ function Breathing({ language, onMoment }: { language: "en" | "ja"; onMoment: Pr
   return (
     <section className="v-activity v-breathe">
       <h2>{ja ? "水辺で、ひと呼吸。" : "A breath by the water."}</h2>
+      <PondFeeding {...gardenControls} />
       <div className={`v-breath-orbit ${running ? "is-running" : ""}`} style={{"--breath-scale":1+amount*.12} as React.CSSProperties}>
         <svg className="v-breath-ring" viewBox="0 0 160 160" aria-hidden="true">
           <circle cx="80" cy="80" r="70" />
@@ -350,7 +354,9 @@ function Mood({
   travel,
   language,
   onMoment,
+  gardenControls,
 }: {
+  gardenControls: GardenControls;
   onMoment: Props["onMoment"];
   travel: (id: PlaceId) => void;
   language: "en" | "ja";
@@ -373,6 +379,7 @@ function Mood({
           ? "どんな気持ちでも、ここにいて大丈夫。"
           : "Take a sip of tea. There is room for all of it."}
       </p>
+      <MintTea {...gardenControls} />
       <div className="v-moods">
         {moods.map((m, i) => (
           <button

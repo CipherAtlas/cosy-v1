@@ -1,0 +1,45 @@
+{
+  "samples": [
+    {
+      "place": "garden",
+      "frames": 960,
+      "meanMs": 8.329999999900656,
+      "p95Ms": 10,
+      "draws": 193,
+      "triangles": 2889689,
+      "quality": "detailed",
+      "drawingBuffer": [
+        1280,
+        720
+      ]
+    },
+    {
+      "place": "mood",
+      "frames": 481,
+      "meanMs": 8.315800415602153,
+      "p95Ms": 10,
+      "draws": 216,
+      "triangles": 2597289,
+      "quality": "detailed",
+      "drawingBuffer": [
+        1280,
+        720
+      ]
+    },
+    {
+      "place": "breathe",
+      "frames": 1409,
+      "meanMs": 8.507735982966638,
+      "p95Ms": 10,
+      "draws": 248,
+      "triangles": 2499717,
+      "quality": "detailed",
+      "drawingBuffer": [
+        1280,
+        720
+      ]
+    }
+  ],
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "limits": "Short local Chromium renderer preview with four companions, not target-device or sustained performance acceptance."
+}

@@ -1,6 +1,16 @@
 # Movement, camera, and a living world
 
-Updated: 2026-09-26. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+Updated: 2026-09-27. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+
+## 2026-09-27 settled camera dragging
+
+While settled at any of the seven activities, hold and drag the scene to orbit the authored look target. Mouse and touch use pointer capture; activity controls remain directly clickable. The orbit has independent yaw/pitch, terrain/obstruction clearance outdoors and interior bounds in the cottage. Release, cancellation, menus and blur stop dragging. Each visit starts at its authored view; exiting restores the walking orientation. Walking mouse capture remains unchanged. See [focused checks and native UI verification](../../VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras).
+
+## 2026-09-27 garden and companions
+
+C or a nearby resident's button toggles following; Friends supports any subset or all four. `navigation.ts` builds a lazy 0.75 m grid from the same `VillageMovement.clear` / `canWalkTo` rules as the player, including the bridge, larger pond and ramped feeding dock. Smoothed A* paths replan as the player moves; dismissal routes each resident back to its nearest authored waypoint. Roaming encounters are suspended for companions. Direct activity travel carries companions to authored positions; leaving restores them to clear outdoor ground. Invitations are per visit, with no costs or obligations.
+
+E interacts with nearby vegetable beds, flowers, mint, tea or duck feeding; B asks nearby Maple for his reusable pouch. Menus/simple view expose the same actions. After planting and one watering, radishes grow over 2 minutes, mint over 3 and carrots over 5. Wall-clock watering timestamps survive reloads; ripe plants never expire. Mint uses the same full cycle in its own bed. Luma accepts each harvest at tea, gives a compliment and animated thanks, and exchanges mint for a saved cup with an explicit drink action. Reduced motion disables plant sway, jumps and decorative particles. Tea stages the player on the garden-facing bench and Luma by the table regardless of companion selection. A four-second entry pan stops when the user drags; reduced motion uses the final view immediately. All seven places retain a visible exit. See [the growth and tea checks](../../VILLAGE_BUILD.md#2026-09-27-gentle-growth-and-lumas-tea) and [initial feature checks and UI evidence](../../VILLAGE_BUILD.md#2026-09-27-garden-pond-and-companions).
 
 ## 2026-09-26 unlimited dashing
 

@@ -7,10 +7,11 @@ import type { ActivityMoment, Collider } from "./environment";
 export const ACTIVITY_STAGES: Record<PlaceId, { actor: [number,number,number]; yaw: number; camera: [number,number,number]; look: [number,number,number] }> = {
   focus: { actor:[108.65,.15,-.65],yaw:Math.PI,camera:[111.3,2.65,2.5],look:[108.8,1.25,-1.65] },
   music: { actor:[-5.8,.4,-16.1],yaw:Math.PI,camera:[-.9,2.8,-15.5],look:[-5.8,1,-18.1] },
-  breathe: { actor:[-22.7,.3,-10.25],yaw:Math.PI,camera:[-20.2,3.2,-8.7],look:[-23.4,.85,-12.8] },
-  mood: { actor:[15.2,.1,-8.7],yaw:Math.PI,camera:[18.5,2.6,-5.7],look:[15.2,1.2,-9.6] },
+  breathe: { actor:[-23,.24,-5.5],yaw:Math.PI,camera:[-18.5,3.7,-2],look:[-26,.5,-9] },
+  mood: { actor:[13.9,.4,-10],yaw:Math.PI/2,camera:[11.6,2.6,-12.2],look:[15.9,1.2,-10] },
   gratitude: { actor:[-18.2,.05,6.6],yaw:-Math.PI/2,camera:[-16.5,2.8,7.7],look:[-19.1,1.2,6.5] },
   compliment: { actor:[3.05,.05,.35],yaw:Math.PI,camera:[5.2,2.4,-3.2],look:[3,1.25,-.4] },
+  garden: { actor:[24.6,.05,-5.4],yaw:Math.PI,camera:[30.5,5.8,1.5],look:[24.7,.6,-7] },
 };
 
 export class VillageActivities {
@@ -22,6 +23,8 @@ export class VillageActivities {
   private breathAmount = 0;
   private cup = new T.Group();
   private steam: T.Mesh[] = [];
+  private mintLeaves = new T.Group();
+  private teaLiquid = new T.MeshStandardMaterial({color:"#966027",roughness:.22});
   private quill = new T.Group();
   private deskQuill = new T.Group();
   private letter = new T.Group();
@@ -67,7 +70,10 @@ export class VillageActivities {
     this.cup.position.set(15.2,1.28,-9.65);this.outdoor.add(this.cup);
     add(this.cup,new T.CylinderGeometry(.23,.22,.035,24),paper,0,0,0);
     add(this.cup,new T.LatheGeometry([new T.Vector2(.12,.035),new T.Vector2(.14,.08),new T.Vector2(.17,.27),new T.Vector2(.145,.27),new T.Vector2(.125,.09)],24),ink,0,0,0);
-    add(this.cup,new T.CylinderGeometry(.143,.143,.008,24),new T.MeshStandardMaterial({color:"#966027",roughness:.22}),0,.238,0);
+    add(this.cup,new T.CylinderGeometry(.143,.143,.008,24),this.teaLiquid,0,.238,0);
+    const leafMaterial = new T.MeshStandardMaterial({ color: "#79a84c", roughness: .85 });
+    for (const angle of [-.5, .7]) { const leaf = add(this.mintLeaves, new T.SphereGeometry(.05, 10, 6), leafMaterial, angle * .055, .247, 0); leaf.scale.set(.65, .06, 1.4); leaf.rotation.y = angle; }
+    this.mintLeaves.visible = false; this.cup.add(this.mintLeaves);
     add(this.cup,new T.TorusGeometry(.085,.02,8,18),ink,.18,.16,0);
     for(let i=0;i<3;i++) {
       const path=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(.035,.1,0),new T.Vector3(-.03,.23,0),new T.Vector3(.025,.4,0)]);
@@ -97,7 +103,7 @@ export class VillageActivities {
     this.deskQuill.position.set(108.85,1.14,-1.8);feather(this.deskQuill);this.indoor.add(this.deskQuill);
     for(let i=0;i<3;i++) {
       const m=new T.MeshBasicMaterial({color:i===0?"#d8fff1":"#97ddd1",transparent:true,opacity:.45,side:T.DoubleSide,depthWrite:false});
-      const ring=add(this.outdoor,new T.RingGeometry(.94,1,80),m,-23.6,-.24,-13.1);ring.rotation.x=-Math.PI/2;ring.castShadow=ring.receiveShadow=false;ring.visible=false;this.rings.push(ring);
+      const ring=add(this.outdoor,new T.RingGeometry(.94,1,80),m,-25,-.24,-9);ring.rotation.x=-Math.PI/2;ring.castShadow=ring.receiveShadow=false;ring.visible=false;this.rings.push(ring);
     }
     this.motes=new T.InstancedMesh(new T.SphereGeometry(.025,6,4),new T.MeshBasicMaterial({color:"#ffe1a0",transparent:true,opacity:.65}),14);
     this.motes.frustumCulled=false;this.motes.visible=false;this.outdoor.add(this.motes);
@@ -120,6 +126,7 @@ export class VillageActivities {
       }
     }
   }
+  setMintTea(ready: boolean) { this.mintLeaves.visible = ready; this.teaLiquid.color.set(ready ? "#a6b850" : "#966027"); }
   setMoment(moment:ActivityMoment) {this.moment=moment;this.changedAt=this.time;}
   enter(place:PlaceId|null) {
     this.indoor.visible=place==="focus";
@@ -137,7 +144,9 @@ export class VillageActivities {
       (steam.material as T.MeshBasicMaterial).opacity=reduced?.16:.12+Math.sin(t*1.3+i)*.05;
     });
     const sip=!reduced&&place==="mood"&&moment.kind==="tea"&&age<3.2?Math.sin(Math.min(1,age/3.2)*Math.PI):0;
-    this.cup.position.set(15.2,1.28+sip*.34,-9.65+sip*.45);this.cup.rotation.x=sip*.22;
+    this.cup.position.set(T.MathUtils.lerp(15.2,14.4,sip),1.28+sip*.18,T.MathUtils.lerp(-9.65,-10,sip));
+    this.cup.rotation.z=sip*.22;
+    player.rotation.z = 0;
     const writing=!reduced&&place==="gratitude"&&moment.kind==="write"&&age<1.8;
     this.quill.rotation.z=writing?Math.sin(t*15)*.12:0;this.quill.position.x=.26+(writing?Math.sin(t*4)*.07:0);
     const save=!reduced&&place==="gratitude"&&moment.kind==="save"&&age<1.4;

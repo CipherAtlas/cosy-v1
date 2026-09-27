@@ -1,0 +1,30 @@
+{
+  "id": "garden-pond-v2",
+  "creator": "Original project artwork, Blender 5.2.1 LTS",
+  "source": "assets/village/garden-pond.blend",
+  "runtime": "public/village/models/garden-pond.glb",
+  "bytes": 3239548,
+  "sha256": "4210b507c6386829fd17122f3817e708d6159710513eda4f28f8bcb3c7e0a8e1",
+  "models": [
+    "Duck",
+    "Duckling",
+    "Swan",
+    "Fish",
+    "Sunflower",
+    "Daisy",
+    "Mint",
+    "Sprout",
+    "Carrot",
+    "Radish",
+    "Reeds",
+    "Iris",
+    "Lily",
+    "WateringCan",
+    "Basket",
+    "BreadPouch",
+    "Teapot"
+  ],
+  "animation": "Named wing, head and tail pivots; swimming, jumps, feeding, wind, watering and tea animated by the runtime.",
+  "license": "Original project artwork; no third-party models or textures.",
+  "triangles": 97740
+}
