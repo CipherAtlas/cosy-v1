@@ -1,0 +1,103 @@
+{
+  "recordedAt": "2026-09-27T11:33:29.696592+00:00",
+  "url": "https://cosy.sabarg.com",
+  "applicationCommit": "5507ec0990ff43e5ee95e3831918e55f28583981",
+  "workflow": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36315999478",
+  "root": 200,
+  "assets": [
+    {
+      "path": "/_next/static/chunks/119-75a198015ae8febc.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/255-102f2e5b2e3dc2ef.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/937-820514b86c4c430b.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/app/page-6893505b3b5bf145.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/app/template-fe05001d0ca40588.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/main-app-5037e7411c5f27b8.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/webpack-90410ba2a6075424.js",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/css/2bfda0318adf1a00.css",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/css/d4e2784ef38afcde.css",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/media/630c17af355fa44e-s.p.woff2",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",
+      "status": 200
+    },
+    {
+      "path": "/village/models/spirit.glb?v=1",
+      "status": 200
+    },
+    {
+      "path": "/village/models/garden-pond.glb?v=2",
+      "status": 200
+    },
+    {
+      "path": "/village/textures/sunset.hdr",
+      "status": 200
+    },
+    {
+      "path": "/village/CREDITS.txt",
+      "status": 200
+    }
+  ],
+  "checks": [
+    "Root-path HTML and every referenced asset respond with HTTP 200",
+    "Sampled spirit/garden models, HDR and credits respond with HTTP 200",
+    "Deployed JavaScript includes daisy gifting and the additional tea seating anchor",
+    "HTML has no former project-subpath asset references"
+  ],
+  "browser": {
+    "url": "https://cosy.sabarg.com/",
+    "browser": "chrome",
+    "version": "154.0.8037.57",
+    "checks": [
+      "Tea prompt appears after walking behind the bench",
+      "E enters tea from the back approach and releases the pointer",
+      "The matching tea button also enters and keeps the exit visible",
+      "Daisy harvest upgrades the older save and preserves its inventory",
+      "Replanting and watering persist the daisy growth start",
+      "Daisies show a visible countdown",
+      "Reload preserves the running daisy timer",
+      "Phone layout keeps the daisy controls and activity exit reachable",
+      "Luma accepts one daisy with a visible thank-you",
+      "No application errors"
+    ],
+    "errors": [],
+    "warnings": []
+  },
+  "limits": "Live Chrome smoke checks reuse an isolated older-save fixture; full real three-minute waits were completed locally in Chrome and Firefox. Physical touch and sustained performance were not evaluated."
+}

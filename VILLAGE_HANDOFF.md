@@ -6,7 +6,7 @@ Tea entry now covers a second 4 m interaction area centered on the seating at `(
 
 Daisies occupy the sixth reusable raised wooden bed at `(27.2,-1)`, matching the mint/vegetable soil, border and planting height. They start ready to pick, then follow plant → water → grow for 3 minutes → harvest, with a visible countdown and no wilting. Harvests enter the basket and can be given to Luma. English/Japanese and simple view use the shared garden controls. Five-bed saves retain their beds, inventory, timers, tea and crumb pouch; the new bed and daisy count default safely under the existing garden key. Decorative watering now targets the sunflower border.
 
-Source/build and 202 module checks per browser pass in Chrome 154 and Firefox 142. Both exported-app runs complete the real three-minute cycle, reload, harvest and gift; Chrome also verifies 390×844 controls. The requested release is ready to publish; see [the current evidence](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing).
+Source/build and 202 module checks per browser pass in Chrome 154 and Firefox 142. Both exported-app runs complete the real three-minute cycle, reload, harvest and gift; Chrome also verifies 390×844 controls. Published at [cosy.sabarg.com](https://cosy.sabarg.com/) in application commit [`5507ec0`](https://github.com/CipherAtlas/cosy-v1/commit/5507ec0990ff43e5ee95e3831918e55f28583981) after successful [Pages run 36315999478](https://github.com/CipherAtlas/cosy-v1/actions/runs/36315999478). Live Chrome repeats tea approach/entry, daisy tending/reload/gift and phone controls without app errors; see [the current evidence](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing).
 
 ## 2026-09-27 — nearby interaction and garden prop fix
 
