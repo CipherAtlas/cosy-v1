@@ -1,5 +1,15 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-27 birds harvest and companion release
+
+At the user's explicit approval, the complete verified village changes were committed and pushed to `main`: white Blender doves and Wren's feeding clearing, sunflower growing and harvest basket, companion hand-holding, and local layout studio source/presets. Release commit [`d6f218f`](https://github.com/CipherAtlas/cosy-v1/commit/d6f218f205ca26605c226a862d7c2c55607afa7e) passed both jobs in [Pages run 36323478979](https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979). No dependencies, hosting settings, secrets or workflow configuration changed. The studio has no public route; player data remains browser-local.
+
+Immediately before publication, the root-path production export, standalone typecheck and complete release diff checks passed. Fresh scene runs against the combined source passed 633 bird checks, 46 companion checks and 50 sunflower checks. The exported app passed 16 bird checks with a real 34.344-second scatter-to-thanks cycle. A final source hash comparison confirmed the release candidate had not changed since verification; three trailing spaces in the sunflower test were removed before pushing. Existing build warnings remain unrelated to these additions.
+
+[Live publication evidence](docs/village/evidence/bird-release-publication.json) records the successful workflow, HTTP 200 for the root and all 14 HTML references plus five runtime assets, root-path URLs, byte-identical dove/credits, and the bird/basket controls in the deployed bundle. Live Chrome passes 16 bird checks: direct Places entry, Wren's sourdough gift, duplicate-feed prevention, an actual 34.33-second cycle ending in visible hearts and exact speech, click/E/Escape exits, saved pouch reload, Wren invitation, phone control/speech bounds, and queued feeding completed in Japanese simple view. All 15 live sunflower checks pass, including harvest inventory, native nearby E/click entry, ticking/reload, gifting and phone/simple-view controls. These tests use isolated browser profiles; the sunflower completion check uses a shortened saved timestamp, not a real five-minute wait. No application errors were captured. [Live clearing](docs/village/evidence/bird-release-live.png), [phone view](docs/village/evidence/bird-release-phone.png).
+
+Earlier local-only implementation notes are historical. Physical touch, sustained target-device performance and subjective listening were not added to the acceptance evidence. The existing GitHub Pages workflow and SSH access were used without altering saved remotes.
+
 ## 2026-09-27 local layout studio
 
 A private standalone editor runs at `http://127.0.0.1:3040` with `npm run dev:editor`. The implementation is in `tools/village-editor/`, using existing Three.js/TypeScript and Python's standard library. Optional capture hooks in `world.ts` expose reusable assets while preserving normal public-world batching. No dependency changes, Git writes or deployment were performed by this task; the public export contains no editor route.

@@ -1,6 +1,6 @@
 # Sunflowers and harvest basket — 2026-09-27
 
-This side-conversation addition is implemented locally and is **not committed or deployed**. It was developed in an isolated copy while the main chat completed its tea/daisy release, then reconciled with that release. The main chat's tea approach and 2.4 m daisy interaction radius are preserved.
+This side-conversation addition is now **committed and deployed** in the [birds, harvest and companion release](../../VILLAGE_BUILD.md#2026-09-27-birds-harvest-and-companion-release). It was developed in an isolated copy while the main chat completed its tea/daisy release, then reconciled with that release. The main chat's tea approach and 2.4 m daisy interaction radius are preserved.
 
 ## Behavior
 
@@ -35,4 +35,4 @@ PLAYWRIGHT_PATH=/absolute/path/to/playwright APP_URL=http://127.0.0.1:3042 node 
 
 The UI command expects a root static export served at the chosen APP_URL. For Firefox, replace `chrome` with `firefox` and provide BROWSER_EXECUTABLE when required by the installed browser/runtime pair.
 
-The next release should include this addition and perform the usual live-site smoke check after deployment. This side conversation does not authorize publication.
+The main chat subsequently authorized publication. All 15 live Chrome sunflower/basket checks passed; [release evidence](evidence/bird-release-publication.json) records the live result and verification limits.

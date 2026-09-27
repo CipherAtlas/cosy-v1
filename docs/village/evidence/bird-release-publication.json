@@ -1,0 +1,348 @@
+{
+  "at": "2026-09-27T13:47:21.289650+00:00",
+  "commit": "d6f218f205ca26605c226a862d7c2c55607afa7e",
+  "run": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979",
+  "root": {
+    "path": "/",
+    "status": 200,
+    "bytes": 11426,
+    "sha256": "e67b28fa6b422e457c872818e064794ceabb297439f4ab8c42618b77eba9e335",
+    "type": "text/html; charset=utf-8"
+  },
+  "htmlReferences": 14,
+  "assets": [
+    {
+      "path": "/_next/static/chunks/255-102f2e5b2e3dc2ef.js",
+      "status": 200,
+      "bytes": 172787,
+      "sha256": "ef2652affb28ff5ee4e98516273447e2cc41f7d63104e60ae0fba9aa95ba4072",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "status": 200,
+      "bytes": 173019,
+      "sha256": "2c752a401191671d5bbbe7514f5828bbb0a7cc50bfbe77ddaf1b1ccba4412ed2",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/513-d315695bee0a8596.js",
+      "status": 200,
+      "bytes": 120260,
+      "sha256": "282cfca53ab39ea891b94fcfcd556eadc250c8a3b2fb7ecec24bccc6b4fd9b67",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/937-820514b86c4c430b.js",
+      "status": 200,
+      "bytes": 109956,
+      "sha256": "8219e2b8bab5b9fd0f26e605e0349122ce0a047a38b2013076de0eefa3bbc614",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/app/page-806c6094a395f2b2.js",
+      "status": 200,
+      "bytes": 86141,
+      "sha256": "fd6c69f8a8cc5016360825860f12d119425ad0348f8867d38013d8a54ed7f989",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/app/template-fe05001d0ca40588.js",
+      "status": 200,
+      "bytes": 4394,
+      "sha256": "90c080ea45609c774e2a4a243666ba4d7df59496d71a7421dd2d5d3c4f370277",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/main-app-5037e7411c5f27b8.js",
+      "status": 200,
+      "bytes": 557,
+      "sha256": "0980984a81db5f3beb31adf5fbb71ad980481945d2fcb60ad65b7767553989e4",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "status": 200,
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/chunks/webpack-27f198764a27261f.js",
+      "status": 200,
+      "bytes": 3606,
+      "sha256": "654a59479e07104959483c3a22d9d1739ecfebce302852817ada57f5438b8d6f",
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/css/54cfcd6050e127b9.css",
+      "status": 200,
+      "bytes": 31600,
+      "sha256": "45b6db02b51117b97e5928627912d56526fef397f8b7239201ba3f2bec2dc0e5",
+      "type": "text/css; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/css/d4e2784ef38afcde.css",
+      "status": 200,
+      "bytes": 41088,
+      "sha256": "0685bb2fa8e9725e9039f7cf85973d8e3839265ded8653e53f0c76b921587ccf",
+      "type": "text/css; charset=utf-8"
+    },
+    {
+      "path": "/_next/static/media/630c17af355fa44e-s.p.woff2",
+      "status": 200,
+      "bytes": 43120,
+      "sha256": "10f1a0ef3f3497901c1c3e9987d0cb97d092a6ce1ff45669a1aed503cf67e6ef",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",
+      "status": 200,
+      "bytes": 32228,
+      "sha256": "92684e4acde79ef07758cd09380b7e01e9824d8b061eddeda046f78c166d7b12",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/icon.svg",
+      "status": 200,
+      "bytes": 2475,
+      "sha256": "b76f74555f5d844e7d90927f9d0c2c84dca61dcbd888217fe80a8d370989c0ec",
+      "type": "image/svg+xml"
+    },
+    {
+      "path": "/village/CREDITS.txt",
+      "status": 200,
+      "bytes": 5002,
+      "sha256": "19673fd176aaafb0b4a1ee56b2287bb196ec84acae5c57e93c75fade09868812",
+      "type": "text/plain; charset=utf-8"
+    },
+    {
+      "path": "/village/models/dove.glb",
+      "status": 200,
+      "bytes": 240928,
+      "sha256": "ee6d5c28cf781087cad44e9bf812a40f02d4035d5b2d07d5ff2dbc2743d353bb",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/village/models/garden-pond.glb",
+      "status": 200,
+      "bytes": 3239548,
+      "sha256": "4210b507c6386829fd17122f3817e708d6159710513eda4f28f8bcb3c7e0a8e1",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/village/models/spirit.glb",
+      "status": 200,
+      "bytes": 437768,
+      "sha256": "d089abfbdaf6a36a0bad15eb1911e37332b847ffe28e93b5a09bb48db7cfbc66",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/village/textures/sunset.hdr",
+      "status": 200,
+      "bytes": 1061624,
+      "sha256": "e90f2130848de0364b76d2b3da7a72ce31bbb95d66bd86d5b4f85f0626421b8d",
+      "type": "application/octet-stream"
+    }
+  ],
+  "doveMatches": true,
+  "creditsMatch": true,
+  "birdAndBasketUiInBundle": true,
+  "rootPaths": true,
+  "localVerification": {
+    "build": "passed",
+    "typecheck": "passed",
+    "whitespace": "passed",
+    "birdSceneChecks": 633,
+    "companionSceneChecks": 46,
+    "sunflowerSceneChecks": 50,
+    "birdUiChecks": 16
+  },
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "d6f218f205ca26605c226a862d7c2c55607afa7e",
+    "jobs": [
+      {
+        "completedAt": "2026-09-27T13:46:42Z",
+        "conclusion": "success",
+        "databaseId": 108631678211,
+        "name": "build",
+        "startedAt": "2026-09-27T13:45:11Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-09-27T13:45:12Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-09-27T13:45:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:45:25Z",
+            "conclusion": "success",
+            "name": "Checkout",
+            "number": 2,
+            "startedAt": "2026-09-27T13:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:45:31Z",
+            "conclusion": "success",
+            "name": "Setup Node.js",
+            "number": 3,
+            "startedAt": "2026-09-27T13:45:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:45:31Z",
+            "conclusion": "success",
+            "name": "Setup GitHub Pages",
+            "number": 4,
+            "startedAt": "2026-09-27T13:45:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:45:44Z",
+            "conclusion": "success",
+            "name": "Install dependencies",
+            "number": 5,
+            "startedAt": "2026-09-27T13:45:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:37Z",
+            "conclusion": "success",
+            "name": "Build static site",
+            "number": 6,
+            "startedAt": "2026-09-27T13:45:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:37Z",
+            "conclusion": "success",
+            "name": "Add .nojekyll",
+            "number": 7,
+            "startedAt": "2026-09-27T13:46:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:40Z",
+            "conclusion": "success",
+            "name": "Upload artifact",
+            "number": 8,
+            "startedAt": "2026-09-27T13:46:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:40Z",
+            "conclusion": "success",
+            "name": "Post Setup Node.js",
+            "number": 15,
+            "startedAt": "2026-09-27T13:46:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:40Z",
+            "conclusion": "success",
+            "name": "Post Checkout",
+            "number": 16,
+            "startedAt": "2026-09-27T13:46:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:40Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-09-27T13:46:40Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979/job/108631678211"
+      },
+      {
+        "completedAt": "2026-09-27T13:46:56Z",
+        "conclusion": "success",
+        "databaseId": 108631937032,
+        "name": "deploy",
+        "startedAt": "2026-09-27T13:46:46Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-09-27T13:46:48Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-09-27T13:46:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:55Z",
+            "conclusion": "success",
+            "name": "Deploy to GitHub Pages",
+            "number": 2,
+            "startedAt": "2026-09-27T13:46:48Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-09-27T13:46:55Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 3,
+            "startedAt": "2026-09-27T13:46:55Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979/job/108631937032"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979"
+  },
+  "liveSunflowers": {
+    "browser": "chrome",
+    "version": "154.0.8037.57",
+    "checks": [
+      "Empty basket is explained",
+      "Inventory shows all five crops with zero quantities",
+      "Harvesting different crops increments the matching inventory rows",
+      "Walking along the garden path offers the basket",
+      "E beside the basket opens the inventory",
+      "The nearby click control opens the same inventory",
+      "Sunflower countdown ticks in the exported app",
+      "Watered sunflowers continue growing after reload",
+      "Stored inventory survives reload",
+      "Completed sunflower growth yields another stored harvest",
+      "Phone inventory fits the viewport and has a visible close button",
+      "Sunflowers can be shared with Luma",
+      "Japanese simple view shows the saved inventory after gifting",
+      "Japanese simple view keeps an accessible close action",
+      "No application errors were captured"
+    ],
+    "errors": [],
+    "growthTiming": "UI ticking/reload plus a shortened saved timestamp; no real five-minute wait"
+  },
+  "liveBirds": {
+    "checks": [
+      "Clearing is directly reachable from Places",
+      "Talking to Wren gives sourdough crumbs with her dialogue",
+      "Repeated feeding is disabled while crumbs are queued or being eaten",
+      "World speech appears after the real flight and feeding cycle",
+      "Clearing has a directly clickable exit",
+      "Phone bird speech stays below the exit control",
+      "Phone feeding and exit controls fit the viewport",
+      "Phone feeding and exit controls fit the viewport",
+      "Leaving returns to exploration",
+      "E enters the clearing from its arrival point",
+      "Escape leaves the clearing",
+      "Wren\u2019s crumb pouch survives reload",
+      "Wren can join as a companion",
+      "Switching to Japanese simple view completes queued feeding and translates the thanks",
+      "Japanese simple view keeps the exit visible",
+      "No application errors"
+    ],
+    "realWaitSeconds": 34.33,
+    "errors": []
+  }
+}
