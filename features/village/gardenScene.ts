@@ -1,7 +1,7 @@
 import * as T from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { floorHeight, POND, type Collider } from "./environment";
-import { BEDS, CROP_NAMES, FEED_POSITION, FLOWER_POSITION, MINT_POSITION, MINT_BED, growthProgress, growthTimeLeft, freshGarden, type GardenAction, type GardenSound, type GardenState } from "./garden";
+import { BEDS, CROP_NAMES, CROP_MODELS, FEED_POSITION, FLOWER_POSITION, MINT_POSITION, MINT_BED, DAISY_BED, growthProgress, growthTimeLeft, freshGarden, type GardenAction, type GardenSound, type GardenState } from "./garden";
 
 /** Original Blender kit, instanced planting, and bounded pools for water/feeding effects. */
 export class GardenScene {
@@ -11,7 +11,7 @@ export class GardenScene {
   private foliage: T.MeshStandardMaterial;
   private wind = { value: 0 };
   private breeze = { value: 1 };
-  private beds: { root: T.Group; sprout: T.InstancedMesh; carrot: T.InstancedMesh; radish: T.InstancedMesh; mint: T.InstancedMesh; scale: number }[] = [];
+  private beds: { root: T.Group; sprout: T.InstancedMesh; carrot: T.InstancedMesh; radish: T.InstancedMesh; mint: T.InstancedMesh; daisy: T.InstancedMesh; scale: number }[] = [];
   private birds: { root: T.Object3D; head?: T.Object3D; wings: T.Object3D[]; phase: number; swan: boolean }[] = [];
   private fish: { root: T.Object3D; tail?: T.Object3D; jumping: boolean }[] = [];
   private ripples: T.InstancedMesh;
@@ -93,11 +93,13 @@ export class GardenScene {
       for (const z of [-1.28, 1.28]) box(wood, bed.x, .2, bed.z + z, 3.45, .38, .14);
       for (const x of [-1.65, 1.65]) box(wood, bed.x + x, .2, bed.z, .14, .38, 2.7);
       colliders.push({ x: bed.x, z: bed.z, w: 3.5, d: 2.8, top: .45 });
-      const root = new T.Group(); root.position.set(bed.x, .25, bed.z); root.name = `Vegetable bed ${index + 1}`; this.group.add(root);
+      const root = new T.Group(); root.position.set(bed.x, .25, bed.z); root.name = `Garden bed ${index + 1}`; this.group.add(root);
       const positions = Array.from({ length: 9 }, (_, i) => [(i % 3 - 1) * .92, 0, (Math.floor(i / 3) - 1) * .7, 1] as const);
       const sprout = this.plant("Sprout", positions, root), carrot = this.plant("Carrot", positions, root), radish = this.plant("Radish", positions, root);
       const mint = this.plant("Mint", positions, root);
-      this.beds.push({ root, sprout, carrot, radish, mint, scale: 1 });
+      const daisies = Array.from({ length: 20 }, (_, i) => [-1.24 + (i % 5) * .62, 0, .9 - Math.floor(i / 5) * .55, .75 + (i % 3) * .08] as const);
+      const daisy = this.plant("Daisy", daisies, root);
+      this.beds.push({ root, sprout, carrot, radish, mint, daisy, scale: 1 });
       sign(bed.x + .25, bed.z + 1.23, index === MINT_BED ? "Mint · Tea leaves" : "", index === MINT_BED ? "ミント・お茶の葉" : "", index);
       const canvas = document.createElement("canvas"); canvas.width = canvas.height = 192;
       const texture = new T.CanvasTexture(canvas); texture.colorSpace = T.SRGBColorSpace;
@@ -116,14 +118,11 @@ export class GardenScene {
       }
     };
     flowerBed(24.7, -12.7, 9.9, 1.1);
-    flowerBed(27.2, -1, 3.45, 2.7);
     flowerBed(30.1, -7.3, .85, 9.5);
     const sunflowers = Array.from({ length: 13 }, (_, i) => [20.08 + i * .77, .13, -12.7 + Math.sin(i * 1.5) * .08, .9 + (i % 3) * .09] as const);
     this.plant("Sunflower", sunflowers);
-    this.plant("Daisy", Array.from({ length: 20 }, (_, i) => [25.96 + (i % 5) * .62, .13, -.1 - Math.floor(i / 5) * .55, .75 + (i % 3) * .08] as const));
     this.plant("Iris", Array.from({ length: 12 }, (_, i) => [30.1 + Math.sin(i * 2.4) * .2, .13, -11.3 + i * .74, .75] as const));
     sign(24.7, -12.25, "Sunflowers", "ひまわり");
-    sign(27.45, .23, "Daisies", "デイジー");
     sign(29.78, -7.3, "Irises", "アイリス", undefined, -Math.PI / 2);
     this.can = this.model("WateringCan", [0, 0, 0]); this.can.visible = false;
     this.model("BreadPouch", [-23.8, .25, -4.9], .75);
@@ -216,6 +215,7 @@ export class GardenScene {
       bed.carrot.visible = leafy && state.beds[i].crop === "carrot";
       bed.radish.visible = leafy && state.beds[i].crop === "radish";
       bed.mint.visible = leafy && i === MINT_BED;
+      bed.daisy.visible = leafy && i === DAISY_BED;
     });
     this.updateLabels();
   }
@@ -351,7 +351,7 @@ export class GardenScene {
       const origin = "bed" in action ? [BEDS[action.bed].x, .4, BEDS[action.bed].z] : MINT_POSITION;
       const f = Math.min(1, age / 1.6);
       const crop = this.state.beds[(action as { bed: number }).bed].crop;
-      const name = crop === "mint" ? "Mint" : crop === "carrot" ? "Carrot" : "Radish";
+      const name = CROP_MODELS[crop];
       if (this.harvest.name !== name) { this.harvest.removeFromParent(); this.harvest = this.model(name, origin); }
       this.harvest.position.set(T.MathUtils.lerp(origin[0], 25, f), .6 + Math.sin(f * Math.PI) * 1.5, T.MathUtils.lerp(origin[2], -.6, f)); this.harvest.rotation.y = age * 2;
     }

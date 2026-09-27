@@ -1,0 +1,12 @@
+{
+  "pass": true,
+  "browser": "154.0.8037.57",
+  "viewport": "390x844",
+  "checks": [
+    "Japanese simple view harvests daisies",
+    "Japanese simple view replants and waters daisies",
+    "Daisy countdown is visible in Japanese",
+    "Inventory and watering timestamp persist"
+  ],
+  "errors": []
+}

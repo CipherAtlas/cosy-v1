@@ -1,0 +1,26 @@
+{
+  "url": "http://127.0.0.1:3036/",
+  "browser": "chrome",
+  "version": "154.0.8037.57",
+  "checks": [
+    "Tea prompt appears after walking behind the bench",
+    "E enters tea from the back approach and releases the pointer",
+    "The matching tea button also enters and keeps the exit visible",
+    "Daisy harvest upgrades the older save and preserves its inventory",
+    "Replanting and watering persist the daisy growth start",
+    "Daisies show a visible countdown",
+    "Reload preserves the running daisy timer",
+    "Phone layout keeps the daisy controls and activity exit reachable",
+    "Daisies become harvestable after the real three-minute wait",
+    "The newly grown daisies can be harvested",
+    "Luma accepts one daisy with a visible thank-you",
+    "No application errors"
+  ],
+  "errors": [],
+  "warnings": [
+    "The resource http://127.0.0.1:3036/_next/static/media/630c17af355fa44e-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://127.0.0.1:3036/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://127.0.0.1:3036/_next/static/media/630c17af355fa44e-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://127.0.0.1:3036/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+  ]
+}

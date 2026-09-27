@@ -1,5 +1,13 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-27 — tea seating access and growing daisies
+
+Tea entry now covers a second 4 m interaction area centered on the seating at `(14.7,-10)`, including the back of the bench and both sides of the pergola. The original arrival approach, click/E parity, prepared-tea priority and safe exit remain intact.
+
+Daisies occupy the sixth reusable raised wooden bed at `(27.2,-1)`, matching the mint/vegetable soil, border and planting height. They start ready to pick, then follow plant → water → grow for 3 minutes → harvest, with a visible countdown and no wilting. Harvests enter the basket and can be given to Luma. English/Japanese and simple view use the shared garden controls. Five-bed saves retain their beds, inventory, timers, tea and crumb pouch; the new bed and daisy count default safely under the existing garden key. Decorative watering now targets the sunflower border.
+
+Source/build and 202 module checks per browser pass in Chrome 154 and Firefox 142. Both exported-app runs complete the real three-minute cycle, reload, harvest and gift; Chrome also verifies 390×844 controls. The requested release is ready to publish; see [the current evidence](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing).
+
 ## 2026-09-27 — nearby interaction and garden prop fix
 
 The tea approach could display “Take a quiet moment” while E silently selected an unavailable mint-tea action. The keyboard now uses the same `nearbyGardenAction` availability check as the visible button and falls back to the nearby activity. This also fixes garden entry beside growing crops. The static basket is removed from the mint/daisy aisle; the watering can is hidden except during its existing watering animation.

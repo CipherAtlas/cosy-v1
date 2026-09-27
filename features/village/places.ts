@@ -37,6 +37,7 @@ export const PLACES = [
     activity: "Check in",
     description: "Come exactly as you are.",
     position: [15.6, 0, -6.8],
+    interactionPosition: [14.7, 0, -10],
     camera: [16.5, 2.4, -6],
     look: [15, 1.2, -12],
     prompt: "Take a quiet moment",

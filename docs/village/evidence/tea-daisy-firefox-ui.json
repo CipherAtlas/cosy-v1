@@ -1,0 +1,27 @@
+{
+  "url": "http://127.0.0.1:3036/",
+  "browser": "firefox",
+  "version": "142.0.1",
+  "checks": [
+    "Tea prompt appears after walking behind the bench",
+    "E enters tea from the back approach and releases the pointer",
+    "The matching tea button also enters and keeps the exit visible",
+    "Daisy harvest upgrades the older save and preserves its inventory",
+    "Replanting and watering persist the daisy growth start",
+    "Daisies show a visible countdown",
+    "Reload preserves the running daisy timer",
+    "Daisies become harvestable after the real three-minute wait",
+    "The newly grown daisies can be harvested",
+    "Luma accepts one daisy with a visible thank-you",
+    "No application errors"
+  ],
+  "errors": [],
+  "warnings": [
+    "[JavaScript Warning: \"WebGL warning: texSubImage: Alpha-premult and y-flip are deprecated for non-DOM-Element uploads.\"]",
+    "[JavaScript Warning: \"WebGL warning: drawElementsInstanced: Depth texture comparison requests (e.g. `LINEAR`) Filtering, but behavior is implementation-defined, and so on some systems will sometimes behave as `NEAREST`. (warns once)\"]",
+    "[JavaScript Warning: \"WebGL warning: drawElementsInstanced: Drawing to a destination rect smaller than the viewport rect. (This warning will only be given once)\"]",
+    "[JavaScript Warning: \"WebGL warning: texSubImage: Alpha-premult and y-flip are deprecated for non-DOM-Element uploads.\"]",
+    "[JavaScript Warning: \"WebGL warning: drawElementsInstanced: Depth texture comparison requests (e.g. `LINEAR`) Filtering, but behavior is implementation-defined, and so on some systems will sometimes behave as `NEAREST`. (warns once)\"]",
+    "[JavaScript Warning: \"WebGL warning: drawElementsInstanced: Drawing to a destination rect smaller than the viewport rect. (This warning will only be given once)\"]"
+  ]
+}

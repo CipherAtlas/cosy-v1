@@ -876,9 +876,12 @@ export class VillageEngine {
       let near: PlaceId | null = null,
         dist = 4;
       PLACES.forEach((p) => {
-        const d = Math.hypot(
-          p.position[0] - this.player.position.x,
-          p.position[2] - this.player.position.z,
+        // Keep the arrival approach reachable while covering the tea seating itself.
+        const d = Math.min(
+          Math.hypot(p.position[0] - this.player.position.x, p.position[2] - this.player.position.z),
+          "interactionPosition" in p
+            ? Math.hypot(p.interactionPosition[0] - this.player.position.x, p.interactionPosition[2] - this.player.position.z)
+            : Infinity,
         );
         if (d < dist) {
           dist = d;

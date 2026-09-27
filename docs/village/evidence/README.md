@@ -1,5 +1,11 @@
 # Village implementation evidence — updated 2026-09-27
 
+## Tea seating and growing daisies
+
+[Chrome module checks](tea-daisy-chrome.json) and [Firefox module checks](tea-daisy-firefox.json) each pass 202 assertions covering tea approach/keyboard interactions, growth and older saves, countdowns and clear paths, and garden/pond/companion regressions. [Chrome exported-app checks](tea-daisy-chrome-ui.json) and [Firefox exported-app checks](tea-daisy-firefox-ui.json) include actual keyboard/click input, reload persistence, a real three-minute daisy grow cycle, harvesting and gifting.
+
+Inspected: [tea prompt behind the bench](tea-daisy-chrome-tea-approach.png), [matching raised beds](tea-daisy-garden-front-alignment.png), [desktop countdown](tea-daisy-chrome-countdown.png), [390×844 countdown and exit](tea-daisy-chrome-phone-countdown.png), and [Luma holding a daisy](tea-daisy-chrome-luma-daisy.png). The raised-bed overview uses the production-module renderer without React overlays; the other images show the exported app. [Japanese simple-view results](tea-daisy-japanese-simple.json) and [phone capture](tea-daisy-japanese-simple.png) cover the translated daisy cycle. No physical-touch claim. [Full scope and release status](../../../VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing).
+
 ## Nearby interaction and garden prop fix
 
 [Chrome regression results](interaction-fix-chrome.json) and [Firefox regression results](interaction-fix-firefox.json) each contain 15 focused checks and 89 existing garden/pond/companion assertions. The tests reproduce overlapping tea/activity targets, verify E-key fallback with no mint tea or growing crops, retain harvest/drink priority, and confirm removal of parked garden props.

@@ -3,7 +3,7 @@ import { VillageLife } from './modules/features/village/life.js';
 import { VillageNavigation } from './modules/features/village/navigation.js';
 import { PLACES } from './modules/features/village/places.js';
 import { POND, pondDistance, onPondDock } from './modules/features/village/environment.js';
-import { freshGarden, readGarden, gardenAction, gardenActionAllowed, growGarden, growthProgress, growthTimeLeft, BEDS, GROWTH_MS, MINT_BED, HARVEST_COMPLIMENTS, GARDEN_KEY } from './modules/features/village/garden.js';
+import { freshGarden, readGarden, gardenAction, gardenActionAllowed, growGarden, growthProgress, growthTimeLeft, nearbyGardenAction, BEDS, GROWTH_MS, MINT_BED, DAISY_BED, CROP_INVENTORY, HARVEST_COMPLIMENTS, GARDEN_KEY } from './modules/features/village/garden.js';
 import { VillageAudio } from './modules/features/village/audio.js';
 import { DEFAULT_MIX } from './modules/features/village/places.js';
 
@@ -22,6 +22,14 @@ export async function checkNearbyInteractions(engine, save) {
   engine.callbacks.interact = id => { calls.push(`place:${id}`); engine.travel(id); };
   engine.callbacks.gardenInteract = id => calls.push(`garden:${id}`);
   try {
+    engine.setGarden(freshGarden());
+    for (const [x, z, label] of [[12.1, -10, 'Behind the tea bench'], [14.7, -13.5, 'North pergola approach'], [17.7, -10, 'Table side'], [15.6, -6.8, 'Original tea arrival']]) {
+      stand(x, z);
+      check(engine.movement.clear(x, z), `${label}: interaction is reachable on clear ground`);
+      check(engine.near === 'mood', `${label}: offers the tea activity without precise positioning`);
+      press(); check(calls.join() === 'place:mood' && engine.place === 'mood', `${label}: E enters the tea activity`);
+    }
+    stand(9.5, -10); check(engine.near !== 'mood', 'Tea prompt stays local to the courtyard');
     engine.setGarden(freshGarden()); stand(15.2, -8.1);
     check(engine.near === 'mood' && engine.nearGarden === 'tea', 'Tea approach overlaps the activity and tea-drinking targets');
     press();
@@ -45,6 +53,15 @@ export async function checkNearbyInteractions(engine, save) {
     check(calls.join() === 'place:garden', 'Growing vegetables also fall back to the visible activity prompt');
     engine.setGarden(growGarden(growing, Date.now() + GROWTH_MS.radish)); stand(23.8, -4.5); press();
     check(calls.join() === 'garden:bed-2', 'Ripe vegetables regain harvest priority');
+
+    engine.setGarden(freshGarden()); stand(27.2, .8); press();
+    check(calls.join() === `garden:bed-${DAISY_BED}`, 'The daisy approach selects its harvest instead of decorative watering');
+    let daisies = gardenAction(freshGarden(), { kind: 'harvest', bed: DAISY_BED });
+    check(nearbyGardenAction(`bed-${DAISY_BED}`, daisies)?.kind === 'plant', 'An empty daisy bed offers replanting');
+    daisies = gardenAction(daisies, { kind: 'plant', bed: DAISY_BED, crop: 'daisy' });
+    check(nearbyGardenAction(`bed-${DAISY_BED}`, daisies)?.kind === 'water', 'Daisy sprouts offer watering');
+    daisies = gardenAction(daisies, { kind: 'water', bed: DAISY_BED });
+    check(nearbyGardenAction(`bed-${DAISY_BED}`, daisies) === null, 'Growing daisies cannot be repeatedly watered or harvested');
 
     stand(15.2, -8.1); engine.setBlocked(true); press();
     check(calls.length === 0, 'Menus block nearby keyboard interactions');
@@ -137,7 +154,7 @@ export async function checkGarden(engine, capture, save) {
   localStorage.setItem(GARDEN_KEY, JSON.stringify(state));
   checks(JSON.stringify(readGarden(localStorage.getItem(GARDEN_KEY))) === JSON.stringify(state), 'Garden inventory and beds round-trip through browser storage');
   for (const invalid of ['null', '{}', '[]', 'broken', '{"mint":-4,"carrots":1e99,"beds":[null]}']) {
-    const restored = readGarden(invalid); checks(restored.beds.length === 5 && restored.mint >= 0 && Number.isSafeInteger(restored.carrots), `Safe optional garden recovery: ${invalid}`);
+    const restored = readGarden(invalid); checks(restored.beds.length === 6 && restored.mint >= 0 && Number.isSafeInteger(restored.carrots), `Safe optional garden recovery: ${invalid}`);
   }
   checks(POND.rx * POND.rz > 2 * 7.7 * 7, 'Pond water area is more than twice the previous footprint');
   checks(!engine.world.colliders.some(c => c.x === -24 && c.z === -5), 'Pond-front cottage collision is removed');
@@ -327,7 +344,7 @@ export async function checkCosyFeedback(engine, capture, save) {
 export async function checkGentleGrowth(engine, capture, save) {
   const results = [], check = (ok, label) => { if (!ok) throw Error(label); results.push(label); };
   const start = 1_800_000_000_000, delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-  for (const [crop, minutes, bed] of [['radish', 2, 2], ['mint', 3, MINT_BED], ['carrot', 5, 2]]) {
+  for (const [crop, minutes, bed] of [['radish', 2, 2], ['mint', 3, MINT_BED], ['carrot', 5, 2], ['daisy', 3, DAISY_BED]]) {
     let state = freshGarden(); state.beds[bed] = { crop, stage: 'empty' };
     state = gardenAction(state, { kind: 'plant', crop, bed }, start);
     state = gardenAction(state, { kind: 'water', bed }, start);
@@ -341,7 +358,7 @@ export async function checkGentleGrowth(engine, capture, save) {
     check(state.beds[bed].stage === 'grown', `${crop}: becomes ready exactly on time, including after a reload`);
     check(growGarden(state, start + 30 * 86400000).beds[bed].stage === 'grown', `${crop}: stays ripe after a month away`);
     state = gardenAction(state, { kind: 'harvest', bed }, start + minutes * 60000);
-    const key = crop === 'carrot' ? 'carrots' : crop === 'radish' ? 'radishes' : 'mint';
+    const key = CROP_INVENTORY[crop];
     check(state[key] === 1 && state.beds[bed].stage === 'empty', `${crop}: one harvest enters the basket and frees its bed`);
     const gifted = gardenAction(state, { kind: 'gift', crop });
     check(gifted[key] === 0 && HARVEST_COMPLIMENTS[crop].en && HARVEST_COMPLIMENTS[crop].ja, `${crop}: gifting consumes one item and has both compliment translations`);
@@ -356,6 +373,17 @@ export async function checkGentleGrowth(engine, capture, save) {
   const old = { beds: freshGarden().beds.slice(0, 4), mint: 7, carrots: 4, radishes: 3, crumbPouch: true };
   const preserved = readGarden(JSON.stringify(old));
   check(preserved.mint === 7 && preserved.carrots === 4 && preserved.radishes === 3 && preserved.crumbPouch && preserved.beds[4].stage === 'sprout', 'Existing saves retain harvests, pouch and beds, with a new mint sprout');
+  const previous = { ...freshGarden(), beds: freshGarden().beds.slice(0, 5), carrots: 8, mintTea: 2, crumbPouch: true };
+  delete previous.daisies;
+  previous.beds[MINT_BED] = { crop: 'mint', stage: 'growing', wateredAt: start };
+  const upgraded = readGarden(JSON.stringify(previous), start + 60000);
+  check(JSON.stringify(upgraded.beds.slice(0, 5)) === JSON.stringify(previous.beds) && upgraded.carrots === 8 && upgraded.mintTea === 2 && upgraded.crumbPouch,
+    'Five-bed saves preserve every existing bed, mint timer, inventory, prepared tea and pouch');
+  check(upgraded.beds[DAISY_BED].crop === 'daisy' && upgraded.beds[DAISY_BED].stage === 'grown' && upgraded.daisies === 0,
+    'Existing decorative daisies become a ready-to-pick bed on an older save');
+  const empty = freshGarden(); empty.beds = empty.beds.map(bed => ({ ...bed, stage: 'empty' }));
+  check(!gardenActionAllowed(empty, { kind: 'plant', bed: 0, crop: 'daisy' }) && !gardenActionAllowed(empty, { kind: 'plant', bed: DAISY_BED, crop: 'carrot' }),
+    'Daisies keep their own bed without changing vegetable planting choices');
   const invalid = freshGarden(); invalid.beds[0] = { crop: 'carrot', stage: 'growing', wateredAt: 'bad' };
   check(readGarden(JSON.stringify(invalid)).beds[0].stage === 'sprout', 'Malformed growth timestamps recover as waterable sprouts');
   engine.setCompanions([]); engine.setGarden(freshGarden()); engine.setBlocked(false); engine.travel('mood');
@@ -377,8 +405,19 @@ export async function checkGentleGrowth(engine, capture, save) {
   engine.travel('garden'); const growing = freshGarden();
   growing.beds[2] = { crop: 'carrot', stage: 'growing', wateredAt: Date.now() - 150000 };
   growing.beds[MINT_BED] = { crop: 'mint', stage: 'growing', wateredAt: Date.now() - 90000 };
+  growing.beds[DAISY_BED] = { crop: 'daisy', stage: 'growing', wateredAt: Date.now() - 90000 };
   engine.setGarden(growing); await delay(1200);
   check(engine.garden.beds[MINT_BED].mint.visible && engine.garden.beds[MINT_BED].root.scale.y > .5 && engine.garden.beds[MINT_BED].root.scale.y < .7, 'Mint visibly grows in its own bed');
+  const daisy = engine.garden.beds[DAISY_BED];
+  check(daisy.daisy.visible && daisy.root.scale.y > .5 && daisy.root.scale.y < .7 && engine.garden.clocks[DAISY_BED].sprite.visible,
+    'Daisies visibly grow with a countdown in their raised bed');
+  const harvested = gardenAction(growGarden(growing, Date.now() + GROWTH_MS.daisy), { kind: 'harvest', bed: DAISY_BED });
+  engine.setGarden(harvested); engine.gardenAction({ kind: 'harvest', bed: DAISY_BED });
+  engine.garden.update(.016, engine.garden.time + .1, false);
+  check(!daisy.daisy.visible && !daisy.sprout.visible && engine.garden.harvest.name === 'Daisy', 'Picking daisies clears the flowers and animates a daisy harvest');
+  const replanted = gardenAction(harvested, { kind: 'plant', bed: DAISY_BED, crop: 'daisy' }); engine.setGarden(replanted);
+  check(daisy.sprout.visible && !daisy.daisy.visible, 'Replanting restores sprouts instead of full-size daisies');
+  engine.setGarden(growing);
   const soil = []; engine.garden.group.traverse(o => { if (o.material?.name === 'Painted garden soil') soil.push(o); });
   check(soil.length > 0 && soil.every(o => o.material.map === engine.world.gardenSurfaces.ground.map), 'Garden soil uses the painted world ground texture');
   check(engine.garden.group.children.some(o => o.material === engine.world.gardenSurfaces.paving), 'Flower borders reuse the exact footpath material');
@@ -393,14 +432,14 @@ export async function checkGardenDetails(engine, capture, save) {
   const results = [], check = (ok, label) => { if (!ok) throw Error(label); results.push(label); };
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   const start = 1800000000000;
-  for (const crop of ['carrot', 'radish', 'mint']) {
+  for (const crop of ['carrot', 'radish', 'mint', 'daisy']) {
     const bed = { crop, stage: 'growing', wateredAt: start };
     check(growthTimeLeft(bed, start) === `${GROWTH_MS[crop] / 60000}:00`, `${crop}: countdown starts at its full growth duration`);
     check(growthTimeLeft(bed, start + GROWTH_MS[crop] - 1) === '0:01', `${crop}: partial seconds round up until ready`);
     check(growthTimeLeft(bed, start + GROWTH_MS[crop] + 10000) === '0:00', `${crop}: countdown never becomes negative`);
   }
   const garden = engine.garden;
-  check(garden.labels.length === 8 && garden.labels.every(label => label.text), 'All five crop beds and three flower beds have named wooden labels');
+  check(garden.labels.length === 8 && garden.labels.every(label => label.text), 'All six growing beds and two decorative flower borders have named wooden labels');
   engine.setLanguage('ja');
   check(garden.labels[MINT_BED].text === 'ミント・お茶の葉' && garden.labels.some(label => label.text === 'ひまわり'), 'Mint and flower labels follow the Japanese setting');
   engine.setLanguage('en');

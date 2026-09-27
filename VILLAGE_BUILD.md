@@ -1,5 +1,19 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-27 tea seating and daisy growing
+
+The tea activity previously checked only the 4 m circle around its arrival point `(15.6,-6.8)`, missing the west/back bench approach shown in the user's screenshot. A second interaction anchor at `(14.7,-10)` covers the seating and pergola approaches; either area offers the same E/click action. Arrival/exit positions and other place ranges are unchanged.
+
+The daisies reuse the existing raised-bed geometry and timed crop system as bed 6 at `(27.2,-1)`. They begin grown, can be harvested and replanted, need one watering, grow for three minutes, then remain ready indefinitely. Countdown, growing geometry, harvest animation, inventory, Luma's held-daisy/thank-you reaction and both languages are connected to the existing shared paths. The generic decorative watering action moves to the sunflower border so it cannot shadow daisy tending. No new dependencies, artwork downloads or hosting changes.
+
+`readGarden` adds the new bed and `daisies` count to older local saves without changing the storage key or resetting the first five beds, their watering dates, inventory, prepared tea or crumb pouch. Validation restricts daisy seeds to their own bed and preserves carrot/radish choice in vegetable beds.
+
+Verification: root-path static export, standalone TypeScript and diff checks pass. Chrome 154 and Firefox 142 each pass 32 interaction assertions, 59 growth/save/scene assertions, 22 countdown/layout assertions (including 224 clear aisle samples), and 89 existing garden/pond/companion regressions. [Chrome results](docs/village/evidence/tea-daisy-chrome.json), [Firefox results](docs/village/evidence/tea-daisy-firefox.json). Reproduce with `python3 scripts/village/preview_qa.py --port 3035 --evidence-prefix tea-daisy-`, then Load village, Check nearby interaction keys, Check growing garden and Luma tea, Check garden labels and countdowns, and Review garden, pond and companions.
+
+Exported-app verification in isolated [Chrome 154](docs/village/evidence/tea-daisy-chrome-ui.json) and [Firefox 142](docs/village/evidence/tea-daisy-firefox-ui.json) passes actual walking behind the bench, pointer capture, E entry/release, button entry and visible exit; older-save initialization, daisy harvest/replant/watering, countdown persistence after reload, a real three-minute wait, the next harvest and Luma's thank-you. Chrome also checks 390×844 countdown/exit layout. Inspected the [raised bed](docs/village/evidence/tea-daisy-garden-front-alignment.png), [tea approach](docs/village/evidence/tea-daisy-chrome-tea-approach.png), [phone countdown](docs/village/evidence/tea-daisy-chrome-phone-countdown.png) and [held daisy/heart](docs/village/evidence/tea-daisy-chrome-luma-daisy.png).
+
+[Japanese simple view at 390×844](docs/village/evidence/tea-daisy-japanese-simple.json) also passes harvesting, replanting, watering and the visible countdown. No application errors occurred. Chrome reports font-preload warnings; Firefox also reports the existing WebGL upload/depth-filtering compatibility warnings. Existing build warnings concern workspace lockfiles, Browserslist age and the unrelated RoomScene image. Physical touch and sustained device performance are outside this focused follow-up. The implementation is ready for the requested publication through the existing main → Pages workflow.
+
 ## 2026-09-27 nearby interaction fix
 
 Reproduced at `(15.2, -8.1)`: the nearest activity was `mood`, the garden target was `tea`, and `mintTea` was zero. E called `gardenInteract("tea")`, whose resolver returned null, while the UI offered “Take a quiet moment”. `VillageEngine.onKeyDown` now checks `nearbyGardenAction` before prioritizing that target, matching the React prompt and falling back to the nearby place. Growing crops use the same fallback; ripe crops and prepared tea retain their action priority.

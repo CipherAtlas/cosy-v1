@@ -5,7 +5,7 @@ import { VILLAGERS } from "./villagers";
 import { VillageNavigation } from "./navigation";
 import { ACTIVITY_STAGES } from "./activityScene";
 import type { PlaceId } from "./places";
-import type { Crop, GardenAction } from "./garden";
+import { CROP_MODELS, type Crop, type GardenAction } from "./garden";
 
 const COMPANION_STAGES: Record<PlaceId, [number, number, number][]> = {
   focus: [[107.6, .1, -.45], [109.8, .1, -.3], [107.3, .1, 1], [109.2, .1, 1.1]],
@@ -101,8 +101,8 @@ export class VillageLife {
         encounter: { state: "roam", path: [], time: 0, noticed: false, cooldown: 0, checkIn: 0 } });
     });
     const luma = this.residents[3].root;
-    for (const crop of ["carrot", "radish", "mint"] as const) {
-      const template = props?.getObjectByName(crop === "carrot" ? "Carrot" : crop === "radish" ? "Radish" : "Mint");
+    for (const crop of ["carrot", "radish", "mint", "daisy"] as const) {
+      const template = props?.getObjectByName(CROP_MODELS[crop]);
       if (template) { const gift = template.clone(true); gift.visible = false; luma.add(gift); this.giftProps.set(crop, gift); }
     }
     const heart = new T.Shape(); heart.moveTo(0, -.4);

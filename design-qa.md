@@ -4,6 +4,10 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current release does not close those findings.
 
+## 2026-09-27 tea seating and growing daisies
+
+The wider tea-seating approach and raised daisy bed are verified in the running renderer. Chrome/Firefox pass the exported-app tea entry/exit, real three-minute daisy grow/harvest cycle, reload persistence and Luma's held-daisy reaction; Chrome phone dimensions retain readable controls and an explicit exit. [Evidence and limits](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing). The broader art/device verdict remains unchanged.
+
 ## 2026-09-27 garden readability and ground follow-up
 
 Added growing-crop circular countdowns in the world and activity controls, bilingual wooden labels for all eight planting beds, and recognizable serrated green mint leaves. Aligned the mint/daisy row and replaced inconsistent inner paths/grass patches with a continuous paved court joined to tea. Inspected front, activity and mint-detail views; desktop and 390×844 UI show readable ticking rings, including resumed progress after reload. Typecheck/static export, 19 focused checks with 224 walking samples, and 89 garden/companion regressions pass. [Evidence and boundaries](VILLAGE_BUILD.md#2026-09-27-garden-labels-countdowns-and-ground). Local only; broader art/device acceptance remains open.
