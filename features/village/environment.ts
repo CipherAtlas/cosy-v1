@@ -37,11 +37,11 @@ export type Collider = {
 
 export const riverX = (z: number) => -11 + Math.sin(z * 0.052) * 3;
 export const roadX = (z: number) => Math.sin(z * 0.048) * 2;
-export const HEARTH = { x: -5.8, z: -19, radius: 1 };
+export const HEARTH = { x: -5.8, z: -19, radius: 1, pavingRadius: 3.6, pavingHeight: .14 };
 export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3 };
 export const POND = { x: -27, z: -14, rx: 9, rz: 12, y: -.3 };
 export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
-export const BIRD_CLEARING = { x: -24, z: -31, radius: 3.8 };
+export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5 };
 
 export function pondDistance(x: number, z: number) {
   return Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz);
@@ -72,13 +72,19 @@ export function onBridge(x: number, z: number) {
   return Math.abs(x - BRIDGE.x) <= BRIDGE.length / 2 && Math.abs(z - BRIDGE.z) <= BRIDGE.width / 2;
 }
 export function surfaceAt(x: number, z: number): Surface {
-  if (Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.6) return "stone";
+  if (Math.hypot(x - BIRD_CLEARING.x, z - BIRD_CLEARING.z) < BIRD_CLEARING.radius) return "stone";
+  if (Math.hypot((x + 24) / 3.8, (z + 29.5) / 3.2) < 1) return "stone";
+  if (Math.hypot(x - HEARTH.x, z - HEARTH.z) < HEARTH.pavingRadius) return "stone";
   if (onPondDock(x, z)) return "wood";
   if (onBridge(x, z) || Math.abs(x - roadX(z)) < 1.75 || (Math.abs(z - 3) < 1.25 && x < 1)) return "stone";
   if (Math.abs(x - roadX(z)) < 2.4) return "soil";
   return "grass";
 }
 export function floorHeight(x: number, z: number) {
+  if (Math.hypot(x - BIRD_CLEARING.x, z - BIRD_CLEARING.z) < BIRD_CLEARING.radius) return .1;
+  if (Math.hypot((x + 24) / 3.8, (z + 29.5) / 3.2) < 1)
+    return Math.max(landscapeHeight(x + 39.5, z + 19.1), 0) + .10067727470825035;
+  if (Math.hypot(x - HEARTH.x, z - HEARTH.z) < HEARTH.pavingRadius) return HEARTH.pavingHeight;
   if (onBridge(x, z)) return bridgeHeight(x);
   if (surfaceAt(x, z) === "wood") return dockHeight(x);
   return Math.max(landscapeHeight(x, z), surfaceAt(x, z) === "stone" ? 0.05 : 0);

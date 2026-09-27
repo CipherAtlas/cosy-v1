@@ -4,6 +4,22 @@ import { BIRD_CLEARING } from "./environment";
 export type BirdStatus = "flying" | "crumbs" | "waiting" | "eating" | "happy";
 export const BIRD_THANKS = { en: "Coo coo~ (Thank you~)", ja: "クークー〜（ありがとう〜）" };
 
+// Landing positions from the saved “Current village copy”.
+export const BIRD_LANDING_SPOTS: [number, number][] = [
+  [-35.95, 3.993025],
+  [-35.441154, 4.893025],
+  [-36.475, 4.902352],
+  [-36, 2],
+  [-37.525, 4.993025],
+  [-38.558846, 4.893025],
+  [-38.05, 3.993025],
+  [-38.558846, 3.093025],
+  [-37.525, 3.083698],
+  [-37, 2.193025],
+  [-36.475, 3.083698],
+  [-35.441154, 3.093025],
+];
+
 /** One flock, with continuous takeoff/circuit/landing and one meal per visit. */
 export class BirdFlock {
   readonly group = new T.Group();
@@ -20,6 +36,12 @@ export class BirdFlock {
   private crumbs: T.InstancedMesh;
   private dummy = new T.Object3D();
   private next = new T.Vector3();
+  // Lift along the open eastern approach, circle the pond above the canopies,
+  // then descend from the west without crossing the birdwatching bench.
+  private flightRoute = new T.CatmullRomCurve3([
+    [0, 0, 0], [6, 8, 1], [14, 16, -6], [14, 19, -24],
+    [3, 21, -31], [-6, 19, -23], [-8, 14, -10], [-5, 7, -1], [0, 0, 0],
+  ].map(([x, y, z]) => new T.Vector3(x, y, z)));
   private bubble = document.createElement("div");
   private projected = new T.Vector3();
   private language: "en" | "ja" = "en";
@@ -34,10 +56,10 @@ export class BirdFlock {
     if (!template) throw new Error("The dove asset is missing its named root.");
     for (let i = 0; i < 12; i++) {
       const root = template.clone(true);
-      const angle = i * Math.PI * 2 / 12, radius = i % 2 ? 1.8 : 1.05;
+      const [x, z] = BIRD_LANDING_SPOTS[i];
       this.birds.push({ root, head: root.getObjectByName("DoveHead")!,
         wings: [root.getObjectByName("DoveWingLeft")!, root.getObjectByName("DoveWingRight")!],
-        landing: new T.Vector3(BIRD_CLEARING.x + Math.cos(angle) * radius, .13, BIRD_CLEARING.z + Math.sin(angle) * radius) });
+        landing: new T.Vector3(x, .13, z) });
     }
     template.traverse(node => {
       if (!(node instanceof T.Mesh)) return;
@@ -80,13 +102,8 @@ export class BirdFlock {
   }
   private flightPosition(index: number, age: number, target: T.Vector3) {
     const bird = this.birds[index], t = T.MathUtils.clamp(age / 30, 0, 1);
-    const angle = t * Math.PI * 2;
-    // The circuit starts and ends exactly on this bird's own landing spot.
-    const lift = T.MathUtils.smoothstep(age, 0, 4) * (1 - T.MathUtils.smoothstep(age, 26, 30));
-    target.copy(bird.landing);
-    target.x += Math.sin(angle) * (17 + index * .22);
-    target.z += (1 - Math.cos(angle)) * (21 + index * .18);
-    target.y += lift * (12 + (index % 3) * .65);
+    this.flightRoute.getPointAt(t, target).add(bird.landing);
+    target.y += Math.sin(t * Math.PI) ** 2 * (index % 3) * .65;
     return target;
   }
   update(dt: number, time: number, reduced: boolean, camera: T.Camera, player: T.Vector3, caretaker: boolean, visible: boolean) {

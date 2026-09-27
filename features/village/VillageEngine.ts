@@ -16,7 +16,7 @@ import { GARDEN_TARGETS, freshGarden, nearbyGardenAction, type GardenState, type
 import type { ActivityMoment } from "./environment";
 import { softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
-import { floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
+import { BIRD_CLEARING, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
 
@@ -420,10 +420,10 @@ export class VillageEngine {
     this.scene.add(this.life.group);
     this.birds = new BirdFlock(dove.scene, this.host, status => {
       this.callbacks.birds?.(status);
-      if (status === "happy") this.callbacks.gardenSound?.("coo", [-24, .6, -31]);
+      if (status === "happy") this.callbacks.gardenSound?.("coo", [BIRD_CLEARING.x, .6, BIRD_CLEARING.z]);
     }, caretaker => {
       if (caretaker) this.life?.feedBirds();
-      this.callbacks.gardenSound?.("crumbs", [-24, .4, -31]);
+      this.callbacks.gardenSound?.("crumbs", [BIRD_CLEARING.x, .4, BIRD_CLEARING.z]);
     });
     this.scene.add(this.birds.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
@@ -808,8 +808,8 @@ export class VillageEngine {
       this.cameraGoal.x = this.lookGoal.x + (this.cameraGoal.x - this.lookGoal.x) * 1.8;
       this.cameraGoal.z = this.lookGoal.z + (this.cameraGoal.z - this.lookGoal.z) * 1.8;
     } else if (this.compactView && place === "birds") {
-      this.lookGoal.set(-24, .3, -31);
-      this.cameraGoal.set(-17, 7.3, -20.5);
+      this.lookGoal.set(BIRD_CLEARING.x, .3, BIRD_CLEARING.z);
+      this.cameraGoal.set(BIRD_CLEARING.x + 7, 7.3, BIRD_CLEARING.z + 10.5);
     } else if(this.compactView) {
       this.temp.fromArray(stage.actor).y+=1.1;
       this.lookGoal.lerp(this.temp,.7);

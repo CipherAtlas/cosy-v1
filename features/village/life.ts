@@ -15,7 +15,7 @@ const COMPANION_STAGES: Record<PlaceId, [number, number, number][]> = {
   mood: [[13.9, .4, -10.85], [13.9, .4, -9.15], [16.5, .1, -8.5], [16.5, .1, -11.5], [17,.1,-10]],
   gratitude: [[-18.1, .05, 5.2], [-17, .05, 6.6], [-18.1, .05, 7.8], [-17, .05, 8.1], [-16,.05,7.8]],
   compliment: [[2, .05, .5], [4.1, .05, .5], [2.5, .05, 1.6], [3.8, .05, 1.6], [4.8,.05,1.6]],
-  birds: [[-25.5,.05,-27.8],[-22.5,.05,-27.8],[-26.8,.05,-28.4],[-21.2,.05,-28.4],[-27,.05,-31.5]],
+  birds: [[-38.5,.1,6.5],[-35.5,.1,6.5],[-39.8,.1,5.9],[-34.2,.1,5.9],[-38,.1,1.5]],
   garden: [[24.4, .05, -7.3], [20, .05, -7.5], [28.3, .05, -7.4], [25, .05, -3], [29,.05,-4]],
 };
 
@@ -63,7 +63,7 @@ export class VillageLife {
       // Tea garden, central junction and the open garden perimeter.
       [[13.8, -6.8], [12.8, -7.5], [9, -7.8], [6.5, -7.8], [4, -3], [.5, 1],
         [-1.2, -3], [-.8, -9], [4, -10], [8, -10], [12, -14.5], [18, -14.5], [19, -7.5], [17, -5.8]],
-      [[-27, -31.5], [-27.2, -33], [-25.8, -33.5], [-27, -31.5]],
+      [[-38, 1.5], [-38.8, 1.8], [-37.5, 2], [-36, 1.5]],
     ];
     routes.forEach((route, i) => {
       const root = source.clone(true);
@@ -88,6 +88,7 @@ export class VillageLife {
       const movement = new VillageMovement(colliders, () => {});
       movement.settle(...route[0]);
       actor.position.set(movement.position.x, movement.position.y, movement.position.z);
+      if (i === 4) actor.rotation.y = Math.PI / 4;
       this.group.add(actor);
       actor.name = VILLAGERS[i].name.en;
       const cup = new T.Group(); cup.visible = false; actor.add(cup);

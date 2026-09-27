@@ -77,9 +77,9 @@ export const PLACES = [
     name: "Bird clearing",
     activity: "Feed the birds",
     description: "A little sourdough, a chorus of coos.",
-    position: [-20.5, 0, -28.5],
-    camera: [-18, 4.5, -24],
-    look: [-24, .7, -31],
+    position: [-33.5, 0, 4],
+    camera: [-31, 4.5, 11],
+    look: [-37, .7, 4],
     prompt: "Visit the bird clearing",
   },
 ] as const;

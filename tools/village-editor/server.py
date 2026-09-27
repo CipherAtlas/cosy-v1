@@ -44,12 +44,14 @@ def validate(doc):
                 raise ValueError(f'Invalid {key}.')
         path = item.get('path')
         if path is not None:
-            if item['asset'] != 'custom-path' or not isinstance(path, dict) or type(path.get('width')) not in (int, float) or not .3 <= path['width'] <= 20:
+            if item['asset'] not in ('custom-path', 'path-straight', 'path-curved') or not isinstance(path, dict) or type(path.get('width')) not in (int, float) or not .3 <= path['width'] <= 20:
                 raise ValueError('Invalid path width.')
             points = path.get('points')
             if not isinstance(points, list) or not 2 <= len(points) <= 100 or any(not isinstance(p, list) or len(p) != 2 or any(type(n) not in (int, float) or not math.isfinite(n) or abs(n) > 2000 for n in p) for p in points):
                 raise ValueError('Invalid path points.')
-        elif item['asset'] == 'custom-path':
+            if all(math.hypot(p[0] - points[0][0], p[1] - points[0][1]) < .01 for p in points):
+                raise ValueError('A path needs two distinct points.')
+        elif item['asset'] in ('custom-path', 'path-straight', 'path-curved'):
             raise ValueError('A path needs control points.')
     return doc
 

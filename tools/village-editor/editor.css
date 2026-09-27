@@ -1428,3 +1428,26 @@ dialog h3 span {
     animation:none!important
   }
 }
+
+.selection-marquee {
+  position:absolute;
+  border:1px solid #355e4d;
+  background:#92b78338;
+  box-shadow:0 0 0 1px #fff8 inset;
+  pointer-events:none;
+  z-index:4;
+}
+.clipboard-actions {
+  display:flex;
+  gap:6px;
+  margin-top:18px;
+}
+.clipboard-actions button {
+  flex:1;
+  min-width:0;
+}
+
+.land-directions { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+#land-settings h3 { margin-top:20px; }
+#path-settings button { margin:4px 4px 4px 0; }
+.collision-toggle { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; }

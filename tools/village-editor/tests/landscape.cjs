@@ -1,0 +1,51 @@
+// Run against a studio server using --layouts-dir with a temporary directory.
+const { chromium }=require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const assert=require('node:assert/strict');
+const url=process.env.STUDIO_URL || 'http://127.0.0.1:3041';
+const screenshot=process.env.STUDIO_SCREENSHOT || '/tmp/cosy-studio-ground-paths.png';
+(async()=>{const browser=await chromium.launch({channel:'chrome',headless:true});try{
+ const p=await browser.newPage({viewport:{width:1560,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+ await p.goto(url);await p.waitForFunction(()=>window.cosyStudio,null,{timeout:60000});
+ const snapshot=()=>p.evaluate(()=>window.cosyStudio.snapshot()); const selected=async()=>{const s=await snapshot(),id=await p.evaluate(()=>window.cosyStudio.selection()[0]);return s.layout.objects.find(o=>o.id===id)};
+ const fill=async(name,value)=>{const f=p.getByRole('spinbutton',{name,exact:true});await f.fill(String(value));await f.press('Tab')};
+ const shelf=async(query)=>{await p.getByRole('tab',{name:'Assets',exact:true}).click();await p.getByRole('searchbox').fill(query)};
+ const point=async(id)=>p.evaluate(id=>window.cosyStudio.screenPoint(id),id);
+ const place=async(name,x,y)=>{await p.getByRole('button',{name:'Place '+name,exact:true}).click();await p.mouse.move(x,y);await p.mouse.click(x,y)};
+ await p.getByRole('button',{name:'Top down',exact:true}).click();
+ await shelf('Meadow ground'); const canvas=await p.locator('#viewport > canvas').boundingBox();
+ await place('Meadow ground · 40 m',canvas.x+canvas.width*.75,canvas.y+canvas.height*.65);
+ await fill('Position X',70);await fill('Position Z',0);await fill('Position Y',10);let land=await selected();assert.equal(land.asset,'land-tile-40');
+ await p.getByRole('button',{name:'↑ North',exact:true}).click();let next=await selected();assert.deepEqual(next.position,[70,10,-40]);
+ console.log('PASS ground placement, elevation and connected perimeter extension');
+ await p.getByRole('button',{name:'Focus',exact:true}).click();let pt=await point(next.id);
+ await shelf('grass');await place('Meadow grass patch',pt.x,pt.y);let grass=await selected();assert.equal(grass.asset,'grass-patch');assert(Math.abs(grass.position[1]-10)<.1);
+ console.log('PASS grass snaps to expanded elevated ground');
+ await shelf('Straight limestone');await place('Straight limestone path',pt.x,pt.y);let path=await selected();assert.equal(path.path.points.length,2);assert(Math.abs(path.position[1]-10)<.1);
+ await fill('Length (metres)',12);await fill('Width (metres)',3);await p.getByRole('button',{name:'Extend by 5 m',exact:true}).click();path=await selected();assert.equal(path.path.points.length,3);assert(Math.abs(path.path.points.at(-1)[1]+17)<.1);
+ await p.getByRole('combobox',{name:'Path shape',exact:true}).selectOption('curved');path=await selected();assert.equal(path.asset,'path-curved');
+ await p.getByRole('button',{name:'Continue on map',exact:true}).click();await p.mouse.click(pt.x+100,pt.y-100);await p.getByRole('button',{name:'Finish path',exact:true}).click();path=await selected();assert.equal(path.path.points.length,4);
+ console.log('PASS straight/curved paths, length, width and extension on map');
+ await shelf('');await p.screenshot({path:screenshot});
+ await p.getByRole('button',{name:'Focus',exact:true}).click();
+ // Return to the tile centre to exercise solid placement on its surface.
+ await p.getByRole('tab',{name:/Scene/}).click();await p.getByRole('searchbox').fill('Meadow ground');await p.locator('.scene-select').last().click();await p.getByRole('button',{name:'Focus',exact:true}).click();pt=await point(next.id);
+ await shelf('Bluebell');await place('Bluebell cottage',pt.x+85,pt.y+70);let house=await selected();assert.equal(house.asset,'cottage-1');
+ await fill('Position Y',-100);house=await selected();assert(house.position[1]>=9.9);
+ pt=await point(house.id);let count=(await snapshot()).layout.objects.length;
+ await place('Bluebell cottage',pt.x,pt.y);assert.equal((await snapshot()).layout.objects.length,count);assert((await p.locator('#toast').textContent()).includes('overlaps'));
+ await p.keyboard.press('Escape');console.log('PASS solid overlap rejection and object grounding');
+ await p.getByLabel('Avoid solid overlaps',{exact:true}).uncheck();await place('Bluebell cottage',pt.x,pt.y);assert.equal((await snapshot()).layout.objects.length,count+1);await p.getByRole('button',{name:'Undo',exact:true}).click();await p.getByLabel('Avoid solid overlaps',{exact:true}).check();
+ console.log('PASS intentional layering override and undo');
+ await p.getByRole('button',{name:'Save layout',exact:false}).click();await p.waitForFunction(()=>window.cosyStudio.snapshot().fileId);let saved=await snapshot();const disk=await(await p.request.get(url+'/api/layouts/'+saved.fileId)).json();assert.deepEqual(disk.layout,saved.layout);
+ await p.reload();await p.waitForFunction(()=>window.cosyStudio);assert.deepEqual((await snapshot()).layout,saved.layout);console.log('PASS local save/reload for grass, ground and extended paths');
+ const collision=await p.evaluate(async()=>{
+   const T=await import('/three/build/three.module.js'),{StudioCollision}=await import('/modules/tools/village-editor/spatial.js');
+   const wall=new T.Mesh(new T.BoxGeometry(4,6,.2),new T.MeshBasicMaterial());wall.position.y=3;const template=new T.Group();template.add(wall);
+   const item={id:'wall',asset:'wall',name:'Wall',position:[0,0,0],rotation:[0,45,0],scale:[1,1,1],visible:true,locked:true};
+   const root=template.clone();root.rotation.y=Math.PI/4;root.updateMatrixWorld(true);
+   const model={assets:new Map([['wall',{template,solid:true}]]),roots:new Map([['wall',root]])};const c=new StudioCollision(model);c.refresh({objects:[item]});
+   const result=c.moveCamera(new T.Vector3(0,3,10),new T.Vector3(0,3,-10));
+   return {position:result.toArray(),solid:c.solid(item).containsPoint(result)};
+ });assert(collision.position[2]>0);assert(!collision.solid);console.log('PASS camera sweep cannot tunnel through a thin rotated wall');
+ assert.deepEqual(errors,[]);console.log('PASS no JavaScript/renderer errors');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

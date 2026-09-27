@@ -2,6 +2,7 @@ import * as T from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { buildWorld, type WorldLayoutCapture, type World } from "../../features/village/world";
 import { BIRD_CLEARING } from "../../features/village/environment";
+import { BIRD_LANDING_SPOTS } from "../../features/village/birds";
 import { VillageLife } from "../../features/village/life";
 import { GardenScene } from "../../features/village/gardenScene";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -12,7 +13,15 @@ export type LayoutItem = {
   path?: { points: [number, number][]; width: number };
 };
 export type Layout = { version: 1; base: "cosy-village-2026-09-27"; name: string; objects: LayoutItem[] };
-export type Asset = { id: string; name: string; category: string; template: T.Object3D; thumbnail?: string; shelf: boolean };
+export type Asset = { id: string; name: string; category: string; template: T.Object3D; thumbnail?: string; shelf: boolean; surface?: boolean; solid?: boolean; path?: LayoutItem["path"] };
+export const PATH_ASSETS = ["custom-path", "path-straight", "path-curved"];
+export function pathCurve(path: NonNullable<LayoutItem["path"]>, straight = false): T.Curve<T.Vector3> {
+  const points = path.points.map(([x, z]) => new T.Vector3(x, .09, z));
+  if (!straight) return new T.CatmullRomCurve3(points);
+  const curve = new T.CurvePath<T.Vector3>();
+  for (let i = 1; i < points.length; i++) curve.add(new T.LineCurve3(points[i - 1], points[i]));
+  return curve;
+}
 const tuple = (v: T.Vector3): [number, number, number] => v.toArray().map(n => Math.round(n * 1e6) / 1e6) as [number, number, number];
 export function readTransform(object: T.Object3D) {
   return { position: tuple(object.position), rotation: [object.rotation.x, object.rotation.y, object.rotation.z].map(n => Math.round(T.MathUtils.radToDeg(n) * 1e6) / 1e6) as [number, number, number], scale: tuple(object.scale) };
@@ -36,8 +45,9 @@ export function validateLayout(value: unknown, assets?: Map<string, Asset>): Lay
       const a = item[key];
       if (!Array.isArray(a) || a.length !== 3 || a.some(n => !Number.isFinite(n) || Math.abs(n) > (key === "position" ? 2000 : key === "rotation" ? 36000 : 100) || (key === "scale" && n < .01))) throw Error(`Invalid ${key} on ${item.name}.`);
     }
-    if (item.path && (item.asset !== "custom-path" || !Number.isFinite(item.path.width) || item.path.width < .3 || item.path.width > 20 || !Array.isArray(item.path.points) || item.path.points.length < 2 || item.path.points.length > 100 || item.path.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || Math.abs(n) > 2000)))) throw Error("Invalid path: use 2–100 points and a width of 0.3–20 metres.");
-    if (item.asset === "custom-path" && !item.path) throw Error("A custom path needs its control points.");
+    if (item.path && (!PATH_ASSETS.includes(item.asset) || !Number.isFinite(item.path.width) || item.path.width < .3 || item.path.width > 20 || !Array.isArray(item.path.points) || item.path.points.length < 2 || item.path.points.length > 100 || item.path.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || Math.abs(n) > 2000)))) throw Error("Invalid path: use 2–100 points and a width of 0.3–20 metres.");
+    if (item.path && item.path.points.every(point => Math.hypot(point[0] - item.path!.points[0][0], point[1] - item.path!.points[0][1]) < .01)) throw Error("A path needs two distinct points.");
+    if (PATH_ASSETS.includes(item.asset) && !item.path) throw Error("A custom path needs its control points.");
   }
   return structuredClone(doc);
 }
@@ -150,10 +160,10 @@ export class LayoutScene {
       originals.push({ id: `resident-${name.toLowerCase()}`, asset: id, name, position, rotation: [0, 0, 0], scale: [1, 1, 1], visible: true, locked: false });
     });
     for (let i = 0; i < 12; i++) {
-      const angle = i * Math.PI * 2 / 12, radius = i % 2 ? 1.8 : 1.05;
+      const [x, z] = BIRD_LANDING_SPOTS[i];
       originals.push({ id: `dove-${i + 1}`, asset: "white-dove", name: `White dove ${i + 1}`,
-        position: [BIRD_CLEARING.x + Math.cos(angle) * radius, .13, BIRD_CLEARING.z + Math.sin(angle) * radius],
-        rotation: [0, -T.MathUtils.radToDeg(angle), 0], scale: [1, 1, 1], visible: true, locked: false });
+        position: [x, .13, z],
+        rotation: [0, T.MathUtils.radToDeg(Math.atan2(BIRD_CLEARING.x - x, BIRD_CLEARING.z - z)), 0], scale: [1, 1, 1], visible: true, locked: false });
     }
     residents.dispose();
     const raisedBed = new T.Group();
@@ -170,9 +180,61 @@ export class LayoutScene {
     const meadow = new T.Mesh(new T.CylinderGeometry(12, 13, 1.2, 48), new T.MeshStandardMaterial({ color: "#98b760", roughness: 1 }));
     meadow.position.y = -.6; meadow.receiveShadow = true; const tile = new T.Group(); tile.add(meadow);
     this.assets.set("meadow-island", { id: "meadow-island", name: "Meadow platform", category: "Landscape", template: tile, shelf: true });
+    for (const [id, name, points] of [
+      ["path-straight", "Straight limestone path", [[0, 0], [0, -8]]],
+      ["path-curved", "Curved limestone path", [[0, 0], [0, -4], [2, -6], [6, -6]]],
+    ] as [string, string, [number, number][]][]) {
+      const path = { points, width: 2.4 };
+      this.assets.set(id, { id, name, category: "Paths", template: this.makePath(path, id === "path-straight"), shelf: true, path });
+    }
+    // Reuse the village's blades, wind material and shadows in small editable patches.
+    let grassSource: T.InstancedMesh | undefined;
+    this.assets.get("meadow-grass")!.template.traverse(o => { if (o instanceof T.InstancedMesh) grassSource = o; });
+    for (const [id, name, width, count] of [
+      ["grass-tuft", "Grass tuft", 1, 18], ["grass-patch", "Meadow grass patch", 6, 520], ["grass-wide", "Wide meadow grass", 14, 2400],
+    ] as [string, string, number, number][]) {
+      const blades = new T.InstancedMesh(grassSource!.geometry, grassSource!.material, count), dummy = new T.Object3D();
+      let seed = 71; const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+      for (let i = 0; i < count; i++) {
+        dummy.position.set((random() - .5) * width, 0, (random() - .5) * width);
+        dummy.rotation.y = random() * Math.PI * 2; dummy.scale.setScalar(.65 + random() * .8); dummy.updateMatrix(); blades.setMatrixAt(i, dummy.matrix);
+        blades.setColorAt(i, new T.Color().setHSL(.22 + random() * .055, .55, .48 + random() * .15));
+      }
+      blades.customDepthMaterial = grassSource!.customDepthMaterial; blades.receiveShadow = true;
+      const root = new T.Group(); root.add(blades); this.assets.set(id, { id, name, category: "Nature", template: root, shelf: true });
+    }
+    let sourceGround!: T.MeshStandardMaterial;
+    this.assets.get("terrain")!.template.traverse(o => { if (o instanceof T.Mesh) sourceGround = o.material as T.MeshStandardMaterial; });
+    const landMaterial = sourceGround.clone(); landMaterial.vertexColors = false; landMaterial.color.setHSL(.248, .54, .625);
+    landMaterial.onBeforeCompile = sourceGround.onBeforeCompile;
+    const groundUV = (geometry: T.BufferGeometry) => {
+      const p = geometry.attributes.position, uv = geometry.attributes.uv;
+      for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 650, p.getZ(i) / 650);
+      return geometry;
+    };
+    const landSide = new T.MeshStandardMaterial({ color: "#85865f", roughness: 1 });
+    for (const size of [20, 40]) {
+      const mesh = new T.Mesh(groundUV(new T.BoxGeometry(size, 2, size)), [landSide, landSide, landMaterial, landSide, landSide, landSide]);
+      mesh.position.y = -1; mesh.receiveShadow = true;
+      const root = new T.Group(); root.add(mesh); const id = `land-tile-${size}`;
+      this.assets.set(id, { id, name: `Meadow ground · ${size} m`, category: "Landscape", template: root, shelf: true, surface: true });
+    }
+    const hillGeometry = new T.PlaneGeometry(24, 24, 24, 24); hillGeometry.rotateX(-Math.PI / 2);
+    const vertices = hillGeometry.attributes.position;
+    for (let i = 0; i < vertices.count; i++) {
+      const radius = Math.min(1, Math.hypot(vertices.getX(i), vertices.getZ(i)) / 12);
+      vertices.setY(i, Math.pow(Math.cos(radius * Math.PI / 2), 2) * 4);
+    }
+    hillGeometry.computeVertexNormals(); const hill = new T.Mesh(groundUV(hillGeometry), landMaterial); hill.receiveShadow = true;
+    const hillRoot = new T.Group(); hillRoot.add(hill);
+    this.assets.set("land-hill", { id: "land-hill", name: "Gentle grassy hill", category: "Landscape", template: hillRoot, shelf: true, surface: true });
     const boulder = new T.Mesh(new T.IcosahedronGeometry(1.5, 1), new T.MeshStandardMaterial({ color: "#b6bea1", roughness: 1 }));
     boulder.scale.set(1.6, .75, 1); boulder.position.y = .6; boulder.castShadow = boulder.receiveShadow = true;
     const rock = new T.Group(); rock.add(boulder); this.assets.set("boulder", { id: "boulder", name: "Mossy boulder", category: "Nature", template: rock, shelf: true });
+    for (const asset of this.assets.values()) {
+      asset.surface ||= ["terrain", "shore", "meadow-island", "bridge", "dock"].includes(asset.id) || asset.id.startsWith("island-");
+      asset.solid = asset.category === "Buildings" || asset.category === "Bridges" || /^(bench-|fence-|lamp-|tree-|willow-)/.test(asset.id) || ["postbox", "raised-bed", "boulder", "bird-clearing-bench", "bird-feeding-dish"].includes(asset.id);
+    }
     this.original = { version: 1, base: "cosy-village-2026-09-27", name: "Current village", objects: originals };
     this.apply(this.original); progress(100);
   }
@@ -186,26 +248,78 @@ export class LayoutScene {
         root.removeFromParent(); this.releasePath(root); this.roots.delete(item.id); root = undefined;
       }
       if (!root) {
-        root = item.path ? this.makePath(item.path) : this.assets.get(item.asset)!.template.clone(true);
+        root = item.path ? this.makePath(item.path, item.asset === "path-straight") : this.assets.get(item.asset)!.template.clone(true);
         root.userData = { layoutId: item.id, asset: item.asset, path: structuredClone(item.path) };
         this.roots.set(item.id, root); this.group.add(root);
       }
       root.name = item.name; applyTransform(root, item);
     }
   }
+  conformPaths(height: (x: number, z: number) => number) {
+    for (const root of this.roots.values()) {
+      if (!root.userData.path) continue;
+      root.updateMatrixWorld(true);
+      const anchor = height(root.position.x, root.position.z);
+      root.traverse(object => {
+        if (!(object instanceof T.Mesh) || !object.geometry.userData.flatPositions) return;
+        const base = object.geometry.userData.flatPositions as number[], attribute = object.geometry.attributes.position;
+        for (let i = 0; i < attribute.count; i++) {
+          const point = new T.Vector3(base[i * 3], 0, base[i * 3 + 2]).applyMatrix4(object.matrixWorld);
+          const lift = height(point.x, point.z) - anchor + .09;
+          attribute.setY(i, Math.abs(object.matrixWorld.elements[5]) > .1 ? lift / object.matrixWorld.elements[5] : .09);
+        }
+        attribute.needsUpdate = true; object.geometry.computeVertexNormals(); object.geometry.computeBoundingBox(); object.geometry.computeBoundingSphere();
+      });
+    }
+  }
+  conformGrass(height: (x: number, z: number) => number, blocked: (point: T.Vector3) => boolean) {
+    const paths: { bounds: T.Box3; points: T.Vector3[]; width: number }[] = [];
+    for (const root of this.roots.values()) {
+      if (!root.visible || !root.userData.path) continue;
+      const mesh = root.children[0] as T.Mesh, positions = mesh.geometry.attributes.position, points: T.Vector3[] = [];
+      for (let i = 0; i < positions.count; i += 2) points.push(new T.Vector3().fromBufferAttribute(positions, i).add(new T.Vector3().fromBufferAttribute(positions, i + 1)).multiplyScalar(.5).applyMatrix4(root.matrixWorld));
+      paths.push({ bounds: new T.Box3().setFromObject(root).expandByScalar(.3), points, width: root.userData.path.width * Math.max(root.scale.x, root.scale.z) / 2 + .2 });
+    }
+    for (const root of this.roots.values()) {
+      const asset = root.userData.asset as string;
+      if (!root.visible || !(asset === "meadow-grass" || asset.startsWith("grass-"))) continue;
+      let source: T.InstancedMesh | undefined, blades: T.InstancedMesh | undefined;
+      this.assets.get(asset)!.template.traverse(o => { if (o instanceof T.InstancedMesh) source = o; });
+      root.traverse(o => { if (o instanceof T.InstancedMesh) blades = o; });
+      if (!source || !blades) continue;
+      const anchor = height(root.position.x, root.position.z), dummy = new T.Object3D(), matrix = new T.Matrix4();
+      for (let i = 0; i < source.count; i++) {
+        source.getMatrixAt(i, matrix); matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
+        const point = dummy.position.clone().applyMatrix4(root.matrixWorld);
+        if (asset !== "meadow-grass" && Math.abs(root.matrixWorld.elements[5]) > .1) dummy.position.y += (height(point.x, point.z) - anchor) / root.matrixWorld.elements[5];
+        point.copy(dummy.position).applyMatrix4(root.matrixWorld); point.y += .15;
+        const covered = paths.some(path => {
+          if (point.x < path.bounds.min.x || point.x > path.bounds.max.x || point.z < path.bounds.min.z || point.z > path.bounds.max.z) return false;
+          for (let n = 1; n < path.points.length; n++) {
+            const closest = new T.Line3(path.points[n - 1], path.points[n]).closestPointToPoint(point, true, new T.Vector3());
+            if (Math.abs(point.y - closest.y) < .6 && Math.hypot(point.x - closest.x, point.z - closest.z) < path.width) return true;
+          }
+          return false;
+        });
+        if (covered || blocked(point)) dummy.scale.setScalar(0);
+        dummy.updateMatrix(); blades.setMatrixAt(i, dummy.matrix);
+      }
+      blades.instanceMatrix.needsUpdate = true; blades.computeBoundingBox(); blades.computeBoundingSphere();
+    }
+  }
   private releasePath(root: T.Object3D) {
     if (!root.userData.path) return;
     root.traverse(o => { if (o instanceof T.Mesh && this.generated.delete(o.geometry)) o.geometry.dispose(); });
   }
-  private makePath(path: NonNullable<LayoutItem["path"]>) {
-    const curve = new T.CatmullRomCurve3(path.points.map(([x, z]) => new T.Vector3(x, .09, z)));
+  private makePath(path: NonNullable<LayoutItem["path"]>, straight = false) {
+    const curve = pathCurve(path, straight);
     const positions: number[] = [], uvs: number[] = [], indices: number[] = [];
     for (let i = 0; i <= 120; i++) {
       const p = curve.getPoint(i / 120), tangent = curve.getTangent(i / 120);
       for (const side of [-1, 1]) { const x = p.x + tangent.z * path.width * side / 2, z = p.z - tangent.x * path.width * side / 2; positions.push(x, p.y, z); uvs.push(x / 2, z / 2); }
       if (i < 120) { const n = i * 2; indices.push(n, n + 2, n + 1, n + 1, n + 2, n + 3); }
     }
-    const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3)); geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2)); geo.setIndex(indices); geo.computeVertexNormals(); this.generated.add(geo);
+    const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3)); geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2)); geo.setIndex(indices); geo.computeVertexNormals(); this.generated.add(geo); geo.userData.flatPositions = positions.slice();
     const mesh = new T.Mesh(geo, this.pathMaterial); mesh.receiveShadow = true; const group = new T.Group(); group.add(mesh); return group;
   }
 }

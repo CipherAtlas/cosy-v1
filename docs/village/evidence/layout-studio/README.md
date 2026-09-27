@@ -17,3 +17,7 @@ Six Python server tests cover protected presets, input limits, duplicate IDs, or
 The earlier snapshot contains 231 objects. At the user's explicit request the current default was refreshed to 252 objects, including ongoing garden/bird work. The JSON files preserve transforms and use the current shared artwork; they do not freeze historical geometry. Browser editing cannot overwrite either preset.
 
 Saved layouts are visual authoring documents. They do not automatically update playable-world collisions, walkable bridges, activity anchors or resident routes. Actors are posed in the editor. Tests do not establish physical-touch behavior, Firefox/Safari compatibility or sustained device performance. No editor deployment was performed.
+
+## Grass, paths and map expansion follow-up
+
+[Expanded ground and an edited path](editor-ground-paths.png) shows the local editor with two connected, elevated 40 m ground tiles, a grass patch and a lengthened curved path. `tools/village-editor/tests/landscape.cjs` passes eight focused groups covering placement/expansion, grass on elevated ground, path shape/length/width/continuation, collision rejection/grounding, intentional layering/undo, exact save/reload, a thin rotated-wall camera sweep and empty JavaScript/renderer error logs. Typecheck and six server tests also pass. This follow-up did not rerun the comprehensive application suite or production build.

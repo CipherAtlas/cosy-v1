@@ -1,7 +1,7 @@
 import * as T from "three";
 import { landscapeHeight } from "../../features/village/environment";
 import { StudioView } from "./view";
-import { validateLayout, type Layout, type LayoutItem, type Asset } from "./model";
+import { validateLayout, pathCurve, type Layout, type LayoutItem, type Asset } from "./model";
 
 type DocumentState = { layout: Layout; fileId: string | null; revision: string };
 const $ = <E extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as E;
@@ -9,6 +9,10 @@ const input = (id: string) => $<HTMLInputElement>(id);
 const select = (id: string) => $<HTMLSelectElement>(id);
 const button = (id: string) => $<HTMLButtonElement>(id);
 const DRAFT_KEY = "cosy-layout-studio-draft-v1";
+const CLIPBOARD_KEY = "cosy-layout-studio-clipboard-v1";
+let clipboard: LayoutItem[] = [];
+let pasteCount = 0;
+let extendingPath: string | null = null;
 const categories = ["All", "Buildings", "Bridges", "Nature", "Villagers", "Furnishings", "Paths", "Landscape"];
 let state: DocumentState;
 let selection: string[] = [];
@@ -32,6 +36,11 @@ const view = new StudioView($("viewport"), {
     else selection = id ? [id] : [];
     updateSelection();
   },
+  selectArea: ids => {
+    if (!ready) return;
+    selection = [...new Set([...selection, ...ids])]; updateSelection();
+    status(`${selection.length} objects selected. Cut, copy or move them together. Locked and hidden objects are skipped.`);
+  },
   begin: () => begin(),
   transform: changes => {
     for (const { id, transform } of changes) { const item = state.layout.objects.find(o => o.id === id); if (item) Object.assign(item, transform); }
@@ -39,16 +48,25 @@ const view = new StudioView($("viewport"), {
   },
   commit: () => { try { validateLayout(state.layout, view.model.assets); finish(); } catch (issue) { if (before) { state = before; before = null; view.sync(state.layout); update(); } error(issue); } },
   place: (asset, position, yaw, repeat) => {
-    transact(() => { const item = makeItem(asset, position); item.rotation[1] = yaw; state.layout.objects.push(item); selection = [item.id]; });
+    const placed = transact(() => { const item = makeItem(asset, position); item.rotation[1] = yaw; if (!view.model.assets.get(asset)?.surface) view.collision.ground(item, true); state.layout.objects.push(item); selection = [item.id]; });
+    if (!placed) return;
     if (!repeat) cancelPlacement(); else toast("Placed. Click again to add another, or Esc to finish.");
   },
   path: points => {
-    const origin = points[0];
-    transact(() => {
-      const item = makeItem("custom-path", [origin[0], 0, origin[1]]);
-      item.path = { width: 2.4, points: points.map(([x, z]) => [x - origin[0], z - origin[1]]) };
-      state.layout.objects.push(item); selection = [item.id];
-    }); toast("Path added. Adjust its width and control points in the inspector.");
+    const existing = state.layout.objects.find(item => item.id === extendingPath);
+    const added = transact(() => {
+      if (existing?.path) {
+        const root = view.model.roots.get(existing.id)!;
+        existing.path.points = points.map(([x, z]) => {
+          const local = root.worldToLocal(new T.Vector3(x, root.position.y, z)); return [local.x, local.z];
+        }); selection = [existing.id];
+      } else {
+        const origin = points[0], item = makeItem("custom-path", [origin[0], view.collision.height(...origin), origin[1]]);
+        item.path = { width: 2.4, points: points.map(([x, z]) => [x - origin[0], z - origin[1]]) };
+        state.layout.objects.push(item); selection = [item.id];
+      }
+    });
+    extendingPath = null; if (added) toast(existing ? "Path extended. Its width and shape are still editable." : "Path added. Adjust length, width or shape in the inspector.");
   },
   status: toast,
   coordinates: p => { $("coordinates").textContent = `X ${p.x.toFixed(1)} · Z ${p.z.toFixed(1)}`; },
@@ -57,14 +75,16 @@ const view = new StudioView($("viewport"), {
 
 function begin() { before = clone(state); }
 function finish() {
+  if (before && view.avoidOverlaps) view.collision.validateEdits(state.layout, before.layout);
+  state.layout = validateLayout(state.layout, view.model.assets);
   if (before && JSON.stringify(before.layout) !== fingerprint()) { past.push(before); if (past.length > 80) past.shift(); future = []; }
   before = null; view.sync(state.layout); update(); draft();
 }
 function transact(change: () => void) {
-  if (!ready) return;
+  if (!ready) return false;
   begin();
-  try { change(); state.layout = validateLayout(state.layout, view.model.assets); finish(); }
-  catch (issue) { if (before) state = before; before = null; view.sync(state.layout); update(); error(issue); }
+  try { change(); state.layout = validateLayout(state.layout, view.model.assets); finish(); return true; }
+  catch (issue) { if (before) state = before; before = null; view.sync(state.layout); update(); error(issue); return false; }
 }
 function draft() {
   try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ state, savedFingerprint })); }
@@ -76,17 +96,46 @@ function selectedItems(unlocked = false) { return state.layout.objects.filter(it
 function makeItem(assetId: string, position: [number, number, number]): LayoutItem {
   if (state.layout.objects.length >= 2000) throw Error("This layout has reached 2,000 objects. Remove a few objects before adding more.");
   const asset = view.model.assets.get(assetId)!;
-  return { id: `object-${crypto.randomUUID()}`, asset: assetId, name: asset.name.replace(/ 1$/, ""), position, rotation: [0, 0, 0], scale: [1, 1, 1], visible: true, locked: false };
+  return { id: `object-${crypto.randomUUID()}`, asset: assetId, name: asset.name.replace(/ 1$/, ""), position, rotation: [0, 0, 0], scale: [1, 1, 1], visible: true, locked: false, ...(asset.path ? { path: clone(asset.path) } : {}) };
 }
 function duplicate() {
   const items = selectedItems(true); if (!items.length) return toast("Unlock an object before duplicating it.");
-  transact(() => {
+  const added = transact(() => {
     if (state.layout.objects.length + items.length > 2000) throw Error("Duplicating would exceed the 2,000 object limit.");
-    const copies = items.map(item => ({ ...clone(item), id: `object-${crypto.randomUUID()}`, name: `${item.name.replace(/ copy$/, "")} copy`.slice(0, 100), position: [item.position[0] + 2, item.position[1], item.position[2] + 2] as [number, number, number] }));
+    const size = view.getBounds().getSize(new T.Vector3()), offset = Math.max(size.x, size.z) + 2;
+    const copies = items.map(item => ({ ...clone(item), id: `object-${crypto.randomUUID()}`, name: `${item.name.replace(/ copy$/, "")} copy`.slice(0, 100), position: [item.position[0] + offset, item.position[1], item.position[2] + offset] as [number, number, number] }));
     state.layout.objects.push(...copies); selection = copies.map(o => o.id);
-  }); toast(`Duplicated ${items.length === 1 ? items[0].name : `${items.length} objects`}.`);
+  }); if (added) toast(`Duplicated ${items.length === 1 ? items[0].name : `${items.length} objects`}.`);
 }
 function removeSelection() { const ids = new Set(selectedItems(true).map(o => o.id)); if (!ids.size) return; transact(() => { state.layout.objects = state.layout.objects.filter(o => !ids.has(o.id)); selection = []; }); status(`Removed ${ids.size} object${ids.size === 1 ? "" : "s"}. Undo is available.`); }
+function copySelection(cut = false) {
+  const items = selectedItems(cut); if (!items.length) return toast("Select objects first. Unlock them before cutting.");
+  // Persist before a cut, so reloading cannot lose the removed group.
+  try { localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(items)); }
+  catch { toast("The studio clipboard could not be saved. Your objects have been left in place."); return; }
+  clipboard = clone(items); pasteCount = 0;
+  if (cut) removeSelection();
+  updateSelection(); toast(`${cut ? "Cut" : "Copied"} ${items.length} object${items.length === 1 ? "" : "s"}. Move the camera, then paste at the centre of your view.`);
+}
+function readClipboard() {
+  const raw = localStorage.getItem(CLIPBOARD_KEY);
+  if (raw) clipboard = validateLayout({ version: 1, base: "cosy-village-2026-09-27", name: "Clipboard", objects: JSON.parse(raw) }, view.model.assets).objects;
+}
+function pasteSelection() {
+  try { readClipboard(); } catch (issue) { error(issue); return; }
+  if (!clipboard.length) return toast("Copy some objects in the studio first.");
+  if (state.layout.objects.length + clipboard.length > 2000) return toast("Pasting would exceed the 2,000 object limit.");
+  const center = new T.Vector3(); clipboard.forEach(item => center.add(new T.Vector3(...item.position))); center.divideScalar(clipboard.length);
+  const point = view.pastePoint(), offset = pasteCount * 2;
+  const dy = Math.max(0, landscapeHeight(point[0] + offset, point[2] + offset)) - Math.max(0, landscapeHeight(center.x, center.z));
+  const added = transact(() => {
+    const items = clipboard.map(item => ({ ...clone(item), id: `object-${crypto.randomUUID()}`, locked: false,
+      position: [item.position[0] + point[0] + offset - center.x, item.position[1] + dy, item.position[2] + point[2] + offset - center.z] as [number, number, number] }));
+    state.layout.objects.push(...items); selection = items.map(item => item.id);
+  });
+  if (!added) return;
+  pasteCount++; setTool("translate"); toast(`Pasted ${clipboard.length} objects. Drag the handles to move the group; Undo is available.`);
+}
 function setTool(tool: string) { cancelPlacement(); activeTool = tool; view.setTool(tool); for (const el of document.querySelectorAll<HTMLButtonElement>("[data-tool]")) el.setAttribute("aria-pressed", String(el.dataset.tool === tool)); }
 function startPlacement(asset: Asset) {
   if (!ready) return;
@@ -94,8 +143,8 @@ function startPlacement(asset: Asset) {
   $("placement-text").textContent = `Place ${asset.name.toLowerCase()} · [ / ] to turn`;
   renderAssets(); status("Click the ground to place. Hold Shift to keep adding. Escape cancels.");
 }
-function startPath() { if (!ready) return; placement = "path"; view.startPath(); $("placement").hidden = false; $("finish-path").hidden = false; $("placement-text").textContent = "Click points to trace a path"; status("Click two or more ground points, then Finish path or Enter."); }
-function cancelPlacement() { placement = null; view.cancelPlacement(); $("placement").hidden = true; renderAssets(); }
+function startPath() { if (!ready) return; extendingPath = null; placement = "path"; view.startPath(); $("placement").hidden = false; $("finish-path").hidden = false; $("placement-text").textContent = "Click points to trace a path"; status("Click two or more ground points, then Finish path or Enter."); }
+function cancelPlacement() { extendingPath = null; placement = null; view.cancelPlacement(); $("placement").hidden = true; renderAssets(); }
 function finishPath() { if (view.finishPath()) { placement = null; $("placement").hidden = true; updateSelection(); } }
 function setPreview(value: boolean) { preview = value; cancelPlacement(); document.body.classList.toggle("preview-mode", value); $("leave-preview").hidden = !value; view.setPreview(value); }
 function update() {
@@ -110,6 +159,7 @@ function updateSelection() {
   selection = selection.filter(id => state.layout.objects.some(o => o.id === id));
   view.setSelection(selection);
   const items = selectedItems(), single = items.length === 1 ? items[0] : null;
+  button("copy").disabled = !items.length; button("cut").disabled = !selectedItems(true).length; button("paste").disabled = !clipboard.length;
   $("selection-empty").hidden = !!items.length; $("selection-controls").hidden = !items.length;
   if (items.length) {
     const locked = items.some(item => item.locked);
@@ -124,13 +174,11 @@ function updateSelection() {
     for (const el of document.querySelectorAll<HTMLInputElement>(".xyz input")) el.disabled = locked;
     for (const el of document.querySelectorAll<HTMLButtonElement>("[data-turn]")) el.disabled = locked;
     refreshFields(); renderPathSettings(single);
-    const others = state.layout.objects.filter(o => !selection.includes(o.id) && o.visible && ["Buildings", "Bridges", "Furnishings"].includes(view.model.assets.get(o.asset)!.category) && !o.locked);
-    const own = items.filter(o => o.visible && ["Buildings", "Bridges", "Furnishings"].includes(view.model.assets.get(o.asset)!.category));
-    const overlaps = own.length && others.some(o => {
-      const box = new T.Box3().setFromObject(view.model.roots.get(o.id)!); box.expandByScalar(-.08);
-      return own.some(item => box.intersectsBox(new T.Box3().setFromObject(view.model.roots.get(item.id)!)));
-    });
-    $("overlap-warning").hidden = !overlaps; $("overlap-warning").textContent = "Some object bounds overlap. Check doorways, bridge ends and paths in Preview.";
+    const overlap = items.map(item => view.collision.overlap(item, state.layout)).find(Boolean);
+    $("overlap-warning").hidden = !overlap; $("overlap-warning").textContent = overlap ? `Solid bounds overlap ${overlap.name}. Move them apart or use intentional layering.` : "";
+    $("land-settings").hidden = !(single && ["land-tile-20", "land-tile-40", "land-hill", "meadow-island"].includes(single.asset));
+    for (const el of document.querySelectorAll<HTMLButtonElement>("[data-expand]")) el.disabled = locked;
+
   }
   renderScene();
 }
@@ -145,6 +193,9 @@ function refreshFields() {
 }
 function renderPathSettings(item: LayoutItem | null) {
   $("path-settings").hidden = !item?.path; if (!item?.path) return;
+  select("path-shape").value = item.asset === "path-straight" ? "straight" : "curved"; select("path-shape").disabled = item.locked;
+  input("path-length").value = pathCurve(item.path, item.asset === "path-straight").getLength().toFixed(1); input("path-length").disabled = item.locked;
+  button("path-continue").disabled = item.locked || item.path.points.length >= 100;
   input("path-width").value = String(item.path.width); input("path-width").disabled = item.locked;
   button("path-add-point").disabled = item.locked || item.path.points.length >= 100;
   $("path-points").replaceChildren();
@@ -294,14 +345,44 @@ input("object-name").onchange = () => transact(() => { const item = selectedItem
 input("object-visible").onchange = () => transact(() => { selectedItems().forEach(item => { item.visible = input("object-visible").checked; }); });
 input("object-locked").onchange = () => transact(() => { selectedItems().forEach(item => { item.locked = input("object-locked").checked; }); });
 input("path-width").onchange = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path) item.path.width = input("path-width").valueAsNumber; });
-button("path-add-point").onclick = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path) { const last = item.path.points.at(-1)!; item.path.points.push([last[0] + 3, last[1]]); } });
-button("ground").onclick = () => transact(() => { for (const item of selectedItems(true)) item.position[1] = Math.max(0, landscapeHeight(item.position[0], item.position[2])); });
+select("path-shape").onchange = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path) item.asset = select("path-shape").value === "straight" ? "path-straight" : "path-curved"; });
+input("path-length").onchange = () => {
+  const length = input("path-length").valueAsNumber;
+  if (!Number.isFinite(length) || length < .5 || length > 1000) return toast("Use a path length between 0.5 and 1,000 metres.");
+  transact(() => {
+    const item = selectedItems(true)[0]; if (!item?.path) return;
+    const oldLength = pathCurve(item.path, item.asset === "path-straight").getLength();
+    if (oldLength < .001) throw Error("Separate two path points before changing length.");
+    const origin = item.path.points[0]; item.path.points = item.path.points.map(([x, z]) => [origin[0] + (x - origin[0]) * length / oldLength, origin[1] + (z - origin[1]) * length / oldLength]);
+  });
+};
+button("path-continue").onclick = () => {
+  const item = selectedItems(true)[0]; if (!item?.path) return;
+  const root = view.model.roots.get(item.id)!;
+  const points = item.path.points.map(([x, z]) => { const p = root.localToWorld(new T.Vector3(x, 0, z)); return [p.x, p.z] as [number, number]; });
+  extendingPath = item.id; placement = "path"; view.startPath(points, item.asset === "path-straight");
+  $("placement").hidden = false; $("finish-path").hidden = false; $("placement-text").textContent = "Continue from the last path point";
+  status("Click to extend the path, then Finish path. Escape cancels.");
+};
+for (const el of document.querySelectorAll<HTMLButtonElement>("[data-expand]")) el.onclick = () => transact(() => {
+  const item = selectedItems(true)[0]; if (!item) return;
+  const size = new T.Box3().setFromObject(view.model.roots.get(item.id)!).getSize(new T.Vector3());
+  const next = clone(item); next.id = `object-${crypto.randomUUID()}`; next.locked = false;
+  const direction = el.dataset.expand!;
+  next.position[0] += direction === "east" ? size.x : direction === "west" ? -size.x : 0;
+  next.position[2] += direction === "south" ? size.z : direction === "north" ? -size.z : 0;
+  state.layout.objects.push(next); selection = [next.id];
+});
+input("avoid-overlaps").onchange = () => { view.avoidOverlaps = input("avoid-overlaps").checked; status(view.avoidOverlaps ? "Solid collision protection is on." : "Intentional layering is enabled. Camera collision stays on."); };
+button("path-add-point").onclick = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path) { const last = item.path.points.at(-1)!, previous = item.path.points.at(-2)!; const direction = new T.Vector2(last[0] - previous[0], last[1] - previous[1]).normalize().multiplyScalar(5); item.path.points.push([last[0] + direction.x, last[1] + direction.y]); } });
+button("ground").onclick = () => transact(() => { for (const item of selectedItems(true)) view.collision.ground(item, true); });
 for (const el of document.querySelectorAll<HTMLButtonElement>("[data-turn]")) el.onclick = () => transact(() => { selectedItems(true).forEach(item => { item.rotation[1] += Number(el.dataset.turn); }); });
 for (const el of document.querySelectorAll<HTMLButtonElement>("[data-tool]")) el.onclick = () => setTool(el.dataset.tool!);
 button("assets-tab").onclick = () => setTab("assets"); button("scene-tab").onclick = () => setTab("scene");
 for (const id of ["assets-tab", "scene-tab"]) button(id).onkeydown = event => { if (["ArrowLeft", "ArrowRight"].includes(event.key)) { event.preventDefault(); setTab(tab === "assets" ? "scene" : "assets"); button(`${tab}-tab`).focus(); } };
 input("search").oninput = () => { renderAssets(); renderScene(); };
 button("undo").onclick = undo; button("redo").onclick = redo; button("duplicate").onclick = duplicate; button("delete").onclick = removeSelection;
+button("cut").onclick = () => copySelection(true); button("copy").onclick = () => copySelection(); button("paste").onclick = pasteSelection;
 button("focus-object").onclick = () => view.focus(); button("home-view").onclick = () => view.home();
 button("start-house").onclick = () => { selection = [state.layout.objects.find(o => o.asset.startsWith("cottage-"))?.id ?? ""]; updateSelection(); view.focus(); setTool("rotate"); };
 button("draw-path").onclick = startPath; button("finish-path").onclick = finishPath; button("cancel-placement").onclick = cancelPlacement;
@@ -324,13 +405,17 @@ button("preview").onclick = () => setPreview(true); button("leave-preview").oncl
 for (const close of document.querySelectorAll<HTMLButtonElement>(".close-dialog")) close.onclick = () => close.closest("dialog")!.close();
 window.addEventListener("keydown", event => {
   if (!ready || document.querySelector("dialog[open]")) return;
-  const editing = event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement;
+  const editing = event.target instanceof HTMLElement && event.target.matches("input, select, textarea, [contenteditable=true]");
   const mod = event.metaKey || event.ctrlKey;
   if (mod && event.key.toLowerCase() === "s") { event.preventDefault(); if (editing) (event.target as HTMLElement).blur(); void save(); return; }
   if (editing) return;
+  if (!mod && !event.altKey && view.navigate(event)) return;
   if (event.key === "Escape") { if (preview) setPreview(false); else if (placement) cancelPlacement(); else { selection = []; updateSelection(); } return; }
   if (preview) return;
   if (mod) {
+    if (event.key.toLowerCase() === "c") { event.preventDefault(); copySelection(); }
+    if (event.key.toLowerCase() === "x") { event.preventDefault(); copySelection(true); }
+    if (event.key.toLowerCase() === "v") { event.preventDefault(); pasteSelection(); }
     if (event.key.toLowerCase() === "z") { event.preventDefault(); if (event.shiftKey) redo(); else undo(); }
     if (event.key.toLowerCase() === "d") { event.preventDefault(); duplicate(); }
     if (event.key.toLowerCase() === "y") { event.preventDefault(); redo(); }
@@ -338,7 +423,7 @@ window.addEventListener("keydown", event => {
   }
   if (placement && ["[", "]"].includes(event.key)) { view.turnPlacement(event.key === "[" ? -15 : 15); return; }
   if (placement === "path" && event.key === "Enter") { event.preventDefault(); finishPath(); return; }
-  const tool = ({ v: "select", w: "translate", e: "rotate", r: "scale" } as Record<string,string>)[event.key.toLowerCase()];
+  const tool = ({ v: "select", g: "translate", e: "rotate", r: "scale" } as Record<string,string>)[event.key.toLowerCase()];
   if (tool) setTool(tool);
   if (event.key.toLowerCase() === "p") startPath();
   if (event.key.toLowerCase() === "f") view.focus();
@@ -350,7 +435,10 @@ window.addEventListener("keydown", event => {
   }
 });
 window.addEventListener("beforeunload", event => { if (ready && fingerprint() !== savedFingerprint) { draft(); event.preventDefault(); event.returnValue = ""; } });
-window.addEventListener("storage", event => { if (event.key === DRAFT_KEY && ready) status("Another studio tab updated the recovery draft. Save a named layout to keep this tab's version."); });
+window.addEventListener("storage", event => {
+  if (event.key === DRAFT_KEY && ready) status("Another studio tab updated the recovery draft. Save a named layout to keep this tab's version.");
+  if (event.key === CLIPBOARD_KEY && ready) { try { readClipboard(); updateSelection(); } catch (issue) { error(issue); } }
+});
 window.addEventListener("error", event => { if (ready) error(event.message); });
 window.addEventListener("unhandledrejection", event => error(event.reason));
 
@@ -368,6 +456,7 @@ async function start() {
     let recovered = false;
     try { const raw = localStorage.getItem(DRAFT_KEY); if (raw) { const draft = JSON.parse(raw); state = { layout: validateLayout(draft.state.layout, view.model.assets), fileId: typeof draft.state.fileId === "string" && /^[a-zA-Z0-9_-]{1,100}$/.test(draft.state.fileId) ? draft.state.fileId : null, revision: typeof draft.state.revision === "string" ? draft.state.revision : "" }; savedFingerprint = typeof draft.savedFingerprint === "string" ? draft.savedFingerprint : ""; recovered = true; } }
     catch { toast("The previous browser draft could not be read. It remains in browser storage; a fresh working copy is open."); }
+    try { readClipboard(); } catch { toast("The previous clipboard could not be restored. Your layout is unchanged."); }
     ready = true; view.sync(state.layout); update(); $("loading").hidden = true;
     status(recovered ? "Recovered your working copy. The original village is preserved." : "Your working copy is ready. Choose an asset, or click something in the village.");
     renderAssets();
@@ -377,7 +466,7 @@ async function start() {
     view.sync(current); view.setSelection(selection);
     void view.thumbnails(() => renderAssets());
     // A read-only development inspection surface supports reproducible studio QA.
-    Object.assign(window, { cosyStudio: { snapshot: () => clone(state), original: () => clone(view.model.original), presets: () => presets.map(p => ({ id: p.id, layout: clone(p.layout) })), selection: () => [...selection], assets: () => [...view.model.assets.values()].map(a => ({ id: a.id, name: a.name, category: a.category })), capture: () => view.capture(), screenPoint: (id: string, offset?: [number, number, number]) => view.screenPoint(id, offset) } });
+    Object.assign(window, { cosyStudio: { snapshot: () => clone(state), original: () => clone(view.model.original), presets: () => presets.map(p => ({ id: p.id, layout: clone(p.layout) })), selection: () => [...selection], assets: () => [...view.model.assets.values()].map(a => ({ id: a.id, name: a.name, category: a.category })), capture: () => view.capture(), screenPoint: (id: string, offset?: [number, number, number]) => view.screenPoint(id, offset), camera: () => view.navigationState() } });
   } catch (issue) { $("loading-text").textContent = issue instanceof Error ? issue.message : String(issue); $("loading").querySelector("h2")!.textContent = "The studio couldn't open"; error(issue); }
 }
 void start();

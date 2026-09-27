@@ -61,7 +61,7 @@ export async function buildWorld(
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
     || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9
     || pondDistance(x, z) < 1.12
-    || Math.hypot(x - BIRD_CLEARING.x, z - BIRD_CLEARING.z) < 4.35
+    || Math.hypot(x + 24, z + 31) < 4.35
     || Math.hypot(x - HARVEST_BASKET[0], z - HARVEST_BASKET[2]) < 1.25
     || teaCourtyardDistance(x, z) < 1.16
     || gardenPathClearance.has(plantingCell(x, z))
@@ -440,6 +440,9 @@ export async function buildWorld(
       if (coverage > terraceColor.getX(i)) terraceColor.setX(i, coverage);
     }
   }
+  const pondRestPaving = add(terrace, pathMaterial, -39.5, .02867727470825035, -19.1);
+  pondRestPaving.castShadow = false;
+  capture?.("pond-rest-paving", "Pond rest paving", "Paths", [pondRestPaving], [-24, .02867727470825035, -29.5]);
   // Water occupies a shallow channel, with shader normals moving independently of the banks.
   const waterUniform = { time: { value: 0 } };
   const riverSurface=makeWater(waterUniform.time,wind.strength);
@@ -567,13 +570,14 @@ export async function buildWorld(
   }
   capture?.("tower", "Village spire", "Buildings", [tower], [4, 0, -57]);
   let benchIndex = 0;
-  function bench(x: number, z: number, rot: number) {
+  function bench(x: number, z: number, rot: number, scaleX = 1) {
     const b = new T.Group();
     b.position.set(x, 0, z);
-    b.rotation.y = rot;
+    b.rotation.y = rot; b.scale.x = scaleX;
     group.add(b);
-    colliders.push({ x, z, w: Math.abs(Math.cos(rot)) * 2.2 + Math.abs(Math.sin(rot)) * .7,
-      d: Math.abs(Math.sin(rot)) * 2.2 + Math.abs(Math.cos(rot)) * .7, top: 1.4 });
+    const collider = { x, z, w: Math.abs(Math.cos(rot)) * 2.2 * scaleX + Math.abs(Math.sin(rot)) * .7,
+      d: Math.abs(Math.sin(rot)) * 2.2 * scaleX + Math.abs(Math.cos(rot)) * .7, top: 1.4 };
+    colliders.push(collider);
     for (const s of [-1, 1]) {
       box(mat.darkWood, s * 0.88, 0.36, 0, 0.13, 0.72, 0.65, b);
       box(mat.wood, s * 0.88, 0.9, -0.3, 0.1, 1.1, 0.1, b);
@@ -583,26 +587,29 @@ export async function buildWorld(
     for (let i = 0; i < 2; i++)
       box(mat.wood, 0, 1.05 + i * 0.23, -0.32, 2.2, 0.18, 0.1, b);
     capture?.(`bench-${++benchIndex}`, `Oak bench ${benchIndex}`, "Furnishings", [b], [x, 0, z]);
+    return collider;
   }
-  // A feeding clearing on the dry northern bank; all furnishings stay off its approach.
+  // The saved copy places the feeding clearing at the western end of the bridge path.
   layoutStart = group.children.length;
   const clearing = new T.CircleGeometry(BIRD_CLEARING.radius, 64); clearing.rotateX(-Math.PI / 2);
   const cp = clearing.attributes.position, cuv = clearing.attributes.uv;
   for (let i = 0; i < cp.count; i++) cuv.setXY(i, (cp.getX(i) + BIRD_CLEARING.x) / 3, (cp.getZ(i) + BIRD_CLEARING.z) / 3);
   add(clearing, mat.path, BIRD_CLEARING.x, .1, BIRD_CLEARING.z).castShadow = false;
-  capture?.("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [-24, 0, -31]);
+  capture?.("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
   const rim = new T.TorusGeometry(.72, .07, 8, 40); rim.rotateX(-Math.PI / 2);
-  add(rim, mat.stone, -24, .17, -31);
-  add(new T.CylinderGeometry(.67,.67,.025,40), mat.wood, -24, .13, -31).castShadow = false;
-  capture?.("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [-24, 0, -31]);
+  add(rim, mat.stone, BIRD_CLEARING.x, .17, BIRD_CLEARING.z);
+  add(new T.CylinderGeometry(.67,.67,.025,40), mat.wood, BIRD_CLEARING.x, .13, BIRD_CLEARING.z).castShadow = false;
+  capture?.("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
   // A low bench faces the birds, leaving the eastern entrance completely open.
-  box(mat.wood, -24, .4, -27.8, 2.5, .14, .65);
-  box(mat.wood, -24, .87, -27.48, 2.5, .48, .1);
-  for (const x of [-24.9, -23.1]) for (const z of [-28.03, -27.57]) box(mat.darkWood, x, .2, z, .11, .4, .11);
-  colliders.push({x:-24,z:-27.75,w:2.6,d:.85,top:1.12});
-  capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [-24, 0, -27.8]);
+  const birdBenchX = BIRD_CLEARING.x, birdBenchZ = BIRD_CLEARING.benchZ;
+  box(mat.wood, birdBenchX, .4, birdBenchZ, 2.5, .14, .65);
+  box(mat.wood, birdBenchX, .87, birdBenchZ + .32, 2.5, .48, .1);
+  for (const x of [-.9, .9]) for (const z of [-.23, .23]) box(mat.darkWood, birdBenchX + x, .2, birdBenchZ + z, .11, .4, .11);
+  const birdBenchCollider = {x:-24,z:-27.75,w:2.6,d:.85,top:1.12};
+  colliders.push(birdBenchCollider);
+  capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [birdBenchX, 0, birdBenchZ]);
   layoutStart = group.children.length;
   const leaf = new T.MeshStandardMaterial({color:'#6d9959',roughness:1});
   const petal = new T.MeshStandardMaterial({color:'#fff9e9',roughness:.85});
@@ -613,13 +620,18 @@ export async function buildWorld(
     for (let p=0;p<5;p++) { const a=p*Math.PI*2/5; add(sphereGeo,petal,x+Math.cos(a)*.072,.44,z+Math.sin(a)*.072,.066,.028,.066); }
     add(sphereGeo,flowerGold,x,.465,z,.04,.025,.04);
   }
-  capture?.("bird-clearing-flowers", "Dove clearing flower border", "Nature", group.children.slice(layoutStart), [-24, 0, -31]);
+  const clearingFlowers = group.children.slice(layoutStart);
+  for (const flower of clearingFlowers) flower.position.add(new T.Vector3(-13, -.12, 34.993025));
+  capture?.("bird-clearing-flowers", "Dove clearing flower border", "Nature", clearingFlowers, [-37, -.12, 3.993025]);
   // Seats face the fire; the main village path stays unobstructed.
   bench(HEARTH.x, HEARTH.z + 2.9, Math.PI);
   bench(HEARTH.x, HEARTH.z - 2.9, 0);
   bench(HEARTH.x - 2.7, HEARTH.z, Math.PI / 2);
   bench(13.9, -10, Math.PI / 2);
   bench(-17.8, -7.6, Math.PI / 2);
+  const pondRestBench = bench(-24, -30, 0, 1.644445);
+  // Apply the new colliders after seeded planting so unrelated scenery stays in place.
+  colliders.pop();
   layoutStart = group.children.length;
   // Hearth with glowing embers and gently animated flame geometry.
   for (let i = 0; i < 16; i++) {
@@ -641,7 +653,15 @@ export async function buildWorld(
     emissiveIntensity: 0.3,
   });
   add(new T.CylinderGeometry(.8, .8, 0.12, 24), coal, HEARTH.x, 0.15, HEARTH.z);
-  add(new T.CylinderGeometry(3.6, 3.6, .06, 48), mat.path, HEARTH.x, .01, HEARTH.z).castShadow = false;
+  // Clear the uneven meadow and path shoulders instead of letting grass cut through the terrace.
+  const hearthPaving = new T.CylinderGeometry(HEARTH.pavingRadius, HEARTH.pavingRadius, .16, 64);
+  const hearthPosition = hearthPaving.attributes.position, hearthNormal = hearthPaving.attributes.normal;
+  const hearthUV = hearthPaving.attributes.uv;
+  for (let i = 0; i < hearthPosition.count; i++) {
+    if (hearthNormal.getY(i) > .5)
+      hearthUV.setXY(i, (hearthPosition.getX(i) + HEARTH.x) / 2, (hearthPosition.getZ(i) + HEARTH.z) / 2);
+  }
+  add(hearthPaving, mat.path, HEARTH.x, HEARTH.pavingHeight - .08, HEARTH.z).castShadow = false;
   const charredWood=mat.darkWood.clone();charredWood.color.set("#624030");charredWood.roughness=1;
   for (let i = 0; i < 7; i++) {
     let a = i * 0.8;
@@ -1134,7 +1154,7 @@ export async function buildWorld(
     [7, 28, 0.8],
     [-7, 15, 1.15],
     [16, 19, 1.2],
-    [-18, -20, 1.3],
+    [-36.5, -28.5, 1.3],
     [-37, -8, 1.1],
     [20, -16, 1.3],
     [-31, 15, 1],
@@ -1151,8 +1171,8 @@ export async function buildWorld(
       0.65 + rnd() * 0.7,
     ]);
   }
-  const treeTransforms = treePositions.map(([x, z, s]) => {
-    dummy.position.set(x, landscapeHeight(x, z), z);
+  const treeTransforms = treePositions.map(([x, z, s], i) => {
+    dummy.position.set(x, i === 4 ? -.005309 : landscapeHeight(x, z), z);
     dummy.rotation.set(0, rnd() * Math.PI * 2, 0);
     dummy.scale.setScalar(s);
     dummy.updateMatrix();
@@ -1177,6 +1197,39 @@ export async function buildWorld(
   // Crown colors carry their soft occlusion; self-shadowing intersecting lobes produces striping.
   inst.castShadow = true; inst.receiveShadow = false; group.add(inst);
   capture?.("tree", "Round canopy tree", "Nature", [inst]);
+  const restShrubs: [number, number, number][] = [
+    [-30.5, 0.0021889620241282728, -26.5],
+    [-28, 0.04870400533322876, -32],
+    [-26.5, 0.06147569016718084, -33.5],
+    [-24.5, 0.061601576312927966, -34],
+    [-22.5, 0.05088307723410275, -34],
+    [-20.5, 0.030448035371557824, -33],
+    [-29, 0.038220625820518224, -31],
+    [-29, 0.023209967905932886, -29],
+  ];
+  const shrubColor = new T.Color(); bushes.getColorAt(0, shrubColor);
+  restShrubs.forEach((position, i) => {
+    const shrub = new T.InstancedMesh(bushGeo, bushes.material, 1);
+    shrub.setMatrixAt(0, new T.Matrix4()); shrub.setColorAt(0, shrubColor);
+    shrub.position.fromArray(position); shrub.customDepthMaterial = bushes.customDepthMaterial;
+    shrub.castShadow = shrub.receiveShadow = true; group.add(shrub); vegetation.push(shrub);
+    capture?.(`pond-rest-shrub-${i + 1}`, `Pond rest shrub ${i + 1}`, "Nature", [shrub], position);
+  });
+  // Clear only the added paving footprints, leaving the seeded rest of the meadow unchanged.
+  const plantingMatrix = new T.Matrix4(), plantingPosition = new T.Vector3();
+  for (const plants of [grass, stems, blossoms]) {
+    for (let i = 0; i < plants.count; i++) {
+      plants.getMatrixAt(i, plantingMatrix); plantingPosition.setFromMatrixPosition(plantingMatrix);
+      const { x, z } = plantingPosition;
+      if (Math.hypot(x - BIRD_CLEARING.x, z - BIRD_CLEARING.z) < 4.35
+        || Math.hypot((x + 24) / 4.2, (z + 29.5) / 3.6) < 1) {
+        plantingMatrix.scale(new T.Vector3(0, 0, 0)); plants.setMatrixAt(i, plantingMatrix);
+      }
+    }
+    plants.instanceMatrix.needsUpdate = true;
+  }
+  birdBenchCollider.x = birdBenchX; birdBenchCollider.z = birdBenchZ + .05;
+  colliders.push(pondRestBench);
   const wayfinding = buildWayfinding(colliders);
   group.add(wayfinding.group);
   capture?.("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);

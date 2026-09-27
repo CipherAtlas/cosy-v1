@@ -1,5 +1,27 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-27 — studio grass, paths and map expansion
+
+The local studio now offers wind-animated grass tufts/patches, editable straight and curved limestone paths, textured 20/40 m meadow ground tiles and a grassy hill. Path length/width/shape, tangent extension and continuing by ground clicks work on the existing path object. Ground tiles have directional edge-to-edge expansion. Paths and grass follow placed surfaces; grass clears under editable paths and solid props. New asset IDs retain the version-1 layout shape and existing preset compatibility.
+
+`spatial.ts` provides editor support surfaces and oriented solid bounds for placement, transforms and swept camera movement. Solid overlaps are rejected by default; an explicit checkbox allows intentional layering. Locked solids still collide, hidden ones do not, and camera collision stays active. Ground, paths and vegetation can overlap. This is editor behavior only: public gameplay collision and activity routing are unchanged. Existing presets and user files were not rewritten. See the updated [studio guide](tools/village-editor/README.md).
+
+Typecheck, six persistence tests and the focused eight-check `tests/landscape.cjs` browser smoke pass cover elevated ground/grass placement, edge-to-edge expansion, path edits/extension, collision rejection, intentional layering/undo, exact file saves/reloads and a thin rotated-wall camera sweep. No comprehensive application suite or production build was run for this follow-up. Existing concurrent village edits were preserved.
+
+## 2026-09-27 — saved village copy applied locally
+
+Applied the editor’s saved 262-object **Current village copy** (`layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json`) to the playable world. The bird terrace/dish/bench, flower border, twelve landing spots and Wren now sit at the western bridge-path end around `(-37,4)`. The previous clearing has the copied tea paving, widened oak bench and eight shrubs; tree 5 moves to `(-36.5,-28.5)`. Existing preset files and the saved working copy remain intact. Runtime props retain editor captures/library support. Saves in the editor still require an explicit gameplay integration pass.
+
+The flock follows a continuous 30-second pond circuit with an eastern climb and western descent. Wren’s roaming/return route, companion staging, activity arrival/exit, desktop/compact cameras, collision/floor surfaces and positional feeding/coo sounds follow the new clearing. Bird feet sit on the paving rather than at the saved pose’s below-paving height. Seeded background placements are retained, with plants cleared only under the added paving. Concurrent hearth and editor-control work is preserved.
+
+Typecheck and focused Node checks cover the exact saved landing X/Z coordinates, flight endpoints, terrain/bench clearance, safe arrival, Wren’s return route with the clearing bench collider, and the feeding/thanks/takeoff cycle. The existing browser bird script is retargeted but was not run. No broad browser suite, production build, Git writes or deployment; visual testing is left to the user as requested.
+
+## 2026-09-27 — studio navigation and area selection
+
+The local editor now has faster cursor-directed zoom, WASD camera movement (Shift for 3× speed), Page Up/Down for height, and a default terrain floor 1.5 m below the camera. Move-tool shortcut is G so W remains navigation. Shift-drag adds visible, unlocked objects intersecting the rectangle; Cut/Copy/Paste buttons and Cmd/Ctrl+X/C/V preserve group transforms and paste at the view centre. Cuts/pastes use existing undo and draft recovery, and the studio clipboard is persisted before removing cut objects. Text inputs retain normal typing and clipboard behavior.
+
+Typecheck, diff whitespace and a focused eight-check Chrome smoke pass cover navigation/speed, zoom, ground protection, text inputs, marquee selection, grouped copy/paste, cut/undo and JavaScript errors. No comprehensive suite or production build was run for this follow-up, as requested. The local server was restarted on port 3040; reload the editor to load these controls. No public runtime, presets or dependencies were changed; no Git write operations were performed.
+
 ## 2026-09-27 — birds, harvest basket and companion release
 
 Published at [cosy.sabarg.com](https://cosy.sabarg.com/) in release commit [`d6f218f`](https://github.com/CipherAtlas/cosy-v1/commit/d6f218f205ca26605c226a862d7c2c55607afa7e), through successful [Pages run 36323478979](https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979). This includes the white doves/Wren, sunflower growing/harvest basket, and companion hand-holding described below. The layout studio, presets and new asset registrations are committed as local development tools; the public export has no editor route. Earlier local-only statements record implementation milestones and are superseded by this release.
