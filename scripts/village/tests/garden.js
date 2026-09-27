@@ -7,6 +7,66 @@ import { freshGarden, readGarden, gardenAction, gardenActionAllowed, growGarden,
 import { VillageAudio } from './modules/features/village/audio.js';
 import { DEFAULT_MIX } from './modules/features/village/places.js';
 
+export async function checkNearbyInteractions(engine, save) {
+  const results = [], calls = [], check = (ok, label) => { if (!ok) throw Error(label); results.push(label); };
+  const original = { ...engine.callbacks }, state = engine.gardenState;
+  const canvas = engine.renderer.domElement;
+  const press = (options = {}) => {
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', bubbles: true, ...options }));
+    canvas.dispatchEvent(new KeyboardEvent('keyup', { key: 'e', bubbles: true }));
+  };
+  const stand = (x, z) => {
+    engine.setPlace(null); engine.setBlocked(false); engine.movement.settle(x, z);
+    engine.frame(performance.now()); calls.length = 0;
+  };
+  engine.callbacks.interact = id => { calls.push(`place:${id}`); engine.travel(id); };
+  engine.callbacks.gardenInteract = id => calls.push(`garden:${id}`);
+  try {
+    engine.setGarden(freshGarden()); stand(15.2, -8.1);
+    check(engine.near === 'mood' && engine.nearGarden === 'tea', 'Tea approach overlaps the activity and tea-drinking targets');
+    press();
+    check(calls.join() === 'place:mood' && engine.place === 'mood', 'E opens the tea activity when no mint tea is prepared');
+    press(); check(calls.length === 1, 'A settled activity does not repeat the nearby interaction');
+
+    stand(15.2, -8.1); engine.setGarden({ ...freshGarden(), mintTea: 1 }); press();
+    check(calls.join() === 'garden:tea', 'Prepared mint tea keeps the same priority as the on-screen prompt');
+    calls.length = 0; engine.setGarden(freshGarden()); press();
+    check(calls.join() === 'place:mood', 'E falls back immediately when the last cup has been consumed');
+
+    stand(23.8, -1.8); press();
+    check(calls.join() === 'garden:bed-4', 'E waters unwatered mint beside the garden entrance');
+    calls.length = 0; engine.setGarden(gardenAction(freshGarden(), { kind: 'water', bed: MINT_BED })); press();
+    check(calls.join() === 'place:garden' && engine.place === 'garden', 'Growing mint cannot swallow the garden entry keypress');
+
+    let growing = freshGarden();
+    growing = gardenAction(growing, { kind: 'plant', bed: 2, crop: 'radish' });
+    growing = gardenAction(growing, { kind: 'water', bed: 2 });
+    engine.setGarden(growing); stand(23.8, -4.5); press();
+    check(calls.join() === 'place:garden', 'Growing vegetables also fall back to the visible activity prompt');
+    engine.setGarden(growGarden(growing, Date.now() + GROWTH_MS.radish)); stand(23.8, -4.5); press();
+    check(calls.join() === 'garden:bed-2', 'Ripe vegetables regain harvest priority');
+
+    stand(15.2, -8.1); engine.setBlocked(true); press();
+    check(calls.length === 0, 'Menus block nearby keyboard interactions');
+    engine.setBlocked(false); press({ repeat: true });
+    check(calls.length === 0, 'Holding E does not repeat an interaction');
+    stand(.3, 20); press(); check(calls.length === 0, 'E away from activities remains harmless');
+
+    const time = engine.garden.time + 10;
+    engine.garden.update(0, time, false);
+    check(!engine.garden.group.getObjectByName('Basket') && !engine.garden.can.visible, 'Garden aisles have no parked basket or watering can');
+    engine.gardenAction({ kind: 'flowers' }); engine.garden.update(.1, time + .1, false);
+    check(engine.garden.can.visible && engine.garden.drops.visible, 'Watering still shows its temporary can and water');
+    engine.garden.update(.1, time + 3, false);
+    check(!engine.garden.can.visible && !engine.garden.drops.visible, 'Watering props disappear when the action ends');
+    const result = { pass: true, count: results.length, results, browser: navigator.userAgent };
+    await save('nearby-interactions.json', JSON.stringify(result, null, 2)); return result;
+  } finally {
+    Object.assign(engine.callbacks, original); engine.setGarden(state); engine.setPlace(null); engine.setBlocked(false);
+    engine.garden.actionAt = -100; engine.garden.update(0, engine.elapsed, false);
+  }
+}
+
 export async function checkGardenAudio(save) {
   const results = [], signal = [], check = (value, name) => { if (!value) throw Error(name); results.push(name); };
   const audio = new VillageAudio(), delay = ms => new Promise(resolve => setTimeout(resolve, ms));

@@ -1,5 +1,11 @@
 # Village implementation evidence — updated 2026-09-27
 
+## Nearby interaction and garden prop fix
+
+[Chrome regression results](interaction-fix-chrome.json) and [Firefox regression results](interaction-fix-firefox.json) each contain 15 focused checks and 89 existing garden/pond/companion assertions. The tests reproduce overlapping tea/activity targets, verify E-key fallback with no mint tea or growing crops, retain harvest/drink priority, and confirm removal of parked garden props.
+
+[Exported-app UI results](interaction-fix-ui.json) use actual keyboard/pointer input. [Tea after pressing E](interaction-fix-tea.png) and [the cleared garden aisle](interaction-fix-garden.png) are Chrome 154 screenshots. Firefox 142 also completes the flow with two WebGL warnings and no application errors. See [the build ledger](../../../VILLAGE_BUILD.md#2026-09-27-nearby-interaction-fix) for scope and limits.
+
 ## Garden labels, countdowns and ground
 
 Current local screenshot follow-up: [front alignment and plant signs](labels-garden-front-alignment.png), [recognizable mint and its countdown](labels-mint-leaf-detail.png), and [growing garden](labels-garden-labels-countdown.png). These use the production renderer at 1280×720 in the isolated Chromium harness, without DOM controls.

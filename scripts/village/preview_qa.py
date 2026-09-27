@@ -34,6 +34,7 @@ allowed.update({'activity-focus.png','activity-music.png','activity-breathe.png'
 allowed.update({'garden-checks.json','garden-overview.png','pond-overview.png','pond-ducks.png','garden-watering.png','companions-tea.png','companions-focus.png','garden-motion.webm'})
 allowed.update({'cosy-feedback.json','happy-ducks.png'})
 allowed.update({'garden-details.json','garden-labels-countdown.png','garden-front-alignment.png','mint-leaf-detail.png'})
+allowed.add('nearby-interactions.json')
 allowed.update({'gentle-growth.json','tea-garden-view.png','luma-harvest.png','mint-tea-sip.png','growing-garden.png'})
 allowed.update({'garden-audio.json','garden-sounds.webm','garden-profile.json'})
 class Handler(SimpleHTTPRequestHandler):

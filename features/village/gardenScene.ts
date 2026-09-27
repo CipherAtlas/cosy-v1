@@ -125,8 +125,7 @@ export class GardenScene {
     sign(24.7, -12.25, "Sunflowers", "ひまわり");
     sign(27.45, .23, "Daisies", "デイジー");
     sign(29.78, -7.3, "Irises", "アイリス", undefined, -Math.PI / 2);
-    this.can = this.model("WateringCan", [24, .1, -.8]);
-    this.model("Basket", [25, .08, -.6]);
+    this.can = this.model("WateringCan", [0, 0, 0]); this.can.visible = false;
     this.model("BreadPouch", [-23.8, .25, -4.9], .75);
     this.teapot = this.model("Teapot", [15, 1.28, -10.3], 1);
     this.teaMint = this.model("Mint", [15.21, 1.49, -9.64], .13); this.teaMint.visible = false;
@@ -335,6 +334,7 @@ export class GardenScene {
     });
     const age = time - this.actionAt, action = this.action;
     const watering = age < 2.5 && (action?.kind === "water" || action?.kind === "flowers");
+    this.can.visible = watering;
     this.drops.visible = watering && !reduced;
     if (watering) {
       const target = action.kind === "water" ? [BEDS[action.bed].x, .4, BEDS[action.bed].z] : FLOWER_POSITION;
@@ -345,7 +345,7 @@ export class GardenScene {
         this.dummy.rotation.set(0, 0, 0); this.dummy.scale.set(1, 1.7, 1); this.dummy.updateMatrix(); this.drops.setMatrixAt(i, this.dummy.matrix);
       }
       this.drops.instanceMatrix.needsUpdate = true;
-    } else { this.can.position.set(24, .1, -.8); this.can.rotation.z = 0; }
+    }
     this.harvest.visible = !reduced && age < 1.6 && action?.kind === "harvest";
     if (this.harvest.visible && action) {
       const origin = "bed" in action ? [BEDS[action.bed].x, .4, BEDS[action.bed].z] : MINT_POSITION;

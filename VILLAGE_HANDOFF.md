@@ -1,5 +1,11 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-27 — nearby interaction and garden prop fix
+
+The tea approach could display “Take a quiet moment” while E silently selected an unavailable mint-tea action. The keyboard now uses the same `nearbyGardenAction` availability check as the visible button and falls back to the nearby activity. This also fixes garden entry beside growing crops. The static basket is removed from the mint/daisy aisle; the watering can is hidden except during its existing watering animation.
+
+Typecheck/root static export pass. All 15 targeted interaction checks and 89 garden/pond/companion regressions pass in Chrome 154 and Firefox 142. Exported-app testing confirms captured-pointer E entry, pointer release, button entry, mint watering/countdown and visible exits; Chrome also covers 390×844. [Evidence and release verification](VILLAGE_BUILD.md#2026-09-27-nearby-interaction-fix).
+
 ## 2026-09-27 — garden release published
 
 All garden, pond, companion, growth/tea, countdown/sign and courtyard changes below are committed and published at [cosy.sabarg.com](https://cosy.sabarg.com/). Application commit [`e38e517`](https://github.com/CipherAtlas/cosy-v1/commit/e38e5173cb9eba63dae9e8bb18157f768f2d0d64) passed [Pages run 36312226275](https://github.com/CipherAtlas/cosy-v1/actions/runs/36312226275). The earlier local-only status notes are historical.

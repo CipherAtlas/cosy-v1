@@ -1,0 +1,43 @@
+{
+  "localExport": [
+    {
+      "url": "http://127.0.0.1:3036/",
+      "browser": "chrome",
+      "version": "154.0.8037.57",
+      "checks": [
+        "The tea-entry prompt is visible on approach",
+        "Desktop canvas captures the pointer",
+        "E opens the tea activity with no mint tea prepared",
+        "Entering the activity releases pointer capture",
+        "The matching click control also opens tea",
+        "Mint watering starts a visible countdown",
+        "The compact garden view keeps its visible exit",
+        "Tea entry and exit remain usable at phone dimensions",
+        "No app errors"
+      ],
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "url": "http://127.0.0.1:3036/",
+      "browser": "firefox",
+      "version": "142.0.1",
+      "checks": [
+        "The tea-entry prompt is visible on approach",
+        "Desktop canvas captures the pointer",
+        "E opens the tea activity with no mint tea prepared",
+        "Entering the activity releases pointer capture",
+        "The matching click control also opens tea",
+        "Mint watering starts a visible countdown",
+        "The compact garden view keeps its visible exit",
+        "No app errors"
+      ],
+      "errors": [],
+      "warnings": [
+        "[JavaScript Warning: \"WebGL warning: texSubImage: Alpha-premult and y-flip are deprecated for non-DOM-Element uploads.\"]",
+        "[JavaScript Warning: \"WebGL warning: drawElementsInstanced: Depth texture comparison requests (e.g. `LINEAR`) Filtering, but behavior is implementation-defined, and so on some systems will sometimes behave as `NEAREST`. (warns once)\"]"
+      ]
+    }
+  ],
+  "limits": "Automated desktop Chrome 154 and Firefox 142 in isolated profiles. Phone dimensions in Chrome; no physical touch or current user-profile check."
+}

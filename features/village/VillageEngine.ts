@@ -10,7 +10,7 @@ import { VillageLife } from "./life";
 import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
-import { GARDEN_TARGETS, freshGarden, type GardenState, type GardenAction, type GardenSound } from "./garden";
+import { GARDEN_TARGETS, freshGarden, nearbyGardenAction, type GardenState, type GardenAction, type GardenSound } from "./garden";
 import type { ActivityMoment } from "./environment";
 import { softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
@@ -125,7 +125,7 @@ export class VillageEngine {
     if (e.key.toLowerCase() === "c" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.invite();
     if (e.key.toLowerCase() === "b" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.bread();
     if (e.key.toLowerCase() === "e" && !e.repeat && !this.place) {
-      if (this.nearGarden) this.callbacks.gardenInteract?.(this.nearGarden);
+      if (this.nearGarden && nearbyGardenAction(this.nearGarden, this.gardenState)) this.callbacks.gardenInteract?.(this.nearGarden);
       else if (this.near) this.callbacks.interact(this.near);
     }
   };

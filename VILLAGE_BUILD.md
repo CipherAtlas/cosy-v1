@@ -1,5 +1,15 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-27 nearby interaction fix
+
+Reproduced at `(15.2, -8.1)`: the nearest activity was `mood`, the garden target was `tea`, and `mintTea` was zero. E called `gardenInteract("tea")`, whose resolver returned null, while the UI offered “Take a quiet moment”. `VillageEngine.onKeyDown` now checks `nearbyGardenAction` before prioritizing that target, matching the React prompt and falling back to the nearby place. Growing crops use the same fallback; ripe crops and prepared tea retain their action priority.
+
+`GardenScene` no longer instantiates the parked basket. Its watering can starts hidden, appears during the 2.5-second watering action and hides afterward. Inventory, crop growth and companion watering are preserved; no assets, dependencies, storage schema or hosting configuration changed.
+
+Verification: `NEXT_PUBLIC_BASE_PATH='' npm run build`, `npm run typecheck` and `git diff --check` pass. Existing workspace-lockfile, Browserslist and unrelated RoomScene image warnings remain. [Chrome 154 checks](docs/village/evidence/interaction-fix-chrome.json) and [Firefox 142 checks](docs/village/evidence/interaction-fix-firefox.json) each pass 15 new interaction/prop assertions plus 89 existing garden/pond/companion regressions. Reproduce the focused suite with `python3 scripts/village/preview_qa.py --port 3035 --evidence-prefix interaction-fix-`, Load village, then Check nearby interaction keys.
+
+The exported app was exercised through actual browser keyboard and click input in isolated Chrome 154 and Firefox 142 profiles: walk into the tea approach with no prepared tea, capture the pointer, press E, verify the tea panel and pointer release, return and enter via the button; water mint, inspect its countdown, and retain a visible exit in the compact garden view. Chrome also passes tea entry/exit at 390×844. No app errors; Firefox emitted WebGL upload and depth-filtering compatibility warnings. These are automated desktop browsers, not the user's current Firefox profile, physical touch, listening or sustained performance acceptance. [UI evidence](docs/village/evidence/README.md#nearby-interaction-and-garden-prop-fix).
+
 ## 2026-09-27 garden release
 
 At the user's request, all 97 changed/new source, artwork, documentation and evidence files were committed in [`e38e517`](https://github.com/CipherAtlas/cosy-v1/commit/e38e5173cb9eba63dae9e8bb18157f768f2d0d64) and pushed to `main`. [Pages run 36312226275](https://github.com/CipherAtlas/cosy-v1/actions/runs/36312226275) successfully built and deployed [the live village](https://cosy.sabarg.com/). The local-only statements in the implementation milestones below record their earlier verification state. Existing world-layout authoring hooks were included; no dependencies, authentication or deployment configuration changed. Garden saves use their own key, preserving existing notes and preferences.
