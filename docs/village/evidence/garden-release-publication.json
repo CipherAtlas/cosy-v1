@@ -1,0 +1,145 @@
+{
+  "checkedAt": "2026-09-27T10:22:47.241277+00:00",
+  "url": "https://cosy.sabarg.com/",
+  "applicationCommit": "e38e5173cb9eba63dae9e8bb18157f768f2d0d64",
+  "htmlStatus": 200,
+  "rootPathExport": true,
+  "htmlAssetCount": 13,
+  "gardenBundlePresent": true,
+  "gardenModelMatchesManifest": true,
+  "assets": [
+    {
+      "path": "/_next/static/chunks/119-75a198015ae8febc.js",
+      "status": 200,
+      "bytes": 113035,
+      "sha256": "0c4244fd53669013ed573ef97c35bd78c65b82e82c65f622091e11ee615868b9",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/chunks/255-102f2e5b2e3dc2ef.js",
+      "status": 200,
+      "bytes": 172787,
+      "sha256": "ef2652affb28ff5ee4e98516273447e2cc41f7d63104e60ae0fba9aa95ba4072",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "status": 200,
+      "bytes": 173019,
+      "sha256": "2c752a401191671d5bbbe7514f5828bbb0a7cc50bfbe77ddaf1b1ccba4412ed2",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/chunks/937-820514b86c4c430b.js",
+      "status": 200,
+      "bytes": 109956,
+      "sha256": "8219e2b8bab5b9fd0f26e605e0349122ce0a047a38b2013076de0eefa3bbc614",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/chunks/app/page-e2855d5cb1954269.js",
+      "status": 200,
+      "bytes": 78840,
+      "sha256": "aec7e79365e1c59e2c83742e80a42af08a2b1d0b47d9cf4deaa7b723550c08c4",
+      "matchesLocalExport": false
+    },
+    {
+      "path": "/_next/static/chunks/app/template-fe05001d0ca40588.js",
+      "status": 200,
+      "bytes": 4394,
+      "sha256": "90c080ea45609c774e2a4a243666ba4d7df59496d71a7421dd2d5d3c4f370277",
+      "matchesLocalExport": false
+    },
+    {
+      "path": "/_next/static/chunks/main-app-5037e7411c5f27b8.js",
+      "status": 200,
+      "bytes": 557,
+      "sha256": "0980984a81db5f3beb31adf5fbb71ad980481945d2fcb60ad65b7767553989e4",
+      "matchesLocalExport": false
+    },
+    {
+      "path": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "status": 200,
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/chunks/webpack-593802807a69a802.js",
+      "status": 200,
+      "bytes": 3606,
+      "sha256": "311af31f2ca879d4e1752682101d270813efe4a196b2b168061490741144c077",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/css/2bfda0318adf1a00.css",
+      "status": 200,
+      "bytes": 30718,
+      "sha256": "f109c4d596badf9bbc2cb7a1e7e8e387f803e5f486f61b78d1022795260f5313",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/css/d4e2784ef38afcde.css",
+      "status": 200,
+      "bytes": 41088,
+      "sha256": "0685bb2fa8e9725e9039f7cf85973d8e3839265ded8653e53f0c76b921587ccf",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/media/630c17af355fa44e-s.p.woff2",
+      "status": 200,
+      "bytes": 43120,
+      "sha256": "10f1a0ef3f3497901c1c3e9987d0cb97d092a6ce1ff45669a1aed503cf67e6ef",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",
+      "status": 200,
+      "bytes": 32228,
+      "sha256": "92684e4acde79ef07758cd09380b7e01e9824d8b061eddeda046f78c166d7b12",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/models/garden-pond.glb?v=2",
+      "status": 200,
+      "bytes": 3239548,
+      "sha256": "4210b507c6386829fd17122f3817e708d6159710513eda4f28f8bcb3c7e0a8e1",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/models/spirit.glb?v=1",
+      "status": 200,
+      "bytes": 437768,
+      "sha256": "d089abfbdaf6a36a0bad15eb1911e37332b847ffe28e93b5a09bb48db7cfbc66",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/textures/sunset.hdr",
+      "status": 200,
+      "bytes": 1061624,
+      "sha256": "e90f2130848de0364b76d2b3da7a72ce31bbb95d66bd86d5b4f85f0626421b8d",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/audio/music/quiet-village-2.mp3",
+      "status": 200,
+      "bytes": 3200357,
+      "sha256": "4550240cc388dde4f1ef2ab1d5a303b24fabcb40cda7f246cdf373a5bb1bd50d",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/audio/world/stream.mp3",
+      "status": 200,
+      "bytes": 216909,
+      "sha256": "c936eb73ee7d4403106118a773e5c010b4b01a7d508bb078112964aa46538c40",
+      "matchesLocalExport": true
+    },
+    {
+      "path": "/village/CREDITS.txt",
+      "status": 200,
+      "bytes": 4555,
+      "sha256": "124657b6fd24bd418ef0ff7bc2e790552e03b73be28d7ac41716286c82da45df",
+      "matchesLocalExport": true
+    }
+  ]
+}

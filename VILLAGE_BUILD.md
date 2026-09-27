@@ -1,5 +1,15 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-27 garden release
+
+At the user's request, all 97 changed/new source, artwork, documentation and evidence files were committed in [`e38e517`](https://github.com/CipherAtlas/cosy-v1/commit/e38e5173cb9eba63dae9e8bb18157f768f2d0d64) and pushed to `main`. [Pages run 36312226275](https://github.com/CipherAtlas/cosy-v1/actions/runs/36312226275) successfully built and deployed [the live village](https://cosy.sabarg.com/). The local-only statements in the implementation milestones below record their earlier verification state. Existing world-layout authoring hooks were included; no dependencies, authentication or deployment configuration changed. Garden saves use their own key, preserving existing notes and preferences.
+
+Fresh `npm run typecheck`, `NEXT_PUBLIC_BASE_PATH='' npm run build` and staged diff checks pass. A trailing blank line in the new villager profile file was removed during staging. Existing build warnings concern workspace lockfiles, Browserslist data and the unrelated room image; Actions also reports upcoming runner/Node deprecations. HTTPS Git uploads returned HTTP 408 without updating the remote; pushing the same commit through the repository's existing SSH access succeeded, without changing saved remote configuration or credentials.
+
+[Publication checks](docs/village/evidence/garden-release-publication.json) confirm HTTP 200 for the root page, all 13 HTML asset references and six runtime samples (garden/spirit models, HDR, pond soundtrack, stream and credits). The root contains no old `/cosy-v1/` asset paths, the deployed JavaScript includes the garden controls, and the garden GLB matches the committed manifest's SHA-256.
+
+Live in-app Chromium inspection at 1280×720 confirms village loading/entry; seven Places cards; the mint label and 3:00 countdown after watering; rendered wooden signs and consistent paving; carrot harvesting and Luma's compliment with a held carrot/heart; inviting all four residents; Maple's crumb pouch; duck feeding with happy hearts beside the swan and fish; mouse dragging that visibly changes the pond camera; and Back to village restoring exploration. No warnings/errors were captured. This release smoke check supplements the earlier 19 focused countdown/layout and 89 garden regressions; it does not repeat physical touch, Firefox/Safari, subjective listening, full real-time growth or sustained device-performance acceptance.
+
 ## 2026-09-27 garden labels, countdowns and ground
 
 Implemented the user's screenshot follow-up in `garden.ts`, `GardenActivities.tsx`, `gardenScene.ts`, `VillageEngine.ts`, `world.ts`, `village.css` and the original Blender generator/kit. Growing crops have small circular progress rings with minutes/seconds in the scene and accessible activity controls. Rings use the existing saved watering time and disappear at ripeness; no expiry, warning color or added obligation. Canvas clock textures update once per displayed second and are disposed on teardown. All eight planting beds have small double-sided wooden labels; crop names follow planting choices, and all names support English/Japanese.

@@ -1,5 +1,11 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-27 — garden release published
+
+All garden, pond, companion, growth/tea, countdown/sign and courtyard changes below are committed and published at [cosy.sabarg.com](https://cosy.sabarg.com/). Application commit [`e38e517`](https://github.com/CipherAtlas/cosy-v1/commit/e38e5173cb9eba63dae9e8bb18157f768f2d0d64) passed [Pages run 36312226275](https://github.com/CipherAtlas/cosy-v1/actions/runs/36312226275). The earlier local-only status notes are historical.
+
+Fresh release typecheck/static export and staged whitespace checks passed. Live verification confirms all seven Places entries, mint watering/countdown, wooden labels and continuous paving, carrot harvest/Luma's compliment and heart, all four companions, Maple's crumbs, happy duck hearts, pond camera dragging and return to exploration. No browser warnings/errors were captured. All 13 root HTML assets and six sampled runtime assets return HTTP 200; the deployed garden GLB matches the manifest. [Release evidence and limits](VILLAGE_BUILD.md#2026-09-27-garden-release).
+
 ## 2026-09-27 — garden labels and visible countdowns
 
 The latest request explicitly adds a small visual countdown: each growing crop has a sage circular ring with minutes/seconds beside its wooden bed label and in the activity panel. The ring advances once per second, resumes after reload and disappears when ready; ripe crops still wait indefinitely. All five crop beds and three flower beds have English/Japanese wooden signs, with crop labels following replanted choices. The front-left mint bed is labeled “Mint · Tea leaves”; the original Blender asset now has upright stems, serrated green blades and veins.
