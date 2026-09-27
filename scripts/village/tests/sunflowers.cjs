@@ -99,11 +99,11 @@ const path = require('node:path');
       setShot([23.8, 3.1, -2.7], [17.3, .5, -3.2]);
       return { checks, count: checks.length };
     });
-    
+
     fs.writeFileSync(path.join(output, 'basket-' + kind + '.png'), Buffer.from((await page.evaluate(() => setShot([23.8, 3.1, -2.7], [17.3, .5, -3.2]))).split(',')[1], 'base64'));
     fs.writeFileSync(path.join(output, 'sunflowers-' + kind + '.png'), Buffer.from((await page.evaluate(() => setShot([28.5, 3.2, -17], [24.7, .9, -12.7]))).split(',')[1], 'base64'));
-    
-    
+
+
     if (errors.length) throw Error(errors.join('\n'));
     const report = { ...result, browser: kind, version: browser.version(), errors, growthTiming: 'Injected timestamps; no real five-minute wait' };
     fs.writeFileSync(path.join(output, 'checks-' + kind + '.json'), JSON.stringify(report, null, 2));
