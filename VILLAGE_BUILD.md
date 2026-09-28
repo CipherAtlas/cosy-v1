@@ -1,5 +1,23 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-28 public shared village
+
+The dev-only Colyseus trial was replaced with a Cloudflare Worker and one SQLite-backed Durable Object. Its hibernatable WebSocket protocol synchronizes colored 3D visitors, two-word cosy names, movement, garden actions, bird and duck feeding, and chat. Chat is reset at each UTC hour boundary. The garden survives Worker restarts. The static client joins automatically after village entry, reconnects after an established connection drops, and reports an unavailable world without saving a competing local garden. One world currently admits 64 simultaneous visitors.
+
+Focused checks: `npm run typecheck`, `NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_SHARED_WORLD_URL=wss://cosy-village-world.sabargulati777.workers.dev/ npm run build`, and `git diff --check` pass. Local Durable Object WebSocket checks exchanged join, movement, garden and chat messages between two clients. The deployed Worker returns HTTP 200 from `/health` and a secure WebSocket welcome from the village origin. The static export has no editor route or layout-save API. Browser and Pages publication status are recorded after the release below.
+
+## 2026-09-28 bird clearing and bench interactions
+
+Wren and Maple no longer repeat their spoken lines in the bottom feedback notice; their dialogue stays in the overhead conversation bubble. The bird clearing's nearby E action now scatters breadcrumbs in place, including before receiving Wren's reusable pouch. The direct Places entry and accessible simple view still provide the bird activity. Wren's redundant “Visit the bird clearing” link is removed. Feeding remains single-use per flock cycle.
+
+All seven modeled benches offer a nearby Sit action, hold the spirit on the seat, and use E or the Stand up button to leave. The birdwatching bench also offers Scatter sourdough crumbs while seated; crumbs visibly arc from the player to the clearing ground. The hearth's west bench uses a clear rear exit when the fire blocks its front. The local scene checks cover each bench's proximity, E to stand, collision-free exit, scattering without a pouch, and the toss path. Typecheck and a Chrome app flow for direct scattering, no activity transition, and no bottom notice pass. No asset or saved-layout changes; local only, with no commit or deployment. Physical-touch and extended seating sessions remain unverified.
+
+## 2026-09-27 shorter villager dialogue
+
+Nearby speech now lasts five seconds for greetings and ambient remarks, and six seconds for explicit chat. Once a line ends, the nearest villager's full panel folds into a small name and Chat control with the same touch target and F shortcut. Companions do not start new ambient or approach lines while following; an explicit conversation still opens normally. This keeps walk-along dialogue available without leaving a large panel over the scene. No assets, saved data or editor behavior changed.
+
+Typecheck, static export and [33 Chrome dialogue checks](docs/village/evidence/dialogue-compact-villager-dialogue.json) pass, including the loaded scene's activity return and no page errors. The smaller control was checked at portrait width. Physical touch and longer walking sessions remain unverified. Local only; no Git writes or deployment.
+
 ## 2026-09-27 birds harvest and companion release
 
 At the user's explicit approval, the complete verified village changes were committed and pushed to `main`: white Blender doves and Wren's feeding clearing, sunflower growing and harvest basket, companion hand-holding, and local layout studio source/presets. Release commit [`d6f218f`](https://github.com/CipherAtlas/cosy-v1/commit/d6f218f205ca26605c226a862d7c2c55607afa7e) passed both jobs in [Pages run 36323478979](https://github.com/CipherAtlas/cosy-v1/actions/runs/36323478979). No dependencies, hosting settings, secrets or workflow configuration changed. The studio has no public route; player data remains browser-local.

@@ -13,6 +13,7 @@ export { groundY, riverX } from "./environment";
 
 /** Optional authoring hook; the public village keeps its existing merged render path. */
 export type WorldLayoutCapture = (id: string, name: string, category: string, objects: T.Object3D[], pivot?: [number, number, number]) => void;
+export type VillageBench = { id: string; x: number; z: number; facing: number; seatHeight: number; birdClearing: boolean };
 
 export type World = {
   group: T.Group;
@@ -25,6 +26,7 @@ export type World = {
   setWeather: (rain: number, dusk: number) => void;
   setLanguage: (language: "en" | "ja") => void;
   colliders: Collider[];
+  benches: VillageBench[];
   flames: T.Mesh[];
   lanterns: T.Mesh[];
   water: T.Mesh;
@@ -50,6 +52,7 @@ export async function buildWorld(
   seed = 62025;
   const group = new T.Group();
   const colliders: World["colliders"] = [],
+    benches: VillageBench[] = [],
     flames: T.Mesh[] = [],
     lanterns: T.Mesh[] = [];
   const wind = { time: { value: 0 }, strength: { value: 0.3 } };
@@ -586,7 +589,9 @@ export async function buildWorld(
       box(mat.wood, 0, 0.65, -0.22 + i * 0.22, 2.2, 0.1, 0.18, b);
     for (let i = 0; i < 2; i++)
       box(mat.wood, 0, 1.05 + i * 0.23, -0.32, 2.2, 0.18, 0.1, b);
-    capture?.(`bench-${++benchIndex}`, `Oak bench ${benchIndex}`, "Furnishings", [b], [x, 0, z]);
+    const id = `bench-${++benchIndex}`;
+    benches.push({ id, x, z, facing: rot, seatHeight: .7, birdClearing: false });
+    capture?.(id, `Oak bench ${benchIndex}`, "Furnishings", [b], [x, 0, z]);
     return collider;
   }
   // The saved copy places the feeding clearing at the western end of the bridge path.
@@ -609,6 +614,7 @@ export async function buildWorld(
   for (const x of [-.9, .9]) for (const z of [-.23, .23]) box(mat.darkWood, birdBenchX + x, .2, birdBenchZ + z, .11, .4, .11);
   const birdBenchCollider = {x:-24,z:-27.75,w:2.6,d:.85,top:1.12};
   colliders.push(birdBenchCollider);
+  benches.push({ id: "bird-clearing-bench", x: birdBenchX, z: birdBenchZ, facing: Math.PI, seatHeight: .47, birdClearing: true });
   capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [birdBenchX, 0, birdBenchZ]);
   layoutStart = group.children.length;
   const leaf = new T.MeshStandardMaterial({color:'#6d9959',roughness:1});
@@ -1245,6 +1251,7 @@ export async function buildWorld(
       riverSurface.setWeather(rain,dusk);pondSurface.setWeather(rain,dusk);
     },
     colliders,
+    benches,
     flames,
     lanterns,
     water,

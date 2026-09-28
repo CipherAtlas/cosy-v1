@@ -39,6 +39,8 @@
   touch-action: none;
   outline: none;
 }
+.v-visitor-name { position: absolute; z-index: 2; transform: translate(-50%, -100%); padding: 5px 10px; border: 1px solid var(--visitor-color); border-radius: 20px; background: #263b32e8; color: #fff9eb; box-shadow: 0 3px 10px #16251e66; font: 12px var(--font-outfit), sans-serif; white-space: nowrap; pointer-events: none; }
+.v-visitor-name[hidden] { display: none; }
 .v-villager-dialogue {
   position: absolute;
   inset: 0;
@@ -93,6 +95,14 @@
   line-height: 1.45;
   text-wrap: pretty;
 }
+.v-simple-luma-bubble { position: relative; width: 100%; max-width: 100%; margin: 12px 0 18px; }
+.v-villager-bubble.is-compact {
+  width: auto;
+  padding: 4px 7px 4px 12px;
+}
+.v-villager-bubble.is-compact p,
+.v-villager-bubble.is-compact .v-villager-actions { display: none; }
+.v-villager-bubble.is-compact .v-villager-footer { margin-top: 0; }
 .v-villager-footer {
   display: flex;
   align-items: center;
@@ -380,6 +390,12 @@ kbd {
 }
 .v-interact:hover {
   background: #3e4837;
+}
+.v-interact:disabled {
+  color: #fff1dc;
+  background: #39443bcf;
+  opacity: .85;
+  cursor: default;
 }
 .v-interact kbd {
   width: 29px;
@@ -1283,12 +1299,32 @@ kbd {
 .v-maple-gift p { font-size: 13px; color: #6f7b61; line-height: 1.5; margin: 0 0 10px; }
 .v-maple-gift .v-text-button { display: block; color: #466f52; margin-top: 10px; min-height: 44px; }
 .v-save-warning { position: absolute; bottom: 14px; left: 20px; max-width: 350px; padding: 10px 15px; background: #fff4d9; color: #685536; border-radius: 8px; font-size: 13px; z-index: 5; }
+.v-shared-trial { position: absolute; z-index: 6; top: 88px; left: 30px; width: min(320px, calc(100vw - 30px)); color: #fff9eb; }
+.v-shared-toggle { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid #e9dfc580; border-radius: 24px; background: #243e35e8; color: inherit; font: 13px var(--font-outfit), sans-serif; cursor: pointer; }
+.v-shared-toggle:hover { background: #345849; }
+.v-shared-chat { margin-top: 9px; padding: 16px; border: 1px solid #f6e8c6a3; border-radius: 18px; background: #223a32f2; box-shadow: 0 15px 35px #15211875; backdrop-filter: blur(16px); }
+.v-shared-chat-header { display: flex; align-items: center; justify-content: space-between; }
+.v-shared-chat h2 { margin: 0; font: 22px Georgia, serif; }
+.v-shared-chat-header button { display: grid; place-items: center; width: 34px; height: 34px; border: 0; background: none; color: inherit; cursor: pointer; }
+.v-shared-people { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.v-shared-people span { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border: 1px solid #f6e8c64b; border-radius: 20px; background: #fff9eb12; font-size: 12px; }
+.v-shared-people i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.v-shared-chat-note { margin: 8px 0 13px; color: #e4e4ca; font-size: 12px; line-height: 1.4; }
+.v-shared-chat-log { min-height: 80px; max-height: min(220px, 36dvh); overflow-y: auto; padding: 8px 0; border-top: 1px solid #f6e8c63d; border-bottom: 1px solid #f6e8c63d; }
+.v-shared-chat-log p { margin: 6px 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.v-shared-chat-log strong { color: #ffe0a5; }
+.v-shared-chat-empty { color: #e0ddc6; }
+.v-shared-chat form { display: flex; gap: 7px; margin-top: 12px; }
+.v-shared-chat input { min-width: 0; flex: 1; min-height: 39px; padding: 8px 10px; border: 1px solid #e6dfc573; border-radius: 9px; background: #fff9eb; color: #243e35; font: 13px var(--font-outfit), sans-serif; }
+.v-shared-chat form button { min-height: 39px; padding: 7px 12px; border: 0; border-radius: 9px; background: #f0d695; color: #243e35; font-weight: 700; cursor: pointer; }
+.v-shared-chat form button:disabled { opacity: .5; cursor: default; }
 @media (max-width: 700px) {
   .v-header nav { gap: 5px; }
   .v-header nav > button { padding-inline: 9px; }
   .v-garden-bed { padding: 12px 0; }
   .v-garden-bed-actions .v-button { flex: 1; }
   .v-friend-name strong { font-size: 20px; }
+  .v-shared-trial { top: 84px; left: 14px; width: min(320px, calc(100vw - 28px)); }
 }
 
 .v-harvest-inventory > p { color: #60745e; font-size: 14px; line-height: 1.6; margin: 0 0 20px; }

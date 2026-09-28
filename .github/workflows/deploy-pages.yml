@@ -36,6 +36,7 @@ jobs:
       - name: Build static site
         env:
           NEXT_PUBLIC_BASE_PATH: ""
+          NEXT_PUBLIC_SHARED_WORLD_URL: "wss://cosy-village-world.sabargulati777.workers.dev/"
         run: npm run build
 
       - name: Add .nojekyll

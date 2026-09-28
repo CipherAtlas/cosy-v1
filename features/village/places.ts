@@ -80,7 +80,7 @@ export const PLACES = [
     position: [-33.5, 0, 4],
     camera: [-31, 4.5, 11],
     look: [-37, .7, 4],
-    prompt: "Visit the bird clearing",
+    prompt: "Scatter sourdough crumbs",
   },
 ] as const;
 export type PlaceId = (typeof PLACES)[number]["id"];

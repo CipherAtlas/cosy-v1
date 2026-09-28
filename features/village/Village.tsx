@@ -37,6 +37,7 @@ import { withBasePath } from "@/lib/basePath";
 import type { BirdStatus } from "./birds";
 import { VILLAGERS } from "./villagers";
 import { GARDEN_KEY, CROP_NAMES, HARVEST_COMPLIMENTS, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
+import type { SharedWorldConnection, SharedVisitor } from "./sharedWorld";
 
 export function Village() {
   const canvas = useRef<HTMLDivElement>(null),
@@ -51,8 +52,23 @@ export function Village() {
     [near, setNear] = useState<PlaceId | null>(null),
     [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "friends" | "basket" | null>(null);
   const [birdStatus, setBirdStatus] = useState<BirdStatus>("flying");
+  const [nearBench, setNearBench] = useState<string | null>(null);
+  const [seatedBench, setSeatedBench] = useState<string | null>(null);
   const [garden, setGarden] = useState(freshGarden);
   const gardenRef = useRef(garden);
+  const sharedTrialModeRef = useRef(false);
+  const sharedTrialRef = useRef<SharedWorldConnection | null>(null);
+  const sharedConnectedRef = useRef(false);
+  const sharedVisitorsRef = useRef<SharedVisitor[]>([]);
+  const sharedIdentityRef = useRef<Pick<SharedVisitor, "slot" | "color"> | null>(null);
+  const [sharedTrialEnabled, setSharedTrialEnabled] = useState(false);
+  const [sharedStatus, setSharedStatus] = useState("Connecting…");
+  const [sharedPeople, setSharedPeople] = useState<Pick<SharedVisitor, "id" | "name" | "color">[]>([]);
+  const [sharedSelfId, setSharedSelfId] = useState("");
+  const [sharedChat, setSharedChat] = useState<{ name: string; message: string }[]>([]);
+  const [sharedChatHour, setSharedChatHour] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatDraft, setChatDraft] = useState("");
   const [companions, setCompanions] = useState<string[]>([]);
   const companionsRef = useRef(companions);
   const [activityCompact,setActivityCompact]=useState(false);
@@ -72,6 +88,7 @@ export function Village() {
   const preferences = useRef({ quality, weather, language });
   preferences.current = { quality, weather, language };
   const [notice, setNotice] = useState("");
+  const [lumaSpeech, setLumaSpeech] = useState<{ en: string; ja: string } | null>(null);
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
@@ -83,6 +100,7 @@ export function Village() {
     setNotice("Your session is complete. Take a breath.");
   });
   const openPlace = useCallback((id: PlaceId) => {
+    setLumaSpeech(null);
     setPlace(id);
     setActivityCompact(false);
     setPanel(null);
@@ -90,6 +108,7 @@ export function Village() {
     audio.current?.setPlace(id);
   }, []);
   const leave = useCallback(() => {
+    setLumaSpeech(null);
     setPlace(null);
     engine.current?.setPlace(null);
     audio.current?.setPlace(null);
@@ -104,8 +123,12 @@ export function Village() {
   }, []);
   const onGardenAction = useCallback((action: GardenAction) => {
     if (action.kind === "basket") { setPanel("basket"); return; }
+    if (sharedTrialModeRef.current) {
+      if (sharedConnectedRef.current && sharedTrialRef.current) sharedTrialRef.current.sendGarden(action);
+      else setNotice("The shared village is offline. Reload to reconnect.");
+      return;
+    }
     if (action.kind === "feedBirds") {
-      if (!gardenRef.current.crumbPouch) return;
       if (engine.current) { engine.current.gardenAction(action); return; }
       setBirdStatus(current => current === "eating" || current === "happy" ? current : "eating");
       return;
@@ -118,17 +141,21 @@ export function Village() {
     if (!engine.current) audio.current?.gardenEffect(action.kind === "drink" || action.kind === "gift" ? "pour" : action.kind === "plant" ? "plant" : action.kind === "water" || action.kind === "flowers" ? "water" : action.kind === "feed" || action.kind === "crumbs" ? "crumbs" : "pluck", [0, 0, 0], true);
     try { localStorage.setItem(GARDEN_KEY, JSON.stringify(next)); setGardenStorageError(false); }
     catch { setGardenStorageError(true); }
+    if (action.kind === "birdCrumbs" || action.kind === "crumbs") { setNotice(""); return; }
+    if (action.kind === "gift") {
+      setNotice("");
+      if (!engine.current) setLumaSpeech({ ...HARVEST_COMPLIMENTS[action.crop] });
+      return;
+    }
     const messages = {
       plant: ["A new little sprout. Water it whenever you like.", "小さな芽が出ました。好きなときに水をどうぞ。"],
       water: ["A little water. Now it can grow while you wander.", "お水を少し。あとは、お散歩している間に育ちます。"],
       harvest: ["Something lovely for your basket.", "かごに小さな収穫を。"],
       flowers: ["A little shower for the flowers.", "お花たちに小さなシャワー。"],
       drink: ["Fresh from your garden. A warm sip, a quiet moment.", "あなたの庭から、あたたかいひと口。ほっとするひととき。"],
-      birdCrumbs: ["Wren: Here, some sourdough crumbs. Scatter a little and watch their wings!", "レン：サワードウのパンくずをどうぞ。少し撒いて、羽を見ていてね！"],
-      crumbs: ["Maple gave you a little pouch of bread crumbs. Take it to the pond whenever you like.", "メープルからパンくずの袋をもらいました。好きなときに池へどうぞ。"],
       feed: ["Here come the little duckies.", "小さなアヒルたちがやってきました。"],
     };
-    setNotice(action.kind === "gift" ? HARVEST_COMPLIMENTS[action.crop][preferences.current.language] : messages[action.kind][preferences.current.language === "ja" ? 1 : 0]);
+    setNotice(messages[action.kind][preferences.current.language === "ja" ? 1 : 0]);
   }, []);
   useEffect(() => {
     if (!simple) return;
@@ -180,6 +207,7 @@ export function Village() {
   }, []);
   useEffect(() => {
     const refresh = () => {
+      if (sharedTrialModeRef.current) return;
       const next = growGarden(gardenRef.current);
       if (next === gardenRef.current) return;
       gardenRef.current = next; setGarden(next); engine.current?.setGarden(next);
@@ -191,6 +219,69 @@ export function Village() {
     document.addEventListener("visibilitychange", refresh);
     return () => { clearInterval(interval); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
   }, []);
+  useEffect(() => {
+    if (!entered || simple || (process.env.NODE_ENV === "development"
+      ? new URLSearchParams(location.search).get("sharedTrial") !== "1"
+      : !process.env.NEXT_PUBLIC_SHARED_WORLD_URL)) return;
+    let cancelled = false;
+    let peopleKey = "", chatKey = "";
+    sharedTrialModeRef.current = true;
+    setSharedTrialEnabled(true);
+    void import("./sharedWorld").then(({ connectSharedWorld }) => connectSharedWorld({
+      getPose: () => engine.current?.getPlayerPose() ?? null,
+      onState: snapshot => {
+        if (cancelled) return;
+        sharedConnectedRef.current = true;
+        setSharedSelfId(snapshot.selfId);
+        const self = snapshot.visitors.find(visitor => visitor.id === snapshot.selfId);
+        if (self && (self.slot !== sharedIdentityRef.current?.slot || self.color !== sharedIdentityRef.current?.color)) {
+          sharedIdentityRef.current = { slot: self.slot, color: self.color };
+          engine.current?.setSharedIdentity(self.slot, self.color);
+        }
+        if (snapshot.gardenChanged) {
+          gardenRef.current = snapshot.garden;
+          setGarden(snapshot.garden);
+          engine.current?.setGarden(snapshot.garden);
+        }
+        const visitors = snapshot.visitors.filter(visitor => visitor.id !== snapshot.selfId);
+        sharedVisitorsRef.current = visitors;
+        engine.current?.setRemoteVisitors(visitors);
+        const nextPeopleKey = snapshot.visitors.map(visitor => `${visitor.id}:${visitor.name}:${visitor.color}`).sort().join("|");
+        if (nextPeopleKey !== peopleKey) {
+          peopleKey = nextPeopleKey;
+          setSharedPeople(snapshot.visitors.map(({ id, name, color }) => ({ id, name, color })));
+        }
+        const nextChatKey = `${snapshot.chatHour}:${JSON.stringify(snapshot.chat)}`;
+        if (nextChatKey !== chatKey) {
+          chatKey = nextChatKey;
+          setSharedChat(snapshot.chat);
+          setSharedChatHour(snapshot.chatHour);
+        }
+        setSharedStatus("Connected");
+      },
+      onAction: event => { if (!cancelled) engine.current?.gardenAction(event.action, { x: event.x, z: event.z }, event.isSelf); },
+      onDisconnect: () => {
+        if (cancelled) return;
+        sharedConnectedRef.current = false;
+        sharedVisitorsRef.current = [];
+        engine.current?.setRemoteVisitors([]);
+        setSharedPeople([]);
+        setSharedStatus("Disconnected");
+      },
+    })).then(connection => {
+      if (cancelled) connection.close();
+      else sharedTrialRef.current = connection;
+    }).catch(error => { if (!cancelled) setSharedStatus(error instanceof Error ? error.message : "Could not connect"); });
+    return () => {
+      cancelled = true;
+      sharedTrialRef.current?.close();
+      sharedTrialRef.current = null;
+      sharedVisitorsRef.current = [];
+      sharedIdentityRef.current = null;
+      sharedTrialModeRef.current = false;
+      sharedConnectedRef.current = false;
+    };
+  }, [entered, simple]);
   useEffect(() => {
     if (!canvas.current || simple) return;
     let cancelled = false;
@@ -215,6 +306,9 @@ export function Village() {
             if (!cancelled) setReady(true);
           },
           near: setNear,
+          nearBench: setNearBench,
+          seat: setSeatedBench,
+          scatterBirds: () => onGardenAction({ kind: "feedBirds" }),
           interact: openPlace,
           error: (msg) => {
             setError(msg);
@@ -228,6 +322,9 @@ export function Village() {
         local.setBlocked(!enterRef.current);
         await local.load();
         if (!cancelled) {
+          local.setGarden(gardenRef.current);
+          if (sharedIdentityRef.current) local.setSharedIdentity(sharedIdentityRef.current.slot, sharedIdentityRef.current.color);
+          local.setRemoteVisitors(sharedVisitorsRef.current);
           local.setQuality(preferences.current.quality);
           local.setWeather(preferences.current.weather);
           local.setLanguage(preferences.current.language);
@@ -284,6 +381,11 @@ export function Village() {
     return () => clearTimeout(id);
   }, [notice]);
   useEffect(() => {
+    if (!lumaSpeech) return;
+    const id = setTimeout(() => setLumaSpeech(null), 6000);
+    return () => clearTimeout(id);
+  }, [lumaSpeech]);
+  useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
@@ -327,6 +429,8 @@ export function Village() {
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
   const showWorldInteraction = entered && !place && !simple;
+  const nearBirds = nearPlace?.id === "birds" || seatedBench === "bird-clearing-bench";
+  const birdMealBusy = birdStatus === "crumbs" || birdStatus === "eating" || birdStatus === "happy";
   const showActivityPanel = entered && place && (!activityCompact || simple);
   const nearbyAction = nearGarden ? nearbyGardenAction(nearGarden, garden) : null;
   const nearbyLabel = nearbyAction?.kind === "plant" ? t(`Plant ${CROP_NAMES[nearbyAction.crop].en.toLowerCase()}`, "種を植える")
@@ -518,7 +622,7 @@ export function Village() {
           toggleSound={toggleSound}
           travel={openPlace}
           language={language}
-          gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace, meetMaple: () => setPanel("friends") }}
+          gardenControls={{ garden, onGardenAction, birdStatus, language, lumaSpeech: simple ? lumaSpeech : null, travel: openPlace, meetMaple: () => setPanel("friends") }}
         />
         </div>
       )}
@@ -556,12 +660,30 @@ export function Village() {
       )}
       {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}`}>
         {notice && <div className="v-notice" role="status">{notice}</div>}
-        {showWorldInteraction && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
-        {showWorldInteraction && nearPlace && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
+        {showWorldInteraction && seatedBench && <button className="v-interact" onClick={() => engine.current?.stand()}><kbd>E</kbd>{t("Stand up", "立ち上がる")}</button>}
+        {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
+        {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
+        {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}<Bird size={17} /></button>}
+        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && !nearBench && !seatedBench && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </button>}
       </div>}
-      {gardenStorageError && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
+      {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
+      {sharedTrialEnabled && entered && <div className="v-shared-trial">
+        <button className="v-shared-toggle" onClick={() => setChatOpen(open => !open)} aria-expanded={chatOpen}>
+          <UsersThree size={18} /> {sharedStatus === "Connected" ? `${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here` : sharedStatus}
+        </button>
+        {chatOpen && <section className="v-shared-chat" aria-label="Village chat">
+          <div className="v-shared-chat-header"><h2>Village chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close village chat"><X size={18} /></button></div>
+          <div className="v-shared-people">{sharedPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>
+          <p className="v-shared-chat-note">Everyone is in this village. Messages clear each hour{sharedChatHour ? `, at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : ""}.</p>
+          <div className="v-shared-chat-log" role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => <p key={index}><strong>{entry.name}</strong> {entry.message}</p>) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
+          <form onSubmit={event => { event.preventDefault(); const message = chatDraft.trim(); if (message && sharedTrialRef.current) { sharedTrialRef.current.sendChat(message); setChatDraft(""); } }}>
+            <input aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => event.stopPropagation()} maxLength={180} placeholder="Say something kind…" disabled={sharedStatus !== "Connected"} />
+            <button type="submit" disabled={!chatDraft.trim() || sharedStatus !== "Connected"}>Send</button>
+          </form>
+        </section>}
+      </div>}
       {entered && companions.length > 0 && <div className="sr-only" role="status">{t("With you", "一緒にいる仲間")}: {VILLAGERS.filter(v => companions.includes(v.id)).map(v => v.name[language]).join(", ")}</div>}
       {showStats && (
         <output className="v-stats">
@@ -629,7 +751,6 @@ export function Village() {
                 {v.id === "luma" && <button className="v-text-button" onClick={() => openPlace("mood")}>{t("Share your harvest over tea", "収穫を持ってお茶をしよう")}</button>}
                 {v.id === "wren" && <div className="v-maple-gift"><p>{t("Wren tends the bird clearing with a little pouch of sourdough crumbs.", "レンはサワードウのパンくずを持って、小鳥の広場のお世話をしています。")}</p>
                   <button className="v-button" onClick={() => onGardenAction({ kind: "birdCrumbs" })}>{t("Chat with Wren · Ask for crumbs", "レンと話してパンくずをもらう")}</button>
-                  <button className="v-text-button" onClick={() => openPlace("birds")}>{t("Visit the bird clearing", "小鳥の広場へ")}</button>
                 </div>}
                 {v.id === "maple" && <div className="v-maple-gift"><p>{t("Our baker has a little something for the duckies.", "パン屋さんから、アヒルたちへ小さな贈りもの。")}</p>
                   <button className="v-button" onClick={() => onGardenAction({ kind: "crumbs" })}>{garden.crumbPouch ? t("A few more crumbs, Maple?", "メープル、もう少しパンくずを？") : t("Ask Maple for bread crumbs", "メープルにパンくずをもらう")}</button>

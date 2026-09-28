@@ -15,6 +15,7 @@ export class VillagerDialogue {
   private enabled = false;
   private nearest = -1;
   private clock = 0;
+  private teaSpeechUntil = 0;
   private width = 0;
   private height = 0;
   private anchor = new T.Vector3();
@@ -98,6 +99,10 @@ export class VillagerDialogue {
       b.button.setAttribute("aria-keyshortcuts", "F");
       this.actionLabels(b);
     });
+    if (this.clock < this.teaSpeechUntil) {
+      const luma = this.bubbles[3];
+      this.announcement.textContent = `${luma.profile.name[language]}: ${luma.line[language]}`;
+    }
   }
   private actionLabels(b: typeof this.bubbles[number]) {
     const state = `${this.language}:${b.resident.following}`;
@@ -115,19 +120,19 @@ export class VillagerDialogue {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || !this.actions) return;
     this.onTalk(); this.actions.companion(b.profile.id); this.actionLabels(b); b.measured = "";
-    this.say(index, b.resident.following ? line("A little company? I'd love that.", "一緒にお散歩？うれしいな。") : line("See you around. I'll be right here in the village.", "またね。村でのんびりしてるね。"), 5);
+    this.say(index, b.resident.following ? line("A little company? I'd love that.", "一緒にお散歩？うれしいな。") : line("See you around. I'll be right here in the village.", "またね。村でのんびりしてるね。"), 4);
   }
   bread(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || !["maple", "wren"].includes(b.profile.id) || !this.actions) return;
     this.onTalk(); this.actions.crumbs(b.profile.id);
-    this.say(index, b.profile.id === "wren" ? b.profile.chat[0] : line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 10);
+    this.say(index, b.profile.id === "wren" ? b.profile.chat[0] : line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 6);
     this.announcement.textContent = b.line[this.language];
   }
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
-    this.layer.hidden = !enabled;
+    this.layer.hidden = !enabled && this.clock >= this.teaSpeechUntil;
     if (!enabled) {
       this.nearest = -1;
       this.announcement.textContent = "";
@@ -145,20 +150,54 @@ export class VillagerDialogue {
     b.nextAmbient = b.until + 5 + index * 1.3;
   }
 
+  sayAtTea(text: Line) {
+    this.say(3, text, 6);
+    this.teaSpeechUntil = this.clock + 6;
+    this.layer.hidden = false;
+    this.announcement.textContent = `${this.bubbles[3].profile.name[this.language]}: ${text[this.language]}`;
+  }
+
+  clearTeaSpeech() {
+    this.teaSpeechUntil = 0;
+    if (!this.enabled) this.layer.hidden = true;
+    this.bubbles[3].element.hidden = true;
+    this.announcement.textContent = "";
+  }
+
   talk(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || index !== this.nearest) return;
-    if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 10; b.resident.chatting = true; return; }
+    if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 6; b.resident.chatting = true; return; }
     this.onTalk();
-    this.say(index, b.profile.chat[b.chat++ % b.profile.chat.length], 10);
-    b.talkingUntil = this.clock + 10;
+    this.say(index, b.profile.chat[b.chat++ % b.profile.chat.length], 6);
+    b.talkingUntil = this.clock + 6;
     b.resident.chatting = true;
     this.announcement.textContent = `${b.profile.name[this.language]}: ${b.line[this.language]}`;
   }
 
   update(delta: number, camera: T.Camera, player: T.Vector3, weather: Weather) {
-    if (!this.enabled || !this.width || !this.height) return;
+    if (!this.width || !this.height || !this.enabled && this.clock >= this.teaSpeechUntil) return;
     this.clock += delta;
+    if (!this.enabled) {
+      if (this.clock >= this.teaSpeechUntil) { this.clearTeaSpeech(); return; }
+      const b = this.bubbles[3];
+      this.anchor.copy(b.resident.root.position);
+      this.anchor.y += 2.12 * b.resident.root.scale.y;
+      this.projected.copy(this.anchor).project(camera);
+      b.element.hidden = this.projected.z < -1 || this.projected.z > 1;
+      if (b.element.hidden) return;
+      b.element.classList.remove("is-compact");
+      b.button.hidden = true;
+      b.actions.hidden = true;
+      const width = b.element.offsetWidth, height = b.element.offsetHeight;
+      const x = T.MathUtils.clamp((this.projected.x * .5 + .5) * this.width, 24, this.width - 24);
+      const y = (-this.projected.y * .5 + .5) * this.height;
+      const left = T.MathUtils.clamp(x - width / 2, 12, this.width - width - 12);
+      const top = T.MathUtils.clamp(y - height - 14, 76, Math.max(76, this.height * (this.width < 700 ? .44 : .85) - height));
+      b.element.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0)`;
+      b.element.style.setProperty("--tail-x", `${T.MathUtils.clamp(x - left, 16, width - 16)}px`);
+      return;
+    }
     this.nearest = -1;
     const candidates: number[] = [];
     this.bubbles.forEach((b, index) => {
@@ -176,16 +215,16 @@ export class VillagerDialogue {
         && !this.boxes.some(box => this.ray.intersectBox(box, this.hit) && this.hit.distanceTo(camera.position) < distanceToCamera - .2);
       if (!b.visible) { b.element.hidden = true; b.button.hidden = true; return; }
       if (b.distance < 4.5 && (this.nearest < 0 || b.distance < this.bubbles[this.nearest].distance)) this.nearest = index;
-      if (!b.greetingSeen && b.distance < 2.5) {
+      if (!b.resident.following && !b.greetingSeen && b.distance < 2.5) {
         b.greetingSeen = true;
-        this.say(index, b.profile.greeting, 8);
-        b.talkingUntil = this.clock + 5;
+        this.say(index, b.profile.greeting, 5);
+        b.talkingUntil = this.clock + 4;
         b.resident.chatting = true;
-      } else if (this.clock >= b.nextAmbient && this.clock >= b.talkingUntil) {
+      } else if (!b.resident.following && this.clock >= b.nextAmbient && this.clock >= b.talkingUntil) {
         const turn = b.ambient++;
         const text = weather !== "golden" && turn % 2 === 0 ? b.profile[weather]
           : b.profile.ambient[turn % b.profile.ambient.length];
-        this.say(index, text, 8);
+        this.say(index, text, 5);
       }
       b.x = (this.projected.x * .5 + .5) * this.width;
       b.y = (-this.projected.y * .5 + .5) * this.height;
@@ -196,11 +235,16 @@ export class VillagerDialogue {
     candidates.sort((a, b) => this.bubbles[a].distance - this.bubbles[b].distance).forEach(index => {
       const b = this.bubbles[index];
       const canChat = index === this.nearest;
+      if (b.resident.following && !canChat && this.clock >= b.until) {
+        b.visible = false; b.element.hidden = true; return;
+      }
       b.button.hidden = !canChat;
       b.actions.hidden = !canChat || !this.actions;
       this.actionLabels(b);
+      const compact = canChat && this.clock >= b.until;
+      b.element.classList.toggle("is-compact", compact);
       b.element.hidden = false;
-      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}`;
+      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}:${compact}`;
       if (b.measured !== measureKey) {
         b.width = b.element.offsetWidth; b.height = b.element.offsetHeight; b.measured = measureKey;
       }

@@ -1,0 +1,12 @@
+{
+  "name": "cosy-village-world",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-28",
+  "workers_dev": true,
+  "durable_objects": {
+    "bindings": [{ "name": "VILLAGE", "class_name": "VillageWorld" }]
+  },
+  "exports": {
+    "VillageWorld": { "type": "durable-object", "storage": "sqlite" }
+  }
+}

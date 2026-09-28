@@ -102,7 +102,6 @@ export class VillageAudio {
       this.mix.music > 0 && this.mix.master > 0 ? this.soundtrack!.start(cue) : Promise.resolve(),
     ]);
     if (this.disposed) throw new Error("Audio was disposed.");
-    this.recordings.forEach(recording => recording.next = 0);
     this.nextDetail = c.currentTime + 5; this.apply();
     if (this.mix.master === 0) await c.suspend();
     this.schedule();
@@ -116,7 +115,11 @@ export class VillageAudio {
     this.master?.gain.setTargetAtTime(0, this.context.currentTime, .06);
     clearTimeout(this.suspension);
     this.suspension = setTimeout(() => {
-      if (!this.enabled && !this.disposed) { this.soundtrack?.pause(); this.clearVoices(); void this.context?.suspend(); }
+      if (!this.enabled && !this.disposed) {
+        this.soundtrack?.pause(); this.clearVoices();
+        this.recordings.forEach(recording => recording.next = 0);
+        void this.context?.suspend();
+      }
     }, 350);
   }
   setMix(m: AudioMix) {

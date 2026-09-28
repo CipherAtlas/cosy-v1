@@ -1,5 +1,17 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-28 — public shared village
+
+The local 3D multiplayer trial has been adapted for a public, single shared village. A Cloudflare Worker with one SQLite-backed Durable Object owns connected visitors, server-generated two-word cosy names and colors, shared garden state, feeding events and chat that clears hourly. The Worker uses hibernatable WebSockets and stores the garden across restarts. The GitHub Pages client joins automatically after entering the 3D village, renders other visitors as spirit models with name labels and reconnects after a dropped connection. The first release is capped at 64 simultaneous visitors; horizontal scaling, moderation and physical-device performance are future work. The editor stays local. See [the build ledger](VILLAGE_BUILD.md#2026-09-28-public-shared-village).
+
+## 2026-09-28 — bird clearing and benches
+
+Wren/Maple dialogue now stays in overhead bubbles instead of duplicating at the bottom. Walking into the bird clearing offers Scatter sourdough crumbs directly; all seven benches offer Sit and E to stand, with scattering also available from the birdwatching seat. Bird feeding no longer requires Wren's optional pouch, and thrown crumbs arc from the spirit to the ground. The old visit prompt and Wren's extra visit link are removed, while Places and simple view retain the bird activity. Scene bench and bird checks, typecheck, static export and a Chrome app flow pass; long seating and physical touch remain open. This is local, uncommitted work. See [the current milestone](VILLAGE_BUILD.md#2026-09-28-bird-clearing-and-bench-interactions).
+
+## 2026-09-27 — quieter walk-along dialogue
+
+Villager lines now close after five seconds for automatic speech or six seconds for chat, leaving a compact name and Chat control for the nearest resident. Following companions no longer repeat ambient lines. The control retains the F shortcut and a 44 px touch target. Typecheck, static export and 33 loaded-scene Chrome dialogue checks pass; physical touch and extended walking were not retested. This is a local change, not committed or deployed. See [the milestone](VILLAGE_BUILD.md#2026-09-27-shorter-villager-dialogue).
+
 ## 2026-09-27 — studio grass, paths and map expansion
 
 The local studio now offers wind-animated grass tufts/patches, editable straight and curved limestone paths, textured 20/40 m meadow ground tiles and a grassy hill. Path length/width/shape, tangent extension and continuing by ground clicks work on the existing path object. Ground tiles have directional edge-to-edge expansion. Paths and grass follow placed surfaces; grass clears under editable paths and solid props. New asset IDs retain the version-1 layout shape and existing preset compatibility.

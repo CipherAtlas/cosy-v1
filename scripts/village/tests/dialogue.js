@@ -39,9 +39,22 @@ export async function checkDialogue(engine) {
     const mobile = visible()[0].getBoundingClientRect(), bounds = host.getBoundingClientRect();
     check(mobile.left >= bounds.left && mobile.right <= bounds.right, 'Portrait bubble stays within the viewport');
     check(visible()[0].querySelector('button').getBoundingClientRect().height >= 44, 'Chat target is at least 44 pixels high');
+    update(6.1);
+    check(visible()[0].classList.contains('is-compact') && visible()[0].querySelector('button').offsetHeight >= 44,
+      'Expired speech becomes a compact, touchable Chat control');
+    dialogue.talk(); update();
+    check(!visible()[0].classList.contains('is-compact'), 'Chat reopens the full conversation');
+    residents[0].following = true;
+    update(6.1);
+    check(visible()[0].classList.contains('is-compact'), 'Walking companion speech folds away after six seconds');
+    const companionLine = visible()[0].querySelector('p').textContent;
+    update(60);
+    check(visible()[0].classList.contains('is-compact') && visible()[0].querySelector('p').textContent === companionLine,
+      'Walking companions do not repeat ambient lines');
+    residents[0].following = false;
     dialogue.setEnabled(false); update();
     check(host.querySelector('.v-villager-dialogue').hidden && !residents.some(r => r.chatting), 'Disabling dialogue hides bubbles and releases residents');
-    dialogue.talk(0); check(interactions === 5, 'Hidden dialogue cannot be activated');
+    dialogue.talk(0); check(interactions === 6, 'Hidden dialogue cannot be activated');
     dialogue.setEnabled(true);
     residents[0].root.position.z = 12; update(); check(!visible().length, 'Behind-camera speech is hidden');
     residents[0].root.position.set(0, 0, -30); update(); check(!visible().length, 'Distant speech is hidden');

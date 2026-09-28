@@ -23,11 +23,11 @@ export const CROP_NAMES = { carrot: { en: "Carrots", ja: "ニンジン" }, radis
 export const CROP_INVENTORY = { carrot: "carrots", radish: "radishes", mint: "mint", daisy: "daisies", sunflower: "sunflowers" } as const;
 export const CROP_MODELS = { carrot: "Carrot", radish: "Radish", mint: "Mint", daisy: "Daisy", sunflower: "Sunflower" } as const;
 export const HARVEST_COMPLIMENTS = {
-  carrot: { en: "Luma: You grew this? What a lovely little carrot. You have such a gentle touch!", ja: "ルマ：育てたの？なんてかわいいニンジン。あなたの優しさが伝わるね！" },
-  radish: { en: "Luma: A rosy little radish! You make this garden feel loved. Thank you.", ja: "ルマ：ばら色のラディッシュ！あなたのおかげで、庭が幸せそう。ありがとう。" },
-  mint: { en: "Luma: It smells wonderful! You grew a little cup of happiness. This special mint tea is for you.", ja: "ルマ：いい香り！小さな幸せを育ててくれたね。特別なミントティーをどうぞ。" },
-  daisy: { en: "Luma: A daisy for me? What a lovely little piece of your garden. Thank you!", ja: "ルマ：デイジーをくれるの？あなたの庭から届いた、小さな宝物だね。ありがとう！" },
-  sunflower: { en: "Luma: A sunflower! It's like a little bit of sunshine from your garden. Thank you!", ja: "ルマ：ひまわり！あなたの庭のお日さまみたい。ありがとう！" },
+  carrot: { en: "You grew this? What a lovely little carrot. You have such a gentle touch!", ja: "育てたの？なんてかわいいニンジン。あなたの優しさが伝わるね！" },
+  radish: { en: "A rosy little radish! You make this garden feel loved. Thank you.", ja: "ばら色のラディッシュ！あなたのおかげで、庭が幸せそう。ありがとう。" },
+  mint: { en: "It smells wonderful! You grew a little cup of happiness. This special mint tea is for you.", ja: "いい香り！小さな幸せを育ててくれたね。特別なミントティーをどうぞ。" },
+  daisy: { en: "A daisy for me? What a lovely little piece of your garden. Thank you!", ja: "デイジーをくれるの？あなたの庭から届いた、小さな宝物だね。ありがとう！" },
+  sunflower: { en: "A sunflower! It's like a little bit of sunshine from your garden. Thank you!", ja: "ひまわり！あなたの庭のお日さまみたい。ありがとう！" },
 };
 export const GARDEN = { x: 25, z: -7, width: 12, depth: 12 };
 export const MINT_POSITION = [22.2, 0, -1] as const;

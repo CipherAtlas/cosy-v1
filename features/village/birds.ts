@@ -34,6 +34,9 @@ export class BirdFlock {
   private parts: { mesh: T.InstancedMesh; nodes: T.Object3D[] }[] = [];
   private hearts: T.InstancedMesh;
   private crumbs: T.InstancedMesh;
+  private thrownCrumbs: T.InstancedMesh;
+  private throwOrigin = new T.Vector3();
+  private throwAge = -1;
   private dummy = new T.Object3D();
   private next = new T.Vector3();
   // Lift along the open eastern approach, circle the pond above the canopies,
@@ -75,7 +78,9 @@ export class BirdFlock {
     this.hearts.name = "Happy dove hearts";
     this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.038, 0), new T.MeshStandardMaterial({ color: "#edc693", roughness: 1 }), 36);
     this.crumbs.name = "Sourdough crumbs";
-    for (const mesh of [this.hearts, this.crumbs]) {
+    this.thrownCrumbs = new T.InstancedMesh(this.crumbs.geometry, this.crumbs.material, 18);
+    this.thrownCrumbs.name = "Scattered sourdough crumbs";
+    for (const mesh of [this.hearts, this.crumbs, this.thrownCrumbs]) {
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); mesh.frustumCulled = false; mesh.visible = false; this.group.add(mesh);
     }
     this.bubble.className = "v-bird-bubble"; this.bubble.hidden = true;
@@ -85,8 +90,10 @@ export class BirdFlock {
 
   setLanguage(language: "en" | "ja") { this.language = language; this.bubble.lang = language; }
   resize(width: number, height: number) { this.width = width; this.height = height; }
-  feed() {
+  feed(from: T.Vector3) {
     if (this.queued || this.served) return false;
+    this.throwOrigin.copy(from).y += 1.05;
+    this.throwAge = 0;
     this.queued = true;
     if (this.phase === "ground") this.startMeal(false);
     this.publish();
@@ -108,6 +115,7 @@ export class BirdFlock {
   }
   update(dt: number, time: number, reduced: boolean, camera: T.Camera, player: T.Vector3, caretaker: boolean, visible: boolean) {
     this.age += dt;
+    if (this.throwAge >= 0) this.throwAge += dt;
     if (this.phase === "flight" && this.age >= 30) { this.phase = "ground"; this.age = 0; }
     const nearby = Math.hypot(player.x - BIRD_CLEARING.x, player.z - BIRD_CLEARING.z) < 7;
     if (this.phase === "ground" && !this.served) {
@@ -120,7 +128,7 @@ export class BirdFlock {
     }
     this.publish();
     this.hearts.visible = visible && this.status === "happy";
-    this.crumbs.visible = visible && (this.queued || this.status === "eating");
+    this.crumbs.visible = visible && (this.queued || this.status === "eating") && (reduced || this.throwAge < 0 || this.throwAge >= 1.15);
     const joyAge = this.mealAge - 4;
     this.birds.forEach((bird, i) => {
       const flying = this.phase === "flight", happy = this.status === "happy";
@@ -154,12 +162,31 @@ export class BirdFlock {
     this.hearts.instanceMatrix.needsUpdate = true;
     if (this.crumbs.visible) for (let i = 0; i < 36; i++) {
       const a = i * 2.399, r = .2 + (i % 7) * .19;
-      const toss = reduced || this.mealAge < 0 ? 0 : Math.max(0, 1 - this.mealAge * 1.8);
-      this.dummy.position.set(BIRD_CLEARING.x + Math.cos(a) * r, .18 + Math.sin(toss * Math.PI) * .7, BIRD_CLEARING.z + Math.sin(a) * r);
+      this.dummy.position.set(BIRD_CLEARING.x + Math.cos(a) * r, .18, BIRD_CLEARING.z + Math.sin(a) * r);
       this.dummy.rotation.set(i, i, i); this.dummy.scale.setScalar(this.mealAge > 2 ? Math.max(0, (4 - this.mealAge) / 2) : 1);
       this.dummy.updateMatrix(); this.crumbs.setMatrixAt(i, this.dummy.matrix);
     }
     this.crumbs.instanceMatrix.needsUpdate = true;
+    this.thrownCrumbs.visible = visible && this.throwAge >= 0 && this.throwAge < 3.5;
+    if (this.thrownCrumbs.visible) {
+      const progress = reduced ? 1 : T.MathUtils.clamp(this.throwAge / 1.15, 0, 1);
+      for (let i = 0; i < 18; i++) {
+        const angle = i * 2.399, radius = .18 + (i % 6) * .16;
+        const startX = this.throwOrigin.x + Math.cos(angle) * .12;
+        const startZ = this.throwOrigin.z + Math.sin(angle) * .12;
+        const endX = BIRD_CLEARING.x + Math.cos(angle) * radius;
+        const endZ = BIRD_CLEARING.z + Math.sin(angle) * radius;
+        this.dummy.position.set(
+          T.MathUtils.lerp(startX, endX, progress),
+          T.MathUtils.lerp(this.throwOrigin.y, .19, progress) + (reduced ? 0 : Math.sin(progress * Math.PI) * .65),
+          T.MathUtils.lerp(startZ, endZ, progress),
+        );
+        this.dummy.rotation.set(i, i, i);
+        this.dummy.scale.setScalar(this.throwAge > 2.5 ? Math.max(0, (3.5 - this.throwAge)) : 1);
+        this.dummy.updateMatrix(); this.thrownCrumbs.setMatrixAt(i, this.dummy.matrix);
+      }
+      this.thrownCrumbs.instanceMatrix.needsUpdate = true;
+    }
     this.projected.set(BIRD_CLEARING.x, 1.8, BIRD_CLEARING.z).project(camera);
     const show = visible && this.status === "happy" && nearby && this.projected.z > -1 && this.projected.z < 1
       && Math.abs(this.projected.x) < .9 && Math.abs(this.projected.y) < .9;
