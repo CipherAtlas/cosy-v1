@@ -1,6 +1,7 @@
 import { readGarden, type GardenAction, type GardenState } from "./garden";
 
 export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; z: number; heading: number };
+export type SharedChatEntry = { id?: string; name: string; message: string };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
   sendChat: (message: string) => void;
@@ -8,18 +9,19 @@ export type SharedWorldConnection = {
 };
 
 type WorldMessage =
-  | { type: "welcome"; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: { name: string; message: string }[] }
+  | { type: "welcome"; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[] }
   | { type: "join"; visitor: SharedVisitor }
   | { type: "move"; id: string; x: number; z: number; heading: number }
   | { type: "leave"; id: string }
   | { type: "garden"; garden: GardenState; event: { action: GardenAction; actor: string; x: number; z: number } }
-  | { type: "chat"; chatHour: number; entry: { name: string; message: string } }
+  | { type: "chat"; chatHour: number; entry: SharedChatEntry }
   | { type: "hour"; chatHour: number }
   | { type: "error"; message: string };
 
 export function connectSharedWorld(options: {
   getPose: () => { x: number; z: number; heading: number } | null;
-  onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: { name: string; message: string }[] }) => void;
+  onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
+  onChat: (entry: SharedChatEntry) => void;
   onAction: (event: { action: GardenAction; x: number; z: number; isSelf: boolean }) => void;
   onDisconnect: () => void;
 }): Promise<SharedWorldConnection> {
@@ -29,7 +31,7 @@ export function connectSharedWorld(options: {
     let selfId = "";
     let garden = readGarden(null);
     let chatHour = 0;
-    let chat: { name: string; message: string }[] = [];
+    let chat: SharedChatEntry[] = [];
     let interval = 0;
     let retry = 0;
     let retryDelay = 1000;
@@ -99,6 +101,7 @@ export function connectSharedWorld(options: {
           chatHour = message.chatHour;
           chat = [...chat, message.entry].slice(-80);
           publish();
+          options.onChat(message.entry);
         } else if (message.type === "hour") {
           chatHour = message.chatHour;
           chat = [];

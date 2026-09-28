@@ -18,7 +18,7 @@ PDF, manga, books and book/search experiences are excluded from the village work
 
 ## Current application
 
-The root page uses [features/village/Village.tsx](features/village/Village.tsx), with raw Three.js scenery, accessible React activity controls, local persistence and a recorded Web Audio soundtrack. All seven activities are available through exploration, Places and simple view. English/Japanese, reduced motion and explicit audio activation are preserved.
+The root page uses [features/village/Village.tsx](features/village/Village.tsx), with raw Three.js scenery, accessible React activity controls, local persistence and a recorded Web Audio soundtrack. Activities are available through exploration and Places. English/Japanese, reduced motion and explicit audio activation are preserved.
 
 Explore as a smiling white spirit using WASD/arrows, R for quick glide, Shift for unlimited dash and Space to jump. There is no energy mechanic or bar. Click the scene to capture the desktop mouse, move it to look, and press Escape to release. Menus and activities release capture automatically; touch uses drag-to-look and movement buttons. While settled into an activity, hold and drag the scene to look around. Clicking or tapping the ground does not move the player.
 

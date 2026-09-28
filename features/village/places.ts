@@ -70,7 +70,6 @@ export const PLACES = [
     position: [24.6, 0, -2.7],
     camera: [30.5, 5.8, 1.5],
     look: [24.7, .6, -7],
-    prompt: "Wander into the garden",
   },
   {
     id: "birds",

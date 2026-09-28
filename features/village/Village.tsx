@@ -36,8 +36,8 @@ import "./village.css";
 import { withBasePath } from "@/lib/basePath";
 import type { BirdStatus } from "./birds";
 import { VILLAGERS } from "./villagers";
-import { GARDEN_KEY, CROP_NAMES, HARVEST_COMPLIMENTS, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
-import type { SharedWorldConnection, SharedVisitor } from "./sharedWorld";
+import { GARDEN_KEY, CROP_NAMES, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
+import type { SharedChatEntry, SharedWorldConnection, SharedVisitor } from "./sharedWorld";
 
 export function Village() {
   const canvas = useRef<HTMLDivElement>(null),
@@ -46,8 +46,8 @@ export function Village() {
   const [progress, setProgress] = useState(0),
     [ready, setReady] = useState(false),
     [entered, setEntered] = useState(false),
-    [error, setError] = useState(""),
-    [simple, setSimple] = useState(false);
+    [error, setError] = useState("");
+  const [engineAttempt, setEngineAttempt] = useState(0);
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
     [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "friends" | "basket" | null>(null);
@@ -60,15 +60,23 @@ export function Village() {
   const sharedTrialRef = useRef<SharedWorldConnection | null>(null);
   const sharedConnectedRef = useRef(false);
   const sharedVisitorsRef = useRef<SharedVisitor[]>([]);
+  const sharedPeopleRef = useRef<SharedVisitor[]>([]);
+  const sharedSelfIdRef = useRef("");
   const sharedIdentityRef = useRef<Pick<SharedVisitor, "slot" | "color"> | null>(null);
   const [sharedTrialEnabled, setSharedTrialEnabled] = useState(false);
   const [sharedStatus, setSharedStatus] = useState("Connecting…");
   const [sharedPeople, setSharedPeople] = useState<Pick<SharedVisitor, "id" | "name" | "color">[]>([]);
   const [sharedSelfId, setSharedSelfId] = useState("");
-  const [sharedChat, setSharedChat] = useState<{ name: string; message: string }[]>([]);
+  const [sharedChat, setSharedChat] = useState<SharedChatEntry[]>([]);
   const [sharedChatHour, setSharedChatHour] = useState(0);
-  const [chatOpen, setChatOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
+  const chatOpenRef = useRef(chatOpen);
+  chatOpenRef.current = chatOpen;
+  const [chatUnread, setChatUnread] = useState(false);
+  const [chatPulse, setChatPulse] = useState(0);
   const [chatDraft, setChatDraft] = useState("");
+  const chatInput = useRef<HTMLInputElement>(null);
+  const chatLog = useRef<HTMLDivElement>(null);
   const [companions, setCompanions] = useState<string[]>([]);
   const companionsRef = useRef(companions);
   const [activityCompact,setActivityCompact]=useState(false);
@@ -88,7 +96,6 @@ export function Village() {
   const preferences = useRef({ quality, weather, language });
   preferences.current = { quality, weather, language };
   const [notice, setNotice] = useState("");
-  const [lumaSpeech, setLumaSpeech] = useState<{ en: string; ja: string } | null>(null);
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
@@ -100,7 +107,6 @@ export function Village() {
     setNotice("Your session is complete. Take a breath.");
   });
   const openPlace = useCallback((id: PlaceId) => {
-    setLumaSpeech(null);
     setPlace(id);
     setActivityCompact(false);
     setPanel(null);
@@ -108,7 +114,6 @@ export function Village() {
     audio.current?.setPlace(id);
   }, []);
   const leave = useCallback(() => {
-    setLumaSpeech(null);
     setPlace(null);
     engine.current?.setPlace(null);
     audio.current?.setPlace(null);
@@ -144,7 +149,6 @@ export function Village() {
     if (action.kind === "birdCrumbs" || action.kind === "crumbs") { setNotice(""); return; }
     if (action.kind === "gift") {
       setNotice("");
-      if (!engine.current) setLumaSpeech({ ...HARVEST_COMPLIMENTS[action.crop] });
       return;
     }
     const messages = {
@@ -157,14 +161,6 @@ export function Village() {
     };
     setNotice(messages[action.kind][preferences.current.language === "ja" ? 1 : 0]);
   }, []);
-  useEffect(() => {
-    if (!simple) return;
-    if (birdStatus === "flying" || birdStatus === "crumbs") { setBirdStatus(birdStatus === "crumbs" ? "eating" : "waiting"); return; }
-    if (birdStatus !== "eating" && birdStatus !== "happy") return;
-    if (birdStatus === "happy") audio.current?.gardenEffect("coo", [0, 0, 0], true);
-    const timer = setTimeout(() => setBirdStatus(birdStatus === "eating" ? "happy" : "waiting"), birdStatus === "eating" ? 4000 : 6000);
-    return () => clearTimeout(timer);
-  }, [simple, birdStatus]);
   const interactGarden = useCallback((id: string) => {
     const action = nearbyGardenAction(id, gardenRef.current);
     if (!action) return;
@@ -220,7 +216,7 @@ export function Village() {
     return () => { clearInterval(interval); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
   }, []);
   useEffect(() => {
-    if (!entered || simple || (process.env.NODE_ENV === "development"
+    if (!entered || (process.env.NODE_ENV === "development"
       ? new URLSearchParams(location.search).get("sharedTrial") !== "1"
       : !process.env.NEXT_PUBLIC_SHARED_WORLD_URL)) return;
     let cancelled = false;
@@ -232,6 +228,8 @@ export function Village() {
       onState: snapshot => {
         if (cancelled) return;
         sharedConnectedRef.current = true;
+        sharedSelfIdRef.current = snapshot.selfId;
+        sharedPeopleRef.current = snapshot.visitors;
         setSharedSelfId(snapshot.selfId);
         const self = snapshot.visitors.find(visitor => visitor.id === snapshot.selfId);
         if (self && (self.slot !== sharedIdentityRef.current?.slot || self.color !== sharedIdentityRef.current?.color)) {
@@ -260,10 +258,17 @@ export function Village() {
         setSharedStatus("Connected");
       },
       onAction: event => { if (!cancelled) engine.current?.gardenAction(event.action, { x: event.x, z: event.z }, event.isSelf); },
+      onChat: entry => {
+        if (cancelled) return;
+        const selfName = sharedPeopleRef.current.find(visitor => visitor.id === sharedSelfIdRef.current)?.name ?? "";
+        engine.current?.showChatBubble(entry, sharedSelfIdRef.current, selfName);
+        if (!chatOpenRef.current) { setChatUnread(true); setChatPulse(value => value + 1); }
+      },
       onDisconnect: () => {
         if (cancelled) return;
         sharedConnectedRef.current = false;
         sharedVisitorsRef.current = [];
+        sharedPeopleRef.current = [];
         engine.current?.setRemoteVisitors([]);
         setSharedPeople([]);
         setSharedStatus("Disconnected");
@@ -277,13 +282,15 @@ export function Village() {
       sharedTrialRef.current?.close();
       sharedTrialRef.current = null;
       sharedVisitorsRef.current = [];
+      sharedPeopleRef.current = [];
+      sharedSelfIdRef.current = "";
       sharedIdentityRef.current = null;
       sharedTrialModeRef.current = false;
       sharedConnectedRef.current = false;
     };
-  }, [entered, simple]);
+  }, [entered]);
   useEffect(() => {
-    if (!canvas.current || simple) return;
+    if (!canvas.current) return;
     let cancelled = false;
     let local: VillageEngine | undefined;
     import("./VillageEngine")
@@ -308,11 +315,12 @@ export function Village() {
           near: setNear,
           nearBench: setNearBench,
           seat: setSeatedBench,
+          seatFull: () => setNotice(preferences.current.language === "ja" ? "このベンチは満席です。別のベンチをどうぞ。" : "This bench is full. Try another one."),
           scatterBirds: () => onGardenAction({ kind: "feedBirds" }),
           interact: openPlace,
           error: (msg) => {
             setError(msg);
-            setSimple(true);
+            setReady(false);
           },
           stats: (fps, draws, triangles) => setStats({ fps, draws, triangles }),
         });
@@ -334,10 +342,9 @@ export function Village() {
         if (!cancelled) {
           console.error("Village initialization failed", e);
           setError(
-            "The village could not load. You can still enjoy every activity in simple view.",
+            "The village could not load. Please retry the 3D village.",
           );
-          setSimple(true);
-          setReady(true);
+          setReady(false);
         }
       });
     return () => {
@@ -347,7 +354,7 @@ export function Village() {
     };
     // Settings are applied independently, without remounting the world.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [simple, openPlace]);
+  }, [engineAttempt, openPlace]);
   useEffect(() => {
     engine.current?.setBlocked(!entered || panel !== null);
     enterRef.current = entered;
@@ -381,18 +388,26 @@ export function Village() {
     return () => clearTimeout(id);
   }, [notice]);
   useEffect(() => {
-    if (!lumaSpeech) return;
-    const id = setTimeout(() => setLumaSpeech(null), 6000);
-    return () => clearTimeout(id);
-  }, [lumaSpeech]);
+    if (chatOpen && chatLog.current) chatLog.current.scrollTop = chatLog.current.scrollHeight;
+  }, [sharedChat, chatOpen]);
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement
+        e.target instanceof HTMLSelectElement ||
+        e.target instanceof HTMLButtonElement ||
+        (e.target instanceof HTMLElement && e.target.isContentEditable)
       )
         return;
+      if (e.key === "Enter" && sharedTrialEnabled && entered && !panel && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setChatOpen(true);
+        setChatUnread(false);
+        if (document.pointerLockElement) document.exitPointerLock();
+        requestAnimationFrame(() => chatInput.current?.focus());
+        return;
+      }
       if (e.key === "Escape" && place && !panel) {
         leave();
       }
@@ -401,7 +416,7 @@ export function Village() {
     };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, [place, entered, panel, leave]);
+  }, [place, entered, panel, leave, sharedTrialEnabled]);
   async function enableSound() {
     if (soundBusy.current || sound) return;
     try {
@@ -428,10 +443,10 @@ export function Village() {
   }
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
-  const showWorldInteraction = entered && !place && !simple;
+  const showWorldInteraction = entered && !place;
   const nearBirds = nearPlace?.id === "birds" || seatedBench === "bird-clearing-bench";
   const birdMealBusy = birdStatus === "crumbs" || birdStatus === "eating" || birdStatus === "happy";
-  const showActivityPanel = entered && place && (!activityCompact || simple);
+  const showActivityPanel = entered && place && !activityCompact;
   const nearbyAction = nearGarden ? nearbyGardenAction(nearGarden, garden) : null;
   const nearbyLabel = nearbyAction?.kind === "plant" ? t(`Plant ${CROP_NAMES[nearbyAction.crop].en.toLowerCase()}`, "種を植える")
     : nearbyAction?.kind === "water" ? t("Water the sprouts", "芽に水をあげる")
@@ -446,7 +461,7 @@ export function Village() {
       : PLACES.find((p) => p.id === id)!.name;
   return (
     <div
-      className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""} ${simple ? "v-simple" : ""}`}
+      className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""}`}
       data-weather={weather}
       data-activity={place ?? "explore"}
     >
@@ -469,7 +484,7 @@ export function Village() {
             </button>
           )}
           <button
-            disabled={!ready && !simple}
+            disabled={!ready}
             aria-label={t("Places", "場所")}
             onClick={() => setPanel("places")}
           >
@@ -477,7 +492,7 @@ export function Village() {
             <span>{t("Places", "場所")}</span>
           </button>
           <button
-            disabled={!ready && !simple}
+            disabled={!ready}
             aria-label={t("Sound", "音")}
             onClick={() => setPanel("sound")}
           >
@@ -488,7 +503,7 @@ export function Village() {
             <UsersThree size={21} /><span>{t("Friends", "仲間")}{companions.length > 0 ? ` · ${companions.length}` : ""}</span>
           </button>}
           <button
-            disabled={!ready && !simple}
+            disabled={!ready}
             aria-label={t("Settings", "設定")}
             onClick={() => setPanel("settings")}
           >
@@ -506,41 +521,34 @@ export function Village() {
                 "静かな村で、自分のためのひとときを。",
               )}
             </p>
-            {!ready && !simple ? (
+            {!ready && !error ? (
               <div className="v-loading">
                 <progress max={100} value={progress} />
                 <span>
                   {t("Opening the village", "村を準備しています")} · {progress}%
                 </span>
               </div>
+            ) : error ? (
+              <button className="v-button v-primary v-enter-button" onClick={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}>
+                {t("Retry the village", "村をもう一度開く")}<ArrowRight size={19} />
+              </button>
             ) : (
               <button
                 className="v-button v-primary v-enter-button"
                 onClick={() => {
                   void enableSound();
                   setEntered(true);
-                  setPanel(simple ? "places" : null);
+                  setPanel(null);
                 }}
               >
                 {t("Enter the village", "村に入る")}
                 <ArrowRight size={19} />
               </button>
             )}
-            <button
-              className="v-text-button"
-              onClick={() => {
-                void enableSound();
-                setSimple(true);
-                setEntered(true);
-                setPanel("places");
-              }}
-            >
-              {t("Open simple view", "シンプル表示を開く")}
-            </button>
           </div>
         </div>
       )}
-      {entered && !place && !simple && (
+      {entered && !place && (
         <>
           <div className="v-location">
             <span>{t("The village", "村の入口")}</span>
@@ -608,7 +616,7 @@ export function Village() {
         </>
       )}
       {entered && place && (
-        <div id="v-activity-panel" hidden={activityCompact && !simple}>
+        <div id="v-activity-panel" hidden={activityCompact}>
         {notice && <div className="v-notice" role="status">{notice}</div>}
         <Activities
           key={place}
@@ -622,22 +630,11 @@ export function Village() {
           toggleSound={toggleSound}
           travel={openPlace}
           language={language}
-          gardenControls={{ garden, onGardenAction, birdStatus, language, lumaSpeech: simple ? lumaSpeech : null, travel: openPlace, meetMaple: () => setPanel("friends") }}
+          gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace, meetMaple: () => setPanel("friends") }}
         />
         </div>
       )}
-      {entered && simple && !place && (
-        <section className="v-simple-places">
-          <h1>{t("Make yourself at home.", "どうぞ、ごゆっくり。")}</h1>
-          {PLACES.map((p) => (
-            <button key={p.id} onClick={() => openPlace(p.id)}>
-              <span>{placeName(p.id)}</span>
-              <ArrowUpRight size={22} />
-            </button>
-          ))}
-        </section>
-      )}
-      {entered && place && !simple && (
+      {entered && place && (
         <button className="v-scene-toggle" aria-controls="v-activity-panel" aria-expanded={!activityCompact} onClick={()=>setActivityCompact(value=>!value)}>
           {activityCompact ? t("Show activity", "操作を表示") : t("Enjoy the view", "景色を楽しむ")}<CaretDown size={16} style={{transform:activityCompact?"rotate(180deg)":undefined}} />
         </button>
@@ -653,9 +650,7 @@ export function Village() {
       {error && (
         <div className="v-error" role="status">
           {error}
-          <button aria-label="Dismiss message" onClick={() => setError("")}>
-            <X size={18} />
-          </button>
+          {entered && <button onClick={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}>{t("Retry the village", "村をもう一度開く")}</button>}
         </div>
       )}
       {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}`}>
@@ -664,22 +659,23 @@ export function Village() {
         {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
         {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
         {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}<Bird size={17} /></button>}
-        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && !nearBench && !seatedBench && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
+        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !nearBench && !seatedBench && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </button>}
       </div>}
       {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
       {sharedTrialEnabled && entered && <div className="v-shared-trial">
-        <button className="v-shared-toggle" onClick={() => setChatOpen(open => !open)} aria-expanded={chatOpen}>
+        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? "Hide village chat" : chatUnread ? "Open village chat, new message" : "Open village chat"}>
           <UsersThree size={18} /> {sharedStatus === "Connected" ? `${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here` : sharedStatus}
+          {chatUnread && !chatOpen && <span key={chatPulse} className="v-shared-unread" aria-hidden="true" />}
         </button>
         {chatOpen && <section className="v-shared-chat" aria-label="Village chat">
           <div className="v-shared-chat-header"><h2>Village chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close village chat"><X size={18} /></button></div>
           <div className="v-shared-people">{sharedPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>
           <p className="v-shared-chat-note">Everyone is in this village. Messages clear each hour{sharedChatHour ? `, at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : ""}.</p>
-          <div className="v-shared-chat-log" role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => <p key={index}><strong>{entry.name}</strong> {entry.message}</p>) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
+          <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => <p key={index}><strong>{entry.name}</strong> {entry.message}</p>) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
           <form onSubmit={event => { event.preventDefault(); const message = chatDraft.trim(); if (message && sharedTrialRef.current) { sharedTrialRef.current.sendChat(message); setChatDraft(""); } }}>
-            <input aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => event.stopPropagation()} maxLength={180} placeholder="Say something kind…" disabled={sharedStatus !== "Connected"} />
+            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => event.stopPropagation()} maxLength={180} placeholder="Say something kind…" disabled={sharedStatus !== "Connected"} />
             <button type="submit" disabled={!chatDraft.trim() || sharedStatus !== "Connected"}>Send</button>
           </form>
         </section>}
@@ -772,7 +768,8 @@ export function Village() {
                     ["R", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
                     ["Shift", t("Hold to dash", "長押しでダッシュ")],
                     ["Space", t("Jump", "ジャンプ")],
-                    ["E", t("Garden / enjoy a nearby activity", "庭のお世話 / 近くの場所に入る")],
+                    ["E", t("Tend plants, sit, or enjoy a nearby activity", "植物のお世話・座る・近くの場所に入る")],
+                    ["Enter", t("Message the village", "村のチャットに入力")],
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
                     ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
@@ -874,24 +871,6 @@ export function Village() {
                     <option value="en">English</option>
                     <option value="ja">日本語</option>
                   </select>
-                </label>
-                <label className="v-check">
-                  <input
-                    type="checkbox"
-                    checked={simple}
-                    onChange={(e) => {
-                      setSimple(e.target.checked);
-                      if (e.target.checked) {
-                        setReady(true);
-                      } else {
-                        setReady(false);
-                        setEntered(false);
-                        setPlace(null);
-                      }
-                      setPanel(null);
-                    }}
-                  />
-                  {t("Simple view", "シンプル表示")}
                 </label>
                 <label className="v-check">
                   <input

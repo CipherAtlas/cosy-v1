@@ -20,7 +20,7 @@ import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphics
 import { BIRD_CLEARING, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
-import type { SharedVisitor } from "./sharedWorld";
+import type { SharedChatEntry, SharedVisitor } from "./sharedWorld";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -44,7 +44,8 @@ export class VillageEngine {
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
   private character?: T.Object3D;
-  private remoteVisitors = new Map<string, { group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement }>();
+  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement }>();
+  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
   private sharedSpawnPlaced = false;
@@ -84,6 +85,7 @@ export class VillageEngine {
   private near: PlaceId | null = null;
   private nearBench: VillageBench | null = null;
   private seatedBench: VillageBench | null = null;
+  private seatedIndex: 0 | 1 | null = null;
   private quality: Quality = "auto";
   private graphicsTier: GraphicsTier = "detailed";
   private qualityChangedAt = 0;
@@ -144,7 +146,7 @@ export class VillageEngine {
       else if (this.nearBench) this.sit(this.nearBench.id);
       else if (this.nearGarden && nearbyGardenAction(this.nearGarden, this.gardenState)) this.callbacks.gardenInteract?.(this.nearGarden);
       else if (this.near === "birds") this.callbacks.scatterBirds?.();
-      else if (this.near) this.callbacks.interact(this.near);
+      else if (this.near && this.near !== "garden") this.callbacks.interact(this.near);
     }
   };
   private onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.key.toLowerCase());
@@ -272,7 +274,7 @@ export class VillageEngine {
     this.clearKeys();
     this.renderer.setAnimationLoop(null);
     this.callbacks.error(
-      "The 3D view was interrupted. Your activities are still available in simple view.",
+      "The 3D view was interrupted. Please retry the village.",
     );
   };
   constructor(
@@ -283,6 +285,7 @@ export class VillageEngine {
       near: (id: PlaceId | null) => void;
       nearBench?: (id: string | null) => void;
       seat?: (id: string | null) => void;
+      seatFull?: () => void;
       scatterBirds?: () => void;
       interact: (id: PlaceId) => void;
       error: (message: string) => void;
@@ -314,7 +317,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to garden or enter activities, F to chat, C to invite a nearby villager, B to ask Maple or Wren for bread crumbs. Places provides direct access to every activity.",
+      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to tend nearby plants, sit, or enter activities; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for bread crumbs. Places provides direct access to every activity.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -730,6 +733,63 @@ export class VillageEngine {
   }
   setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); }
   getPlayerPose() { return { x: this.player.position.x, z: this.player.position.z, heading: this.player.rotation.y }; }
+  showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) {
+    const id = entry.id ?? (entry.name === selfName ? selfId : [...this.remoteVisitors].find(([, remote]) => remote.name === entry.name)?.[0]);
+    if (!id || (id !== selfId && !this.remoteVisitors.has(id))) return;
+    const previous = this.chatBubbles.get(id);
+    if (previous) { clearTimeout(previous.timer); previous.element.remove(); }
+    const element = document.createElement("div");
+    element.className = "v-visitor-chat";
+    element.textContent = entry.message;
+    this.host.append(element);
+    const timer = window.setTimeout(() => {
+      element.remove();
+      this.chatBubbles.delete(id);
+    }, 6000);
+    this.chatBubbles.set(id, { element, timer });
+  }
+  private seatPoint(bench: VillageBench, index: 0 | 1) {
+    const offset = index === 0 ? -.68 : .68;
+    return { x: bench.x + Math.cos(bench.facing) * offset, z: bench.z - Math.sin(bench.facing) * offset };
+  }
+  private visitorSeat(x: number, z: number, heading: number) {
+    for (const bench of this.world?.benches ?? []) {
+      const turn = Math.atan2(Math.sin(heading - bench.facing), Math.cos(heading - bench.facing));
+      if (Math.abs(turn) > .45) continue;
+      if (Math.hypot(x - bench.x, z - bench.z) < .35) return { bench, index: null };
+      for (const index of [0, 1] as const) {
+        const point = this.seatPoint(bench, index);
+        if (Math.hypot(x - point.x, z - point.z) < .4) return { bench, index };
+      }
+    }
+    return null;
+  }
+  private seatOccupants(bench: VillageBench) {
+    const occupants = new Map<0 | 1, number[]>();
+    for (const remote of this.remoteVisitors.values()) {
+      const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
+      if (seat?.bench.id !== bench.id) continue;
+      for (const index of seat.index === null ? [0, 1] as const : [seat.index]) {
+        const slots = occupants.get(index) ?? [];
+        slots.push(remote.slot);
+        occupants.set(index, slots);
+      }
+    }
+    return occupants;
+  }
+  private resolveSeatCollision() {
+    const bench = this.seatedBench, index = this.seatedIndex;
+    if (!bench || index === null) return;
+    if ([...this.remoteVisitors.values()].some(remote => {
+      const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
+      return seat?.bench.id === bench.id && seat.index === null;
+    })) { this.stand(); this.callbacks.seatFull?.(); return; }
+    const occupied = this.seatOccupants(bench);
+    if (!(occupied.get(index) ?? []).some(slot => slot < (this.sharedSlot ?? Infinity))) return;
+    const other = index === 0 ? 1 : 0;
+    if (occupied.has(other)) { this.stand(); this.callbacks.seatFull?.(); }
+    else this.seatedIndex = other;
+  }
   setSharedIdentity(slot: number, color: string) {
     if (this.sharedSlot === slot && this.sharedColor === color) return;
     this.sharedSlot = slot;
@@ -775,6 +835,8 @@ export class VillageEngine {
         if (object instanceof T.Mesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.dispose();
       });
       remote.label.remove();
+      const bubble = this.chatBubbles.get(id);
+      if (bubble) { clearTimeout(bubble.timer); bubble.element.remove(); this.chatBubbles.delete(id); }
       remote.group.removeFromParent(); this.remoteVisitors.delete(id);
     }
     for (const visitor of visitors) {
@@ -788,17 +850,22 @@ export class VillageEngine {
         label.style.setProperty("--visitor-color", visitor.color);
         this.host.append(label);
         group.add(spirit);
-        group.position.set(visitor.x, floorHeight(visitor.x, visitor.z), visitor.z);
+        const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
+        group.position.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
         group.rotation.y = visitor.heading;
         this.scene.add(group);
-        remote = { group, target: group.position.clone(), heading: visitor.heading, label };
+        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label };
         this.remoteVisitors.set(visitor.id, remote);
       }
       if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
+      remote.name = visitor.name;
+      remote.slot = visitor.slot;
       remote.label.style.setProperty("--visitor-color", visitor.color);
-      remote.target.set(visitor.x, floorHeight(visitor.x, visitor.z), visitor.z);
+      const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
+      remote.target.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
       remote.heading = visitor.heading;
     }
+    this.resolveSeatCollision();
   }
   gardenAction(action: GardenAction, source?: { x: number; z: number }, animateSelf = true) {
     if (action.kind === "feedBirds") {
@@ -823,6 +890,7 @@ export class VillageEngine {
     if (id !== "mood") this.dialogue?.clearTeaSpeech();
     if (id && this.seatedBench) {
       this.seatedBench = null;
+      this.seatedIndex = null;
       this.callbacks.seat?.(null);
     }
     this.releaseMouseLook();
@@ -892,9 +960,14 @@ export class VillageEngine {
   sit(id: string) {
     const bench = this.world?.benches.find(value => value.id === id);
     if (!bench || this.blocked || this.place || this.seatedBench || this.nearBench?.id !== id) return;
+    const occupied = this.seatOccupants(bench);
+    const preferred = this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
+    const index = preferred.find(value => !occupied.has(value));
+    if (index === undefined) { this.callbacks.seatFull?.(); return; }
     this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = bench;
+    this.seatedIndex = index;
     this.yaw = bench.facing;
     this.pitch = .4;
     this.callbacks.seat?.(id);
@@ -902,12 +975,17 @@ export class VillageEngine {
   stand() {
     const bench = this.seatedBench;
     if (!bench) return;
+    const seat = this.seatPoint(bench, this.seatedIndex ?? 0);
     const exits = [1.35, 1.8, -1.35].map(offset => ({
+      x: seat.x + Math.sin(bench.facing) * offset,
+      z: seat.z + Math.cos(bench.facing) * offset,
+    })).concat([1.35, 1.8, -1.35].map(offset => ({
       x: bench.x + Math.sin(bench.facing) * offset,
       z: bench.z + Math.cos(bench.facing) * offset,
-    }));
-    const { x, z } = exits.find(point => this.movement?.clear(point.x, point.z)) ?? exits[0];
+    })), [{ x: this.movement?.position.x ?? bench.x, z: this.movement?.position.z ?? bench.z }]);
+    const { x, z } = exits.find(point => this.movement?.clear(point.x, point.z)) ?? exits[exits.length - 1];
     this.seatedBench = null;
+    this.seatedIndex = null;
     this.movement?.settle(x, z);
     this.player.position.set(x, floorHeight(x, z), z);
     this.callbacks.seat?.(null);
@@ -1025,7 +1103,8 @@ export class VillageEngine {
       sprint: this.keys.has("shift"), blocked: this.blocked || this.place !== null || !!this.seatedBench });
     this.player.position.set(movement.position.x, movement.position.y, movement.position.z);
     if (this.seatedBench) {
-      this.player.position.set(this.seatedBench.x, this.seatedBench.seatHeight - .62, this.seatedBench.z);
+      const seat = this.seatPoint(this.seatedBench, this.seatedIndex ?? 0);
+      this.player.position.set(seat.x, this.seatedBench.seatHeight - .62, seat.z);
       this.player.rotation.y = this.seatedBench.facing;
     }
     const moving = movement.speed > 0.12;
@@ -1038,6 +1117,7 @@ export class VillageEngine {
       let near: PlaceId | null = null,
         dist = 4;
       PLACES.forEach((p) => {
+        if (p.id === "garden") return;
         // Keep the arrival approach reachable while covering the tea seating itself.
         const d = p.id === "birds" ? Math.hypot(BIRD_CLEARING.x - this.player.position.x, BIRD_CLEARING.z - this.player.position.z) : Math.min(
           Math.hypot(p.position[0] - this.player.position.x, p.position[2] - this.player.position.z),
@@ -1151,7 +1231,7 @@ export class VillageEngine {
         this.world.treeLod.instanceMatrix.needsUpdate = true;
       }
     }
-    // Refresh moving shadows every frame in detailed view; cap simple view at 30 Hz.
+    // Refresh moving shadows every frame in detailed graphics; limit lower tiers to 30 Hz.
     if (this.renderer.shadowMap.enabled && now - this.shadowTime > (this.graphicsTier === "detailed" ? 0 : 32) && (!this.reducedMotion || moving)) {
       const texel = 48 / this.sun.shadow.mapSize.x;
       const x = Math.round(this.player.position.x / texel) * texel, z = Math.round(this.player.position.z / texel) * texel;
@@ -1173,6 +1253,15 @@ export class VillageEngine {
       if (!remote.label.hidden) {
         remote.label.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
         remote.label.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
+      }
+    }
+    for (const [id, bubble] of this.chatBubbles) {
+      const origin = this.remoteVisitors.get(id)?.group.position ?? this.player.position;
+      const point = this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0)).project(this.camera);
+      bubble.element.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
+      if (!bubble.element.hidden) {
+        bubble.element.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
+        bubble.element.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
       }
     }
     this.dialogue?.update(dt, this.camera, this.player.position, this.weather);
@@ -1200,6 +1289,8 @@ export class VillageEngine {
   }
   dispose() {
     this.disposed = true;
+    for (const bubble of this.chatBubbles.values()) clearTimeout(bubble.timer);
+    this.chatBubbles.clear();
     this.releaseMouseLook();
     this.renderer.setAnimationLoop(null);
     this.resizeObserver.disconnect();

@@ -41,6 +41,9 @@
 }
 .v-visitor-name { position: absolute; z-index: 2; transform: translate(-50%, -100%); padding: 5px 10px; border: 1px solid var(--visitor-color); border-radius: 20px; background: #263b32e8; color: #fff9eb; box-shadow: 0 3px 10px #16251e66; font: 12px var(--font-outfit), sans-serif; white-space: nowrap; pointer-events: none; }
 .v-visitor-name[hidden] { display: none; }
+.v-visitor-chat { position: absolute; z-index: 3; transform: translate(-50%, -100%); max-width: min(260px, calc(100vw - 32px)); padding: 10px 14px; border: 1px solid #f1dfb9; border-radius: 18px; background: #fff9eb; color: #28483c; box-shadow: 0 8px 24px #182c2470; font: 14px/1.4 var(--font-outfit), sans-serif; text-align: center; overflow-wrap: anywhere; pointer-events: none; }
+.v-visitor-chat::after { content: ""; position: absolute; left: calc(50% - 7px); bottom: -7px; width: 12px; height: 12px; transform: rotate(45deg); border-right: 1px solid #f1dfb9; border-bottom: 1px solid #f1dfb9; background: #fff9eb; }
+.v-visitor-chat[hidden] { display: none; }
 .v-villager-dialogue {
   position: absolute;
   inset: 0;
@@ -95,7 +98,6 @@
   line-height: 1.45;
   text-wrap: pretty;
 }
-.v-simple-luma-bubble { position: relative; width: 100%; max-width: 100%; margin: 12px 0 18px; }
 .v-villager-bubble.is-compact {
   width: auto;
   padding: 4px 7px 4px 12px;
@@ -792,39 +794,6 @@ kbd {
   color: #b6bfab;
   line-height: 1.7;
 }
-.v-simple {
-  background: #35402e;
-}
-.v-simple .v-shade {
-  background: radial-gradient(ellipse at 80% 20%, #69745160, transparent 70%);
-}
-.v-simple-places {
-  position: absolute;
-  inset: 140px 10% 60px;
-  overflow: auto;
-  max-width: 700px;
-}
-.v-simple-places h1 {
-  font:
-    36px Georgia,
-    serif;
-  margin-bottom: 30px;
-}
-.v-simple-places > button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 0;
-  border-bottom: 1px solid #eee0bd33;
-  background: none;
-  color: inherit;
-  padding: 18px 0;
-  width: 100%;
-  font:
-    23px Georgia,
-    serif;
-  text-align: left;
-}
 .v-error,
 .v-notice {
   position: absolute;
@@ -863,9 +832,6 @@ kbd {
 .v-performance-report button { padding: 10px 14px; border: 1px solid #b8c2ad; border-radius: 8px; background: #edf1e5; color: #344d40; }
 .v-performance-report label { display: grid; gap: 8px; font-size: 13px; line-height: 1.5; }
 .v-performance-report textarea { width: 100%; min-height: 180px; padding: 10px; border: 1px solid #b8c2ad; border-radius: 8px; background: #fffdf4; color: #344d40; font: 12px/1.5 monospace; resize: vertical; }
-.v-simple .v-activity {
-  max-height: calc(100dvh - 210px);
-}
 @media (max-width: 700px) {
   .v-header {
     top: 17px;
@@ -1025,12 +991,6 @@ kbd {
     width: calc(100vw - 36px);
     font-size: 13px;
   }
-  .v-simple-places {
-    inset: 110px 24px 40px;
-  }
-  .v-simple-places h1 {
-    font-size: 29px;
-  }
 }
 
 /* Feedback and actions share flow, so translated or wrapped messages never cover buttons. */
@@ -1055,15 +1015,10 @@ kbd {
   position: relative; inset: auto; transform: none; width: 100%; max-height: none;
   box-sizing: border-box; min-height: 0; flex: 0 1 auto; pointer-events: auto;
 }
-.village.v-simple #v-activity-panel {
-  left: 50%; right: auto; top: 50%; bottom: auto; transform: translate(-50%,-50%);
-  width: min(520px,calc(100vw - 48px)); max-height: calc(100dvh - 170px);
-}
 @media (max-width: 700px) {
   .v-world-feedback { left: 14px; right: 14px; bottom: 76px; transform: none; width: auto; max-width: none; }
   .v-world-feedback.is-walking { left: 168px; right: 20px; bottom: max(145px,calc(env(safe-area-inset-bottom) + 120px)); align-items: stretch; }
   #v-activity-panel { left: 12px; right: 12px; bottom: 70px; width: auto; max-height: 49dvh; }
-  .village.v-simple #v-activity-panel { left: 12px; right: 12px; top: 140px; bottom: 18px; width: auto; max-height: none; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .village *,
@@ -1224,7 +1179,6 @@ kbd {
 .v-activity.v-letter h2 { color: #3d584c; font-size: 28px; }
 .v-scene-toggle { position: absolute; z-index: 4; right: 30px; bottom: max(22px,env(safe-area-inset-bottom)); min-height: 44px; display: flex; align-items: center; gap: 18px; border-radius: 24px; border: 1px solid #fff1d57a; background: #25483dcc; color: #fff5dd; padding: 10px 18px; backdrop-filter: blur(10px); font: 13px var(--font-outfit),sans-serif; }
 .v-settled .v-session-mini { right: auto; left: 32px; bottom: 24px; }
-.village.v-simple .v-activity { left: 50%; right: auto; top: 50%; bottom: auto; transform: translate(-50%,-50%); width: min(520px,calc(100vw - 48px)); max-height: calc(100dvh - 170px); }
 .village .v-activity button:focus-visible,.village .v-activity input:focus-visible,.village .v-activity textarea:focus-visible,.village .v-activity select:focus-visible { outline: 2px solid #39745d; outline-offset: 3px; }
 .v-dialog { background: #fbf7eaf7; color: #354e43; border-color: #fff9e9; color-scheme: light; box-shadow: 0 20px 80px #193b3026; }
 .v-dialog-close { color: #4e6c5b; width: 44px; height: 44px; }
@@ -1261,7 +1215,6 @@ kbd {
   .v-activity.v-breathe .v-preset-row { margin-top: 16px; }
   .v-scene-toggle { right: 14px; bottom: max(14px,env(safe-area-inset-bottom)); }
   .v-settled .v-session-mini { left: 14px; bottom: 17px; max-width: 43vw; font-size: 11px; }
-  .village.v-simple .v-activity { left: 12px; right: 12px; top: 140px; bottom: 18px; width: auto; max-height: none; transform: none; }
   .v-dialog { padding: 40px 22px; }
   .v-place-list > button { padding: 15px 12px; min-height: 153px; }
   .v-place-list strong { font-size: 18px; }
@@ -1302,6 +1255,9 @@ kbd {
 .v-shared-trial { position: absolute; z-index: 6; top: 88px; left: 30px; width: min(320px, calc(100vw - 30px)); color: #fff9eb; }
 .v-shared-toggle { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid #e9dfc580; border-radius: 24px; background: #243e35e8; color: inherit; font: 13px var(--font-outfit), sans-serif; cursor: pointer; }
 .v-shared-toggle:hover { background: #345849; }
+.v-shared-unread { width: 9px; height: 9px; margin-left: auto; border-radius: 50%; background: #ffdc91; box-shadow: 0 0 0 3px #ffdc9133; animation: v-chat-arrival .55s ease-out 2; }
+@keyframes v-chat-arrival { 50% { transform: scale(1.6); box-shadow: 0 0 0 8px #ffdc9122; } }
+@media (prefers-reduced-motion: reduce) { .v-shared-unread { animation: none; } }
 .v-shared-chat { margin-top: 9px; padding: 16px; border: 1px solid #f6e8c6a3; border-radius: 18px; background: #223a32f2; box-shadow: 0 15px 35px #15211875; backdrop-filter: blur(16px); }
 .v-shared-chat-header { display: flex; align-items: center; justify-content: space-between; }
 .v-shared-chat h2 { margin: 0; font: 22px Georgia, serif; }

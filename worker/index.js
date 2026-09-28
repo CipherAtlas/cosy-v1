@@ -116,7 +116,7 @@ export class VillageWorld extends DurableObject {
       visitor.lastChat = now;
       socket.serializeAttachment(visitor);
       this.rollHour();
-      const entry = { name: visitor.name, message: text };
+      const entry = { id: visitor.id, name: visitor.name, message: text };
       this.chat = [...this.chat, entry].slice(-80);
       this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
       this.broadcast({ type: "chat", chatHour: this.chatHour, entry });

@@ -10,7 +10,6 @@ export type GardenControls = {
   birdStatus: BirdStatus;
   onGardenAction: (action: GardenAction) => void;
   language: "en" | "ja";
-  lumaSpeech?: { en: string; ja: string } | null;
   travel: (id: PlaceId) => void;
   meetMaple: () => void;
 };
@@ -120,7 +119,6 @@ export function MintTea(p: GardenControls) {
   const ja = p.language === "ja", t = (en: string, jp: string) => ja ? jp : en;
   return <div className="v-garden-ritual">
     <p>{t("Luma is here to share a cup and admire your garden.", "ルマとお茶を飲みながら、庭を眺めましょう。")}</p>
-    {p.lumaSpeech && <div className="v-villager-bubble v-simple-luma-bubble" role="status"><p>{p.lumaSpeech[p.language]}</p><div className="v-villager-footer"><span>{t("Luma", "ルマ")}</span></div></div>}
     <div className="v-garden-bed-actions">
       {p.garden.carrots > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "carrot" })}>{t("Give Luma a carrot", "ルマにニンジンを渡す")}</button>}
       {p.garden.radishes > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "radish" })}>{t("Give Luma a radish", "ルマにラディッシュを渡す")}</button>}
