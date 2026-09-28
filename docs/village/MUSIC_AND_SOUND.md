@@ -1,6 +1,14 @@
 # Recorded music and world sound
 
-Updated: 2026-09-27. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+Updated: 2026-09-28. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+
+## Personal lo-fi radio design — disabled 2026-09-28
+
+The active village uses the four original location-aware recordings and the original Sound panel. `PERSONAL_RADIO_ENABLED` in `Village.tsx` is false. The optional radio implementation and these design notes remain in source for later; the current application does not display its dock, search Audius or read radio preferences. The retained design uses a small collapsible dock with play/pause, next song, current track and Sound controls. Its panel offers four lo-fi stations and the original village recordings without an individual song catalog. When enabled, stations search Audius in the background and load more tracks as playback advances.
+
+When enabled, station, current track, play/pause state and collapsed state use `cosy-village-radio` in this browser's local storage; older queue and favorites data are retained for compatibility. The active application does not read or overwrite that key. The active `cosy-village-preferences` continues storing the original sound mix and soundtrack choice. Nothing about an individual's listening choices is synchronized to the shared village. The dormant radio panel places master, music, fire, river, wind, rain, nature and effects controls together. The active Sound panel retains the original soundtrack selector and six volume controls; the music activity exposes the same selector and optional sound balance.
+
+The catalog and streams depend on Audius availability. Artist pages are linked beside the current track for attribution. Station results are user-uploaded and have not been individually curated or license-audited for reuse outside Audius playback. Browser autoplay rules still require entering the village or another direct audio action. Remote failures keep the previous track when possible, or return to the local village recordings at startup.
 
 ## Garden and pond effects — 2026-09-27
 
@@ -14,7 +22,7 @@ The user explicitly replaced the procedural-music direction: use proper recorded
 
 The goal is music worth leaving on during a long focus session, inside a village whose sound communicates location and activity. Audio starts only after a deliberate user action. Music, nature and effects remain independently adjustable.
 
-## Implemented now
+## Original village recordings
 
 `RecordedSoundtrack` in `soundtrack.ts` streams four complete pieces from Holizna's **Quiet Village Collection**, totaling approximately 13.4 minutes. They are locally hosted MP3 files; the runtime no longer imports `composition.ts`, schedules musical notes or loads piano samples. The old composition module and sample files remain archived in the repository for provenance and historical tests.
 
@@ -25,7 +33,7 @@ The goal is music worth leaving on during a long focus session, inside a village
 | Focus cottage, writing nook, rainy/dusk exploration away from other landmarks | Quiet Village 3 | 4:16 |
 | Village hearth | Quiet Village 4 | 2:16 |
 
-`Follow the scenery` is the default. Explicit activity selection changes the cue; walking proximity also selects the pond, tea garden, nook and hearth. A 2.5-second stable candidate and a minimum ten-second hold prevent repeated changes near boundaries. The Sound dialog and hearth allow a manual recording override; changing the music volume does not change the selected recording.
+When village recordings are selected, `Follow the scenery` chooses the cue. Explicit activity selection changes it; walking proximity also selects the pond, tea garden, nook and hearth. A 2.5-second stable candidate and a minimum ten-second hold prevent repeated changes near boundaries. Changing the music volume does not change the selected recording.
 
 Two HTML media elements stream through separate Web Audio gains into the music bus. A change crossfades for four seconds, then pauses the old deck. Full pieces repeat through the media element's loop behavior; this is not a claim of sample-perfect musical loops or beat-matched transitions. Failed loads keep the previous recording playing and display a notice. Media load attempts time out after 15 seconds; disposal/cancellation stops pending work. No music assets load while music or master volume is zero.
 

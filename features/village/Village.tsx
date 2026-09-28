@@ -27,6 +27,9 @@ import {
   type AudioMix,
 } from "./places";
 import { Activities, MixSliders, SoundtrackChoices } from "./Activities";
+import { RadioDock, SoundPanel } from "./RadioControls";
+import { isRadioStationId, isRadioTrack, RADIO_PAGE_SIZE, RADIO_STATIONS, searchRadio, type RadioStationId } from "./radioCatalog";
+import type { RadioTrack } from "./soundtrack";
 import { HarvestInventory } from "./GardenActivities";
 import { VillageAudio } from "./audio";
 import { useSession } from "./useSession";
@@ -39,6 +42,11 @@ import { VILLAGERS } from "./villagers";
 import { GARDEN_KEY, CROP_NAMES, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
 import type { SharedChatEntry, SharedWorldConnection, SharedVisitor } from "./sharedWorld";
 
+type RadioPreferences = { mode: "radio" | "village"; station: RadioStationId; track: RadioTrack | null; favorites: RadioTrack[]; queue: RadioTrack[]; paused: boolean };
+const INITIAL_RADIO: RadioPreferences = { mode: "radio", station: "lofi", track: null, favorites: [], queue: [], paused: false };
+// The personal radio is retained for a later release; the village currently plays its original recordings.
+const PERSONAL_RADIO_ENABLED = false;
+
 export function Village() {
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
@@ -50,12 +58,13 @@ export function Village() {
   const [engineAttempt, setEngineAttempt] = useState(0);
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
-    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "friends" | "basket" | null>(null);
+    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "basket" | null>(null);
   const [birdStatus, setBirdStatus] = useState<BirdStatus>("flying");
   const [nearBench, setNearBench] = useState<string | null>(null);
   const [seatedBench, setSeatedBench] = useState<string | null>(null);
   const [garden, setGarden] = useState(freshGarden);
   const gardenRef = useRef(garden);
+  const crumbsReadyRef = useRef(false);
   const sharedTrialModeRef = useRef(false);
   const sharedTrialRef = useRef<SharedWorldConnection | null>(null);
   const sharedConnectedRef = useRef(false);
@@ -85,6 +94,21 @@ export function Village() {
   const [movement, setMovement] = useState<MovementStatus>({ gait: "idle", running: false });
   const [mouseLook, setMouseLook] = useState<"free" | "locked" | "drag">("free");
   const [soundLoading, setSoundLoading] = useState(false);
+  const [radioExpanded, setRadioExpanded] = useState(false);
+  const [radioPrefs, setRadioPrefs] = useState<RadioPreferences>(INITIAL_RADIO);
+  const radioPrefsRef = useRef(radioPrefs);
+  radioPrefsRef.current = radioPrefs;
+  const radioEnded = useRef<() => void>(() => {});
+  const radioChoiceId = useRef(0);
+  const [radioLoaded, setRadioLoaded] = useState(false);
+  const [radioRequest, setRadioRequest] = useState(0);
+  const radioStation = useRef<RadioTrack[]>([]);
+  const radioPage = useRef(0);
+  const radioHasMore = useRef(false);
+  const radioNextBusy = useRef(false);
+  const radioNextController = useRef<AbortController | null>(null);
+  const [radioLoading, setRadioLoading] = useState(false);
+  const [radioError, setRadioError] = useState("");
   const [sound, setSound] = useState(false),
     [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
     [quality, setQuality] = useState<Quality>("high"),
@@ -128,6 +152,20 @@ export function Village() {
   }, []);
   const onGardenAction = useCallback((action: GardenAction) => {
     if (action.kind === "basket") { setPanel("basket"); return; }
+    if ((action.kind === "feed" || action.kind === "feedBirds") && !crumbsReadyRef.current) {
+      setNotice(preferences.current.language === "ja" ? "先にメープルかレンに話しかけて、パンくずをもらいましょう。" : "Talk to Maple or Wren nearby to get crumbs first.");
+      return;
+    }
+    if (action.kind === "crumbs" || action.kind === "birdCrumbs") {
+      if (sharedTrialModeRef.current && (!sharedConnectedRef.current || !sharedTrialRef.current)) {
+        setNotice(preferences.current.language === "ja" ? "村との接続を待っています。" : "Wait for the village to reconnect.");
+        return;
+      }
+      crumbsReadyRef.current = true;
+      const next = { ...gardenRef.current, crumbPouch: true };
+      gardenRef.current = next; setGarden(next); engine.current?.setGarden(next);
+      setNotice("");
+    }
     if (sharedTrialModeRef.current) {
       if (sharedConnectedRef.current && sharedTrialRef.current) sharedTrialRef.current.sendGarden(action);
       else setNotice("The shared village is offline. Reload to reconnect.");
@@ -164,15 +202,33 @@ export function Village() {
   const interactGarden = useCallback((id: string) => {
     const action = nearbyGardenAction(id, gardenRef.current);
     if (!action) return;
-    if (action.kind === "feed" && !gardenRef.current.crumbPouch) { setPanel("friends"); return; }
+    if (action.kind === "feed" && !crumbsReadyRef.current) { onGardenAction(action); return; }
     if (action.kind === "drink") { openPlace("mood"); }
     onGardenAction(action);
   }, [onGardenAction, openPlace]);
   useEffect(() => {
     audio.current = new VillageAudio(() => setNotice(preferences.current.language === "ja"
       ? "音楽を切り替えられませんでした。音をオフにして、もう一度お試しください。"
-      : "The music couldn't change. Turn sound off and on to retry."));
-    try { const saved = readGarden(localStorage.getItem(GARDEN_KEY)); gardenRef.current = saved; setGarden(saved); }
+      : "The music couldn't change. Turn sound off and on to retry."), () => radioEnded.current());
+    if (PERSONAL_RADIO_ENABLED) try {
+      const stored = JSON.parse(localStorage.getItem("cosy-village-radio") || "null");
+      if (stored && typeof stored === "object") {
+        const saved: RadioPreferences = {
+          mode: stored.mode === "village" ? "village" : "radio",
+          station: isRadioStationId(stored.station) ? stored.station : "lofi",
+          track: isRadioTrack(stored.track) ? stored.track : null,
+          favorites: Array.isArray(stored.favorites) ? stored.favorites.filter(isRadioTrack).slice(0, 100) : [],
+          queue: Array.isArray(stored.queue) ? stored.queue.filter(isRadioTrack).slice(0, 100) : [],
+          paused: stored.paused === true,
+        };
+        radioPrefsRef.current = saved; setRadioPrefs(saved);
+        if (typeof stored.expanded === "boolean") setRadioExpanded(stored.expanded);
+        if (saved.mode === "radio" && saved.track) void audio.current.selectRadio(saved.track);
+        audio.current.setMusicPaused(saved.paused);
+      }
+    } catch {}
+    if (PERSONAL_RADIO_ENABLED) setRadioLoaded(true);
+    try { const saved = { ...readGarden(localStorage.getItem(GARDEN_KEY)), crumbPouch: false }; gardenRef.current = saved; setGarden(saved); }
     catch { setGardenStorageError(true); }
     try {
       const p = JSON.parse(
@@ -195,6 +251,8 @@ export function Village() {
             soundtrack: ["auto", "village", "water", "rest", "hearth"].includes(p.mix.soundtrack) ? p.mix.soundtrack : "auto",
             ambience: typeof p.mix.ambience === "number" && p.mix.ambience >= 0 && p.mix.ambience <= 1 ? p.mix.ambience : .5,
             effects: typeof p.mix.effects === "number" && p.mix.effects >= 0 && p.mix.effects <= 1 ? p.mix.effects : .6,
+            river: typeof p.mix.river === "number" && p.mix.river >= 0 && p.mix.river <= 1 ? p.mix.river : 1,
+            wind: typeof p.mix.wind === "number" && p.mix.wind >= 0 && p.mix.wind <= 1 ? p.mix.wind : 1,
           });
       }
     } catch {}
@@ -237,9 +295,10 @@ export function Village() {
           engine.current?.setSharedIdentity(self.slot, self.color);
         }
         if (snapshot.gardenChanged) {
-          gardenRef.current = snapshot.garden;
-          setGarden(snapshot.garden);
-          engine.current?.setGarden(snapshot.garden);
+          const personalGarden = { ...snapshot.garden, crumbPouch: crumbsReadyRef.current };
+          gardenRef.current = personalGarden;
+          setGarden(personalGarden);
+          engine.current?.setGarden(personalGarden);
         }
         const visitors = snapshot.visitors.filter(visitor => visitor.id !== snapshot.selfId);
         sharedVisitorsRef.current = visitors;
@@ -267,6 +326,9 @@ export function Village() {
       onDisconnect: () => {
         if (cancelled) return;
         sharedConnectedRef.current = false;
+        crumbsReadyRef.current = false;
+        const withoutCrumbs = { ...gardenRef.current, crumbPouch: false };
+        gardenRef.current = withoutCrumbs; setGarden(withoutCrumbs); engine.current?.setGarden(withoutCrumbs);
         sharedVisitorsRef.current = [];
         sharedPeopleRef.current = [];
         engine.current?.setRemoteVisitors([]);
@@ -383,6 +445,32 @@ export function Village() {
     } catch {}
   }, [mix, quality, weather, language, preferencesLoaded]);
   useEffect(() => {
+    if (!PERSONAL_RADIO_ENABLED || !radioLoaded) return;
+    try { localStorage.setItem("cosy-village-radio", JSON.stringify({ ...radioPrefs, expanded: radioExpanded })); } catch {}
+  }, [radioPrefs, radioExpanded, radioLoaded]);
+  const shouldSearchRadio = PERSONAL_RADIO_ENABLED && (entered || panel === "sound");
+  useEffect(() => {
+    if (!shouldSearchRadio || !radioLoaded || radioPrefs.mode !== "radio") return;
+    const controller = new AbortController();
+    radioNextController.current?.abort();
+    radioStation.current = [];
+    radioPage.current = 0;
+    radioHasMore.current = false;
+    setRadioLoading(true);
+    setRadioError("");
+    const query = RADIO_STATIONS.find(station => station.id === radioPrefs.station)!.query;
+    void searchRadio(query, 0, controller.signal).then(({ tracks, hasMore }) => {
+      if (controller.signal.aborted) return;
+      radioStation.current = tracks.filter(track => track.duration >= 90 && track.duration <= 600);
+      radioHasMore.current = hasMore;
+      if (!radioPrefsRef.current.track && radioStation.current.length) void chooseRadioTrack(radioStation.current[0], entered);
+      if (!radioStation.current.length) setRadioError(preferences.current.language === "ja" ? "この局の曲を読み込めませんでした。別の局をお試しください。" : "No songs loaded for this station. Try another.");
+    }).catch(() => {
+      if (!controller.signal.aborted) setRadioError(preferences.current.language === "ja" ? "局を読み込めませんでした。もう一度お試しください。" : "Could not tune the station. Try it again.");
+    }).finally(() => { if (!controller.signal.aborted) setRadioLoading(false); });
+    return () => { controller.abort(); radioNextController.current?.abort(); };
+  }, [shouldSearchRadio, radioLoaded, radioPrefs.mode, radioPrefs.station, radioRequest]);
+  useEffect(() => {
     if (!notice) return;
     const id = setTimeout(() => setNotice(""), 7000);
     return () => clearTimeout(id);
@@ -424,6 +512,10 @@ export function Village() {
       setSoundLoading(true);
       const result = await audio.current?.start();
       setSound(true);
+      if (PERSONAL_RADIO_ENABLED && result?.radioFailed) {
+        updateRadio(current => ({ ...current, mode: "village", track: null }));
+        setNotice(t("The radio could not connect, so village music is playing.", "ラジオに接続できなかったため、村の音楽を再生しています。"));
+      }
       if (result && !result.ambience) setNotice(t("Some nature recordings could not load. Music is still available; turn sound off and on to retry.", "環境音の一部を読み込めませんでした。音楽は再生できます。音をオフにして再度お試しください。"));
     } catch {
       audio.current?.stop();
@@ -441,6 +533,74 @@ export function Village() {
       setSound(false);
     } else void enableSound();
   }
+  function updateRadio(change: (current: RadioPreferences) => RadioPreferences) {
+    const next = change(radioPrefsRef.current);
+    radioPrefsRef.current = next;
+    setRadioPrefs(next);
+  }
+  async function chooseRadioTrack(track: RadioTrack, startIfNeeded = true) {
+    const choiceId = ++radioChoiceId.current;
+    try {
+      await audio.current?.selectRadio(track);
+      if (choiceId !== radioChoiceId.current) return;
+      updateRadio(current => ({ ...current, mode: "radio", track }));
+      if (startIfNeeded && !sound) void enableSound();
+    } catch {
+      setNotice(t("That track could not play. Please choose another.", "この曲は再生できませんでした。別の曲を選んでください。"));
+    }
+  }
+  async function playVillageMusic() {
+    const choiceId = ++radioChoiceId.current;
+    try {
+      await audio.current?.selectRadio(null);
+      if (choiceId !== radioChoiceId.current) return;
+      updateRadio(current => ({ ...current, mode: "village", track: null }));
+    } catch { setNotice(t("Village music could not start.", "村の音楽を再生できませんでした。")); }
+  }
+  function selectStation(station: RadioStationId) {
+    ++radioChoiceId.current;
+    radioNextController.current?.abort();
+    updateRadio(current => ({ ...current, mode: "radio", station, track: null, paused: false }));
+    audio.current?.setMusicPaused(false);
+    setRadioRequest(request => request + 1);
+  }
+  function nextRadioTrack() {
+    if (radioPrefsRef.current.mode === "village") { selectStation(radioPrefsRef.current.station); return; }
+    if (radioLoading || radioNextBusy.current) return;
+    const songs = radioStation.current;
+    const index = songs.findIndex(track => track.id === radioPrefsRef.current.track?.id);
+    if (index + 1 < songs.length) { void chooseRadioTrack(songs[index + 1]); return; }
+    if (!radioHasMore.current) { if (songs.length) void chooseRadioTrack(songs[0]); return; }
+    radioNextBusy.current = true;
+    setRadioLoading(true);
+    const controller = new AbortController();
+    radioNextController.current = controller;
+    const stationId = radioPrefsRef.current.station;
+    const query = RADIO_STATIONS.find(station => station.id === stationId)!.query;
+    const offset = radioPage.current + RADIO_PAGE_SIZE;
+    void searchRadio(query, offset, controller.signal).then(({ tracks, hasMore }) => {
+      if (controller.signal.aborted || radioPrefsRef.current.mode !== "radio" || radioPrefsRef.current.station !== stationId) return;
+      radioPage.current = offset;
+      radioHasMore.current = hasMore;
+      const fresh = tracks.filter(track => track.duration >= 90 && track.duration <= 600 && !songs.some(item => item.id === track.id));
+      radioStation.current = [...songs, ...fresh];
+      if (fresh.length) void chooseRadioTrack(fresh[0]);
+      else if (songs.length) void chooseRadioTrack(songs[0]);
+    }).catch(() => {
+      if (!controller.signal.aborted) setRadioError(preferences.current.language === "ja" ? "次の曲を読み込めませんでした。" : "Could not load the next song.");
+    }).finally(() => {
+      if (radioNextController.current === controller) { radioNextController.current = null; radioNextBusy.current = false; setRadioLoading(false); }
+    });
+  }
+  radioEnded.current = nextRadioTrack;
+  function toggleMusic() {
+    const paused = radioPrefsRef.current.paused;
+    const next = sound ? !paused : false;
+    updateRadio(current => ({ ...current, paused: next }));
+    audio.current?.setMusicPaused(next);
+    if (!sound) void enableSound();
+  }
+  function openRadio() { setPanel("sound"); }
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
   const showWorldInteraction = entered && !place;
@@ -453,7 +613,7 @@ export function Village() {
     : nearbyAction?.kind === "harvest" ? t("Pick your harvest", "収穫する")
     : nearbyAction?.kind === "basket" ? t("Open harvest basket", "収穫かごを開く")
     : nearbyAction?.kind === "flowers" ? t("Water the irises", "アイリスに水をあげる")
-    : nearbyAction?.kind === "feed" ? garden.crumbPouch ? t("Feed the little duckies", "アヒルたちにパンくずをあげる") : t("Ask Maple for bread crumbs", "メープルにパンくずをもらう")
+    : nearbyAction?.kind === "feed" ? garden.crumbPouch ? t("Feed the little duckies", "アヒルたちにパンくずをあげる") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")
     : t("Enjoy your mint tea", "ミントティーを楽しむ");
   const placeName = (id: PlaceId) =>
     ja
@@ -473,7 +633,7 @@ export function Village() {
           onClick={leave}
           aria-label={t("Return to village", "村に戻る")}
         >
-          {current ? placeName(current.id) : "Cosy"}
+          {current ? placeName(current.id) : "Hearthwillow"}
           {!current && <Leaf size={24} weight="light" />}
         </button>
         <nav aria-label={t("Village controls", "村の操作")}>
@@ -494,14 +654,11 @@ export function Village() {
           <button
             disabled={!ready}
             aria-label={t("Sound", "音")}
-            onClick={() => setPanel("sound")}
+            onClick={openRadio}
           >
             {sound ? <SpeakerHigh size={20} /> : <SpeakerSlash size={20} />}
             <span>{t("Sound", "音")}</span>
           </button>
-          {entered && <button aria-label={t("Friends", "仲間")} onClick={() => setPanel("friends")}>
-            <UsersThree size={21} /><span>{t("Friends", "仲間")}{companions.length > 0 ? ` · ${companions.length}` : ""}</span>
-          </button>}
           <button
             disabled={!ready}
             aria-label={t("Settings", "設定")}
@@ -511,10 +668,14 @@ export function Village() {
           </button>
         </nav>
       </header>
+      {PERSONAL_RADIO_ENABLED && entered && <RadioDock expanded={radioExpanded} setExpanded={setRadioExpanded}
+        track={radioPrefs.mode === "radio" ? radioPrefs.track : null} mode={radioPrefs.mode} sound={sound} paused={radioPrefs.paused}
+        loading={soundLoading} toggleMusic={toggleMusic}
+        next={nextRadioTrack} openSound={openRadio} language={language} />}
       {!entered && (
         <div className="v-arrival">
           <div className="v-arrival-content">
-            <h1>{t("Somewhere to slow down.", "ゆっくりできる場所。")}</h1>
+            <h1>{t("Welcome to Hearthwillow.", "ハースウィローへようこそ。")}</h1>
             <p>
               {t(
                 "A quiet village. A little time for yourself.",
@@ -541,7 +702,7 @@ export function Village() {
                   setPanel(null);
                 }}
               >
-                {t("Enter the village", "村に入る")}
+                {t("Enter Hearthwillow", "ハースウィローに入る")}
                 <ArrowRight size={19} />
               </button>
             )}
@@ -550,24 +711,13 @@ export function Village() {
       )}
       {entered && !place && (
         <>
-          <div className="v-location">
-            <span>{t("The village", "村の入口")}</span>
-            <span>
-              {weather === "golden"
-                ? t("Golden hour", "夕暮れ")
-                : weather === "dusk"
-                  ? t("Blue hour", "薄暮")
-                  : t("A rainy afternoon", "雨の午後")}
-            </span>
-          </div>
           <footer className="v-walk-hints">
-            <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> {t("Glide", "移動")}</span>
+            <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>{t("Move", "移動")}</span>
+            <span><kbd>Shift</kbd>{t("Hold to run", "押して走る")}</span>
+            <span><kbd>E</kbd>{t("Interact", "調べる")}</span>
             <span>{mouseLook === "locked" ? t("Mouse to look · Esc to release", "マウスで見回す · Escで解除")
               : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
                 : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
-            <button className="v-controls-button" onClick={() => setPanel("controls")}>
-              {t("Controls", "操作方法")}
-            </button>
           </footer>
           <div
             className="v-touch-pad"
@@ -625,12 +775,16 @@ export function Village() {
           session={focus}
           mix={mix}
           setMix={setMix}
+          radioEnabled={PERSONAL_RADIO_ENABLED}
           sound={sound}
-          soundLoading={soundLoading}
           toggleSound={toggleSound}
+          musicPlaying={sound && !radioPrefs.paused && mix.music > 0 && mix.master > 0}
+          soundLoading={soundLoading}
+          toggleMusic={toggleMusic}
+          openRadio={openRadio}
           travel={openPlace}
           language={language}
-          gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace, meetMaple: () => setPanel("friends") }}
+          gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace }}
         />
         </div>
       )}
@@ -658,21 +812,21 @@ export function Village() {
         {showWorldInteraction && seatedBench && <button className="v-interact" onClick={() => engine.current?.stand()}><kbd>E</kbd>{t("Stand up", "立ち上がる")}</button>}
         {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
         {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
-        {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}<Bird size={17} /></button>}
+        {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{garden.crumbPouch ? t("Scatter sourdough crumbs", "サワードウのパンくずを撒く") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")}<Bird size={17} /></button>}
         {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !nearBench && !seatedBench && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </button>}
       </div>}
       {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
       {sharedTrialEnabled && entered && <div className="v-shared-trial">
-        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? "Hide village chat" : chatUnread ? "Open village chat, new message" : "Open village chat"}>
+        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? "Hide Hearthwillow chat" : chatUnread ? "Open Hearthwillow chat, new message" : "Open Hearthwillow chat"}>
           <UsersThree size={18} /> {sharedStatus === "Connected" ? `${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here` : sharedStatus}
           {chatUnread && !chatOpen && <span key={chatPulse} className="v-shared-unread" aria-hidden="true" />}
         </button>
-        {chatOpen && <section className="v-shared-chat" aria-label="Village chat">
-          <div className="v-shared-chat-header"><h2>Village chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close village chat"><X size={18} /></button></div>
+        {chatOpen && <section className="v-shared-chat" aria-label="Hearthwillow chat">
+          <div className="v-shared-chat-header"><h2>Hearthwillow chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close Hearthwillow chat"><X size={18} /></button></div>
           <div className="v-shared-people">{sharedPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>
-          <p className="v-shared-chat-note">Everyone is in this village. Messages clear each hour{sharedChatHour ? `, at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : ""}.</p>
+          <p className="v-shared-chat-note">Everyone is in Hearthwillow. Messages clear each hour{sharedChatHour ? `, next at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} your time` : ""}.</p>
           <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => <p key={index}><strong>{entry.name}</strong> {entry.message}</p>) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
           <form onSubmit={event => { event.preventDefault(); const message = chatDraft.trim(); if (message && sharedTrialRef.current) { sharedTrialRef.current.sendChat(message); setChatDraft(""); } }}>
             <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => event.stopPropagation()} maxLength={180} placeholder="Say something kind…" disabled={sharedStatus !== "Connected"} />
@@ -694,9 +848,9 @@ export function Village() {
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className="v-dialog-overlay" />
+          <Dialog.Overlay className={`v-dialog-overlay${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className="v-dialog"
+            className={`v-dialog${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
             onCloseAutoFocus={(e) => {
               e.preventDefault();
               canvas.current?.querySelector("canvas")?.focus();
@@ -706,9 +860,7 @@ export function Village() {
               {panel === "places"
                 ? t("Where would you like to go?", "どこへ行きましょうか？")
                 : panel === "sound"
-                  ? t("A little atmosphere.", "心地よい音を。")
-                  : panel === "friends"
-                    ? t("A little company.", "誰かと一緒に。")
+                  ? PERSONAL_RADIO_ENABLED ? t("Sound", "音") : t("A little atmosphere.", "心地よい音を。")
                   : panel === "basket"
                     ? t("Harvest basket", "収穫かご")
                   : panel === "controls"
@@ -719,9 +871,7 @@ export function Village() {
               {panel === "places"
                 ? "Travel directly to a village activity."
                 : panel === "sound"
-                  ? "Music and ambience controls."
-                  : panel === "friends"
-                    ? "Invite villagers to walk and share activities."
+                  ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
                   : panel === "basket"
                     ? t("Stored harvests from your garden.", "庭で収穫して保存したもの。")
                   : panel === "controls"
@@ -735,25 +885,6 @@ export function Village() {
               <X size={22} />
             </Dialog.Close>
             {panel === "basket" && <HarvestInventory garden={garden} language={language} />}
-            {panel === "friends" && <div className="v-friends">
-              <p>{t("Invite anyone you like, or bring everyone. They'll wander with you and join you when you settle in.", "誰でも、みんなでも。一緒にお散歩して、ひと休みもできます。")}</p>
-              <button className="v-button" onClick={() => {
-                const next = companions.length === VILLAGERS.length ? [] : VILLAGERS.map(v => v.id);
-                companionsRef.current = next; setCompanions(next); engine.current?.setCompanions(next);
-              }}>{companions.length === VILLAGERS.length ? t("Let everyone wander", "みんなと別れる") : t("Invite everyone", "みんなを誘う")}</button>
-              {VILLAGERS.map(v => <div className="v-friend" key={v.id}>
-                <div className="v-friend-name"><span style={{ background: v.color }} aria-hidden="true" /><strong>{v.name[language]}</strong></div>
-                <button className="v-button" aria-pressed={companions.includes(v.id)} aria-label={companions.includes(v.id) ? t(`Let ${v.name.en} wander`, `${v.name.ja}と別れる`) : t(`Invite ${v.name.en}`, `${v.name.ja}を誘う`)} onClick={() => toggleCompanion(v.id)}>{companions.includes(v.id) ? t("See you later", "またね") : t("Walk with me", "一緒に歩く")}</button>
-                {v.id === "luma" && <button className="v-text-button" onClick={() => openPlace("mood")}>{t("Share your harvest over tea", "収穫を持ってお茶をしよう")}</button>}
-                {v.id === "wren" && <div className="v-maple-gift"><p>{t("Wren tends the bird clearing with a little pouch of sourdough crumbs.", "レンはサワードウのパンくずを持って、小鳥の広場のお世話をしています。")}</p>
-                  <button className="v-button" onClick={() => onGardenAction({ kind: "birdCrumbs" })}>{t("Chat with Wren · Ask for crumbs", "レンと話してパンくずをもらう")}</button>
-                </div>}
-                {v.id === "maple" && <div className="v-maple-gift"><p>{t("Our baker has a little something for the duckies.", "パン屋さんから、アヒルたちへ小さな贈りもの。")}</p>
-                  <button className="v-button" onClick={() => onGardenAction({ kind: "crumbs" })}>{garden.crumbPouch ? t("A few more crumbs, Maple?", "メープル、もう少しパンくずを？") : t("Ask Maple for bread crumbs", "メープルにパンくずをもらう")}</button>
-                  {garden.crumbPouch && <button className="v-text-button" onClick={() => openPlace("breathe")}>{t("Take the crumbs to the pond", "パンくずを池へ持っていく")}</button>}
-                </div>}
-              </div>)}
-            </div>}
             {panel === "controls" && (
               <div className="v-control-guide">
                 <p>{t("Wander at your own pace, or use Places to settle straight into an activity.", "自分のペースでお散歩。場所メニューから、好きな場所へすぐに移動できます。")}</p>
@@ -792,19 +923,7 @@ export function Village() {
                     <span className="v-place-icon" aria-hidden="true">{[<Timer key="focus" size={23}/>,<Fire key="music" size={23}/>,<Drop key="breathe" size={23}/>,<Coffee key="mood" size={23}/>,<BookOpen key="gratitude" size={23}/>,<EnvelopeSimple key="compliment" size={23}/>,<Leaf key="garden" size={23}/>,<Bird key="birds" size={23}/>][PLACES.findIndex(a=>a.id===p.id)]}</span>
                     <div>
                       <strong>{placeName(p.id)}</strong>
-                      <span>
-                        {ja
-                          ? [
-                              "集中",
-                              "音楽",
-                              "深呼吸",
-                              "気持ち",
-                              "感謝",
-                              "やさしい言葉",
-                              "野菜、お花とミント",
-                            ][PLACES.findIndex((a) => a.id === p.id)]
-                          : p.description}
-                      </span>
+                      <span>{ja ? ["集中", "音楽", "深呼吸", "気持ち", "感謝", "やさしい言葉", "野菜、お花とミント"][PLACES.findIndex(a => a.id === p.id)] : p.description}</span>
                     </div>
                     <ArrowUpRight size={23} />
                   </button>
@@ -823,8 +942,14 @@ export function Village() {
                     ? t("Turn sound off", "音をオフ")
                     : t("Turn sound on", "音をオン")}
                 </button>
-                <SoundtrackChoices mix={mix} setMix={setMix} language={language} />
-                <MixSliders mix={mix} setMix={setMix} language={language} />
+                {PERSONAL_RADIO_ENABLED ? <SoundPanel station={radioPrefs.station} mode={radioPrefs.mode}
+                  track={radioPrefs.mode === "radio" ? radioPrefs.track : null}
+                  loading={radioLoading} error={radioError} selectStation={selectStation} next={nextRadioTrack}
+                  useVillageMusic={() => { void playVillageMusic(); }}
+                  mix={mix} setMix={setMix} language={language} /> : <>
+                  <SoundtrackChoices mix={mix} setMix={setMix} language={language} />
+                  <MixSliders mix={mix} setMix={setMix} language={language} />
+                </>}
               </>
             )}
             {panel === "settings" && (

@@ -73,7 +73,7 @@ export class VillageWorld extends DurableObject {
     while (used.has(name)) name = names[Math.floor(Math.random() * names.length)];
     const slot = (this.ctx.storage.kv.get("nextSlot") || 0) + 1;
     this.ctx.storage.kv.put("nextSlot", slot);
-    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0 };
+    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0, crumbPouch: false };
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment(visitor);
@@ -105,7 +105,12 @@ export class VillageWorld extends DurableObject {
       this.broadcast({ type: "move", id: visitor.id, x: visitor.x, z: visitor.z, heading: visitor.heading }, socket);
     } else if (message.type === "garden" && validAction(message.action, this.garden.beds.length)) {
       const action = message.action;
+      if ((action.kind === "feed" || action.kind === "feedBirds") && !visitor.crumbPouch) return;
       if (action.kind !== "feedBirds" && !gardenActionAllowed(this.garden, action)) return;
+      if (action.kind === "crumbs" || action.kind === "birdCrumbs") {
+        visitor.crumbPouch = true;
+        socket.serializeAttachment(visitor);
+      }
       this.garden = gardenAction(this.garden, action);
       this.ctx.storage.kv.put("garden", this.garden);
       this.broadcast({ type: "garden", garden: this.garden, event: { action, actor: visitor.id, x: visitor.x, z: visitor.z } });

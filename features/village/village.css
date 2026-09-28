@@ -328,24 +328,6 @@
 .v-loading progress::-webkit-progress-value {
   background: #efcf90;
 }
-.v-location {
-  position: absolute;
-  left: 36px;
-  bottom: 100px;
-  z-index: 2;
-  display: grid;
-  gap: 6px;
-  pointer-events: none;
-}
-.v-location span:first-child {
-  font:
-    24px Georgia,
-    serif;
-}
-.v-location span:last-child {
-  font-size: 13px;
-  color: #e3e1c9;
-}
 .v-walk-hints {
   position: absolute;
   bottom: 30px;
@@ -859,13 +841,6 @@ kbd {
   .v-wordmark svg {
     width: 19px;
   }
-  .v-location {
-    left: 20px;
-    bottom: 155px;
-  }
-  .v-location span:first-child {
-    font-size: 21px;
-  }
   .v-walk-hints {
     display: none;
   }
@@ -1115,7 +1090,6 @@ kbd {
 .v-header nav button:hover { background: #fffdf4; color: #183f3b; }
 .v-header nav .v-leave { background: #254d48e8; border-color: #c7e3cd75; color: #fff5dc; }
 .v-settled .v-shade { background: linear-gradient(180deg,#152c2826,transparent 20%,transparent 85%,#152c2826); }
-.v-location { text-shadow: 0 2px 7px #223b38; }
 .v-walk-hints { gap: 14px; }
 .v-interact { background: #fff7e5f2; color: #2a4d47; border-color: #fff9e8; box-shadow: 0 7px 24px #122c3329; }
 .v-interact kbd { border-color: #9baf9e; background: #e3e8d6; color: #24453d; }
@@ -1241,16 +1215,6 @@ kbd {
 .v-garden-flowers p,.v-garden-ritual p { font-size: 13px; line-height: 1.55; color: #64745e; margin: 8px 0; }
 .v-garden-ritual { padding: 4px 0 16px; margin-bottom: 18px; border-bottom: 1px solid #cdd6bd; }
 .v-garden-ritual .v-button { width: 100%; }
-.v-friends > p { color: #60745e; font-size: 14px; line-height: 1.6; margin: 0 0 18px; }
-.v-friends .v-button { min-height: 44px; padding: 10px 14px; font-size: 13px; }
-.v-friend { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px; border-top: 1px solid #d4dcc6; padding: 18px 0; margin-top: 10px; }
-.v-friend-name { display: flex; align-items: center; gap: 10px; }
-.v-friend-name strong { font: 22px Georgia,serif; }
-.v-friend-name > span { width: 19px; height: 22px; border-radius: 50% 50% 45% 45%; border: 1px solid #4a68452b; }
-.v-friend button[aria-pressed="true"] { background: #dfead5; border-color: #809a79; }
-.v-maple-gift { grid-column: 1 / -1; padding-left: 29px; }
-.v-maple-gift p { font-size: 13px; color: #6f7b61; line-height: 1.5; margin: 0 0 10px; }
-.v-maple-gift .v-text-button { display: block; color: #466f52; margin-top: 10px; min-height: 44px; }
 .v-save-warning { position: absolute; bottom: 14px; left: 20px; max-width: 350px; padding: 10px 15px; background: #fff4d9; color: #685536; border-radius: 8px; font-size: 13px; z-index: 5; }
 .v-shared-trial { position: absolute; z-index: 6; top: 88px; left: 30px; width: min(320px, calc(100vw - 30px)); color: #fff9eb; }
 .v-shared-toggle { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid #e9dfc580; border-radius: 24px; background: #243e35e8; color: inherit; font: 13px var(--font-outfit), sans-serif; cursor: pointer; }
@@ -1279,7 +1243,6 @@ kbd {
   .v-header nav > button { padding-inline: 9px; }
   .v-garden-bed { padding: 12px 0; }
   .v-garden-bed-actions .v-button { flex: 1; }
-  .v-friend-name strong { font-size: 20px; }
   .v-shared-trial { top: 84px; left: 14px; width: min(320px, calc(100vw - 28px)); }
 }
 

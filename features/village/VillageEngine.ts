@@ -17,10 +17,11 @@ import { GARDEN_TARGETS, HARVEST_COMPLIMENTS, freshGarden, nearbyGardenAction, t
 import type { ActivityMoment } from "./environment";
 import { softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
-import { BIRD_CLEARING, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
+import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
 import type { SharedChatEntry, SharedVisitor } from "./sharedWorld";
+import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal } from "./focusCottageProps";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -107,6 +108,10 @@ export class VillageEngine {
   private direction = new T.Vector3();
   private temp = new T.Vector3();
   private indoor?: T.Group;
+  private coffeeSteam: T.Mesh[] = [];
+  private bridgeWindow?: T.WebGLRenderTarget;
+  private bridgeCamera = new T.PerspectiveCamera(56, 576 / 512, .12, 1100);
+  private bridgeWindowTime = -1000;
   private rain?: T.LineSegments;
   private weather: Weather = "golden";
   private collisionBox = new T.Box3();
@@ -223,7 +228,6 @@ export class VillageEngine {
       return;
     }
     if (document.pointerLockElement === this.renderer.domElement) {
-      // A menu, Escape or disposal may have happened while the browser handled the request.
       if (!this.wantsMouseLook || this.blocked || this.place || this.disposed || document.hidden) {
         this.releaseMouseLook();
         return;
@@ -253,7 +257,6 @@ export class VillageEngine {
     this.pointerLockPending = true;
     if (!canvas.requestPointerLock) { this.onPointerLockError(); return; }
     try {
-      // Firefox also supports the event-only version, which returns no promise.
       const request = canvas.requestPointerLock();
       request?.catch(this.onPointerLockError);
     } catch { this.onPointerLockError(); }
@@ -317,7 +320,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Cosy village. Use arrow keys or WASD to glide, R to glide faster, Shift to dash, Space to jump. Click to capture the mouse, move the mouse to look, Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to tend nearby plants, sit, or enter activities; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for bread crumbs. Places provides direct access to every activity.",
+      "Walkable Hearthwillow village. Use arrow keys or WASD to move, R to glide faster, hold Shift to run, Space to jump. Click to capture the mouse, move it to look, and press Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to tend nearby plants, sit, or enter activities; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for crumbs when close.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -512,13 +515,8 @@ export class VillageEngine {
     const stone = (stoneSource as T.MeshStandardMaterial).clone();
     stone.vertexColors = false; stone.color.set("#dbceb2");
     const plaster = new T.MeshStandardMaterial({
-      color: "#b2a081",
+      color: "#ddc6a2",
       roughness: 1,
-    });
-    const glow = new T.MeshStandardMaterial({
-      color: "#b0d5dd",
-      emissive: "#c6e3df",
-      emissiveIntensity: .55,
     });
     const cube = (
       m: T.Material,
@@ -539,27 +537,46 @@ export class VillageEngine {
     cube(wooden, 0, -0.13, 0, 9, 0.2, 9);
     cube(wooden, 0, 4.9, 0, 9, 0.15, 9);
     cube(plaster, 0, 2.5, -4.5, 9, 5, 0.25);
+    cube(plaster, 0, 2.5, 4.5, 9, 5, 0.25);
     cube(plaster, 4.5, 2.5, 0, 0.25, 5, 9);
     cube(plaster, -4.5, 2.5, 0, 0.25, 5, 9);
+    const panel = wooden.clone(); panel.color.set("#ba916b");
+    // The room remains enclosed when the focus camera is dragged around the desk.
+    for (const z of [-4.31, 4.31]) {
+      cube(panel, 0, .58, z, 8.8, 1.16, .085);
+      cube(wooden, 0, 1.2, z + (z > 0 ? -.07 : .07), 8.8, .11, .15);
+      for (let x = -4.25; x <= 4.25; x += .85) cube(wooden, x, .55, z + (z > 0 ? -.07 : .07), .055, 1.05, .11);
+    }
+    for (const x of [-4.31, 4.31]) {
+      cube(panel, x, .58, 0, .085, 1.16, 8.8);
+      cube(wooden, x + (x > 0 ? -.07 : .07), 1.2, 0, .15, .11, 8.8);
+      for (let z = -4.25; z <= 4.25; z += .85) cube(wooden, x + (x > 0 ? -.07 : .07), .55, z, .11, 1.05, .055);
+    }
     for (const x of [-4, -2, 0, 2, 4]) {
       cube(wooden, x, 4.5, 0, 0.2, 0.2, 9);
-      cube(wooden, x, 2.2, -4.3, 0.18, 4.5, 0.18);
     }
-    cube(wooden, -2.1, 2.5, -4.28, 2.5, 2.8, 0.18);
-    cube(glow, -2.1, 2.5, -4.15, 2.2, 2.5, 0.05);
-    cube(wooden, -2.1, 2.5, -4.05, 0.08, 2.5, 0.08);
-    cube(wooden, -2.1, 2.5, -4.05, 2.3, 0.08, 0.08);
+    for (const x of [-4, 0, 2, 4]) cube(wooden, x, 2.2, -4.3, 0.18, 4.5, 0.18);
+    this.bridgeWindow = new T.WebGLRenderTarget(384, 342, { depthBuffer: true });
+    this.bridgeWindow.texture.colorSpace = T.SRGBColorSpace;
+    const window = makeBridgeWindow(this.bridgeWindow.texture);
+    window.position.set(-2.1, 1.23, -4.12);
+    g.add(window);
     cube(wooden, -1.6, 1, -2, 3, 0.16, 1.4);
     for (const x of [-2.85, -0.35])
       for (const z of [-2.5, -1.5]) cube(wooden, x, 0.45, z, 0.12, 0.95, 0.12);
-    const paper = new T.MeshStandardMaterial({ color: "#e2d4af" });
-    cube(paper, -1.4, 1.1, -1.95, 0.7, 0.03, 0.5).rotation.y = 0.12;
-    const mug = new T.Mesh(
-      new T.CylinderGeometry(0.13, 0.1, 0.24, 20),
-      new T.MeshStandardMaterial({ color: "#a9aa82" }),
-    );
-    mug.position.set(-2.6, 1.2, -2.2);
-    g.add(mug);
+    const journal = makeDeskJournal();
+    journal.position.set(-1.55, 1.08, -1.95);
+    journal.rotation.y = .12;
+    g.add(journal);
+    const inkwell = makeDeskInkwell();
+    inkwell.position.set(-1.15, 1.08, -1.8);
+    g.add(inkwell);
+    const coffeeCup = makeCoffeeCup();
+    coffeeCup.position.set(-.65, 1.08, -1.85);
+    coffeeCup.traverse(object => {
+      if (object instanceof T.Mesh && object.name.startsWith("Coffee steam")) this.coffeeSteam.push(object);
+    });
+    g.add(coffeeCup);
     cube(stone, 2.7, 1.35, -4.05, 2.5, 2.7, 0.65);
     cube(
       new T.MeshBasicMaterial({ color: "#271b12" }),
@@ -570,7 +587,7 @@ export class VillageEngine {
       1.45,
       0.02,
     );
-    const embers=new T.MeshStandardMaterial({color:"#25160e",emissive:"#d64408",emissiveIntensity:.45,roughness:1});
+    const embers=new T.MeshStandardMaterial({color:"#6b2b12",emissive:"#f27b23",emissiveIntensity:1.1,roughness:1});
     const charred=wooden.clone();charred.color.set("#3a2117");charred.roughness=1;
     for(let i=0;i<5;i++) {
       const log=new T.Mesh(new T.CylinderGeometry(.095,.13,1.05,10),charred);
@@ -581,6 +598,10 @@ export class VillageEngine {
       const ember=new T.Mesh(new T.IcosahedronGeometry(.075+(i%3)*.016,0),embers);
       ember.position.set(2.7+Math.sin(i*2.4)*.57,.32,-3.42+Math.cos(i*2.4)*.24);ember.scale.y=.45;g.add(ember);
     }
+    const hearthGlow = new T.Mesh(new T.PlaneGeometry(1.55, 1.3), new T.MeshBasicMaterial({ color: "#ff9f4c", transparent: true, opacity: .28, depthWrite: false }));
+    hearthGlow.position.set(2.7, .87, -3.67); g.add(hearthGlow);
+    const firelight = new T.Mesh(new T.CircleGeometry(1.5, 32), new T.MeshBasicMaterial({ color: "#ffb663", transparent: true, opacity: .14, depthWrite: false }));
+    firelight.rotation.x = -Math.PI / 2; firelight.scale.y = .55; firelight.position.set(2.4, .025, -2.25); g.add(firelight);
     cube(wooden, 2.7, 2.75, -3.9, 2.8, 0.18, 0.9);
     const f = makeFlame(1.2, 1.1);
     f.position.set(112.7, .82, -3.38);this.scene.add(f);
@@ -597,14 +618,14 @@ export class VillageEngine {
     for (const x of [-1.7, -1.55, -1.4, -1.25, -1.1]) cube(wooden, x, .98, -.39, .045, .78, .045);
     cube(wooden, -1.4, 1.39, -.39, .74, .1, .1);
     cube(cloth, -1.4, .65, -.7, .62, .08, .61);
-    for (const x of [-3.34, -.84]) {
+    for (const x of [-3.95, -.24]) {
       const curtain = new T.PlaneGeometry(.52, 2.7, 12, 1);
       const vertices = curtain.attributes.position;
       for (let i = 0; i < vertices.count; i++) vertices.setZ(i, Math.sin(vertices.getX(i) * 34) * .045);
       curtain.computeVertexNormals(); const mesh = new T.Mesh(curtain, linen);
       mesh.position.set(x, 2.5, -3.99); g.add(mesh);
     }
-    cube(wooden, -2.1, 3.96, -4, 3.15, .065, .065);
+    cube(wooden, -2.1, 3.98, -4, 3.72, .065, .065);
     for (const side of [-1, 1]) for (let row = 0; row < 5; row++) cube(stone, 2.7 + side * 1.02, .23 + row * .44, -3.53, .35, .39, .42);
     for (let i = 0; i < 7; i++) cube(stone, 1.84 + i * .285, 2.4, -3.48, .26, .3, .48);
     cube(wooden, 1.5, 3.45, -4.04, 3.4, .12, .55);
@@ -613,23 +634,51 @@ export class VillageEngine {
       const vase = new T.Mesh(new T.LatheGeometry([new T.Vector2(.45, 0), new T.Vector2(.75, .3), new T.Vector2(.8, 1), new T.Vector2(.35, 1.5), new T.Vector2(.38, 1.8)], 16), pottery);
       vase.scale.setScalar(scale); vase.position.set(x, 3.51, -4.02); g.add(vase);
     }
-    const windowBounce = new T.PointLight("#ffe1ae", 9, 8, 2);
-    windowBounce.position.set(-2, 2.7, -3.3); g.add(windowBounce);
+    const windowBounce = new T.PointLight("#ffd19a", 7, 8, 2);
+    windowBounce.position.set(-2.1, 2.7, -3.3); g.add(windowBounce);
     // Batch static furniture while retaining light and flame objects independently.
     g.updateMatrixWorld(true);
+    const interiorInverse = g.matrixWorld.clone().invert();
     const batches = new Map<T.Material, T.BufferGeometry[]>();
     const pieces: T.Mesh[] = [];
     g.traverse(o => {
-      if (!(o instanceof T.Mesh) || Array.isArray(o.material)) return;
-      o.updateMatrix(); const geometry = o.geometry.clone().applyMatrix4(o.matrix);
+      if (!(o instanceof T.Mesh) || Array.isArray(o.material) || o.material.transparent) return;
+      const geometry = o.geometry.clone().applyMatrix4(interiorInverse.clone().multiply(o.matrixWorld));
       const list = batches.get(o.material) ?? []; list.push(geometry); batches.set(o.material, list); pieces.push(o);
     });
     pieces.forEach(o => { o.removeFromParent(); o.geometry.dispose(); });
     batches.forEach((parts, material) => {
       const geometry = mergeGeometries(parts); parts.forEach(p => p.dispose());
-      if (geometry) { const mesh = new T.Mesh(geometry, material); mesh.castShadow = mesh.receiveShadow = true; g.add(mesh); }
+      if (geometry) { const mesh = new T.Mesh(geometry, material); g.add(mesh); }
     });
     this.indoorLight.position.set(112.7, 2, -2.8);
+  }
+  private renderBridgeWindow(now: number, time: number) {
+    const interval = this.graphicsTier === "minimal" ? 50 : 33;
+    if (this.place !== "focus" || !this.bridgeWindow || !this.world || now - this.bridgeWindowTime < interval) return;
+    this.bridgeWindowTime = now;
+    const windowCamera = this.bridgeCamera;
+    // Offset the outdoor viewpoint with the indoor eye for a small amount of parallax.
+    windowCamera.position.set(
+      1.6 + T.MathUtils.clamp((this.camera.position.x - 111.3) * .24, -.8, .8),
+      4.2 + T.MathUtils.clamp((this.camera.position.y - 2.65) * .18, -.35, .35),
+      10.5 + T.MathUtils.clamp((this.camera.position.z - 2.5) * .2, -.6, .6),
+    );
+    windowCamera.lookAt(BRIDGE.x, 1.1, BRIDGE.z);
+    const indoorVisible = this.indoor?.visible ?? false;
+    const worldVisible = this.world.group.visible;
+    const residentVisibility = this.life?.residents.map(resident => resident.root.visible);
+    if (this.indoor) this.indoor.visible = false;
+    this.world.group.visible = true;
+    this.life?.residents.forEach(resident => { resident.root.visible = !resident.following; });
+    this.atmosphere.update(time, windowCamera.position);
+    this.renderer.setRenderTarget(this.bridgeWindow);
+    this.renderer.render(this.scene, windowCamera);
+    this.renderer.setRenderTarget(null);
+    this.atmosphere.update(time, this.camera.position);
+    this.world.group.visible = worldVisible;
+    if (this.indoor) this.indoor.visible = indoorVisible;
+    this.life?.residents.forEach((resident, index) => { resident.root.visible = residentVisibility?.[index] ?? true; });
   }
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.host;
@@ -670,13 +719,15 @@ export class VillageEngine {
   }
   private applyGraphicsTier() {
     const budget = GRAPHICS_TIERS[this.graphicsTier];
+    const windowWidth = this.graphicsTier === "detailed" ? 384 : this.graphicsTier === "battery" ? 320 : 256;
+    this.bridgeWindow?.setSize(windowWidth, Math.round(windowWidth * 512 / 576));
     this.qualityChangedAt = this.statsTime = performance.now();
     this.frameSum = this.frames = this.slowSamples = 0;
     this.renderer.shadowMap.enabled = budget.shadowSize > 0;
     // Changing the light's shadow count also invalidates Three's cached lighting shaders.
     this.sun.castShadow = this.renderer.shadowMap.enabled;
     this.renderer.shadowMap.autoUpdate = false;
-    this.renderer.shadowMap.needsUpdate = true;
+    this.renderer.shadowMap.needsUpdate = this.place !== "focus";
     const shadowSize = budget.shadowSize || 512;
     if (this.sun.shadow.mapSize.x !== shadowSize) {
       this.sun.shadow.map?.dispose(); this.sun.shadow.map = null;
@@ -707,7 +758,7 @@ export class VillageEngine {
   }
   setWeather(w: Weather) {
     this.weather = w;
-    this.renderer.shadowMap.needsUpdate = true;
+    this.renderer.shadowMap.needsUpdate = this.place !== "focus";
   }
   private updateLighting(dt: number) {
     const speed = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 2.4);
@@ -868,6 +919,7 @@ export class VillageEngine {
     this.resolveSeatCollision();
   }
   gardenAction(action: GardenAction, source?: { x: number; z: number }, animateSelf = true) {
+    if ((action.kind === "feed" || action.kind === "feedBirds") && !this.gardenState.crumbPouch) return false;
     if (action.kind === "feedBirds") {
       const origin = source ? new T.Vector3(source.x, floorHeight(source.x, source.z), source.z) : this.player.position;
       const accepted = this.birds?.feed(origin) ?? false;
@@ -901,7 +953,7 @@ export class VillageEngine {
     if (id && !previousPlace) this.walkingHeading=this.player.rotation.y;
     this.activities?.enter(id);
     if (id === "mood") this.activities?.setMintTea(this.gardenState.mintTea > 0);
-    this.renderer.shadowMap.needsUpdate = true;
+    this.renderer.shadowMap.needsUpdate = id !== "focus";
     this.place = id;
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = true;
@@ -928,7 +980,8 @@ export class VillageEngine {
     this.player.visible = true;
     this.resize();
     if (this.indoor) this.indoor.visible = id === "focus";
-    this.indoorLight.intensity = id === "focus" ? 18 : 0;
+    this.indoorLight.intensity = id === "focus" ? 10 : 0;
+    if (id === "focus") this.bridgeWindowTime = -1000;
     this.world?.flames.forEach((f) => {
       if (f.userData.interior) f.visible = id === "focus";
     });
@@ -956,6 +1009,32 @@ export class VillageEngine {
     this.near = id;
     this.callbacks.near(id);
     this.setPlace(id);
+  }
+  resetPosition() {
+    const x = .3, z = 20;
+    if (!this.movement?.clear(x, z)) return false;
+    this.releaseMouseLook();
+    this.clearKeys();
+    this.seatedBench = null;
+    this.seatedIndex = null;
+    this.callbacks.seat?.(null);
+    this.movement.settle(x, z);
+    this.player.position.set(x, floorHeight(x, z), z);
+    this.player.rotation.y = this.walkingHeading = Math.PI;
+    this.yaw = 0;
+    this.pitch = .15;
+    this.near = null;
+    this.nearBench = null;
+    this.nearGarden = null;
+    this.callbacks.near(null);
+    this.callbacks.nearBench?.(null);
+    this.callbacks.nearGarden?.(null);
+    this.updateWalkingCamera();
+    this.camera.position.copy(this.cameraGoal);
+    this.currentLook.copy(this.lookGoal);
+    this.camera.lookAt(this.currentLook);
+    this.reportMovement(true);
+    return true;
   }
   sit(id: string) {
     const bench = this.world?.benches.find(value => value.id === id);
@@ -1029,8 +1108,8 @@ export class VillageEngine {
     this.cameraGoal.copy(this.lookGoal).add(this.temp.setFromSpherical(this.orbit));
     if (place === "focus") {
       // Keep the orbit inside the cottage walls and below its ceiling.
-      this.cameraGoal.set(T.MathUtils.clamp(this.cameraGoal.x, 105.9, 114.1),
-        T.MathUtils.clamp(this.cameraGoal.y, .45, 4.5), T.MathUtils.clamp(this.cameraGoal.z, -4, 4.1));
+      this.cameraGoal.set(T.MathUtils.clamp(this.cameraGoal.x, 106.5, 113.5),
+        T.MathUtils.clamp(this.cameraGoal.y, .6, 3.9), T.MathUtils.clamp(this.cameraGoal.z, -3.45, 3.5));
     } else {
       this.cameraRay.origin.copy(this.lookGoal);
       this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
@@ -1203,8 +1282,17 @@ export class VillageEngine {
       f.scale.y = 0.95 + Math.sin(t * 3 + i * 2) * 0.08;
       if (f.material instanceof T.ShaderMaterial)
         f.material.uniforms.time.value = t + i;
-      if (f.userData.light) f.userData.light.intensity = (f.userData.interior ? (this.place === "focus" ? 18 : 0) : 9) * (1 + Math.sin(t*7.1)*.045 + Math.sin(t*11.7)*.03);
+      if (f.userData.light) f.userData.light.intensity = f.userData.interior
+        ? (this.place === "focus" ? 10 : 0)
+        : 9 * (1 + Math.sin(t*7.1)*.045 + Math.sin(t*11.7)*.03);
       if (f.userData.coal) f.userData.coal.emissiveIntensity=.45+Math.sin(t*2.1)*.1;
+    });
+    if (this.place === "focus") this.coffeeSteam.forEach((steam, i) => {
+      const phase = (t * .42 + i / this.coffeeSteam.length) % 1;
+      steam.position.x = steam.userData.baseX + Math.sin(t * 1.3 + i * 2.2) * .015;
+      steam.position.y = .265 + phase * .18;
+      steam.scale.set(1 + phase * .28, .72 + phase * .42, 1 + phase * .28);
+      (steam.material as T.MeshBasicMaterial).opacity = this.reducedMotion ? .3 : .6 * Math.sin(Math.PI * phase);
     });
     if (this.place !== "focus") {
       this.camera.updateMatrixWorld();
@@ -1232,7 +1320,7 @@ export class VillageEngine {
       }
     }
     // Refresh moving shadows every frame in detailed graphics; limit lower tiers to 30 Hz.
-    if (this.renderer.shadowMap.enabled && now - this.shadowTime > (this.graphicsTier === "detailed" ? 0 : 32) && (!this.reducedMotion || moving)) {
+    if (this.place !== "focus" && this.renderer.shadowMap.enabled && now - this.shadowTime > (this.graphicsTier === "detailed" ? 0 : 32) && (!this.reducedMotion || moving)) {
       const texel = 48 / this.sun.shadow.mapSize.x;
       const x = Math.round(this.player.position.x / texel) * texel, z = Math.round(this.player.position.z / texel) * texel;
       this.sun.position.set(x + 35, 28, z - 48);
@@ -1246,6 +1334,8 @@ export class VillageEngine {
       const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
     }
+    this.renderBridgeWindow(now, t);
+    if (this.place === "focus") this.sun.intensity = 0;
     this.renderer.render(this.scene, this.camera);
     for (const remote of this.remoteVisitors.values()) {
       const point = this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0)).project(this.camera);
@@ -1333,6 +1423,7 @@ export class VillageEngine {
       }
     });
     this.environment?.dispose();
+    this.bridgeWindow?.dispose();
     this.skyTexture?.dispose();
     this.renderer.dispose();
     this.host.replaceChildren();

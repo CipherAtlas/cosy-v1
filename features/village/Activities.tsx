@@ -20,9 +20,13 @@ type Props = {
   session: FocusSession;
   mix: AudioMix;
   setMix: (m: AudioMix) => void;
+  radioEnabled: boolean;
   sound: boolean;
-  soundLoading: boolean;
   toggleSound: () => void;
+  musicPlaying: boolean;
+  soundLoading: boolean;
+  toggleMusic: () => void;
+  openRadio: () => void;
   travel: (id: PlaceId) => void;
   language: "en" | "ja";
   onMoment: (moment: ActivityMoment) => void;
@@ -51,12 +55,13 @@ const phrasesJa = [
 export function Activities(p: Props) {
   const ja = p.language === "ja",
     t = (en: string, jp: string) => (ja ? jp : en);
-  const { place, session, sound, onMoment } = p;
+  const { place, session, onMoment } = p;
+  const musicPlaying = p.radioEnabled ? p.musicPlaying : p.sound;
   const duration=(session.mode === "focus" ? session.minutes : session.breakMinutes)*60;
   useEffect(() => {
     if (place === "focus") onMoment({kind:"focus",running:session.running,progress:Math.max(0,Math.min(1,1-session.remaining/duration))});
-    if (place === "music") onMoment({kind:"music",playing:sound});
-  }, [place,session.running,session.remaining,duration,sound,onMoment]);
+    if (place === "music") onMoment({kind:"music",playing:musicPlaying});
+  }, [place,session.running,session.remaining,duration,musicPlaying,onMoment]);
   if (p.place === "birds") return <BirdActivity {...p.gardenControls} />;
   if (p.place === "focus")
     return (
@@ -98,6 +103,11 @@ export function Activities(p: Props) {
             </p>
           </>
         )}
+        {!p.session.running && !p.session.done && <div className="v-preset-row" role="group" aria-label={t("Focus and break length", "集中と休憩の長さ")}>
+          {[[25, 5], [50, 10], [10, 2]].map(([minutes, rest]) => <button key={minutes} className="v-chip" aria-pressed={p.session.minutes === minutes && p.session.breakMinutes === rest} onClick={() => p.session.duration(minutes, rest)}>
+            {minutes} {t("min focus", "分集中")} · {rest} {t("rest", "分休憩")}
+          </button>)}
+        </div>}
         <div className="v-actions">
           <button className="v-button v-primary" onClick={p.session.toggle}>
             {p.session.running ? (
@@ -140,22 +150,6 @@ export function Activities(p: Props) {
         {!p.session.running && (
           <details className="v-session-options">
             <summary>{t("Session settings", "セッション設定")}</summary>
-            <div className="v-preset-row">
-              {[
-                [25, 5],
-                [50, 10],
-                [10, 2],
-              ].map(([n, b]) => (
-                <button
-                  key={n}
-                  className="v-chip"
-                  aria-pressed={p.session.minutes === n}
-                  onClick={() => p.session.duration(n, b)}
-                >
-                  {n} {t("min", "分")} · {b} {t("rest", "休憩")}
-                </button>
-              ))}
-            </div>
             <label>
               {t("Focus minutes", "集中時間（分）")}
               <input
@@ -187,7 +181,7 @@ export function Activities(p: Props) {
   if (p.place === "music")
     return (
       <section className="v-activity v-music">
-        <div className={`v-music-waves ${p.sound ? "is-playing" : ""}`} aria-hidden="true">{[0,1,2,3,4,5,6].map(i=><i key={i} style={{animationDelay:`${i*-.19}s`}} />)}</div>
+        <div className={`v-music-waves ${musicPlaying ? "is-playing" : ""}`} aria-hidden="true">{[0,1,2,3,4,5,6].map(i=><i key={i} style={{animationDelay:`${i*-.19}s`}} />)}</div>
         <h2>{t("Stay a little longer.", "もう少し、ここで。")}</h2>
         <p>
           {t(
@@ -195,14 +189,16 @@ export function Activities(p: Props) {
             "やさしい音楽と、あたたかな火。",
           )}
         </p>
-        <button className="v-button v-primary" disabled={p.soundLoading} aria-busy={p.soundLoading} onClick={p.toggleSound}>
-          {p.sound ? <Pause size={18} /> : <Play size={18} weight="fill" />}
-          {p.soundLoading ? t("Loading sound…", "音を準備中…") : p.sound
+        <button className="v-button v-primary" disabled={p.soundLoading} aria-busy={p.soundLoading} onClick={p.radioEnabled ? p.toggleMusic : p.toggleSound}>
+          {musicPlaying ? <Pause size={18} /> : <Play size={18} weight="fill" />}
+          {p.soundLoading ? t("Loading sound…", "音を準備中…") : musicPlaying
             ? t("Pause music", "音楽を止める")
             : t("Play music", "音楽を流す")}
         </button>
-        <SoundtrackChoices mix={p.mix} setMix={p.setMix} language={p.language} />
-        <details className="v-mix-details"><summary>{t("Balance the sounds", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
+        {p.radioEnabled ? <button className="v-button" onClick={p.openRadio}>{t("Open your radio", "ラジオを開く")}</button> : <>
+          <SoundtrackChoices mix={p.mix} setMix={p.setMix} language={p.language} />
+          <details className="v-mix-details"><summary>{t("Balance the sounds", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
+        </>}
       </section>
     );
   if (p.place === "garden") return <GardenActivity {...p.gardenControls} />;
@@ -230,24 +226,26 @@ export function SoundtrackChoices({ mix, setMix, language }: {
     <small>{language === "ja" ? "Holizna 作曲の録音音楽。" : "Recorded music by Holizna."}</small>
   </label>;
 }
-
 export function MixSliders({
   mix,
   setMix,
   language,
+  extended = false,
 }: {
   mix: AudioMix;
   setMix: (m: AudioMix) => void;
   language: "en" | "ja";
+  extended?: boolean;
 }) {
   return (
     <div className="v-mix">
-      {(["music", "ambience", "effects", "rain", "fire", "master"] as const).map((key, i) => (
+      {(extended ? ["master", "music", "fire", "river", "wind", "rain", "ambience", "effects"] as const
+        : ["music", "ambience", "effects", "rain", "fire", "master"] as const).map((key, i) => (
         <label key={key}>
           <span>
             {language === "ja"
-              ? ["音楽", "環境音", "効果音", "雨", "暖炉", "全体"][i]
-              : ["Music", "World", "Spirit & details", "Rain", "Fire", "Volume"][i]}
+              ? (extended ? ["全体", "音楽", "暖炉", "川", "風", "雨", "環境音", "効果音"] : ["音楽", "環境音", "効果音", "雨", "暖炉", "全体"])[i]
+              : (extended ? ["Master", "Music", "Fire", "River", "Wind", "Rain", "Nature", "Effects"] : ["Music", "World", "Spirit & details", "Rain", "Fire", "Volume"])[i]}
           </span>
           <input
             aria-label={key + " volume"}

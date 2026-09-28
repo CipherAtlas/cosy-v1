@@ -2,6 +2,7 @@ import * as T from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import type { PlaceId } from "./places";
 import type { ActivityMoment, Collider } from "./environment";
+import { makeDeskQuill, makeFocusHourglass } from "./focusCottageProps";
 
 // Actor and camera are authored together so the interaction remains visible beside the DOM controls.
 export const ACTIVITY_STAGES: Record<PlaceId, { actor: [number,number,number]; yaw: number; camera: [number,number,number]; look: [number,number,number] }> = {
@@ -32,7 +33,6 @@ export class VillageActivities {
   private letterFlap = new T.Group();
   private letterPaper = new T.Group();
   private page = new T.Group();
-  private sand = new T.Group();
   private sandTop!: T.Mesh;
   private sandBottom!: T.Mesh;
   private sandStream!: T.Mesh;
@@ -92,16 +92,12 @@ export class VillageActivities {
     box(this.letterPaper,paper,0,0,-.025,.34,.24,.008);
     for(let i=0;i<3;i++)box(this.letterPaper,ink,0,.07-i*.045,-.031,.23,.009,.002);
     add(this.letter,new T.SphereGeometry(.043,12,8),gold,0,0,.055).scale.z=.3;
-    // Hourglass and writing companion on the indoor desk.
-    this.sand.position.set(107.7,1.1,-2.12);this.indoor.add(this.sand);
-    for(const y of [0,.58]) add(this.sand,new T.CylinderGeometry(.18,.18,.055,24),gold,0,y,0);
-    for(const x of [-.14,.14])add(this.sand,new T.CylinderGeometry(.017,.017,.56,8),wood,x,.29,0);
-    const glass=new T.MeshPhysicalMaterial({color:"#b5e3df",transparent:true,opacity:.24,roughness:.15,depthWrite:false,side:T.DoubleSide});
-    add(this.sand,new T.LatheGeometry([new T.Vector2(.12,.035),new T.Vector2(.13,.12),new T.Vector2(.024,.29),new T.Vector2(.13,.46),new T.Vector2(.12,.55)],24),glass,0,0,0);
-    this.sandTop=add(this.sand,new T.ConeGeometry(.1,.19,20),gold,0,.44,0);this.sandTop.rotation.z=Math.PI;
-    this.sandBottom=add(this.sand,new T.ConeGeometry(.11,.18,20),gold,0,.09,0);
-    this.sandStream=add(this.sand,new T.CylinderGeometry(.005,.006,.31,6),gold,0,.27,0);
-    this.deskQuill.position.set(108.85,1.14,-1.8);feather(this.deskQuill);this.indoor.add(this.deskQuill);
+    // The timer and quill remain separate so focus progress can move the sand and feather.
+    const timer = makeFocusHourglass();
+    timer.hourglass.position.set(107.7, 1.1, -2.12); this.indoor.add(timer.hourglass);
+    this.sandTop = timer.topSand; this.sandBottom = timer.bottomSand; this.sandStream = timer.stream;
+    this.deskQuill.position.set(108.85, 1.16, -1.8);
+    this.deskQuill.add(makeDeskQuill()); this.indoor.add(this.deskQuill);
     for(let i=0;i<3;i++) {
       const m=new T.MeshBasicMaterial({color:i===0?"#d8fff1":"#97ddd1",transparent:true,opacity:.45,side:T.DoubleSide,depthWrite:false});
       const ring=add(this.outdoor,new T.RingGeometry(.94,1,80),m,-25,-.24,-9);ring.rotation.x=-Math.PI/2;ring.castShadow=ring.receiveShadow=false;ring.visible=false;this.rings.push(ring);

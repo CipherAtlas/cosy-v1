@@ -1,7 +1,7 @@
 import { DEFAULT_MIX, PLACES, type AudioMix, type PlaceId, type Weather } from "./places";
 import type { EnvironmentFrame, Surface, WorldContact } from "./environment";
 import { HEARTH, riverX } from "./environment";
-import { RecordedSoundtrack, soundtrackFor } from "./soundtrack";
+import { RecordedSoundtrack, soundtrackFor, type RadioTrack } from "./soundtrack";
 import { withBasePath } from "@/lib/basePath";
 import type { GardenSound } from "./garden";
 
@@ -15,6 +15,8 @@ export class VillageAudio {
   private ambience?: GainNode;
   private effects?: GainNode;
   private soundtrack?: RecordedSoundtrack;
+  private radioTrack: RadioTrack | null = null;
+  private radioSelection = 0;
   private rain?: GainNode;
   private fire?: GainNode;
   private wind?: GainNode;
@@ -25,6 +27,7 @@ export class VillageAudio {
   private timer?: ReturnType<typeof setInterval>;
   private suspension?: ReturnType<typeof setTimeout>;
   private enabled = false;
+  private musicPaused = false;
   private disposed = false;
   private mix: AudioMix = DEFAULT_MIX;
   private place: PlaceId | null = null;
@@ -41,7 +44,7 @@ export class VillageAudio {
   private lastStep = -1;
   private onVisibility = () => this.apply();
 
-  constructor(private onIssue: (kind: "music" | "ambience") => void = () => {}) { document.addEventListener("visibilitychange", this.onVisibility); }
+  constructor(private onIssue: (kind: "music" | "ambience") => void = () => {}, private onRadioEnded: () => void = () => {}) { document.addEventListener("visibilitychange", this.onVisibility); }
 
   private graph() {
     const c = new AudioContext(); this.context = c;
@@ -55,7 +58,8 @@ export class VillageAudio {
     this.effects = c.createGain(); this.effects.connect(this.master);
     this.shelter = c.createBiquadFilter(); this.shelter.type = "lowpass";
     this.shelter.connect(this.ambience);
-    this.soundtrack = new RecordedSoundtrack(c, this.music, () => this.onIssue("music"));
+    this.soundtrack = new RecordedSoundtrack(c, this.music, () => this.onIssue("music"), this.onRadioEnded);
+    if (this.radioTrack) this.soundtrack.selectRadio(this.radioTrack);
     this.noise = c.createBuffer(1, c.sampleRate * 6, c.sampleRate);
     const data = this.noise.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
@@ -97,16 +101,27 @@ export class VillageAudio {
     if (this.disposed) throw new Error("Audio was disposed.");
     this.enabled = true;
     const cue = soundtrackFor(this.mix, this.place, this.environment);
+    let radioFailed = false;
+    const startMusic = async () => {
+      if (this.musicPaused || this.mix.music === 0 || this.mix.master === 0) return;
+      try { await this.soundtrack!.start(cue); }
+      catch (error) {
+        if (!this.radioTrack) throw error;
+        radioFailed = true;
+        this.radioTrack = null;
+        await this.soundtrack!.leaveRadio(cue);
+      }
+    };
     const [ambience] = await Promise.all([
       this.loadWorldRecordings(),
-      this.mix.music > 0 && this.mix.master > 0 ? this.soundtrack!.start(cue) : Promise.resolve(),
+      startMusic(),
     ]);
     if (this.disposed) throw new Error("Audio was disposed.");
     this.nextDetail = c.currentTime + 5; this.apply();
     if (this.mix.master === 0) await c.suspend();
     this.schedule();
     if (!this.timer) this.timer = setInterval(() => this.schedule(), 80);
-    return { recorded: true, ambience };
+    return { recorded: true, ambience, radioFailed };
   }
   stop() {
     this.enabled = false;
@@ -134,12 +149,38 @@ export class VillageAudio {
       } else {
         if (wasMasterSilent) void this.context.resume();
         if (m.music === 0) this.soundtrack?.pause();
-        else if (wasSilent) {
+        else if (wasSilent && !this.musicPaused) {
           void this.context.resume().then(() => {
             if (this.enabled && this.mix.master > 0 && this.mix.music > 0) return this.soundtrack?.start(soundtrackFor(this.mix, this.place, this.environment));
           }).catch(() => this.onIssue("music"));
         }
       }
+    }
+  }
+  setMusicPaused(paused: boolean) {
+    this.musicPaused = paused;
+    this.apply();
+    if (!this.enabled || !this.context) return;
+    if (paused) this.soundtrack?.pause();
+    else if (this.mix.music > 0 && this.mix.master > 0) {
+      void this.context.resume().then(() => this.soundtrack?.start(soundtrackFor(this.mix, this.place, this.environment)))
+        .catch(() => this.onIssue("music"));
+    }
+  }
+  async selectRadio(track: RadioTrack | null) {
+    const selection = ++this.radioSelection;
+    const previous = this.radioTrack;
+    this.radioTrack = track;
+    if (!this.soundtrack) return;
+    try {
+      if (track) await this.soundtrack.selectRadio(track);
+      else await this.soundtrack.leaveRadio(soundtrackFor(this.mix, this.place, this.environment));
+    } catch (error) {
+      if (selection !== this.radioSelection) return;
+      this.radioTrack = previous;
+      if (previous) await this.soundtrack.selectRadio(previous);
+      else await this.soundtrack.leaveRadio(soundtrackFor(this.mix, this.place, this.environment));
+      throw error;
     }
   }
   setPlace(place: PlaceId | null) {
@@ -157,7 +198,7 @@ export class VillageAudio {
   private apply() {
     const c = this.context; if (!c) return;
     this.master?.gain.setTargetAtTime(this.enabled ? this.mix.master * .65 : 0, c.currentTime, .12);
-    this.music?.gain.setTargetAtTime(this.mix.music * 1.6, c.currentTime, .5);
+    this.music?.gain.setTargetAtTime(this.musicPaused ? 0 : this.mix.music * 1.6, c.currentTime, .5);
     this.effects?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.effects ?? .6), c.currentTime, .2);
     this.ambience?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.ambience ?? .5), c.currentTime, .8);
     this.applyWorld();
@@ -176,8 +217,8 @@ export class VillageAudio {
     }
     const shelter = sheltered ? .13 : 1;
     this.rain?.gain.setTargetAtTime((this.mix.rain + (weather === "rain" ? .55 : 0)) * shelter, now, .7);
-    this.wind?.gain.setTargetAtTime((.012 + wind * .035) * shelter, now, .35);
-    this.water?.gain.setTargetAtTime(.65 * shelter, now, .6);
+    this.wind?.gain.setTargetAtTime((.012 + wind * .035) * (this.mix.wind ?? 1) * shelter, now, .35);
+    this.water?.gain.setTargetAtTime(.65 * (this.mix.river ?? 1) * shelter, now, .6);
     this.fire?.gain.setTargetAtTime(this.mix.fire * 1.2, now, .6);
     this.shelter?.frequency.setTargetAtTime(sheltered ? 950 : weather === "rain" ? 3500 : 6500, now, .7);
     const fire = sheltered ? [112.7, .5, -3.5] : [HEARTH.x, .5, HEARTH.z];

@@ -90,6 +90,8 @@ export type AudioMix = {
   music: number;
   rain: number;
   fire: number;
+  river?: number;
+  wind?: number;
   master: number;
   ambience?: number;
   effects?: number;
@@ -100,6 +102,8 @@ export const DEFAULT_MIX: AudioMix = {
   music: 0.6,
   rain: 0.12,
   fire: 0.35,
+  river: 1,
+  wind: 1,
   master: 0.5,
   ambience: 0.5,
   effects: 0.6,

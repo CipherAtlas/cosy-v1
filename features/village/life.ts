@@ -235,7 +235,6 @@ export class VillageLife {
     }
     for (const r of this.residents) {
       if (r.following || r.returning || this.activity === "mood" && r === this.residents[3]) { this.updateCompanion(r, this.residents.indexOf(r), delta, elapsed, player, reduced); continue; }
-      if (this.activity === "focus") continue;
       const encounter = r.encounter;
       const distance = Math.hypot(player.x - r.movement.position.x, player.z - r.movement.position.z);
       encounter.cooldown = Math.max(0, encounter.cooldown - delta);

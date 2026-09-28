@@ -1,5 +1,11 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-28 original sound and mouse capture
+
+The optional personal lo-fi radio is disabled while its source and design notes remain. The active village plays the original four recorded soundtracks, follows the scenery by default, and exposes the original soundtrack choices and six volume sliders in Sound and the music activity. Scene click captures the desktop mouse for looking; Escape, menus and activities release it. The focus cottage and per-visitor crumb-pouch work from the preceding local checkpoint are included in this release candidate, with the new Worker deployed as version `4e3abdbe-18d7-4fbd-8818-0589a77b6b36` and `/health` returning HTTP 200.
+
+`npm run typecheck`, production-configured `npm run build`, `node --check worker/index.js`, Wrangler dry run and `git diff --check` passed. The export has no editor, tools or API route. A local browser showed no radio dock, the four Holizna soundtrack choices, the six original sound sliders and the music activity's original controls. `scripts/village/tests/camera.cjs firefox` passed 20 checks including capture, look, Escape/menu/activity release, fallback drag and disposal. This automated host rejected pointer lock in Chromium; Firefox verified the capture path. Physical-device and longer listening checks remain open.
+
 ## 2026-09-28 shared chat and seating follow-up
 
 The chat panel opens with the shared village and remains visible until someone closes it. History and new messages scroll to the newest line. Enter focuses chat from exploration or a settled activity, releasing pointer lock. A new message while chat is hidden lights and briefly pulses the chat button. Accepted messages appear for six seconds in projected bubbles over their sender, including the player's own spirit. The Worker adds a sender ID to future chat entries; the client also resolves the existing name-only format for compatibility with the currently deployed Worker.

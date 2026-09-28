@@ -5,6 +5,7 @@ import { BIRD_CLEARING } from "../../features/village/environment";
 import { BIRD_LANDING_SPOTS } from "../../features/village/birds";
 import { VillageLife } from "../../features/village/life";
 import { GardenScene } from "../../features/village/gardenScene";
+import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeDeskQuill, makeFocusHourglass } from "../../features/village/focusCottageProps";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export type LayoutItem = {
@@ -175,6 +176,12 @@ export class LayoutScene {
     for (const z of [-1.28, 1.28]) bedPart(bedWood, [0, .2, z], [3.45, .38, .14]);
     for (const x of [-1.65, 1.65]) bedPart(bedWood, [x, .2, 0], [.14, .38, 2.7]);
     this.assets.set("raised-bed", { id: "raised-bed", name: "Raised garden bed", category: "Furnishings", template: raisedBed, shelf: true });
+    this.assets.set("coffee-cup", { id: "coffee-cup", name: "Coffee cup", category: "Furnishings", template: makeCoffeeCup(), shelf: true });
+    this.assets.set("writing-journal", { id: "writing-journal", name: "Open writing journal", category: "Furnishings", template: makeDeskJournal(), shelf: true });
+    this.assets.set("desk-inkwell", { id: "desk-inkwell", name: "Desk inkwell", category: "Furnishings", template: makeDeskInkwell(), shelf: true });
+    this.assets.set("desk-quill", { id: "desk-quill", name: "Desk quill", category: "Furnishings", template: makeDeskQuill(), shelf: true });
+    this.assets.set("focus-hourglass", { id: "focus-hourglass", name: "Focus hourglass", category: "Furnishings", template: makeFocusHourglass().hourglass, shelf: true });
+    this.assets.set("village-window-vista", { id: "village-window-vista", name: "Bridge-view cottage window", category: "Buildings", template: makeBridgeWindow(), shelf: true });
     this.pathMaterial = this.world.gardenSurfaces.paving;
     this.assets.set("custom-path", { id: "custom-path", name: "Curved limestone path", category: "Paths", template: new T.Group(), shelf: false });
     const meadow = new T.Mesh(new T.CylinderGeometry(12, 13, 1.2, 48), new T.MeshStandardMaterial({ color: "#98b760", roughness: 1 }));

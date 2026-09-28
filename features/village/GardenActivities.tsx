@@ -11,7 +11,6 @@ export type GardenControls = {
   onGardenAction: (action: GardenAction) => void;
   language: "en" | "ja";
   travel: (id: PlaceId) => void;
-  meetMaple: () => void;
 };
 
 export function GardenActivity(p: GardenControls) {
@@ -99,19 +98,17 @@ export function BirdActivity(p: GardenControls) {
     <h2>{t("A picnic for little wings.", "小さな翼のピクニック。")}</h2>
     <p role="status">{status[p.birdStatus]}</p>
     <div className="v-garden-bed-actions">
-      <button className="v-button v-primary" disabled={busy} onClick={() => p.onGardenAction({ kind: "feedBirds" })}>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</button>
+      <button className="v-button v-primary" disabled={busy || !p.garden.crumbPouch} onClick={() => p.onGardenAction({ kind: "feedBirds" })}>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</button>
     </div>
-    <p>{t("Wren feeds them when she's here. You can take a turn, too.", "レンがここにいると、鳥たちにごはんをあげます。あなたもどうぞ。")}</p>
+    <p>{p.garden.crumbPouch ? t("You have crumbs. The birds will be delighted.", "パンくずを持っています。鳥たちもきっと喜びます。") : t("Find Maple or Wren in the village and ask for crumbs first.", "まず村のメープルかレンに会って、パンくずをもらいましょう。")}</p>
   </section>;
 }
 
 export function PondFeeding(p: GardenControls) {
   const ja = p.language === "ja";
   return <div className="v-garden-ritual">
-    <button className="v-button" onClick={() => p.garden.crumbPouch ? p.onGardenAction({ kind: "feed" }) : p.meetMaple()}>
-      {p.garden.crumbPouch ? (ja ? "アヒルたちにパンくずをあげる" : "Feed the little duckies") : (ja ? "メープルにパンくずをもらう" : "Ask Maple for bread crumbs")}
-    </button>
-    <p>{p.garden.crumbPouch ? (ja ? "メープルの小さな袋。いつでももう少し。" : "Maple’s little pouch always has a few more.") : (ja ? "パン屋のメープルに会ってみよう。" : "Maple, our baker, has a little pouch to share.")}</p>
+    {p.garden.crumbPouch && <button className="v-button" onClick={() => p.onGardenAction({ kind: "feed" })}>{ja ? "アヒルたちにパンくずをあげる" : "Feed the little duckies"}</button>}
+    <p>{p.garden.crumbPouch ? (ja ? "パンくずの袋を持っています。" : "You have a pouch of crumbs.") : (ja ? "村のメープルかレンに会って、パンくずをもらいましょう。" : "Find Maple or Wren in the village and ask for crumbs first.")}</p>
   </div>;
 }
 

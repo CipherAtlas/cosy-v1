@@ -9,6 +9,7 @@ export const RECORDINGS = {
   hearth: { file: "quiet-village-4.mp3", title: "Quiet Village 4" },
 } as const;
 export type SoundtrackId = keyof typeof RECORDINGS;
+export type RadioTrack = { id: string; title: string; artist: string; permalink: string; duration: number };
 
 export function soundtrackFor(mix: AudioMix, place: PlaceId | null, frame: EnvironmentFrame): SoundtrackId {
   if (mix.soundtrack && mix.soundtrack !== "auto") return mix.soundtrack;
@@ -24,7 +25,7 @@ export function soundtrackFor(mix: AudioMix, place: PlaceId | null, frame: Envir
 
 /** Two streaming decks bound memory use; a failed change leaves the previous music playing. */
 export class RecordedSoundtrack {
-  private decks: { audio: HTMLAudioElement; source: MediaElementAudioSourceNode; gain: GainNode; cue?: SoundtrackId }[];
+  private decks: { audio: HTMLAudioElement; source: MediaElementAudioSourceNode; gain: GainNode; cue?: SoundtrackId | RadioTrack }[];
   private active = -1;
   private fading?: { index: number; until: number };
   private candidate?: SoundtrackId;
@@ -36,27 +37,43 @@ export class RecordedSoundtrack {
   private generation = 0;
   private cancelLoad?: () => void;
   private failed?: SoundtrackId;
+  private radio: RadioTrack | null = null;
 
-  constructor(private context: AudioContext, bus: GainNode, private onError: () => void) {
+  constructor(private context: AudioContext, bus: GainNode, private onError: () => void, private onRadioEnded: () => void = () => {}) {
     this.decks = [0,1].map(()=>{
-      const audio = new Audio(); audio.preload="none";audio.loop=true;
+      const audio = new Audio(); audio.preload="none";audio.loop=true;audio.crossOrigin="anonymous";
       const source=context.createMediaElementSource(audio),gain=context.createGain();gain.gain.value=0;
       source.connect(gain).connect(bus);return {audio,source,gain};
     });
+    this.decks.forEach((deck, index) => { deck.audio.onended = () => {
+      if (this.enabled && this.active === index && typeof deck.cue !== "string") this.onRadioEnded();
+    }; });
   }
   get current() { return this.active < 0 ? null : this.decks[this.active].cue ?? null; }
+  private key(cue: SoundtrackId | RadioTrack) { return typeof cue === "string" ? cue : `radio:${cue.id}`; }
   async start(cue: SoundtrackId) {
     if (this.disposed) return;
     this.enabled=true;this.failed=undefined;this.candidate=cue;
-    if(this.current===cue && this.decks[this.active].audio.readyState>=2) {
+    const next = this.radio ?? cue;
+    if(this.current && this.key(this.current) === this.key(next) && this.decks[this.active].audio.readyState>=2) {
       await this.decks[this.active].audio.play();
       if (!this.enabled || this.disposed) return;
       const gain = this.decks[this.active].gain.gain;
       gain.cancelScheduledValues(this.context.currentTime);
-      gain.setTargetAtTime(1,this.context.currentTime,.5);
-    } else await this.change(cue);
+      gain.setTargetAtTime(typeof next === "string" ? 1 : .7,this.context.currentTime,.5);
+    } else await this.change(next);
+  }
+  async selectRadio(track: RadioTrack) {
+    this.radio = track;
+    if (this.enabled && (!this.current || this.key(this.current) !== this.key(track))) await this.change(track);
+  }
+  async leaveRadio(cue: SoundtrackId) {
+    this.radio = null;
+    this.request(cue, true);
+    if (this.enabled && this.current !== cue) await this.change(cue);
   }
   request(cue: SoundtrackId, immediate=false) {
+    if (this.radio) return;
     if(cue!==this.candidate) { this.candidate=cue;this.candidateSince=this.context.currentTime;this.failed=undefined; }
     if(immediate) { this.candidateSince=-100;this.changedAt=-100; }
   }
@@ -65,17 +82,22 @@ export class RecordedSoundtrack {
     if(this.fading && now>=this.fading.until) {
       this.decks[this.fading.index].audio.pause();this.fading=undefined;
     }
-    if(!this.enabled || this.loading || this.fading || !this.candidate || this.failed===this.candidate || this.current===this.candidate) return;
+    if(this.radio || !this.enabled || this.loading || this.fading || !this.candidate || this.failed===this.candidate || this.current===this.candidate) return;
     // Hysteresis prevents a new track every time the player skirts a garden boundary.
     if(now-this.candidateSince<2.5 || now-this.changedAt<10) return;
     void this.change(this.candidate).catch(()=>this.onError());
   }
-  private async change(cue: SoundtrackId) {
+  private async change(cue: SoundtrackId | RadioTrack) {
     this.cancelLoad?.();
+    if (this.fading) {
+      const old = this.decks[this.fading.index];
+      old.audio.pause(); old.gain.gain.cancelScheduledValues(this.context.currentTime); old.gain.gain.value = 0;
+      this.fading = undefined;
+    }
     const generation=++this.generation,index=this.active===0?1:0,deck=this.decks[index];
     this.loading=true;deck.gain.gain.cancelScheduledValues(this.context.currentTime);deck.gain.gain.value=0;
     try {
-      deck.audio.pause();deck.cue=cue;
+      deck.audio.pause();deck.cue=cue;deck.audio.loop=typeof cue === "string";
       await new Promise<void>((resolve,reject)=>{
         const finish=(error?: Error)=>{
           clearTimeout(timeout);deck.audio.removeEventListener("canplay",ready);deck.audio.removeEventListener("error",fail);
@@ -85,13 +107,16 @@ export class RecordedSoundtrack {
         const timeout=setTimeout(fail,15000);
         this.cancelLoad=()=>finish(new Error("Soundtrack loading cancelled."));
         deck.audio.addEventListener("canplay",ready,{once:true});deck.audio.addEventListener("error",fail,{once:true});
-        deck.audio.src=withBasePath(`/village/audio/music/${RECORDINGS[cue].file}`);deck.audio.load();
+        deck.audio.src=typeof cue === "string"
+          ? withBasePath(`/village/audio/music/${RECORDINGS[cue].file}`)
+          : `https://api.audius.co/v1/tracks/${encodeURIComponent(cue.id)}/stream`;
+        deck.audio.load();
       });
       if(this.disposed || !this.enabled || generation!==this.generation) return;
       await deck.audio.play();
       if(this.disposed || !this.enabled || generation!==this.generation) { deck.audio.pause();return; }
       const now=this.context.currentTime,previous=this.active;
-      deck.gain.gain.setValueAtTime(0,now);deck.gain.gain.linearRampToValueAtTime(1,now+4);
+      deck.gain.gain.setValueAtTime(0,now);deck.gain.gain.linearRampToValueAtTime(typeof cue === "string" ? 1 : .7,now+4);
       if(previous>=0) {
         const old=this.decks[previous];old.gain.gain.cancelScheduledValues(now);
         old.gain.gain.setValueAtTime(old.gain.gain.value,now);old.gain.gain.linearRampToValueAtTime(0,now+4);
@@ -100,7 +125,7 @@ export class RecordedSoundtrack {
       this.active=index;this.changedAt=now;
     } catch(error) {
       if (generation !== this.generation) return;
-      deck.audio.pause();this.failed=cue;
+      deck.audio.pause();if (typeof cue === "string") this.failed=cue;
       if(!this.disposed && this.enabled) throw error;
     } finally { if (generation === this.generation) this.loading=false; }
   }
@@ -113,6 +138,7 @@ export class RecordedSoundtrack {
   dispose() {
     this.disposed=true;this.pause();
     this.decks.forEach(({audio,source,gain})=>{
+      audio.onended=null;
       audio.removeAttribute("src");audio.load();source.disconnect();gain.disconnect();
     });
   }

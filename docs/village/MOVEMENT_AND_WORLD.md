@@ -1,10 +1,14 @@
 # Movement, camera, and a living world
 
-Updated: 2026-09-27. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+Updated: 2026-09-28. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+
+## Current camera input — 2026-09-28
+
+The desktop scene captures the mouse after a click and uses mouse movement to look without holding a button. Escape, menus, activities, blur and disposal release it. If browser capture is unavailable, dragging the scene looks around instead. Touch uses drag-to-look and movement buttons. Ground clicks and taps do not move the spirit. Verify with `scripts/village/tests/camera.cjs` against the local QA harness.
 
 ## 2026-09-27 settled camera dragging
 
-While settled at any of the seven activities, hold and drag the scene to orbit the authored look target. Mouse and touch use pointer capture; activity controls remain directly clickable. The orbit has independent yaw/pitch, terrain/obstruction clearance outdoors and interior bounds in the cottage. Release, cancellation, menus and blur stop dragging. Each visit starts at its authored view; exiting restores the walking orientation. Walking mouse capture remains unchanged. See [focused checks and native UI verification](../../VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras).
+While settled at any of the seven activities, hold and drag the scene to orbit the authored look target. Mouse and touch use pointer capture; activity controls remain directly clickable. The orbit has independent yaw/pitch, terrain/obstruction clearance outdoors and interior bounds in the cottage. Release, cancellation, menus and blur stop dragging. Each visit starts at its authored view; exiting restores the walking orientation. See [focused checks and native UI verification](../../VILLAGE_BUILD.md#2026-09-27-happy-ducks-and-settled-cameras).
 
 ## 2026-09-27 garden and companions
 

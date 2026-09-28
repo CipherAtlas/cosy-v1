@@ -10,6 +10,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     await page.goto(process.env.QA_URL || 'http://127.0.0.1:3054/');
     const checks = await page.evaluate(async () => {
       const { VillageEngine } = await import('/modules/features/village/VillageEngine.js');
+      const { gardenAction } = await import('/modules/features/village/garden.js');
       const near = [], seats = [], full = [];
       const engine = new VillageEngine(document.querySelector('#scene'), {
         progress: () => {}, ready: () => {}, near: id => near.push(id),
@@ -72,11 +73,13 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
         engine.movement.settle(-37, 4); tick();
         if (engine.near !== 'birds') throw Error('Bird clearing does not offer nearby scattering');
         if (engine.gardenState.crumbPouch) throw Error('Test expected no crumb pouch');
+        if (engine.gardenAction({ kind: 'feedBirds' })) throw Error('Scattering should wait for an NPC pouch');
+        engine.setGarden(gardenAction(engine.gardenState, { kind: 'birdCrumbs' }));
         if (!engine.gardenAction({ kind: 'feedBirds' }) || engine.gardenAction({ kind: 'feedBirds' }))
-          throw Error('First scatter should work without a pouch; repeat should wait for the flock');
+          throw Error('First scatter should work with a pouch; repeat should wait for the flock');
         engine.movement.settle(24.6, -2.7); tick();
         if (engine.near === 'garden') throw Error('Walking into the kitchen garden still offers a scene transition');
-        return { benches, nearBirds: true, scatterWithoutPouch: true, noGardenTransition: true, simultaneousSeatResolved: true, olderClientProtected: true, seatEvents: seats.length, fullBenchNotices: full.length, nearEvents: near.length };
+        return { benches, nearBirds: true, scatterRequiresPouch: true, noGardenTransition: true, simultaneousSeatResolved: true, olderClientProtected: true, seatEvents: seats.length, fullBenchNotices: full.length, nearEvents: near.length };
       } finally { engine.dispose(); }
     });
     if (errors.length) throw Error(errors.join('\n'));
