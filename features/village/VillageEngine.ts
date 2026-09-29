@@ -15,7 +15,7 @@ import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
 import { GARDEN_TARGETS, HARVEST_COMPLIMENTS, freshGarden, nearbyGardenAction, type GardenState, type GardenAction, type GardenSound } from "./garden";
 import type { ActivityMoment } from "./environment";
-import { softenShadowEdges } from "./shadows";
+import { skipDistantPointLights, softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
 import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
@@ -90,11 +90,17 @@ export class VillageEngine {
   private seatedIndex: 0 | 1 | null = null;
   private quality: Quality = "auto";
   private graphicsTier: GraphicsTier = "detailed";
+  private detailedRenderScale = 1;
+  private sceneryPrepareId = 0;
   private qualityChangedAt = 0;
   private slowSamples = 0;
   private frameSum = 0;
   private frames = 0;
   private statsTime = 0;
+  private lowestFps = Infinity;
+  private longestFrameMs = 0;
+  private longestRenderSubmitMs = 0;
+  private lastSceneryPrepareMs = 0;
   private reducedMotion = false;
   private motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   private sun = new T.DirectionalLight("#ffe0ad", 4.1);
@@ -121,7 +127,7 @@ export class VillageEngine {
   private treeFrustum = new T.Frustum();
   private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
-  private spiritLights = Array.from({ length: 4 }, () => new T.PointLight("#ffd17d", 0, 5, 2));
+  private spiritLights = [new T.PointLight("#ffd17d", 0, 5, 2)];
   private spiritGlowColor = new T.Color("#ffd58e");
   private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
@@ -462,6 +468,7 @@ export class VillageEngine {
     this.dialogue.setEnabled(!this.blocked && !this.place);
     this.resize();
     this.buildInterior();
+    skipDistantPointLights();
     softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
       rainPositions = new Float32Array(1200 * 6);
@@ -690,7 +697,8 @@ export class VillageEngine {
     if (!w || !h) return;
     this.statsTime = this.qualityChangedAt = performance.now();
     this.frameSum = this.frames = this.slowSamples = 0;
-    this.renderer.setPixelRatio(graphicsPixelRatio(this.graphicsTier, w, h, window.devicePixelRatio));
+    this.renderer.setPixelRatio(graphicsPixelRatio(this.graphicsTier, w, h, window.devicePixelRatio) *
+      (this.graphicsTier === "detailed" ? this.detailedRenderScale : 1));
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.compactView = w <= 700;
@@ -723,6 +731,7 @@ export class VillageEngine {
   setQuality(q: Quality) {
     this.quality = q;
     this.graphicsTier = initialGraphicsTier(q);
+    if (q === "high") this.detailedRenderScale = 1;
     this.applyGraphicsTier();
   }
   private applyGraphicsTier() {
@@ -759,14 +768,52 @@ export class VillageEngine {
       drawingBuffer: [gl.drawingBufferWidth, gl.drawingBufferHeight],
       preference: this.quality,
       tier: this.graphicsTier,
+      detailedRenderScale: this.detailedRenderScale,
       shadows: this.renderer.shadowMap.enabled,
       antialias: gl.getContextAttributes()?.antialias,
       contextLost: gl.isContextLost(),
+      weather: this.weather,
+      lowestFps: Number.isFinite(this.lowestFps) ? this.lowestFps : null,
+      longestFrameMs: Math.round(this.longestFrameMs),
+      longestRenderSubmitMs: Math.round(this.longestRenderSubmitMs),
+      lastSceneryPrepareMs: Math.round(this.lastSceneryPrepareMs),
+      shaderPrograms: this.renderer.info.programs?.length ?? 0,
     };
   }
   setWeather(w: Weather) {
     this.weather = w;
     this.renderer.shadowMap.needsUpdate = this.place !== "focus";
+  }
+  async prepareWeather(w: Weather) {
+    if (this.disposed || !this.world || this.weather === w) return;
+    const prepareId = ++this.sceneryPrepareId;
+    const start = performance.now();
+    this.renderer.setAnimationLoop(null);
+    this.clearKeys();
+    this.setWeather(w);
+    this.weatherBlend.rain = w === "rain" ? 1 : 0;
+    this.weatherBlend.dusk = w === "dusk" ? 1 : 0;
+    this.weatherBlend.night = w === "night" ? 1 : 0;
+    this.updateLighting(0);
+    this.updateSpiritLights();
+    if (this.rain) this.rain.visible = w === "rain" && this.place !== "focus";
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+      if (this.disposed || prepareId !== this.sceneryPrepareId) return;
+      const now = performance.now();
+      this.bridgeWindowTime = -1000;
+      this.renderBridgeWindow(now, this.elapsed);
+      this.renderer.shadowMap.needsUpdate = this.place !== "focus";
+      this.renderer.render(this.scene, this.camera);
+    } finally {
+      if (!this.disposed && prepareId === this.sceneryPrepareId && !this.renderer.getContext().isContextLost()) {
+        this.lastSceneryPrepareMs = performance.now() - start;
+        this.lastTime = 0;
+        this.statsTime = this.qualityChangedAt = performance.now();
+        this.frameSum = this.frames = this.slowSamples = 0;
+        this.renderer.setAnimationLoop((time) => this.frame(time));
+      }
+    }
   }
   private updateLighting(dt: number) {
     const speed = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 2.4);
@@ -793,6 +840,7 @@ export class VillageEngine {
     fog.color.lerp(this.lightColor.set("#172544"), night);
     fog.density = .0046 + rain * .005 + dusk * .001 + night * .0007;
     this.world?.setWeather(rain, dusk, night);
+    this.world?.updateLampLights(this.player.position.x, this.player.position.z);
     this.atmosphere.setWeather(rain, dusk, night);
     if (Math.abs(night - this.spiritGlowApplied) > .015 || night === 0 && this.spiritGlowApplied !== 0) {
       this.glowSpirit(this.player, night);
@@ -912,22 +960,12 @@ export class VillageEngine {
   }
   private updateSpiritLights() {
     const night = this.weatherBlend.night;
-    if (night < .01) { this.spiritLights.forEach(light => { light.visible = false; }); return; }
-    const origin = this.player.position;
-    const others = [
-      ...(this.life?.residents.map(resident => resident.root) ?? []),
-      ...[...this.remoteVisitors.values()].map(remote => remote.group),
-    ].filter(root => root.visible && root.position.distanceToSquared(origin) < 144);
-    others.sort((a, b) => a.position.distanceToSquared(origin) - b.position.distanceToSquared(origin));
-    const nearby = [this.player, ...others.slice(0, this.spiritLights.length - 1)];
-    this.spiritLights.forEach((light, index) => {
-      const root = nearby[index];
-      light.visible = !!root;
-      if (root) {
-        light.position.copy(root.position); light.position.y += 1.05;
-        light.intensity = night * (index === 0 ? 2.8 : 1.9);
-      }
-    });
+    const light = this.spiritLights[0];
+    light.visible = night >= .01;
+    if (light.visible) {
+      light.position.copy(this.player.position); light.position.y += 1.05;
+      light.intensity = night * 2.8;
+    }
   }
   setRemoteVisitors(visitors: SharedVisitor[]) {
     if (!this.character) return;
@@ -1219,6 +1257,8 @@ export class VillageEngine {
   private frame(now: number) {
     if (this.disposed || document.hidden) return;
     const frameDelta = this.lastTime ? (now - this.lastTime) / 1000 : 0.016;
+    if (now - this.qualityChangedAt > 4000)
+      this.longestFrameMs = Math.max(this.longestFrameMs, frameDelta * 1000);
     let dt = Math.min(frameDelta, 0.06);
     this.lastTime = now;
     this.elapsed += dt;
@@ -1389,9 +1429,12 @@ export class VillageEngine {
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
     }
     this.updateSpiritLights();
+    const renderStart = performance.now();
     this.renderBridgeWindow(now, t);
     if (this.place === "focus") this.sun.intensity = 0;
     this.renderer.render(this.scene, this.camera);
+    if (now - this.qualityChangedAt > 4000)
+      this.longestRenderSubmitMs = Math.max(this.longestRenderSubmitMs, performance.now() - renderStart);
     for (const remote of this.remoteVisitors.values()) {
       const point = this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0)).project(this.camera);
       remote.label.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || this.place === "focus";
@@ -1415,14 +1458,20 @@ export class VillageEngine {
     this.frames++;
     if (now - this.statsTime > 2000) {
       const fps = Math.round(this.frames / this.frameSum);
+      if (now - this.qualityChangedAt > 4000) this.lowestFps = Math.min(this.lowestFps, fps);
       this.callbacks.stats(
         fps,
         this.renderer.info.render.calls,
         this.renderer.info.render.triangles,
       );
       this.slowSamples = fps < 45 ? this.slowSamples + 1 : 0;
+      if (this.quality === "high" && this.graphicsTier === "detailed" &&
+          this.slowSamples >= 2 && now - this.qualityChangedAt > 4000 && this.detailedRenderScale > .67) {
+        this.detailedRenderScale = Math.max(.67, Math.round((this.detailedRenderScale - .16) * 100) / 100);
+        this.resize();
+      }
       // Keep the selected preference: automatic and battery modes can step down again.
-      // Ignore startup/resizing and isolated slow samples; explicit Detailed stays fixed.
+      // Ignore startup/resizing and isolated slow samples; Detailed keeps its scene tier while its drawing buffer adapts.
       if (this.quality !== "high" && this.graphicsTier !== "minimal" &&
           now - this.qualityChangedAt > 4000 && (fps < 24 || this.slowSamples >= 2)) {
         this.graphicsTier = slowerGraphicsTier(this.graphicsTier);

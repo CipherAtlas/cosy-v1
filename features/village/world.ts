@@ -28,6 +28,7 @@ export type World = {
   }[];
   treeLod: T.InstancedMesh;
   setWeather: (rain: number, dusk: number, night?: number) => void;
+  updateLampLights: (x: number, z: number) => void;
   setLanguage: (language: "en" | "ja") => void;
   colliders: Collider[];
   benches: VillageBench[];
@@ -1421,17 +1422,39 @@ export async function buildWorld(
   group.add(wayfinding.group);
   capture?.("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);
   onProgress(80);
+  group.updateMatrixWorld(true);
+  const lampPositions = lampLights.map(light => light.getWorldPosition(new T.Vector3()));
+  let lampDusk = 0, lampNight = 0;
+  const updateLampLights = (x: number, z: number) => {
+    if (capture) return;
+    let first = -1, second = -1, firstDistance = Infinity, secondDistance = Infinity;
+    lampPositions.forEach((position, index) => {
+      const distance = (position.x - x) ** 2 + (position.z - z) ** 2;
+      if (distance < firstDistance) {
+        second = first; secondDistance = firstDistance;
+        first = index; firstDistance = distance;
+      } else if (distance < secondDistance) {
+        second = index; secondDistance = distance;
+      }
+    });
+    lampLights.forEach((light, index) => {
+      light.intensity = lampDusk * .8 + lampNight * (light.userData.nightIntensity ?? 5.2);
+      light.visible = (index === first || index === second) && light.intensity > .01;
+    });
+  };
   return {
     group,
     trees,
     treeLod,
     setLanguage: wayfinding.setLanguage,
+    updateLampLights,
     setWeather(rain: number, dusk: number, night = 0) {
       wetness.value = rain;
       mat.glass.emissiveIntensity = .12 + dusk * 1.3 + night * 3.2 + rain * .22;
       haloMaterial.opacity = Math.max(dusk * .35, night * .85);
       lanternHalos.forEach(halo => { halo.visible = haloMaterial.opacity > .01; });
-      lampLights.forEach(light => { light.intensity = dusk * .8 + night * (light.userData.nightIntensity ?? 5.2); light.visible = light.intensity > .01; });
+      lampDusk = dusk; lampNight = night;
+      if (capture) lampLights.forEach(light => { light.intensity = dusk * .8 + night * (light.userData.nightIntensity ?? 5.2); light.visible = light.intensity > .01; });
       riverSurface.setWeather(rain, Math.min(1, dusk + night));pondSurface.setWeather(rain, Math.min(1, dusk + night));
     },
     colliders,

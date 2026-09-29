@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   ArrowDown,
@@ -126,6 +127,7 @@ export function Village() {
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
+  const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
   const enterRef = useRef(false);
   const ja = language === "ja",
     t = (en: string, jp: string) => (ja ? jp : en);
@@ -428,9 +430,9 @@ export function Village() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineAttempt, openPlace]);
   useEffect(() => {
-    engine.current?.setBlocked(!entered || panel !== null);
+    engine.current?.setBlocked(!entered || panel !== null || sceneryLoading !== null);
     enterRef.current = entered;
-  }, [entered, panel]);
+  }, [entered, panel, sceneryLoading]);
   useEffect(() => {
     document.documentElement.lang = language;
     engine.current?.setLanguage(language);
@@ -442,8 +444,21 @@ export function Village() {
     engine.current?.setMouseSensitivity(mouseSensitivity);
   }, [mouseSensitivity]);
   useEffect(() => {
-    engine.current?.setWeather(weather);
     audio.current?.setWeather(weather);
+    const local = engine.current;
+    if (!local) return;
+    if (!entered || !ready) { local.setWeather(weather); return; }
+    let cancelled = false;
+    setSceneryLoading(weather);
+    // Let the full-screen state paint before WebGL prepares the new lighting.
+    const timer = window.setTimeout(() => {
+      void local.prepareWeather(weather).catch(() => {
+        if (!cancelled) setNotice(t("The sky could not finish preparing. Try again.", "空の準備が終わりませんでした。もう一度お試しください。"));
+      }).finally(() => { if (!cancelled) setSceneryLoading(null); });
+    }, 50);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+    // A weather change is the transition; entry and readiness are handled by load().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weather]);
   useEffect(() => {
     if (!preferencesLoaded || weatherMode !== "auto") return;
@@ -653,6 +668,17 @@ export function Village() {
     >
       <div className="v-canvas" ref={canvas} />
       <div className="v-shade" aria-hidden="true" />
+      {sceneryLoading && typeof document !== "undefined" && createPortal(<div className="v-scenery-loading" role="status" aria-live="polite" aria-busy="true">
+        <div className="v-scenery-loading-content">
+          <Leaf size={35} weight="light" aria-hidden="true" />
+          <h2>{t("Preparing the sky", "空を準備しています")}</h2>
+          <p>{sceneryLoading === "night" ? t("Starlit night", "星降る夜")
+            : sceneryLoading === "dusk" ? t("Blue hour", "薄暮")
+            : sceneryLoading === "rain" ? t("Rainy afternoon", "雨の午後")
+            : t("Golden hour", "夕暮れ")}</p>
+          <span className="v-scenery-loading-line" aria-hidden="true" />
+        </div>
+      </div>, document.body)}
       <header className="v-header">
         <button
           className="v-wordmark"
