@@ -56,6 +56,7 @@ const request = (path, method = 'GET', token = secret, headers = {}) => new Requ
   assert.equal(room.chat.length, 1);
   const cleared = await (await workerDefault.fetch(request('/admin/chat', 'DELETE', secret, { 'If-Match': `"${nowHour}"` }), env)).json();
   assert.equal(cleared.entries.length, 0);
+  assert.equal(messages.at(-2).type, 'hour', 'already-open older clients also clear their log');
   assert.equal(messages.at(-1).removedMessageIds[0], nextId);
 
   const clientSource = ts.transpileModule(fs.readFileSync('features/village/sharedWorld.ts', 'utf8'), {

@@ -96,6 +96,8 @@ export class VillageWorld extends DurableObject {
         const removedMessageIds = this.chat.map(entry => entry.messageId);
         this.chat = [];
         this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+        // Older open clients already understand this reset event.
+        this.broadcast({ type: "hour", chatHour: this.chatHour });
         this.broadcast({ type: "chat_sync", chatHour: this.chatHour, chat: this.chat, removedMessageIds });
         return Response.json({ chatHour: this.chatHour, entries: this.chat });
       }

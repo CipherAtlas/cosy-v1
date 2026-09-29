@@ -4,7 +4,7 @@ This is a local-only page for moderating the shared village chat. It lists the m
 
 ## Start locally
 
-After the Worker admin secret and updated Worker/client have been released, run:
+Run:
 
 ```bash
 python3 tools/village-admin/server.py

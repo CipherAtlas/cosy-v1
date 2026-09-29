@@ -1,8 +1,10 @@
 # Cosy Village — canonical handoff
 
-## 2026-09-29 — local chat admin
+## 2026-09-29 — local chat admin (published)
 
-`tools/village-admin/` provides a loopback-only page for viewing the current shared chat, removing one message, or clearing the current hour. Its Python proxy reads a mode-0600 local secret file or prompts in the terminal, sends authenticated requests to the Worker over HTTPS, and does not give the secret to the browser. The Worker gives new and older current-hour messages stable IDs, persists removals, and broadcasts `chat_sync` so updated visitor clients remove entries and matching overhead bubbles. Clear all checks the displayed hour. The local test and release state is in [the build entry](VILLAGE_BUILD.md#2026-09-29-local-chat-admin). The admin page is outside the public static export.
+`tools/village-admin/` provides a loopback-only page for viewing the current shared chat, removing one message, or clearing the current hour. Its Python proxy reads a mode-0600 local secret file or prompts in the terminal, sends authenticated requests to the Worker over HTTPS, and does not give the secret to the browser. The Worker gives new and older current-hour messages stable IDs, persists removals, and broadcasts `chat_sync` so updated visitor clients remove entries and matching overhead bubbles. Clear all checks the displayed hour. The Worker and matching client were published in [`747a27c`](https://github.com/CipherAtlas/cosy-v1/commit/747a27c109b1186a8be222fabf955ae45137bbb2) through successful [Pages run 36612482359](https://github.com/CipherAtlas/cosy-v1/actions/runs/36612482359). The live admin read and public chat connection passed; no real message was removed. See [the build entry](VILLAGE_BUILD.md#2026-09-29-local-chat-admin). The admin page is outside the public static export.
+
+An already-open older production tab did not clear after Clear all because it ignored the new `chat_sync` event. Clear all now also sends the established `hour` event, which older clients use to empty their chat log. This Worker fallback was deployed as version `4938111e-591c-4083-8fb2-52d34f3555cb`; a second live Clear all reduced the Worker log to zero, a fresh production visitor tab showed an empty chat, and the user confirmed their already-open tab cleared. Individual removal on an old tab still requires a reload.
 
 ## 2026-09-29 — Battery-first graphics default (published)
 
