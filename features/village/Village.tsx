@@ -113,7 +113,7 @@ export function Village() {
   const [radioError, setRadioError] = useState("");
   const [sound, setSound] = useState(false),
     [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
-    [quality, setQuality] = useState<Quality>("high"),
+    [quality, setQuality] = useState<Quality>("low"),
     [weather, setWeather] = useState<Weather>("golden"),
     [weatherMode, setWeatherMode] = useState<"auto" | "manual">("auto"),
     [language, setLanguage] = useState<"en" | "ja">("en"),
@@ -240,7 +240,7 @@ export function Village() {
         localStorage.getItem("cosy-village-preferences") || "null",
       );
       if (p) {
-        if (["auto", "high", "low"].includes(p.quality)) setQuality(p.quality);
+        // Graphics are chosen per visit so older saved Detailed choices cannot raise the default.
         const savedWeather: Weather | null = ["golden", "dusk", "night", "rain"].includes(p.weather) ? p.weather : null;
         // Older preferences saved the default golden scene even if it was never selected.
         if (savedWeather && (p.weatherMode === "manual" || (p.weatherMode === undefined && savedWeather !== "golden"))) {
@@ -481,10 +481,10 @@ export function Village() {
     try {
       localStorage.setItem(
         "cosy-village-preferences",
-        JSON.stringify({ mix, quality, weather, weatherMode, language, mouseSensitivity }),
+        JSON.stringify({ mix, weather, weatherMode, language, mouseSensitivity }),
       );
     } catch {}
-  }, [mix, quality, weather, weatherMode, language, mouseSensitivity, preferencesLoaded]);
+  }, [mix, weather, weatherMode, language, mouseSensitivity, preferencesLoaded]);
   useEffect(() => {
     if (!PERSONAL_RADIO_ENABLED || !radioLoaded) return;
     try { localStorage.setItem("cosy-village-radio", JSON.stringify({ ...radioPrefs, expanded: radioExpanded })); } catch {}
@@ -1040,11 +1040,11 @@ export function Village() {
                     value={quality}
                     onChange={(e) => setQuality(e.target.value as Quality)}
                   >
-                    <option value="auto">{t("Automatic", "自動")}</option>
-                    <option value="high">{t("Detailed", "高画質")}</option>
                     <option value="low">
                       {t("Gentle on battery", "省電力")}
                     </option>
+                    <option value="high">{t("Detailed", "高画質")}</option>
+                    <option value="auto">{t("Automatic", "自動")}</option>
                   </select>
                 </label>
                 <label className="v-sensitivity">

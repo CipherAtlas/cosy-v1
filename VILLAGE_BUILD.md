@@ -1,5 +1,11 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-29 Battery-first graphics default (local)
+
+Every visit now starts at the Battery tier, including browsers with older saved Detailed or Automatic values. Settings still offers Detailed and Automatic on demand, but the graphics choice lasts only for the current visit. The browser preference record no longer saves graphics quality; weather, sound, language and mouse sensitivity continue to use their existing storage. The engine also starts at Battery before the React settings effect runs, so its initial drawing buffer and shadow budget do not briefly use Detailed. The editor and its saved layouts are unchanged.
+
+The production-configured static export, `npm run typecheck` and `git diff --check` passed; the export contains no editor route or layout save API. A local exported-app check in WebKit 26.5 found a fresh visitor at Battery with a 1088×612 drawing buffer at 1280×720 viewport. Selecting Detailed raised it to 1280×720 for that visit; reloading returned to Battery and removed the legacy quality field from browser storage. A separate browser with a saved Detailed preference also started in Battery and retained its saved 140% mouse sensitivity. No page errors were captured. These are local checks; Safari 26.6.2 and long-session FPS still require visitor validation.
+
 ## 2026-09-29 scenery performance release
 
 Published at [cosy.sabarg.com](https://cosy.sabarg.com/) in [commit `0e28033`](https://github.com/CipherAtlas/cosy-v1/commit/0e280330bae77722f9fe3b57e4fe808e66f3df74) through successful [Pages build and deploy run 36596636065](https://github.com/CipherAtlas/cosy-v1/actions/runs/36596636065). The release contains the scenery preparation view, active night-light limit, point-light shader guard and adaptive Detailed drawing buffer documented below. The production-configured export and TypeScript check passed before push; the export had no layout-editor route or save API.

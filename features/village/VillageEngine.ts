@@ -88,8 +88,8 @@ export class VillageEngine {
   private nearBench: VillageBench | null = null;
   private seatedBench: VillageBench | null = null;
   private seatedIndex: 0 | 1 | null = null;
-  private quality: Quality = "auto";
-  private graphicsTier: GraphicsTier = "detailed";
+  private quality: Quality = "low";
+  private graphicsTier: GraphicsTier = "battery";
   private detailedRenderScale = 1;
   private sceneryPrepareId = 0;
   private qualityChangedAt = 0;
