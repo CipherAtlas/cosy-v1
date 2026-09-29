@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — integrated village release (published)
+
+The local village, chat and puppy changes documented below shipped in [commit `a0c8e2a`](https://github.com/CipherAtlas/cosy-v1/commit/a0c8e2a4175ced5266e8cc8e0ea2dff490216411) through successful [Pages run 36615984264](https://github.com/CipherAtlas/cosy-v1/actions/runs/36615984264). The matching Worker is version `eb42ee2f-ae83-42c2-a5b4-79df3bfaae42`. This includes bench-side clicks, nearby recovery and bridge access, Luma's mint cue, four pettable/following puppies, journal backup safeguards, background world sound, garden countdown fixes and the expanded shared-chat controls. The published Battery graphics default and activity seating remain intact. The [release ledger](VILLAGE_BUILD.md#2026-09-30-integrated-village-release-published) records the merged local checks, public HTTP checks, live shared-village entry and Focus cottage exit. The dated local entries below describe their pre-release checkpoints; statements that work was local or not yet deployed refer to those dates. Live hourly-reset/message delivery, physical touch, Safari 26.6.2 and long-session performance are still open.
+
 ## 2026-09-30 — local chat timestamps (local)
 
 New shared-chat entries store the Worker's send time and show a small timestamp beside each message in the viewing computer's local time and hour format. Older current-hour entries without a recorded send time stay visible without a timestamp. A focused Worker/client test confirms persistence and delivery; typecheck and the static export passed. A local browser preview with a mock WebSocket room showed the local time beside the new message and no time beside an older entry. Live deployment remains unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-local-chat-timestamps-local). No deployment occurred.
