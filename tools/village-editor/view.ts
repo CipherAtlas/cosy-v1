@@ -4,6 +4,7 @@ import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { createAtmosphere } from "../../features/village/atmosphere";
 import { StudioCollision } from "./spatial";
 import { LayoutScene, readTransform, type Asset, type Layout, type LayoutItem } from "./model";
+import { insidePlantingClearance, projectWorldLayout } from "../../features/village/worldLayout";
 
 export class StudioView {
   readonly renderer = new T.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
@@ -45,10 +46,21 @@ export class StudioView {
   private straightPath = false;
   private pathGuide = new T.Line(new T.BufferGeometry(), new T.LineBasicMaterial({ color: "#f9ebac", depthTest: false }));
   private pathDots = new T.Group();
+  private routeGuide = new T.Line(new T.BufferGeometry(), new T.LineBasicMaterial({ color: "#4fc4b1", depthTest: false }));
+  private routeDots = new T.Group();
+  private routeMode = false;
+  private pathHandles = new T.Group();
+  private pathDrag: { pointer: number; id: string; kind: "point" | "width"; index: number } | null = null;
+  private pathDrawingDrag: { pointer: number; start: [number, number] } | null = null;
+  private brush?: { mode: "paint" | "erase"; asset?: string; radius: number };
+  private brushDrag: { pointer: number; last: [number, number] } | null = null;
+  private rightStart: { pointer: number; x: number; y: number } | null = null;
+  private brushPreview = new T.Mesh(new T.RingGeometry(.96, 1, 48), new T.MeshBasicMaterial({ color: "#bc6844", transparent: true, opacity: .9, depthTest: false, side: T.DoubleSide }));
   private ground = new T.Vector3();
   private frame = 0;
   private lastFrame = 0;
   private preview = false;
+  private lighting = "day";
   snap = .5;
   private reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   private resizeObserver: ResizeObserver;
@@ -59,8 +71,13 @@ export class StudioView {
     begin: () => void;
     transform: (items: { id: string; transform: ReturnType<typeof readTransform> }[]) => void;
     commit: () => void;
-    place: (asset: string, position: [number, number, number], yaw: number, repeat: boolean) => void;
+    place: (asset: string, position: [number, number, number], yaw: number) => void;
     path: (points: [number, number][]) => void;
+    contextMenu: (id: string | null, point: [number, number, number] | null, x: number, y: number) => void;
+    editPath: (id: string, kind: "point" | "width", index: number, point: [number, number]) => void;
+    paintGrass: (asset: string, point: [number, number, number]) => void;
+    erasePlanting: (points: [number, number, number][], radius: number) => void;
+    routePoint: (point: [number, number]) => void;
     status: (message: string) => void;
     coordinates: (position: T.Vector3) => void;
     stats: (draws: number, triangles: number) => void;
@@ -70,7 +87,7 @@ export class StudioView {
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.shadowMap.autoUpdate = false; this.renderer.shadowMap.needsUpdate = true;
     this.renderer.domElement.tabIndex = 0;
-    this.renderer.domElement.setAttribute("aria-label", "Village layout. WASD to move; Shift to move faster; Shift-drag to select an area; drag to orbit; right-drag to pan; scroll to zoom. Use the Scene list for keyboard selection.");
+    this.renderer.domElement.setAttribute("aria-label", "Village layout. WASD to move; Shift to move faster; Shift-drag to select an area; drag to orbit; right-click for object actions; right-drag to pan; scroll to zoom. Use the Scene list for keyboard selection.");
     host.prepend(this.renderer.domElement);
     this.marquee.className = "selection-marquee"; this.marquee.hidden = true; this.marquee.setAttribute("aria-hidden", "true"); host.append(this.marquee);
     this.scene.fog = new T.FogExp2("#c5d7b4", .0025);
@@ -107,18 +124,83 @@ export class StudioView {
     this.outline.visible = false; this.outline.renderOrder = 100;
     (this.outline.material as T.Material).depthTest = false;
     this.pathGuide.renderOrder = 100; this.pathGuide.visible = false;
-    this.scene.add(this.grid, this.outline, this.pathGuide, this.pathDots);
+    this.routeGuide.renderOrder = 102;
+    this.brushPreview.rotation.x = -Math.PI / 2; this.brushPreview.visible = false; this.brushPreview.renderOrder = 104;
+    this.scene.add(this.grid, this.outline, this.pathGuide, this.pathDots, this.pathHandles, this.routeGuide, this.routeDots, this.brushPreview);
     this.home();
     const canvas = this.renderer.domElement;
     canvas.addEventListener("pointerdown", event => {
       this.dragStart.set(event.clientX, event.clientY); this.moved = false; this.gizmoGesture = false;
+      if (event.button === 2) this.rightStart = { pointer: event.pointerId, x: event.clientX, y: event.clientY };
       canvas.focus({ preventScroll: true });
+      if (event.button === 0 && this.brush) {
+        this.updateRay(event); const point = this.groundPoint();
+        if (point) {
+          event.preventDefault(); event.stopImmediatePropagation(); this.orbit.enabled = false;
+          this.callbacks.begin(); this.brushAt(point);
+          this.brushDrag = { pointer: event.pointerId, last: [point.x, point.z] };
+          canvas.setPointerCapture(event.pointerId); return;
+        }
+      }
+      if (event.button === 0 && this.drawing && !this.pathPoints.length) {
+        this.updateRay(event); const point = this.groundPoint();
+        if (point) {
+          event.preventDefault(); event.stopImmediatePropagation(); this.orbit.enabled = false;
+          this.pathDrawingDrag = { pointer: event.pointerId, start: [point.x, point.z] };
+          this.pathPoints = [[point.x, point.z]]; this.updatePathGuide();
+          canvas.setPointerCapture(event.pointerId); return;
+        }
+      }
+      if (event.button === 0 && !this.preview && !this.drawing && !this.placement && this.pathHandles.children.length) {
+        this.updateRay(event);
+        const handle = this.ray.intersectObjects(this.pathHandles.children, false)[0]?.object;
+        if (handle) {
+          event.preventDefault(); event.stopImmediatePropagation();
+          this.pathDrag = { pointer: event.pointerId, id: handle.userData.id, kind: handle.userData.kind, index: handle.userData.index };
+          this.callbacks.begin(); this.orbit.enabled = false; canvas.setPointerCapture(event.pointerId);
+          return;
+        }
+      }
       if (event.button === 0 && event.shiftKey && !this.preview && !this.placement && !this.drawing) {
         event.preventDefault(); event.stopImmediatePropagation();
         this.marqueePointer = event.pointerId; canvas.setPointerCapture(event.pointerId);
       }
     }, { capture: true });
     canvas.addEventListener("pointermove", event => {
+      if ((event.buttons & 2) && this.dragStart.distanceTo(new T.Vector2(event.clientX, event.clientY)) > 5) this.moved = true;
+      if (this.pathDrag?.pointer === event.pointerId) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.updateRay(event);
+        const point = this.groundPoint();
+        if (point) this.callbacks.editPath(this.pathDrag.id, this.pathDrag.kind, this.pathDrag.index, [point.x, point.z]);
+        this.moved = true; return;
+      }
+      if (this.brushDrag?.pointer === event.pointerId && this.brush) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.updateRay(event);
+        const point = this.groundPoint();
+        const distance = point && Math.hypot(point.x - this.brushDrag.last[0], point.z - this.brushDrag.last[1]);
+        const spacing = this.brush.radius * (this.brush.mode === "erase" ? .8 : 1.1);
+        if (point && distance && distance >= spacing) {
+          if (this.brush.mode === "erase") {
+            const points: [number, number, number][] = [];
+            const steps = Math.ceil(distance / spacing);
+            for (let i = 1; i <= steps; i++) {
+              const x = this.brushDrag.last[0] + (point.x - this.brushDrag.last[0]) * i / steps;
+              const z = this.brushDrag.last[1] + (point.z - this.brushDrag.last[1]) * i / steps;
+              points.push([x, this.collision.height(x, z), z]);
+            }
+            this.callbacks.erasePlanting(points, this.brush.radius);
+          } else this.brushAt(point);
+          this.brushDrag.last = [point.x, point.z];
+        }
+        this.moved = true; return;
+      }
+      if (this.pathDrawingDrag?.pointer === event.pointerId) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.updateRay(event);
+        const point = this.groundPoint();
+        if (point) this.updatePathGuide([point.x, point.z]);
+        this.moved = this.dragStart.distanceTo(new T.Vector2(event.clientX, event.clientY)) > 5;
+        return;
+      }
       if (this.marqueePointer !== event.pointerId) return;
       event.preventDefault(); event.stopImmediatePropagation();
       this.moved = this.dragStart.distanceTo(new T.Vector2(event.clientX, event.clientY)) > 5;
@@ -127,30 +209,61 @@ export class StudioView {
       this.marquee.hidden = !this.moved;
     }, { capture: true });
     canvas.addEventListener("pointerup", event => {
+      if (event.button === 2 && this.rightStart?.pointer === event.pointerId) {
+        const moved = Math.hypot(event.clientX - this.rightStart.x, event.clientY - this.rightStart.y) > 5 || this.moved;
+        this.rightStart = null;
+        if (!moved && !this.preview) {
+          this.updateRay(event); const point = this.groundPoint();
+          this.callbacks.contextMenu(this.pickId(), point?.toArray() as [number, number, number] | null ?? null, event.clientX, event.clientY);
+        }
+        return;
+      }
+      if (this.pathDrag?.pointer === event.pointerId) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.pathDrag = null; this.orbit.enabled = true;
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        this.callbacks.commit(); return;
+      }
+      if (this.brushDrag?.pointer === event.pointerId) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.brushDrag = null; this.orbit.enabled = true;
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        this.callbacks.commit(); return;
+      }
+      if (this.pathDrawingDrag?.pointer === event.pointerId) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.updateRay(event);
+        const point = this.groundPoint(), start = this.pathDrawingDrag.start;
+        this.pathDrawingDrag = null; this.orbit.enabled = true;
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        if (point && this.moved && Math.hypot(point.x - start[0], point.z - start[1]) >= .2) {
+          this.pathPoints = [start, [point.x, point.z]]; this.finishPath();
+        } else { this.pathPoints = [start]; this.updatePathGuide(); }
+        return;
+      }
       if (this.marqueePointer !== event.pointerId) return;
       event.preventDefault(); event.stopImmediatePropagation();
       if (this.moved) this.selectRectangle(event.clientX, event.clientY);
       else this.pick(event, true);
       this.cancelMarquee();
     }, { capture: true });
-    canvas.addEventListener("pointercancel", () => this.cancelMarquee());
-    canvas.addEventListener("lostpointercapture", () => this.cancelMarquee());
+    canvas.addEventListener("pointercancel", () => { this.rightStart = null; this.cancelMarquee(); this.cancelPathDrag(); this.cancelBrushDrag(); });
+    canvas.addEventListener("lostpointercapture", () => { this.rightStart = null; this.cancelMarquee(); this.cancelPathDrag(); this.cancelBrushDrag(); });
     canvas.addEventListener("pointermove", event => {
       if (this.dragStart.distanceTo(new T.Vector2(event.clientX, event.clientY)) > 5) this.moved = true;
       this.updateRay(event);
       const point = this.groundPoint();
       if (point) {
         this.ground.copy(point); this.callbacks.coordinates(point);
+        if (this.brush?.mode === "erase") { this.brushPreview.position.set(point.x, point.y + .25, point.z); this.brushPreview.visible = true; }
         if (this.ghost) this.updateGhost(point);
         if (this.drawing) this.updatePathGuide([point.x, point.z]);
       }
     });
+    canvas.addEventListener("pointerleave", () => { if (!this.brushDrag) this.brushPreview.visible = false; });
     canvas.addEventListener("pointerup", event => {
       if (event.button !== 0 || this.moved || this.gizmoGesture || this.transform.dragging || this.preview) return;
       this.updateRay(event);
       if (this.placement) {
         const p = this.groundPoint(); if (!p) return;
-        this.callbacks.place(this.placement, p.toArray() as [number, number, number], T.MathUtils.radToDeg(this.ghostYaw), event.shiftKey); return;
+        this.callbacks.place(this.placement, p.toArray() as [number, number, number], T.MathUtils.radToDeg(this.ghostYaw)); return;
       }
       if (this.drawing) {
         const p = this.groundPoint(); if (!p) return;
@@ -158,12 +271,16 @@ export class StudioView {
         if (this.pathPoints.length >= 100) { this.callbacks.status("A path can have up to 100 points. Finish this path to start another."); return; }
         this.pathPoints.push([p.x, p.z]); this.updatePathGuide(); this.callbacks.status(`${this.pathPoints.length} path points · click to continue · Enter to finish`); return;
       }
+      if (this.routeMode) {
+        const p = this.groundPoint(); if (p) this.callbacks.routePoint([p.x, p.z]); return;
+      }
       this.pick(event, event.shiftKey);
     });
     canvas.addEventListener("dblclick", () => { if (!this.placement && !this.drawing) this.focus(); });
+    canvas.addEventListener("contextmenu", event => event.preventDefault());
     canvas.addEventListener("webglcontextlost", event => { event.preventDefault(); this.renderer.setAnimationLoop(null); this.callbacks.status("The 3D view was interrupted. Export or save your layout, then reload the studio."); });
     window.addEventListener("keyup", event => { this.navigationKeys.delete(event.code); if (!event.shiftKey) { this.navigationKeys.delete("ShiftLeft"); this.navigationKeys.delete("ShiftRight"); } });
-    window.addEventListener("blur", () => { this.navigationKeys.clear(); this.cancelMarquee(); });
+    window.addEventListener("blur", () => { this.rightStart = null; this.navigationKeys.clear(); this.cancelMarquee(); });
     document.addEventListener("visibilitychange", () => this.navigationKeys.clear());
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(host); this.resize();
     this.renderer.setAnimationLoop(time => this.render(time));
@@ -172,13 +289,26 @@ export class StudioView {
     const pointer = this.marqueePointer; this.marqueePointer = null; this.marquee.hidden = true;
     if (pointer !== null && this.renderer.domElement.hasPointerCapture(pointer)) this.renderer.domElement.releasePointerCapture(pointer);
   }
+  private cancelPathDrag() {
+    if (this.pathDrawingDrag) { this.pathDrawingDrag = null; this.orbit.enabled = true; }
+    if (!this.pathDrag) return;
+    this.pathDrag = null; this.orbit.enabled = true; this.callbacks.commit();
+  }
+  private cancelBrushDrag() { if (!this.brushDrag) return; this.brushDrag = null; this.orbit.enabled = true; this.callbacks.commit(); }
+  private brushAt(point: T.Vector3) {
+    if (this.brush?.mode === "paint") this.callbacks.paintGrass(this.brush.asset!, point.toArray() as [number, number, number]);
+    if (this.brush?.mode === "erase") this.callbacks.erasePlanting([point.toArray() as [number, number, number]], this.brush.radius);
+  }
   private pick(event: PointerEvent, additive: boolean) {
     this.updateRay(event);
-    const candidates = this.layout?.objects.filter(item => item.visible && !item.locked).map(item => this.model.roots.get(item.id)!) ?? [];
+    this.callbacks.select(this.pickId(), additive);
+  }
+  private pickId() {
+    const candidates = this.layout?.objects.filter(item => item.visible && !item.locked && item.asset !== "planting-clearance").map(item => this.model.roots.get(item.id)!) ?? [];
     const hit = this.ray.intersectObjects(candidates, true).find(hit => this.visible(hit.object));
     let root = hit?.object;
     while (root && !root.userData.layoutId) root = root.parent ?? undefined;
-    this.callbacks.select(root?.userData.layoutId ?? null, additive);
+    return root?.userData.layoutId as string | undefined ?? null;
   }
   private selectRectangle(x: number, y: number) {
     const rect = this.renderer.domElement.getBoundingClientRect();
@@ -187,7 +317,7 @@ export class StudioView {
     const frustum = new T.Frustum().setFromProjectionMatrix(new T.Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse));
     const ids: string[] = [];
     for (const item of this.layout?.objects ?? []) {
-      if (!item.visible || item.locked) continue;
+      if (!item.visible || item.locked || item.asset === "planting-clearance") continue;
       const box = new T.Box3().setFromObject(this.model.roots.get(item.id)!);
       if (box.isEmpty() || !frustum.intersectsBox(box)) continue;
       const screen = new T.Box2();
@@ -253,9 +383,30 @@ export class StudioView {
     if (++this.frame % 60 === 0) this.callbacks.stats(this.renderer.info.render.calls, this.renderer.info.render.triangles);
   }
   async load(progress: (n: number) => void) { await this.model.load(this.renderer, progress); this.collision.refresh(this.model.original); this.renderer.shadowMap.needsUpdate = true; }
-  sync(layout: Layout) { this.layout = layout; this.model.apply(layout); this.collision.refresh(layout); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.model.conformGrass((x, z) => this.collision.height(x, z), p => this.collision.blocksGrass(p)); this.renderer.shadowMap.needsUpdate = true; this.setSelection(this.selected.filter(id => this.model.roots.has(id))); }
+  sync(layout: Layout) { this.layout = layout; this.model.apply(layout); this.collision.refresh(layout); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.refreshPlanting(); this.setLighting(this.lighting); this.renderer.shadowMap.needsUpdate = true; this.setSelection(this.selected.filter(id => this.model.roots.has(id))); }
+  refreshPath() { if (!this.layout) return; this.model.apply(this.layout); this.updateClearanceMarkers(); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.renderer.shadowMap.needsUpdate = true; this.updateOutline(); this.updatePathHandles(); }
+  refreshBrush() { if (!this.layout) return; this.model.apply(this.layout); this.updateClearanceMarkers(); this.refreshPlanting(); this.renderer.shadowMap.needsUpdate = true; }
+  private refreshPlanting() {
+    const clearings = projectWorldLayout(this.layout!).clearings;
+    const cleared = (x: number, z: number) => insidePlantingClearance(x, z, clearings);
+    this.model.conformGrass((x, z) => this.collision.height(x, z), p => this.collision.blocksGrass(p), cleared);
+    this.model.conformWildflowers(cleared);
+  }
+  showRoute(points: [number, number][], editing: boolean) {
+    this.routeMode = editing;
+    this.routeGuide.geometry.dispose();
+    this.routeGuide.geometry = new T.BufferGeometry().setFromPoints(points.map(([x, z]) => new T.Vector3(x, this.collision.height(x, z) + .45, z)));
+    this.routeGuide.visible = editing && !this.preview && points.length > 1;
+    for (const child of [...this.routeDots.children]) { child.removeFromParent(); (child as T.Mesh).geometry.dispose(); ((child as T.Mesh).material as T.Material).dispose(); }
+    if (editing && !this.preview) for (const [x, z] of points) {
+      const dot = new T.Mesh(new T.SphereGeometry(.22, 8, 6), new T.MeshBasicMaterial({ color: "#b8fff0", depthTest: false }));
+      dot.position.set(x, this.collision.height(x, z) + .47, z); dot.renderOrder = 103; this.routeDots.add(dot);
+    }
+    if (editing || (!this.brush && !this.placement && !this.drawing)) this.renderer.domElement.style.cursor = editing ? "crosshair" : "";
+  }
   setSelection(ids: string[]) {
     this.selected = ids; this.transform.detach();
+    this.updateClearanceMarkers();
     const unlocked = ids.filter(id => !this.layout?.objects.find(o => o.id === id)?.locked);
     if (unlocked.length === ids.length && ids.length && this.tool !== "select" && !this.preview && !this.placement && !this.drawing) {
       if (ids.length === 1) this.transform.attach(this.model.roots.get(ids[0])!);
@@ -264,7 +415,32 @@ export class StudioView {
         this.pivot.position.copy(center); this.pivot.rotation.set(0, 0, 0); this.pivot.scale.set(1, 1, 1); this.pivot.updateMatrixWorld(true); this.transform.attach(this.pivot);
       }
     }
-    this.updateOutline();
+    this.updateOutline(); this.updatePathHandles();
+  }
+  private updateClearanceMarkers() {
+    for (const item of this.layout?.objects ?? []) if (item.asset === "planting-clearance") {
+      const root = this.model.roots.get(item.id);
+      if (root) root.visible = !this.preview && item.visible && this.selected.includes(item.id);
+    }
+  }
+  private updatePathHandles() {
+    for (const child of [...this.pathHandles.children]) { child.removeFromParent(); (child as T.Mesh).geometry.dispose(); ((child as T.Mesh).material as T.Material).dispose(); }
+    if (this.preview || this.drawing || this.placement || this.selected.length !== 1) return;
+    const item = this.layout?.objects.find(o => o.id === this.selected[0]);
+    if (!item?.path || item.locked) return;
+    const root = this.model.roots.get(item.id); if (!root) return;
+    const points = item.path.points.map(([x, z]) => root.localToWorld(new T.Vector3(x, .25, z)));
+    const addHandle = (point: T.Vector3, kind: "point" | "width", index: number) => {
+      const mesh = new T.Mesh(new T.SphereGeometry(kind === "width" ? .42 : .34, 12, 8), new T.MeshBasicMaterial({ color: kind === "width" ? "#7ec9c0" : "#fff0a4", depthTest: false }));
+      mesh.position.copy(point); mesh.renderOrder = 105; mesh.userData = { id: item.id, kind, index }; this.pathHandles.add(mesh);
+    };
+    points.forEach((point, index) => addHandle(point, "point", index));
+    if (points.length > 1 && item.asset !== "fence-line") {
+      const tangent = points[1].clone().sub(points[0]).setY(0).normalize();
+      const middle = points[0].clone().add(points[1]).multiplyScalar(.5);
+      const scale = Math.max(root.scale.x, root.scale.z);
+      addHandle(middle.add(new T.Vector3(tangent.z, 0, -tangent.x).multiplyScalar(item.path.width * scale / 2)), "width", 0);
+    }
   }
   private updateOutline() {
     this.outline.box.makeEmpty();
@@ -276,10 +452,22 @@ export class StudioView {
   setSnap(distance: number, angle: number) { this.snap = distance; this.transform.setTranslationSnap(distance || null); this.transform.setRotationSnap(angle ? T.MathUtils.degToRad(angle) : null); }
   toggleGrid(visible: boolean) { this.grid.visible = visible; }
   setLighting(value: string) {
+    this.lighting = value;
     const dusk = value === "dusk" ? .85 : 0;
-    this.model.world?.setWeather(0, dusk); this.atmosphere.setWeather(0, dusk);
-    this.sun.color.set(value === "day" ? "#ffe8c1" : "#ffcc8c"); this.sun.intensity = value === "dusk" ? .8 : value === "golden" ? 3.8 : 3.4;
-    this.sun.position.set(40, value === "golden" ? 26 : 60, 25); this.fill.intensity = value === "dusk" ? .65 : 1.45;
+    const night = value === "night" ? 1 : 0;
+    this.model.world?.setWeather(0, dusk, night); this.atmosphere.setWeather(0, dusk, night);
+    this.model.group.traverse(object => {
+      if (object instanceof T.PointLight && object.userData.villageLamp) {
+        object.intensity = dusk * .8 + night * (object.userData.nightIntensity ?? 5.2);
+        object.visible = object.intensity > .01;
+      }
+      if (object instanceof T.Sprite && object.userData.villageHalo) object.visible = dusk > 0 || night > 0;
+    });
+    this.sun.color.set(night ? "#b3c8ed" : value === "day" ? "#ffe8c1" : "#ffcc8c"); this.sun.intensity = night ? .09 : value === "dusk" ? .8 : value === "golden" ? 3.8 : 3.4;
+    this.sun.position.set(40, value === "golden" ? 26 : 60, 25); this.fill.intensity = night ? .22 : value === "dusk" ? .65 : 1.45;
+    this.fill.color.set(night ? "#6882b9" : "#d1e6f5"); this.fill.groundColor.set(night ? "#303b59" : "#8c9361");
+    (this.scene.fog as T.FogExp2).color.set(night ? "#172544" : "#bfd9da");
+    this.renderer.toneMappingExposure = night ? .94 : 1.05;
     this.renderer.shadowMap.needsUpdate = true;
   }
   home() { this.orbit.target.set(-3, 0, -9); this.camera.position.set(70, 75, 93); if (this.camera === this.orthographic) { this.camera.position.set(-3, 150, -8.99); this.orthographic.zoom = 1; this.orthographic.updateProjectionMatrix(); } this.cameraAnchor.copy(this.camera.position); this.orbit.update(); }
@@ -335,8 +523,11 @@ export class StudioView {
     });
     this.ghost.visible = false; this.scene.add(this.ghost); this.transform.detach(); this.renderer.domElement.style.cursor = "crosshair";
   }
+  startGrassBrush(asset: string) { this.cancelPlacement(); this.brush = { mode: "paint", asset, radius: asset === "grass-wide" ? 7 : asset === "grass-patch" ? 3 : .5 }; this.renderer.domElement.style.cursor = "crosshair"; }
+  startErase(radius: number) { this.cancelPlacement(); this.brush = { mode: "erase", radius }; this.brushPreview.scale.set(radius, radius, 1); this.renderer.domElement.style.cursor = "crosshair"; }
   turnPlacement(degrees: number) { this.ghostYaw += T.MathUtils.degToRad(degrees); if (this.ghost) this.updateGhost(this.ground); }
   cancelPlacement() {
+    this.brush = undefined; this.brushPreview.visible = false;
     this.ghost?.removeFromParent(); this.ghost = undefined; this.ghostMaterials.forEach(m => m.dispose()); this.ghostMaterials = []; this.placement = undefined;
     this.drawing = false; this.pathPoints = []; this.pathGuide.visible = false; this.clearDots(); this.renderer.domElement.style.cursor = ""; this.setSelection(this.selected);
   }
@@ -352,7 +543,13 @@ export class StudioView {
     this.clearDots();
     for (const [x, z] of this.pathPoints) { const dot = new T.Mesh(new T.SphereGeometry(.25, 8, 6), new T.MeshBasicMaterial({ color: "#fff4c9", depthTest: false })); dot.position.set(x, this.collision.height(x, z) + .25, z); dot.renderOrder = 101; this.pathDots.add(dot); }
   }
-  setPreview(preview: boolean) { this.preview = preview; if (preview) this.cancelPlacement(); this.setSelection(this.selected); }
+  setPreview(preview: boolean) {
+    this.preview = preview; if (preview) this.cancelPlacement(); this.setSelection(this.selected);
+    this.routeGuide.visible = !preview && this.routeMode && this.routeGuide.geometry.attributes.position?.count > 1;
+    this.routeDots.visible = !preview && this.routeMode;
+    for (const [id, root] of this.model.roots) if (root.userData.asset === "walkable-region") root.visible = !preview && !!this.layout?.objects.find(item => item.id === id)?.visible;
+    this.updateClearanceMarkers();
+  }
   capture() { this.renderer.render(this.scene, this.camera); return this.renderer.domElement.toDataURL("image/png"); }
   getBounds() { this.updateOutline(); return this.outline.box.clone(); }
   screenPoint(id: string, offset?: [number, number, number]) {

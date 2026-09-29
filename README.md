@@ -20,7 +20,7 @@ PDF, manga, books and book/search experiences are excluded from the village work
 
 The root page uses [features/village/Village.tsx](features/village/Village.tsx), with raw Three.js scenery, accessible React activity controls, local persistence, recorded village music and ambience. The personal lo-fi radio code and design notes remain in the repository, but the radio is disabled. Activities are available through exploration and Places. English/Japanese, reduced motion and explicit audio activation are preserved.
 
-Explore as a smiling white spirit using WASD/arrows, R for quick glide, Shift for unlimited dash and Space to jump. There is no energy mechanic or bar. Click the scene to capture the desktop mouse, move it to look, and press Escape to release. Menus and activities release capture automatically; touch uses drag-to-look and movement buttons. Clicking or tapping the ground does not move the player.
+Explore as a smiling white spirit using WASD/arrows, R for quick glide, Shift for unlimited dash and Space to jump. There is no energy mechanic or bar. Click the scene to capture the desktop mouse, move it to look, and press Escape to release. Mouse sensitivity is adjustable from 25% to 200% in Settings and is saved in this browser. Menus and activities release capture automatically; touch uses drag-to-look and movement buttons. Clicking or tapping the ground does not move the player.
 
 Near a bench, press E or use Sit on the bench; press E again or use Stand up to leave the seat. Ask Maple or Wren for crumbs while close to that resident before feeding birds or ducklings. At the bird clearing, scatter the crumbs with a short toss onto the ground, including from its bench.
 
@@ -31,6 +31,10 @@ The kitchen garden adds carrots, radishes, sunflowers, flowers and mint. Water o
 The garden/pond/companion addition is published. The latest tea-seating and daisy follow-up is recorded in [the current milestone](VILLAGE_BUILD.md#2026-09-27-tea-seating-and-daisy-growing). It adds one separate garden save; existing notes/preferences are preserved. Companions are selected per visit.
 
 The spirit stays visible during all seven activities. Recorded music follows the scenery, with manual selection and separate music/world-sound controls. Personal notes and preferences stay in local storage. Art fidelity, long-session listening, physical touch and target-device performance acceptance remain open.
+
+Settings → Time & weather follows your device's local time by default: blue hour near dawn and dusk, a bright village by day, and a starlit sky at night. Pick a fixed scene or rain to override it; Follow local time restores automatic changes. The night has a near-black sky, moon, dense stars and a galaxy band. Lamps, the hearth and glowing spirits provide warm light. Four path lampposts mark the bridge, tea garden, bird clearing and pond approaches; six low stone lanterns light the kitchen garden edge and dry pond banks. The local studio offers a night preview and placeable lamppost and low-lantern assets; its protected presets are unchanged.
+
+The village renderer skips off-camera cells of meadow grass and distant forest while retaining their original placements and the layout editor's placeable assets. Local visual and render-count evidence is in the [build ledger](VILLAGE_BUILD.md#2026-09-29-spatial-vegetation-culling-local); target-device performance remains unverified.
 
 ## Shared village
 
@@ -70,9 +74,9 @@ Runtime asset attribution is in [public/village/CREDITS.txt](public/village/CRED
 
 ## Local layout studio
 
-Run `npm run dev:editor` and open [the local studio](http://127.0.0.1:3040) to arrange cottages, bridges, paths, planting and scenery. The updated village is a protected default, including the latest garden and bird clearing; edits start on a copy. Riverside, meadow and earlier-snapshot presets are included. The editor runs on its own loopback port, saves local JSON layouts, and adds no public route.
+Run `npm run dev:editor` and open [the local studio](http://127.0.0.1:3040) to arrange cottages, bridges, paths, fencing, planting and scenery. The local playable layout now applies the saved **My village** design with its planting clearings and preserved newer lanterns. Drag to draw paths or oak fence lines; edit their points, length and path width or fence height. Click a shelf asset repeatedly to place multiple copies until Escape, or right-click in the scene for Cut, Copy, Paste here, Duplicate, Focus, Remove and history actions. You can also paint grass, erase meadow grass and lane wildflowers under paths, shape walkable areas and edit resident routes. Saved erase rings are hidden until a clearing is selected in Scene. The earlier current village, riverside, meadow and original presets remain protected. The editor runs on its own loopback port, saves local JSON layouts, and adds no public route.
 
-See [the studio guide](tools/village-editor/README.md) for placement controls, save/recovery, asset registration and verification. Studio layouts are visual designs; applying them to the playable game still requires connecting collision surfaces, activity anchors and resident routes.
+See [the studio guide](tools/village-editor/README.md) for placement controls, save/recovery, asset registration and verification. **Apply to local game** writes the versioned `public/village/world-layout.json` for paths, fence lines, grass, erased planting areas, trees, walkable areas, oak meadow benches, resident routes and existing cottage/spire positions, with validation and a backup. Bridges, other buildings and props, activities, garden interactions and cameras remain authored in game code; Apply rejects edits to those objects until their runtime integration is implemented. Nothing is deployed by local Apply.
 
 ## GitHub Pages releases
 

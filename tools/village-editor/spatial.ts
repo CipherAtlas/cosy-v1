@@ -6,7 +6,7 @@ import { type Layout, type LayoutItem, type LayoutScene } from "./model";
 /** Editor-only support surfaces and solid volumes; never changes the playable map. */
 export class StudioCollision {
   private localBounds = new Map<string, T.Box3>();
-  private surfaces: { id: string; root: T.Object3D; bounds: T.Box3 }[] = [];
+  private surfaces: { id: string; bounds: T.Box3; meshes: T.Mesh[] }[] = [];
   private solids: OBB[] = [];
   private ray = new T.Raycaster();
   private defaultTerrain = true;
@@ -20,14 +20,24 @@ export class StudioCollision {
       const asset = this.model.assets.get(item.asset)!, root = this.model.roots.get(item.id)!;
       if (asset.surface) {
         if (item.asset === "terrain" && item.position.every(n => n === 0) && item.rotation.every(n => n === 0) && item.scale.every(n => n === 1)) this.defaultTerrain = true;
-        else this.surfaces.push({ id: item.id, root, bounds: new T.Box3().setFromObject(root) });
+        else {
+          const meshes: T.Mesh[] = [];
+          root.traverse(object => { if (object instanceof T.Mesh) meshes.push(object); });
+          this.surfaces.push({ id: item.id, bounds: new T.Box3().setFromObject(root), meshes });
+        }
       }
       const solid = this.solid(item); if (solid) this.solids.push(solid);
     }
   }
   private bounds(asset: string) {
     let box = this.localBounds.get(asset);
-    if (!box) { box = new T.Box3().setFromObject(this.model.assets.get(asset)!.template); this.localBounds.set(asset, box); }
+    if (!box) {
+      // The low lantern's glow sprite extends below its stone base; grounding uses the physical fixture.
+      box = asset.startsWith("edge-lantern-")
+        ? new T.Box3(new T.Vector3(-.32, 0, -.32), new T.Vector3(.32, 1, .32))
+        : new T.Box3().setFromObject(this.model.assets.get(asset)!.template);
+      this.localBounds.set(asset, box);
+    }
     return box;
   }
   private matrix(item: LayoutItem) {
@@ -50,7 +60,7 @@ export class StudioCollision {
     this.ray.set(new T.Vector3(x, 10000, z), new T.Vector3(0, -1, 0));
     for (const surface of this.surfaces) {
       if (surface.id === exclude || x < surface.bounds.min.x || x > surface.bounds.max.x || z < surface.bounds.min.z || z > surface.bounds.max.z) continue;
-      const hit = this.ray.intersectObject(surface.root, true)[0];
+      const hit = this.ray.intersectObjects(surface.meshes, false)[0];
       if (hit) height = Math.max(height, hit.point.y);
     }
     return height;
@@ -65,7 +75,7 @@ export class StudioCollision {
     }
     this.ray.ray.copy(ray);
     for (const surface of this.surfaces) {
-      const hit = this.ray.intersectObject(surface.root, true)[0];
+      const hit = this.ray.intersectObjects(surface.meshes, false)[0];
       if (hit && (!closest || hit.distance < ray.origin.distanceTo(closest))) closest = hit.point;
     }
     return closest;

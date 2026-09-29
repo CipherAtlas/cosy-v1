@@ -85,7 +85,11 @@ export const PLACES = [
 export type PlaceId = (typeof PLACES)[number]["id"];
 export const JAPANESE_PLACE_NAMES = ["集中のコテージ", "村の焚き火", "柳の池", "お茶の庭", "書きものの隅", "小さなポスト", "小さな菜園", "小鳥の広場"];
 export type Quality = "auto" | "high" | "low";
-export type Weather = "golden" | "dusk" | "rain";
+export type Weather = "golden" | "dusk" | "night" | "rain";
+export function localTimeWeather(date: Date): Weather {
+  const hour = date.getHours();
+  return hour >= 7 && hour < 18 ? "golden" : hour >= 5 && hour < 20 ? "dusk" : "night";
+}
 export type AudioMix = {
   music: number;
   rain: number;

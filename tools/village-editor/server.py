@@ -44,20 +44,60 @@ def validate(doc):
                 raise ValueError(f'Invalid {key}.')
         path = item.get('path')
         if path is not None:
-            if item['asset'] not in ('custom-path', 'path-straight', 'path-curved') or not isinstance(path, dict) or type(path.get('width')) not in (int, float) or not .3 <= path['width'] <= 20:
+            if item['asset'] not in ('custom-path', 'path-straight', 'path-curved', 'fence-line') or not isinstance(path, dict) or type(path.get('width')) not in (int, float) or not .3 <= path['width'] <= (3 if item['asset'] == 'fence-line' else 20):
                 raise ValueError('Invalid path width.')
             points = path.get('points')
             if not isinstance(points, list) or not 2 <= len(points) <= 100 or any(not isinstance(p, list) or len(p) != 2 or any(type(n) not in (int, float) or not math.isfinite(n) or abs(n) > 2000 for n in p) for p in points):
                 raise ValueError('Invalid path points.')
             if all(math.hypot(p[0] - points[0][0], p[1] - points[0][1]) < .01 for p in points):
                 raise ValueError('A path needs two distinct points.')
-        elif item['asset'] in ('custom-path', 'path-straight', 'path-curved'):
+            if item['asset'] == 'fence-line' and sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(points, points[1:])) > 300:
+                raise ValueError('A fence line can be up to 300 metres long.')
+        elif item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line'):
             raise ValueError('A path needs control points.')
+    routes = doc.get('routes')
+    if routes is not None:
+        if not isinstance(routes, dict) or any(name not in ('pip', 'maple', 'moss', 'luma', 'wren') for name in routes):
+            raise ValueError('Invalid resident routes.')
+        for route in routes.values():
+            if not isinstance(route, dict) or not isinstance(route.get('points'), list) or not 2 <= len(route['points']) <= 100:
+                raise ValueError('Resident routes need 2–100 points.')
+            if any(not isinstance(point, list) or len(point) != 2 or any(type(n) not in (int, float) or not math.isfinite(n) or abs(n) > 2000 for n in point) for point in route['points']):
+                raise ValueError('Invalid resident route point.')
+            pauses = route.get('pauses')
+            if pauses is not None and (not isinstance(pauses, list) or len(pauses) != len(route['points']) or any(type(n) not in (int, float) or not math.isfinite(n) or n < 0 or n > 30 for n in pauses)):
+                raise ValueError('Invalid resident route pauses.')
     return doc
 
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def playable_asset(item):
+    return item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line', 'grass-tuft', 'grass-patch', 'grass-wide', 'planting-clearance', 'walkable-region', 'oak-bench', 'cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') or bool(re.fullmatch(r'tree-\d+', item['asset']))
+
+
+def check_playable_changes(previous, next_doc):
+    before = {item['id']: item for item in previous['objects']}
+    after = {item['id']: item for item in next_doc['objects']}
+    for object_id in before.keys() | after.keys():
+        old, new = before.get(object_id), after.get(object_id)
+        if old and old['asset'] in ('cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') and (new is None or new['asset'] != old['asset']):
+            raise ValueError('Playable cottages and the village spire cannot be removed or replaced.')
+        if (old and not playable_asset(old)) or (new and not playable_asset(new)):
+            if old is None or new is None or any(old.get(key) != new.get(key) for key in ('asset', 'position', 'rotation', 'scale', 'visible', 'path')):
+                raise ValueError('This layout changes an object the playable map does not yet control. Apply paths, grass, erased planting, trees, walkable areas, oak meadow benches, and resident routes; keep other object placements in a saved working copy.')
+    for item in next_doc['objects']:
+        if not playable_asset(item): continue
+        if item['asset'] in ('cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') and (not item['visible'] or item['scale'] != [1, 1, 1]):
+            raise ValueError('Playable cottages and the village spire support position and facing; keep them visible at 1× scale.')
+        if item['asset'] in ('cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') and item['id'] != item['asset']:
+            raise ValueError('Only the existing cottages and village spire can be repositioned in the playable layout.')
+        if not re.fullmatch(r'tree-\d+', item['asset']) and (abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
+            raise ValueError('Playable world objects use upright rotation. Set X and Z rotation to 0 before applying.')
+        if item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line') and (abs(item['scale'][0] - item['scale'][2]) > .001 or abs(item['scale'][1] - 1) > .001):
+            raise ValueError('Playable paths use even horizontal scaling and 1× vertical scale. Use the path length and width controls to shape them.')
 
 
 def compile_studio(output):
@@ -77,7 +117,8 @@ def compile_studio(output):
     (output / 'three').symlink_to(ROOT / 'node_modules/three', target_is_directory=True)
 
 
-def make_handler(output, port, layouts):
+def make_handler(output, port, layouts, published=None):
+    published = published or ROOT / 'public/village/world-layout.json'
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=str(output), **kwargs)
@@ -106,6 +147,13 @@ def make_handler(output, port, layouts):
             route = unquote(urlsplit(self.path).path)
             if route == '/api/health':
                 self.reply({'service': 'cosy-layout-studio', 'localOnly': True, 'port': port}); return
+            if route == '/api/playable':
+                try:
+                    data = published.read_bytes()
+                    self.reply({'layout': validate(json.loads(data)), 'revision': digest(data)})
+                except FileNotFoundError: self.reply({'error': 'Playable layout not found.'}, 404)
+                except (OSError, ValueError): self.reply({'error': 'The playable layout is unreadable; the file is preserved.'}, 422)
+                return
             if route == '/api/library':
                 result = {'presets': [], 'layouts': []}
                 for kind, directory in [('presets', STUDIO / 'presets'), ('layouts', layouts)]:
@@ -135,6 +183,34 @@ def make_handler(output, port, layouts):
         def do_POST(self):
             if not self.trusted(write=True): return
             route = urlsplit(self.path).path
+            if route == '/api/apply':
+                try:
+                    size = int(self.headers.get('Content-Length', '0'))
+                    if not 0 < size <= MAX_BYTES: raise ValueError('Layout is empty or exceeds 2 MB.')
+                    doc = validate(json.loads(self.rfile.read(size)))
+                    data = (json.dumps(doc, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode()
+                except (ValueError, TypeError) as exc:
+                    self.reply({'error': str(exc)}, 400); return
+                try:
+                    with SAVE_LOCK:
+                        previous = published.read_bytes() if published.exists() else None
+                        expected = self.headers.get('If-Match', '')
+                        if expected != (digest(previous) if previous else 'new'):
+                            self.reply({'error': 'The playable layout changed. Reload the studio before applying again.'}, 409); return
+                        if previous:
+                            try: check_playable_changes(validate(json.loads(previous)), doc)
+                            except ValueError as exc:
+                                self.reply({'error': str(exc)}, 422); return
+                        if previous:
+                            history = layouts / '.history'; history.mkdir(exist_ok=True)
+                            (history / f'playable-{time.time_ns()}.json').write_bytes(previous)
+                        with tempfile.NamedTemporaryFile(dir=published.parent, prefix='.applying-', delete=False) as stream:
+                            stream.write(data); stream.flush(); os.fsync(stream.fileno()); temporary = stream.name
+                        os.replace(temporary, published)
+                    self.reply({'revision': digest(data), 'objects': len(doc['objects'])})
+                except OSError:
+                    self.reply({'error': 'Could not apply the playable layout. Your working copy is unchanged.'}, 500)
+                return
             match = re.fullmatch(r'/api/layouts/([a-zA-Z0-9_-]{1,100})', route)
             if not match:
                 self.reply({'error': 'Presets are read-only.'}, 403); return
@@ -171,12 +247,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=3040)
     parser.add_argument('--layouts-dir', type=Path, default=STUDIO / 'layouts')
+    parser.add_argument('--playable-file', type=Path, default=ROOT / 'public/village/world-layout.json')
     args = parser.parse_args()
     args.layouts_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='cosy-layout-studio-') as folder:
         output = Path(folder)
         print('Preparing the local village studio…', flush=True); compile_studio(output)
-        server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(output, args.port, args.layouts_dir))
+        server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(output, args.port, args.layouts_dir, args.playable_file))
         print(f'Cosy Layout Studio: http://127.0.0.1:{args.port}\nLayouts: {args.layouts_dir}\nCtrl+C stops the studio. Restart after source edits.', flush=True)
         try: server.serve_forever()
         except KeyboardInterrupt: pass

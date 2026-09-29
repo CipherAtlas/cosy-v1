@@ -1,6 +1,16 @@
 # Movement, camera, and a living world
 
-Updated: 2026-09-28. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+Updated: 2026-09-29. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
+
+## Playable world layout — 2026-09-29
+
+The local game loads `public/village/world-layout.json` before building the scene. Its authored walkable ellipses extend the spirit's former fixed exploration bounds; the eastern Sunrise meadow overlaps the old boundary so the route is continuous. The same loaded layout supplies limestone path surfaces, terrain-following oak fence lines and movement collision, trees, grass and planting clearings, new oak benches, existing cottage/spire positions and optional resident waypoint/pause circuits. `VillageNavigation` expands its lazy grid to cover walkable areas, uses the player's `clear` and `canWalkTo` rules for obstacles/water, and gives stone paths a small cost preference. The studio checks waypoint reachability with those rules before Apply. The current local file applies the saved **My village** copy while retaining six newer lanterns; [the latest ledger entry](../../VILLAGE_BUILD.md#2026-09-29-saved-my-village-layout-and-studio-editing-local) records verification.
+
+Existing cottage and spire collision follows saved positions; bridge colliders, activity positions, garden behavior and cameras remain in their game modules. The Apply action rejects unsupported object-transform changes. Walkable areas do not sculpt terrain; larger new regions need authored terrain, runtime anchor integration and performance review before release.
+
+## Mouse sensitivity — 2026-09-29
+
+Settings saves mouse sensitivity from 25% to 200% in the existing browser-local village preferences. At 100%, camera rotation keeps its previous speed. The multiplier applies to captured desktop mouse movement, fallback mouse dragging, and mouse dragging during settled activities. Touch dragging keeps its existing speed. See the [local implementation and verification](../../VILLAGE_BUILD.md#2026-09-29-mouse-sensitivity).
 
 ## Current camera input — 2026-09-28
 
@@ -50,6 +60,8 @@ An activity's authored pose is temporary: exiting restores the prior movement he
 The archived, no-longer-loaded candidate `traveller.glb` is skinned with 21 bones and clips `Idle`, `Walk`, `Run`, `Sprint`, `JumpStart`, `AirLoop`, `LandSoft`, `LandMoving`. Original editable source and export script are linked in the handoff. In-place strides are 1.65/2.8/3.5 m for walk/run/sprint. These humanoid clips and anatomy are historical, superseded by the current spirit direction.
 
 Shared gusts now affect grass, bushes, tree canopies, willow leaves, water normals and wind gain. Foliage shadow shaders share the deformation; shadow refresh is bounded. Reduced motion disables secondary wind motion. No physical cloth solver, full acoustic occlusion, device acceptance or finished-art claim.
+
+The runtime groups meadow grass and the distant forest into spatial render cells so cells outside the camera view can be skipped. The editor retains its existing placeable assets. Fixed-view local captures match pixel for pixel; the extra draw calls and target-device performance remain open for measurement. See [the build ledger](../../VILLAGE_BUILD.md#2026-09-29-spatial-vegetation-culling-local).
 
 Keyboard: WASD/arrows, R toggle run, Shift hold sprint, Space jump, E interact with a place, F chat with a nearby visible villager. Touch has explicit run/sprint/jump alongside the direction pad and a Chat button on speech bubbles. Input clears on blur, canceled/lost pointers, dialogs and travel. See the evidence ledger for contract tests and recordings; the acceptance list at the bottom remains open.
 

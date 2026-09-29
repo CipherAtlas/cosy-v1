@@ -18,12 +18,13 @@ class StudioTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(prefix='cosy-studio-test-')
         folder = Path(self.tmp.name); (folder / 'layouts').mkdir(); (folder / 'index.html').write_text('local studio')
         self.layouts = folder / 'layouts'
+        self.original = (STUDIO / 'presets/current-village.json').read_bytes()
+        self.published = folder / 'world-layout.json'; self.published.write_bytes(self.original)
         self.server = ThreadingHTTPServer(('127.0.0.1', 0), lambda *args, **kwargs: None)
         self.port = self.server.server_port
-        self.server.RequestHandlerClass = server_module.make_handler(folder, self.port, self.layouts)
+        self.server.RequestHandlerClass = server_module.make_handler(folder, self.port, self.layouts, self.published)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True); self.thread.start()
         self.doc = json.loads((STUDIO / 'presets/current-village.json').read_text())
-        self.original = (STUDIO / 'presets/current-village.json').read_bytes()
 
     def tearDown(self):
         self.server.shutdown(); self.server.server_close(); self.thread.join(); self.tmp.cleanup()
@@ -84,5 +85,55 @@ class StudioTests(unittest.TestCase):
         item['path'] = {'width':2,'points':[[0,0],[5,5]]}; server_module.validate(self.doc)
         item['path']['points'] = [[0,0]]
         with self.assertRaises(ValueError): server_module.validate(self.doc)
+
+    def test_fence_and_cottage_edits_apply_with_bounds(self):
+        revision = self.request('/api/playable')[1]['revision']
+        cottage = next(item for item in self.doc['objects'] if item['asset'] == 'cottage-3')
+        cottage['position'][0] += 2
+        fence = {'id':'test-fence','asset':'fence-line','name':'Oak fence line','position':[0,0,0],
+                 'rotation':[0,0,0],'scale':[1,1,1],'visible':True,'locked':False,
+                 'path':{'points':[[0,0],[0,6]],'width':1.4}}
+        self.doc['objects'].append(fence)
+        self.assertEqual(self.request('/api/apply', self.doc, revision=revision)[0], 200)
+        fence['path']['width'] = 3.1
+        with self.assertRaises(ValueError): server_module.validate(self.doc)
+        fence['path']['width'] = 1.4
+        fence['path']['points'][1] = [301, 0]
+        with self.assertRaises(ValueError): server_module.validate(self.doc)
+        fence['path']['points'][1] = [0, 6]
+        cottage['scale'][0] = 2
+        with self.assertRaises(ValueError): server_module.check_playable_changes(self.doc, self.doc)
+        cottage['scale'][0] = 1
+        extra = cottage.copy(); extra['id'] = 'extra-cottage'; self.doc['objects'].append(extra)
+        with self.assertRaises(ValueError): server_module.check_playable_changes(self.doc, self.doc)
+
+    def test_apply_updates_only_playable_file_with_revision_and_backup(self):
+        code, playable = self.request('/api/playable'); self.assertEqual(code, 200)
+        self.assertEqual(playable['layout'], self.doc)
+        self.doc['name'] = 'Expanded village'
+        self.assertEqual(self.request('/api/apply', self.doc, revision='stale')[0], 409)
+        self.assertEqual(self.published.read_bytes(), self.original)
+        self.assertEqual(self.request('/api/apply', self.doc, revision=playable['revision'], origin=False)[0], 403)
+        code, applied = self.request('/api/apply', self.doc, revision=playable['revision'])
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(self.published.read_text())['name'], 'Expanded village')
+        self.assertEqual(len(list((self.layouts / '.history').glob('playable-*.json'))), 1)
+        self.assertEqual(self.request('/api/apply', self.doc, revision=playable['revision'])[0], 409)
+
+    def test_apply_rejects_static_object_edits_and_accepts_authored_world_layers(self):
+        revision = self.request('/api/playable')[1]['revision']
+        self.doc['objects'][0]['position'][0] += 2
+        self.assertEqual(self.request('/api/apply', self.doc, revision=revision)[0], 422)
+        self.assertEqual(self.published.read_bytes(), self.original)
+        self.doc = json.loads(self.original)
+        self.doc['objects'].append({'id':'new-meadow-bench','asset':'oak-bench','name':'Meadow bench',
+            'position':[58,0,28],'rotation':[0,90,0],'scale':[1,1,1],'visible':True,'locked':False})
+        self.doc['objects'].append({'id':'clear-road-edge','asset':'planting-clearance','name':'Erased planting area',
+            'position':[2,0,12],'rotation':[0,0,0],'scale':[1.5,1,1.5],'visible':True,'locked':False})
+        self.doc['routes'] = {'pip': {'points': [[0,16],[58,28]], 'pauses':[0,3]}}
+        code, _ = self.request('/api/apply', self.doc, revision=revision)
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(self.published.read_text())['routes']['pip']['pauses'], [0,3])
+        self.assertTrue(any(item['id'] == 'clear-road-edge' for item in json.loads(self.published.read_text())['objects']))
 
 if __name__ == '__main__': unittest.main()

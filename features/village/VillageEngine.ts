@@ -63,6 +63,7 @@ export class VillageEngine {
   private keys = new Set<string>();
   private yaw = 0;
   private pitch = 0.15;
+  private mouseSensitivity = 1;
   private distance = 3.8;
   private teaPanAt = -100;
   private teaPan = 1;
@@ -97,7 +98,7 @@ export class VillageEngine {
   private reducedMotion = false;
   private motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   private sun = new T.DirectionalLight("#ffe0ad", 4.1);
-  private weatherBlend = { rain: 0, dusk: 0 };
+  private weatherBlend = { rain: 0, dusk: 0, night: 0 };
   private bounce = new T.DirectionalLight("#c4d9ef", .48);
   private lightColor = new T.Color();
   private fill = new T.HemisphereLight("#bdd7f2", "#6b6550", .9);
@@ -120,6 +121,9 @@ export class VillageEngine {
   private treeFrustum = new T.Frustum();
   private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
+  private spiritLights = Array.from({ length: 4 }, () => new T.PointLight("#ffd17d", 0, 5, 2));
+  private spiritGlowColor = new T.Color("#ffd58e");
+  private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       if (this.seatedBench && !this.blocked) this.stand();
@@ -193,13 +197,14 @@ export class VillageEngine {
       || (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag")) return;
     const dx = e.clientX - this.pointer.x,
       dy = e.clientY - this.pointer.y;
+    const lookStep = .004 * (e.pointerType === "mouse" ? this.mouseSensitivity : 1);
     if (this.place) {
       this.teaPanHeld = true;
-      this.activityOrbit.yaw = T.MathUtils.euclideanModulo(this.activityOrbit.yaw - dx * .004 + Math.PI, Math.PI * 2) - Math.PI;
-      this.activityOrbit.pitch = T.MathUtils.clamp(this.activityOrbit.pitch + dy * .004, -.8, .9);
+      this.activityOrbit.yaw = T.MathUtils.euclideanModulo(this.activityOrbit.yaw - dx * lookStep + Math.PI, Math.PI * 2) - Math.PI;
+      this.activityOrbit.pitch = T.MathUtils.clamp(this.activityOrbit.pitch + dy * lookStep, -.8, .9);
     } else {
-      this.yaw -= dx * 0.004;
-      this.pitch = T.MathUtils.clamp(this.pitch + dy * 0.004, -0.85, 1.35);
+      this.yaw -= dx * lookStep;
+      this.pitch = T.MathUtils.clamp(this.pitch + dy * lookStep, -0.85, 1.35);
     }
     this.pointer.x = e.clientX;
     this.pointer.y = e.clientY;
@@ -211,8 +216,8 @@ export class VillageEngine {
   };
   private onMouseMove = (e: MouseEvent) => {
     if (document.pointerLockElement !== this.renderer.domElement || this.blocked || this.place) return;
-    this.yaw -= e.movementX * .004;
-    this.pitch = T.MathUtils.clamp(this.pitch + e.movementY * .004, -.85, 1.35);
+    this.yaw -= e.movementX * .004 * this.mouseSensitivity;
+    this.pitch = T.MathUtils.clamp(this.pitch + e.movementY * .004 * this.mouseSensitivity, -.85, 1.35);
   };
   private setMouseLook(mode: "free" | "locked" | "drag") {
     if (this.mouseLook === mode) return;
@@ -346,6 +351,7 @@ export class VillageEngine {
       this.fill,
       this.bounce,
       this.indoorLight,
+      ...this.spiritLights,
       new T.AmbientLight("#e9d9ba", 0.08),
     );
     this.player.position.set(0.3, 0, 20);
@@ -439,7 +445,7 @@ export class VillageEngine {
     this.garden.sync(this.gardenState); world.group.add(this.garden.group);
     this.activities=new VillageActivities(this.world.colliders);
     this.world.group.add(this.activities.outdoor);this.scene.add(this.activities.indoor);
-    this.life = new VillageLife(root, world.colliders, gardenKit.scene);
+    this.life = new VillageLife(root, world.colliders, gardenKit.scene, world.authored);
     this.life.setCompanions(this.companions);
     this.scene.add(this.life.group);
     this.birds = new BirdFlock(dove.scene, this.host, status => {
@@ -712,6 +718,9 @@ export class VillageEngine {
     this.world?.setLanguage(language);
     this.garden?.setLanguage(language);
   }
+  setMouseSensitivity(value: number) {
+    if (Number.isFinite(value)) this.mouseSensitivity = T.MathUtils.clamp(value, .25, 2);
+  }
   setQuality(q: Quality) {
     this.quality = q;
     this.graphicsTier = initialGraphicsTier(q);
@@ -764,23 +773,34 @@ export class VillageEngine {
     const speed = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 2.4);
     this.weatherBlend.rain = T.MathUtils.lerp(this.weatherBlend.rain, this.weather === "rain" ? 1 : 0, speed);
     this.weatherBlend.dusk = T.MathUtils.lerp(this.weatherBlend.dusk, this.weather === "dusk" ? 1 : 0, speed);
-    const { rain, dusk } = this.weatherBlend;
+    this.weatherBlend.night = T.MathUtils.lerp(this.weatherBlend.night, this.weather === "night" ? 1 : 0, speed);
+    const { rain, dusk, night } = this.weatherBlend;
     const blendColor = (color: T.Color, golden: string, evening: string, overcast: string) => {
       color.set(golden).lerp(this.lightColor.set(evening), dusk).lerp(this.lightColor.set(overcast), rain);
     };
     blendColor(this.sun.color, "#ffe5b2", "#efa885", "#cedbe2");
-    this.sun.intensity = 4.1 - dusk * 3.5 - rain * 3.35;
-    this.fill.intensity = 1.05 - dusk * .2 + rain * .37;
+    this.sun.color.lerp(this.lightColor.set("#b3c8ed"), night);
+    this.sun.intensity = (4.1 - dusk * 3.5 - rain * 3.35) * (1 - night) + .09 * night;
+    this.fill.intensity = (1.05 - dusk * .2 + rain * .37) * (1 - night) + .22 * night;
     blendColor(this.fill.color, "#bfd8ef", "#7b97d0", "#b3c6cf");
     blendColor(this.fill.groundColor, "#7a7351", "#424c56", "#6f7c70");
-    this.bounce.intensity = .65 - dusk*.19 - rain*.14;
-    this.scene.environmentIntensity = .34 - dusk*.14 + rain*.05;
-    this.renderer.toneMappingExposure = 1.02 + dusk*.06;
+    this.fill.color.lerp(this.lightColor.set("#6882b9"), night);
+    this.fill.groundColor.lerp(this.lightColor.set("#303b59"), night);
+    this.bounce.intensity = (.65 - dusk*.19 - rain*.14) * (1 - night) + .035 * night;
+    this.scene.environmentIntensity = (.34 - dusk*.14 + rain*.05) * (1 - night) + .025 * night;
+    this.renderer.toneMappingExposure = 1.02 + dusk*.06 - night*.08;
     const fog = this.scene.fog as T.FogExp2;
     blendColor(fog.color, "#bfd9da", "#8894bf", "#a3b8bd");
-    fog.density = .0046 + rain * .005 + dusk * .001;
-    this.world?.setWeather(rain, dusk);
-    this.atmosphere.setWeather(rain, dusk);
+    fog.color.lerp(this.lightColor.set("#172544"), night);
+    fog.density = .0046 + rain * .005 + dusk * .001 + night * .0007;
+    this.world?.setWeather(rain, dusk, night);
+    this.atmosphere.setWeather(rain, dusk, night);
+    if (Math.abs(night - this.spiritGlowApplied) > .015 || night === 0 && this.spiritGlowApplied !== 0) {
+      this.glowSpirit(this.player, night);
+      this.life?.residents.forEach(resident => this.glowSpirit(resident.spirit, night));
+      this.remoteVisitors.forEach(remote => this.glowSpirit(remote.group, night));
+      this.spiritGlowApplied = night;
+    }
   }
   setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); }
   getPlayerPose() { return { x: this.player.position.x, z: this.player.position.z, heading: this.player.rotation.y }; }
@@ -871,10 +891,48 @@ export class VillageEngine {
       if (!(object instanceof T.Mesh)) return;
       const materials = (Array.isArray(object.material) ? object.material : [object.material]).map(material => {
         const result = copyMaterials ? material.clone() : material;
-        if (result instanceof T.MeshStandardMaterial && result.name === "Pearl white spirit") result.color.set(color);
+        if (result instanceof T.MeshStandardMaterial && result.name === "Pearl white spirit") {
+          result.color.set(color);
+          result.userData.dayColor = result.color.getHex();
+        }
         return result;
       });
       if (copyMaterials) object.material = Array.isArray(object.material) ? materials : materials[0];
+    });
+  }
+  private glowSpirit(spirit: T.Object3D, night: number) {
+    spirit.traverse(object => {
+      if (!(object instanceof T.Mesh)) return;
+      for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+        if (!(material instanceof T.MeshStandardMaterial) || material.name !== "Pearl white spirit") continue;
+        if (material.userData.dayEmissive === undefined) {
+          material.userData.dayColor = material.color.getHex();
+          material.userData.dayEmissive = material.emissive.getHex();
+          material.userData.dayEmissiveIntensity = material.emissiveIntensity;
+        }
+        material.color.setHex(material.userData.dayColor).lerp(this.spiritGlowColor, night * .72);
+        material.emissive.setHex(material.userData.dayEmissive).lerp(this.spiritGlowColor, night);
+        material.emissiveIntensity = material.userData.dayEmissiveIntensity + night * .65;
+      }
+    });
+  }
+  private updateSpiritLights() {
+    const night = this.weatherBlend.night;
+    if (night < .01) { this.spiritLights.forEach(light => { light.visible = false; }); return; }
+    const origin = this.player.position;
+    const others = [
+      ...(this.life?.residents.map(resident => resident.root) ?? []),
+      ...[...this.remoteVisitors.values()].map(remote => remote.group),
+    ].filter(root => root.visible && root.position.distanceToSquared(origin) < 144);
+    others.sort((a, b) => a.position.distanceToSquared(origin) - b.position.distanceToSquared(origin));
+    const nearby = [this.player, ...others.slice(0, this.spiritLights.length - 1)];
+    this.spiritLights.forEach((light, index) => {
+      const root = nearby[index];
+      light.visible = !!root;
+      if (root) {
+        light.position.copy(root.position); light.position.y += 1.05;
+        light.intensity = night * (index === 0 ? 2.8 : 1.9);
+      }
     });
   }
   setRemoteVisitors(visitors: SharedVisitor[]) {
@@ -895,6 +953,7 @@ export class VillageEngine {
       if (!remote) {
         const group = new T.Group(), spirit = cloneSkeleton(this.character);
         this.tintSpirit(spirit, visitor.color, true);
+        this.glowSpirit(spirit, this.weatherBlend.night);
         const label = document.createElement("div");
         label.className = "v-visitor-name";
         label.textContent = visitor.name;
@@ -1284,8 +1343,8 @@ export class VillageEngine {
         f.material.uniforms.time.value = t + i;
       if (f.userData.light) f.userData.light.intensity = f.userData.interior
         ? (this.place === "focus" ? 10 : 0)
-        : 9 * (1 + Math.sin(t*7.1)*.045 + Math.sin(t*11.7)*.03);
-      if (f.userData.coal) f.userData.coal.emissiveIntensity=.45+Math.sin(t*2.1)*.1;
+        : (9 + this.weatherBlend.night * 6) * (1 + Math.sin(t*7.1)*.045 + Math.sin(t*11.7)*.03);
+      if (f.userData.coal) f.userData.coal.emissiveIntensity=.45+this.weatherBlend.night*.9+Math.sin(t*2.1)*.1;
     });
     if (this.place === "focus") this.coffeeSteam.forEach((steam, i) => {
       const phase = (t * .42 + i / this.coffeeSteam.length) % 1;
@@ -1334,6 +1393,7 @@ export class VillageEngine {
       const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
     }
+    this.updateSpiritLights();
     this.renderBridgeWindow(now, t);
     if (this.place === "focus") this.sun.intensity = 0;
     this.renderer.render(this.scene, this.camera);

@@ -7,6 +7,7 @@ import { ACTIVITY_STAGES } from "./activityScene";
 import type { PlaceId } from "./places";
 import { CROP_MODELS, type Crop, type GardenAction } from "./garden";
 import { CompanionWalk } from "./companionWalk";
+import { RESIDENT_IDS, type AuthoredWorld } from "./worldLayout";
 
 const COMPANION_STAGES: Record<PlaceId, [number, number, number][]> = {
   focus: [[107.6, .1, -.45], [109.8, .1, -.3], [107.3, .1, 1], [109.2, .1, 1.1], [110.6,.1,1.1]],
@@ -25,7 +26,7 @@ export class VillageLife {
   readonly companionWalk: CompanionWalk;
   readonly residents: {
     root: T.Object3D; spirit: T.Object3D; fins: T.Object3D[]; phase: number;
-    movement: VillageMovement; route: [number, number][]; waypoint: number; pause: number; walking: boolean; chatting: boolean;
+    movement: VillageMovement; route: [number, number][]; routePauses?: number[]; waypoint: number; pause: number; walking: boolean; chatting: boolean;
     encounter: {
       state: "roam" | "approach" | "visit" | "return";
       path: [number, number][]; time: number; noticed: boolean; cooldown: number; checkIn: number;
@@ -48,8 +49,8 @@ export class VillageLife {
   private giftProps = new Map<Crop, T.Object3D>();
   private giftHeart = new T.Group();
 
-  constructor(source: T.Object3D, colliders: Collider[], props?: T.Object3D) {
-    this.navigation = new VillageNavigation(colliders);
+  constructor(source: T.Object3D, colliders: Collider[], props?: T.Object3D, authored?: AuthoredWorld) {
+    this.navigation = new VillageNavigation(colliders, authored);
     this.companionWalk = new CompanionWalk(colliders);
     const routes: [number, number][][] = [
       // Cottage lane and the entrance meadow.
@@ -65,6 +66,7 @@ export class VillageLife {
         [-1.2, -3], [-.8, -9], [4, -10], [8, -10], [12, -14.5], [18, -14.5], [19, -7.5], [17, -5.8]],
       [[-38, 1.5], [-38.8, 1.8], [-37.5, 2], [-36, 1.5]],
     ];
+    for (const [index, id] of RESIDENT_IDS.entries()) if (authored?.routes[id]) routes[index] = authored.routes[id]!.points;
     routes.forEach((route, i) => {
       const root = source.clone(true);
       root.name = `${VILLAGERS[i].name.en} spirit`;
@@ -97,7 +99,7 @@ export class VillageLife {
       const handle = new T.Mesh(new T.TorusGeometry(.054, .012, 6, 12), porcelain); handle.position.x = .11; cup.add(handle);
       const wateringCan = props?.getObjectByName("WateringCan")?.clone(true);
       if (wateringCan) { wateringCan.scale.multiplyScalar(.5); wateringCan.visible = false; actor.add(wateringCan); }
-      this.residents.push({ root: actor, spirit: root, fins, phase: i * 1.7, movement, route, waypoint: route.length > 1 ? 1 : 0,
+      this.residents.push({ root: actor, spirit: root, fins, phase: i * 1.7, movement, route, routePauses: authored?.routes[RESIDENT_IDS[i]]?.pauses, waypoint: route.length > 1 ? 1 : 0,
         pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38, .32][i],
         following: false, companionPath: [], replan: 0, goal: [0, 0], returning: false, cup, wateringCan,
         encounter: { state: "roam", path: [], time: 0, noticed: false, cooldown: 0, checkIn: 0 } });
@@ -268,7 +270,7 @@ export class VillageLife {
       const length = Math.hypot(dx, dz);
       if (encounter.state === "roam" && length < .3 && r.route.length > 1) {
         // Rest twice per circuit; intermediate waypoints guide turns without repeated stops.
-        r.pause = r.waypoint === 0 || r.waypoint === Math.floor(r.route.length / 2) ? 4.5 : 0;
+        r.pause = r.routePauses?.[r.waypoint] ?? (r.waypoint === 0 || r.waypoint === Math.floor(r.route.length / 2) ? 4.5 : 0);
         r.waypoint = (r.waypoint + 1) % r.route.length;
       }
       const moving = !r.chatting && distance > 1.2 && (encounter.state === "approach" || (encounter.state === "return" && length >= .2)

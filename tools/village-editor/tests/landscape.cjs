@@ -7,6 +7,7 @@ const screenshot=process.env.STUDIO_SCREENSHOT || '/tmp/cosy-studio-ground-paths
  const p=await browser.newPage({viewport:{width:1560,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  await p.goto(url);await p.waitForFunction(()=>window.cosyStudio,null,{timeout:60000});
  const snapshot=()=>p.evaluate(()=>window.cosyStudio.snapshot()); const selected=async()=>{const s=await snapshot(),id=await p.evaluate(()=>window.cosyStudio.selection()[0]);return s.layout.objects.find(o=>o.id===id)};
+ const startingClearings=(await snapshot()).layout.objects.filter(o=>o.asset==='planting-clearance').length;
  const fill=async(name,value)=>{const f=p.getByRole('spinbutton',{name,exact:true});await f.fill(String(value));await f.press('Tab')};
  const shelf=async(query)=>{await p.getByRole('tab',{name:'Assets',exact:true}).click();await p.getByRole('searchbox').fill(query)};
  const point=async(id)=>p.evaluate(id=>window.cosyStudio.screenPoint(id),id);
@@ -25,6 +26,36 @@ const screenshot=process.env.STUDIO_SCREENSHOT || '/tmp/cosy-studio-ground-paths
  await p.getByRole('combobox',{name:'Path shape',exact:true}).selectOption('curved');path=await selected();assert.equal(path.asset,'path-curved');
  await p.getByRole('button',{name:'Continue on map',exact:true}).click();await p.mouse.click(pt.x+100,pt.y-100);await p.getByRole('button',{name:'Finish path',exact:true}).click();path=await selected();assert.equal(path.path.points.length,4);
  console.log('PASS straight/curved paths, length, width and extension on map');
+ const pathId=path.id, grassId=grass.id;
+ await p.getByRole('button',{name:'Erase',exact:true}).click();
+ await p.mouse.move(pt.x,pt.y);await p.mouse.down();await p.mouse.move(pt.x+25,pt.y,{steps:4});await p.mouse.up();
+ let erased=await snapshot(),clearings=erased.layout.objects.filter(o=>o.asset==='planting-clearance');
+ assert(clearings.length>startingClearings);assert(erased.layout.objects.some(o=>o.id===pathId));assert(erased.layout.objects.some(o=>o.id===grassId));
+ const clearsPoint=await p.evaluate(async ([layout,x,z])=>{
+   const {projectWorldLayout,insidePlantingClearance}=await import('/modules/features/village/worldLayout.js');
+   return insidePlantingClearance(x,z,projectWorldLayout(layout).clearings);
+ },[erased.layout,clearings.at(-1).position[0],clearings.at(-1).position[2]]);
+ assert(clearsPoint);await p.getByRole('button',{name:'Undo',exact:true}).click();
+ assert.equal((await snapshot()).layout.objects.filter(o=>o.asset==='planting-clearance').length,startingClearings);
+ await p.getByRole('button',{name:'Redo',exact:true}).click();
+ assert.equal((await snapshot()).layout.objects.filter(o=>o.asset==='planting-clearance').length,clearings.length);
+ await p.getByRole('button',{name:'Erase',exact:true}).click();
+ const flowerMask=await p.evaluate(async()=>{
+   const T=await import('/three/build/three.module.js'),{LayoutScene}=await import('/modules/tools/village-editor/model.js');
+   const scene=new LayoutScene(),template=new T.Group();
+   for(let part=0;part<2;part++){
+     const mesh=new T.InstancedMesh(new T.BoxGeometry(.1,.2,.1),new T.MeshBasicMaterial(),2);
+     mesh.setMatrixAt(0,new T.Matrix4().makeTranslation(0,0,0));mesh.setMatrixAt(1,new T.Matrix4().makeTranslation(5,0,0));template.add(mesh);
+   }
+   const root=template.clone(true);root.userData.asset='wildflowers';scene.assets.set('wildflowers',{template});scene.roots.set('flowers',root);
+   const matrix=new T.Matrix4();
+   scene.conformWildflowers((x)=>x<1);
+   const masked=root.children.map(mesh=>[0,1].map(i=>{mesh.getMatrixAt(i,matrix);return matrix.elements[0]}));
+   scene.conformWildflowers(()=>false);root.children[0].getMatrixAt(0,matrix);
+   return {masked,restored:matrix.elements[0]};
+ });
+ assert.deepEqual(flowerMask,{masked:[[0,1],[0,1]],restored:1});
+ console.log('PASS Erase clears planting beneath the path without deleting the path or grass source; undo and redo keep a full stroke');
  await shelf('');await p.screenshot({path:screenshot});
  await p.getByRole('button',{name:'Focus',exact:true}).click();
  // Return to the tile centre to exercise solid placement on its surface.

@@ -5,12 +5,12 @@ export function createAtmosphere() {
   const material = new T.ShaderMaterial({
     side: T.BackSide, depthWrite: false, fog: false,
     uniforms: {
-      time: { value: 0 }, rain: { value: 0 }, dusk: { value: 0 },
+      time: { value: 0 }, rain: { value: 0 }, dusk: { value: 0 }, night: { value: 0 },
       sunDirection: { value: new T.Vector3(35, 28, -48).normalize() },
     },
     vertexShader: `varying vec3 direction;
       void main(){ direction=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `varying vec3 direction; uniform float time; uniform float rain; uniform float dusk; uniform vec3 sunDirection;
+    fragmentShader: `varying vec3 direction; uniform float time; uniform float rain; uniform float dusk; uniform float night; uniform vec3 sunDirection;
       float hash(vec3 p){p=fract(p*.3183099+vec3(.13,.37,.71));p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
       float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
         return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
@@ -34,6 +34,33 @@ export function createAtmosphere() {
         vec3 cloudColor=mix(shade,lit,smoothstep(.36,.7,mass)+sun*.2);
         cloudColor=mix(cloudColor,vec3(.43,.49,.54),rain*.7);
         sky=mix(sky,cloudColor,cloud*.94);
+        if(night>.001){
+        vec3 nightSky=mix(vec3(.0015,.003,.012),vec3(.0001,.0003,.003),pow(clamp(elevation*1.7,0.,1.),.7));
+        vec3 galacticNormal=normalize(vec3(.6,.5,.3));
+        float latitude=dot(d,galacticNormal);
+        float band=exp(-pow(latitude/.18,2.))*smoothstep(.005,.14,d.y);
+        float dust=fbm(d*26.+vec3(4.,1.,8.));
+        float filaments=fbm(d*72.+vec3(2.,9.,3.));
+        float galaxy=band*smoothstep(.27,.64,dust+filaments*.22);
+        float rift=smoothstep(.46,.67,fbm(d*45.+vec3(8.,3.,1.)))*.72;
+        nightSky+=band*vec3(.008,.012,.032);
+        nightSky+=galaxy*(1.-rift)*mix(vec3(.18,.3,.65),vec3(.48,.14,.48),smoothstep(-.3,.3,d.x));
+        nightSky+=band*pow(max(filaments-.4,0.),2.)*vec3(.3,.48,.72);
+        vec3 starCell=floor(d*165.);
+        float starSeed=hash(starCell);
+        vec3 starOffset=fract(d*165.)-.5;
+        float star=(1.-smoothstep(.06,.23,length(starOffset)))*step(.93,starSeed);
+        star*=smoothstep(.005,.12,d.y)*(1.-rain*.8);
+        nightSky+=star*mix(vec3(.68,.81,1.),vec3(1.,.88,.68),hash(starCell+7.))*mix(.85,2.7,starSeed);
+        vec3 moonDirection=normalize(vec3(-.15,.23,-.96));
+        float moonDot=max(dot(d,moonDirection),0.);
+        float moonDisc=smoothstep(.99954,.99969,moonDot);
+        float moonDetail=fbm(d*150.);
+        nightSky+=vec3(.16,.18,.28)*pow(moonDot,220.);
+        nightSky=mix(nightSky,vec3(.91,.94,1.)*(.88+moonDetail*.12),moonDisc);
+        nightSky=mix(nightSky,vec3(.012,.014,.028),cloud*.08);
+        sky=mix(sky,nightSky,night);
+        }
         gl_FragColor=vec4(sky,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -44,9 +71,10 @@ export function createAtmosphere() {
   sky.frustumCulled = false;
   return {
     sky,
-    setWeather(rain: number, dusk: number) {
+    setWeather(rain: number, dusk: number, night = 0) {
       material.uniforms.rain.value = rain;
       material.uniforms.dusk.value = dusk;
+      material.uniforms.night.value = night;
     },
     update(time: number, camera: T.Vector3) {
       material.uniforms.time.value = time;

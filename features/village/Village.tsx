@@ -25,6 +25,7 @@ import {
   type Quality,
   type Weather,
   type AudioMix,
+  localTimeWeather,
 } from "./places";
 import { Activities, MixSliders, SoundtrackChoices } from "./Activities";
 import { RadioDock, SoundPanel } from "./RadioControls";
@@ -113,12 +114,14 @@ export function Village() {
     [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
     [quality, setQuality] = useState<Quality>("high"),
     [weather, setWeather] = useState<Weather>("golden"),
+    [weatherMode, setWeatherMode] = useState<"auto" | "manual">("auto"),
     [language, setLanguage] = useState<"en" | "ja">("en"),
+    [mouseSensitivity, setMouseSensitivity] = useState(1),
     [showStats, setShowStats] = useState(false),
     [stats, setStats] = useState({ fps: 0, draws: 0, triangles: 0 });
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
-  const preferences = useRef({ quality, weather, language });
-  preferences.current = { quality, weather, language };
+  const preferences = useRef({ quality, weather, language, mouseSensitivity });
+  preferences.current = { quality, weather, language, mouseSensitivity };
   const [notice, setNotice] = useState("");
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
@@ -236,9 +239,16 @@ export function Village() {
       );
       if (p) {
         if (["auto", "high", "low"].includes(p.quality)) setQuality(p.quality);
-        if (["golden", "dusk", "rain"].includes(p.weather))
-          setWeather(p.weather);
+        const savedWeather: Weather | null = ["golden", "dusk", "night", "rain"].includes(p.weather) ? p.weather : null;
+        // Older preferences saved the default golden scene even if it was never selected.
+        if (savedWeather && (p.weatherMode === "manual" || (p.weatherMode === undefined && savedWeather !== "golden"))) {
+          setWeather(savedWeather);
+          setWeatherMode("manual");
+        }
         if (p.language === "ja") setLanguage("ja");
+        if (typeof p.mouseSensitivity === "number" && Number.isFinite(p.mouseSensitivity)
+          && p.mouseSensitivity >= .25 && p.mouseSensitivity <= 2)
+          setMouseSensitivity(p.mouseSensitivity);
         if (
           p.mix &&
           ["piano", "lofi", "jazz"].includes(p.mix.vibe) &&
@@ -398,6 +408,7 @@ export function Village() {
           local.setQuality(preferences.current.quality);
           local.setWeather(preferences.current.weather);
           local.setLanguage(preferences.current.language);
+          local.setMouseSensitivity(preferences.current.mouseSensitivity);
         }
       })
       .catch((e) => {
@@ -429,9 +440,25 @@ export function Village() {
     engine.current?.setQuality(quality);
   }, [quality]);
   useEffect(() => {
+    engine.current?.setMouseSensitivity(mouseSensitivity);
+  }, [mouseSensitivity]);
+  useEffect(() => {
     engine.current?.setWeather(weather);
     audio.current?.setWeather(weather);
   }, [weather]);
+  useEffect(() => {
+    if (!preferencesLoaded || weatherMode !== "auto") return;
+    const refresh = () => setWeather(localTimeWeather(new Date()));
+    refresh();
+    const interval = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [preferencesLoaded, weatherMode]);
   useEffect(() => {
     audio.current?.setMix(mix);
   }, [mix]);
@@ -440,10 +467,10 @@ export function Village() {
     try {
       localStorage.setItem(
         "cosy-village-preferences",
-        JSON.stringify({ mix, quality, weather, language }),
+        JSON.stringify({ mix, quality, weather, weatherMode, language, mouseSensitivity }),
       );
     } catch {}
-  }, [mix, quality, weather, language, preferencesLoaded]);
+  }, [mix, quality, weather, weatherMode, language, mouseSensitivity, preferencesLoaded]);
   useEffect(() => {
     if (!PERSONAL_RADIO_ENABLED || !radioLoaded) return;
     try { localStorage.setItem("cosy-village-radio", JSON.stringify({ ...radioPrefs, expanded: radioExpanded })); } catch {}
@@ -960,15 +987,23 @@ export function Village() {
                 <label>
                   {t("Time & weather", "時間と天気")}
                   <select
-                    value={weather}
+                    value={weatherMode === "auto" ? "auto" : weather}
                     onChange={(e) => {
-                      setWeather(e.target.value as Weather);
+                      if (e.target.value === "auto") {
+                        setWeatherMode("auto");
+                        setWeather(localTimeWeather(new Date()));
+                      } else {
+                        setWeatherMode("manual");
+                        setWeather(e.target.value as Weather);
+                      }
                       if (e.target.value === "rain")
                         setMix({ ...mix, rain: 0.5 });
                     }}
                   >
+                    <option value="auto">{t("Follow local time", "現地時間に合わせる")}</option>
                     <option value="golden">{t("Golden hour", "夕暮れ")}</option>
                     <option value="dusk">{t("Blue hour", "薄暮")}</option>
+                    <option value="night">{t("Starlit night", "星降る夜")}</option>
                     <option value="rain">
                       {t("Rainy afternoon", "雨の午後")}
                     </option>
@@ -986,6 +1021,22 @@ export function Village() {
                       {t("Gentle on battery", "省電力")}
                     </option>
                   </select>
+                </label>
+                <label className="v-sensitivity">
+                  <span>
+                    {t("Mouse sensitivity", "マウス感度")}
+                    <output>{Math.round(mouseSensitivity * 100)}%</output>
+                  </span>
+                  <input
+                    type="range"
+                    aria-label={t("Mouse sensitivity", "マウス感度")}
+                    aria-valuetext={`${Math.round(mouseSensitivity * 100)}%`}
+                    min=".25"
+                    max="2"
+                    step=".05"
+                    value={mouseSensitivity}
+                    onChange={(e) => setMouseSensitivity(Number(e.target.value))}
+                  />
                 </label>
                 <label>
                   {t("Language", "言語")}

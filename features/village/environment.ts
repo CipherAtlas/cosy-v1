@@ -1,4 +1,5 @@
 import type { Weather } from "./places";
+import { distanceToPath, type AuthoredWorld } from "./worldLayout";
 
 export type ActivityMoment =
   | { kind: "focus"; running: boolean; progress: number }
@@ -42,6 +43,15 @@ export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3 };
 export const POND = { x: -27, z: -14, rx: 9, rz: 12, y: -.3 };
 export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
 export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5 };
+let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], routes: {} };
+export function setAuthoredWorld(world: AuthoredWorld) { authoredWorld = world; }
+export function inWalkableWorld(x: number, z: number) {
+  if (Math.abs(x) <= 40 && z >= -48 && z <= 42) return true;
+  return authoredWorld.walkable.some(area => {
+    const dx = x - area.x, dz = z - area.z, c = Math.cos(area.yaw), s = Math.sin(area.yaw);
+    return Math.hypot((dx * c - dz * s) / area.radiusX, (dx * s + dz * c) / area.radiusZ) <= 1;
+  });
+}
 
 export function pondDistance(x: number, z: number) {
   return Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz);
@@ -77,6 +87,7 @@ export function surfaceAt(x: number, z: number): Surface {
   if (Math.hypot(x - HEARTH.x, z - HEARTH.z) < HEARTH.pavingRadius) return "stone";
   if (onPondDock(x, z)) return "wood";
   if (onBridge(x, z) || Math.abs(x - roadX(z)) < 1.75 || (Math.abs(z - 3) < 1.25 && x < 1)) return "stone";
+  if (authoredWorld.paths.some(path => distanceToPath(x, z, path) < path.width / 2)) return "stone";
   if (Math.abs(x - roadX(z)) < 2.4) return "soil";
   return "grass";
 }

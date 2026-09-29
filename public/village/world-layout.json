@@ -1,0 +1,7850 @@
+{
+  "version": 1,
+  "base": "cosy-village-2026-09-27",
+  "name": "Playable village · My village",
+  "objects": [
+    {
+      "id": "terrain",
+      "asset": "terrain",
+      "name": "Valley ground",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "shore",
+      "asset": "shore",
+      "name": "Willow pond bank",
+      "position": [
+        -27,
+        0,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "path-1",
+      "asset": "path-1",
+      "name": "Village path 1",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-2",
+      "asset": "path-2",
+      "name": "Village path 2",
+      "position": [
+        -23,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-3",
+      "asset": "path-3",
+      "name": "Village path 3",
+      "position": [
+        -2,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-4",
+      "asset": "path-4",
+      "name": "Village path 4",
+      "position": [
+        -18.2,
+        0,
+        -1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-5",
+      "asset": "path-5",
+      "name": "Bird clearing approach",
+      "position": [
+        -17.15,
+        0,
+        -13
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-6",
+      "asset": "path-6",
+      "name": "Village path 6",
+      "position": [
+        8.6,
+        0,
+        -9.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-7",
+      "asset": "path-7",
+      "name": "Village path 7",
+      "position": [
+        19.083103,
+        0,
+        -8.399413
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-8",
+      "asset": "path-8",
+      "name": "Village path 8",
+      "position": [
+        19.2,
+        0,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "path-9",
+      "asset": "path-9",
+      "name": "Village path 9",
+      "position": [
+        5,
+        0,
+        11
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tea-terrace",
+      "asset": "tea-terrace",
+      "name": "Tea courtyard paving",
+      "position": [
+        15.5,
+        0,
+        -10.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "garden-paving",
+      "asset": "garden-paving",
+      "name": "Kitchen garden paving",
+      "position": [
+        24.7,
+        0,
+        -6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "river",
+      "asset": "river",
+      "name": "Flowing river",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "pond",
+      "asset": "pond",
+      "name": "Willow pond",
+      "position": [
+        -27,
+        0,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "river-stones",
+      "asset": "river-stones",
+      "name": "Riverbank stones",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "bridge",
+      "asset": "bridge",
+      "name": "Stone arch bridge",
+      "position": [
+        -10.533896,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-1",
+      "asset": "cottage-1",
+      "name": "Bluebell cottage",
+      "position": [
+        10,
+        0,
+        11
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-2",
+      "asset": "cottage-2",
+      "name": "Rosewood cottage",
+      "position": [
+        10,
+        0,
+        -4
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-3",
+      "asset": "cottage-3",
+      "name": "Lilac cottage",
+      "position": [
+        5.5,
+        0.04367160562172703,
+        -27
+      ],
+      "rotation": [
+        0,
+        -87.811266,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-4",
+      "asset": "cottage-4",
+      "name": "Waterside cottage",
+      "position": [
+        -23,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-7",
+      "asset": "cottage-7",
+      "name": "Hilltop cottage",
+      "position": [
+        2,
+        0.07336999621981011,
+        -52.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-8",
+      "asset": "cottage-8",
+      "name": "Orchard cottage",
+      "position": [
+        15.5,
+        0.055283,
+        -18
+      ],
+      "rotation": [
+        0,
+        -0.676055,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cottage-9",
+      "asset": "cottage-9",
+      "name": "Meadow cottage",
+      "position": [
+        -31,
+        0,
+        25
+      ],
+      "rotation": [
+        0,
+        -17.188734,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tower",
+      "asset": "tower",
+      "name": "Village spire",
+      "position": [
+        10.5,
+        0,
+        -71.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bird-clearing-terrace",
+      "asset": "bird-clearing-terrace",
+      "name": "Bird clearing terrace",
+      "position": [
+        -37,
+        0,
+        4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bird-feeding-dish",
+      "asset": "bird-feeding-dish",
+      "name": "Sourdough feeding dish",
+      "position": [
+        -37,
+        0,
+        4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bird-clearing-bench",
+      "asset": "bird-clearing-bench",
+      "name": "Birdwatching bench",
+      "position": [
+        -37,
+        0,
+        6.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bench-1",
+      "asset": "bench-1",
+      "name": "Oak bench 1",
+      "position": [
+        -5.8,
+        0,
+        -16.1
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bench-2",
+      "asset": "bench-2",
+      "name": "Oak bench 2",
+      "position": [
+        -5.8,
+        0,
+        -21.9
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bench-3",
+      "asset": "bench-3",
+      "name": "Oak bench 3",
+      "position": [
+        -8.5,
+        0,
+        -19
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bench-4",
+      "asset": "bench-4",
+      "name": "Oak bench 4",
+      "position": [
+        13.9,
+        0,
+        -10
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bench-5",
+      "asset": "bench-5",
+      "name": "Oak bench 5",
+      "position": [
+        -17.8,
+        0,
+        -7.6
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "hearth",
+      "asset": "hearth",
+      "name": "Hearth clearing",
+      "position": [
+        -5.8,
+        0,
+        -19
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "dock",
+      "asset": "dock",
+      "name": "Willow fishing dock",
+      "position": [
+        -21.65,
+        0,
+        -5.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "pergola",
+      "asset": "pergola",
+      "name": "Tea garden pergola",
+      "position": [
+        15.5,
+        0,
+        -10.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "postbox",
+      "asset": "postbox",
+      "name": "Little postbox",
+      "position": [
+        3,
+        0,
+        -1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-180",
+      "asset": "fence--1-180",
+      "name": "Oak fence",
+      "position": [
+        -1.679108,
+        0,
+        19.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-204",
+      "asset": "fence--1-204",
+      "name": "Oak fence",
+      "position": [
+        -1.539897,
+        0,
+        21.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-228",
+      "asset": "fence--1-228",
+      "name": "Oak fence",
+      "position": [
+        -1.422693,
+        0,
+        24
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-252",
+      "asset": "fence--1-252",
+      "name": "Oak fence",
+      "position": [
+        -1.329051,
+        0,
+        26.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-276",
+      "asset": "fence--1-276",
+      "name": "Oak fence",
+      "position": [
+        -1.26021,
+        0,
+        28.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-300",
+      "asset": "fence--1-300",
+      "name": "Oak fence",
+      "position": [
+        -1.217083,
+        0,
+        31.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-324",
+      "asset": "fence--1-324",
+      "name": "Oak fence",
+      "position": [
+        -1.200243,
+        0,
+        33.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-348",
+      "asset": "fence--1-348",
+      "name": "Oak fence",
+      "position": [
+        -1.209913,
+        0,
+        36
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence--1-372",
+      "asset": "fence--1-372",
+      "name": "Oak fence",
+      "position": [
+        -1.245963,
+        0,
+        38.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-180",
+      "asset": "fence-1-180",
+      "name": "Oak fence",
+      "position": [
+        4.720892,
+        0,
+        19.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-204",
+      "asset": "fence-1-204",
+      "name": "Oak fence",
+      "position": [
+        4.860103,
+        0,
+        21.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-228",
+      "asset": "fence-1-228",
+      "name": "Oak fence",
+      "position": [
+        4.977307,
+        0,
+        24
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-252",
+      "asset": "fence-1-252",
+      "name": "Oak fence",
+      "position": [
+        5.070949,
+        0,
+        26.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-276",
+      "asset": "fence-1-276",
+      "name": "Oak fence",
+      "position": [
+        5.13979,
+        0,
+        28.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-300",
+      "asset": "fence-1-300",
+      "name": "Oak fence",
+      "position": [
+        5.182917,
+        0,
+        31.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-324",
+      "asset": "fence-1-324",
+      "name": "Oak fence",
+      "position": [
+        5.199757,
+        0,
+        33.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-348",
+      "asset": "fence-1-348",
+      "name": "Oak fence",
+      "position": [
+        5.190087,
+        0,
+        36
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "fence-1-372",
+      "asset": "fence-1-372",
+      "name": "Oak fence",
+      "position": [
+        5.154037,
+        0,
+        38.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-20",
+      "asset": "lamp-20",
+      "name": "Hanging lantern",
+      "position": [
+        -3.1,
+        0,
+        20
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-0",
+      "asset": "lamp-0",
+      "name": "Hanging lantern",
+      "position": [
+        -3.1,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp--27",
+      "asset": "lamp--27",
+      "name": "Hanging lantern",
+      "position": [
+        -3.1,
+        0,
+        -27
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "meadow-grass",
+      "asset": "meadow-grass",
+      "name": "Meadow grass",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "bushes-1",
+      "asset": "bushes-1",
+      "name": "Leafy shrub 1",
+      "position": [
+        -2.576379,
+        -0.087516,
+        24.416397
+      ],
+      "rotation": [
+        0,
+        -15.137046,
+        0
+      ],
+      "scale": [
+        0.687064,
+        0.601708,
+        0.743617
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-2",
+      "asset": "bushes-2",
+      "name": "Leafy shrub 2",
+      "position": [
+        -3.044726,
+        -0.052675,
+        32.137764
+      ],
+      "rotation": [
+        -180,
+        -27.507074,
+        -180
+      ],
+      "scale": [
+        0.78399,
+        1.109219,
+        0.628684
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-3",
+      "asset": "bushes-3",
+      "name": "Leafy shrub 3",
+      "position": [
+        -16.127552,
+        -0.070449,
+        -4.412429
+      ],
+      "rotation": [
+        0,
+        -23.552324,
+        0
+      ],
+      "scale": [
+        1.107374,
+        1.115258,
+        0.717317
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-4",
+      "asset": "bushes-4",
+      "name": "Leafy shrub 4",
+      "position": [
+        -7.415711,
+        -0.039674,
+        -4.541922
+      ],
+      "rotation": [
+        0,
+        -15.123212,
+        0
+      ],
+      "scale": [
+        0.684984,
+        0.54499,
+        0.669824
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-5",
+      "asset": "bushes-5",
+      "name": "Leafy shrub 5",
+      "position": [
+        -18.010792,
+        -0.073576,
+        -33.928944
+      ],
+      "rotation": [
+        -180,
+        85.927566,
+        -180
+      ],
+      "scale": [
+        1.041878,
+        0.530186,
+        0.613777
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-6",
+      "asset": "bushes-6",
+      "name": "Leafy shrub 6",
+      "position": [
+        -7.969781,
+        -0.012687,
+        -8.455097
+      ],
+      "rotation": [
+        180,
+        -88.540095,
+        180
+      ],
+      "scale": [
+        0.980008,
+        1.125623,
+        0.634008
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-7",
+      "asset": "bushes-7",
+      "name": "Leafy shrub 7",
+      "position": [
+        -14.667962,
+        -0.109497,
+        7.286839
+      ],
+      "rotation": [
+        0,
+        -66.290474,
+        0
+      ],
+      "scale": [
+        0.638764,
+        0.645111,
+        0.605037
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-8",
+      "asset": "bushes-8",
+      "name": "Leafy shrub 8",
+      "position": [
+        -17.462669,
+        -0.080106,
+        -7.551164
+      ],
+      "rotation": [
+        0,
+        -55.175742,
+        0
+      ],
+      "scale": [
+        0.660991,
+        0.887715,
+        0.651635
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-9",
+      "asset": "bushes-9",
+      "name": "Leafy shrub 9",
+      "position": [
+        -4.01627,
+        -0.104007,
+        22.256659
+      ],
+      "rotation": [
+        0,
+        24.771285,
+        0
+      ],
+      "scale": [
+        1.103022,
+        0.604464,
+        0.813871
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-10",
+      "asset": "bushes-10",
+      "name": "Leafy shrub 10",
+      "position": [
+        -2.98435,
+        -0.044935,
+        34.750996
+      ],
+      "rotation": [
+        180,
+        -75.357159,
+        180
+      ],
+      "scale": [
+        0.618841,
+        0.586523,
+        0.692115
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-11",
+      "asset": "bushes-11",
+      "name": "Leafy shrub 11",
+      "position": [
+        -13.928897,
+        -0.122282,
+        17.003428
+      ],
+      "rotation": [
+        -180,
+        -20.613454,
+        -180
+      ],
+      "scale": [
+        0.745225,
+        0.715906,
+        0.968426
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-12",
+      "asset": "bushes-12",
+      "name": "Leafy shrub 12",
+      "position": [
+        -4.639192,
+        -0.12461,
+        7.09495
+      ],
+      "rotation": [
+        0,
+        80.232544,
+        0
+      ],
+      "scale": [
+        0.630419,
+        0.653686,
+        0.966661
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-13",
+      "asset": "bushes-13",
+      "name": "Leafy shrub 13",
+      "position": [
+        -4.063478,
+        -0.089125,
+        24.749844
+      ],
+      "rotation": [
+        0,
+        54.476279,
+        0
+      ],
+      "scale": [
+        1.146945,
+        1.004831,
+        0.833228
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-14",
+      "asset": "bushes-14",
+      "name": "Leafy shrub 14",
+      "position": [
+        -12.670332,
+        -0.033885,
+        33.374512
+      ],
+      "rotation": [
+        0,
+        -78.54227,
+        0
+      ],
+      "scale": [
+        1.168466,
+        0.62499,
+        0.649843
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-15",
+      "asset": "bushes-15",
+      "name": "Leafy shrub 15",
+      "position": [
+        -8.758926,
+        -0.108006,
+        -29.160458
+      ],
+      "rotation": [
+        0,
+        8.932476,
+        0
+      ],
+      "scale": [
+        0.659392,
+        0.615835,
+        0.867744
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-16",
+      "asset": "bushes-16",
+      "name": "Leafy shrub 16",
+      "position": [
+        -9.909481,
+        -0.135312,
+        -32.727985
+      ],
+      "rotation": [
+        -180,
+        -45.993775,
+        -180
+      ],
+      "scale": [
+        0.755416,
+        0.617623,
+        1.019832
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-17",
+      "asset": "bushes-17",
+      "name": "Leafy shrub 17",
+      "position": [
+        -12.390627,
+        -0.096075,
+        24.037666
+      ],
+      "rotation": [
+        -180,
+        -56.778444,
+        -180
+      ],
+      "scale": [
+        0.847885,
+        1.119559,
+        0.767362
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-18",
+      "asset": "bushes-18",
+      "name": "Leafy shrub 18",
+      "position": [
+        -4.237168,
+        -0.125138,
+        7.963796
+      ],
+      "rotation": [
+        180,
+        -81.185365,
+        180
+      ],
+      "scale": [
+        0.876016,
+        0.576276,
+        1.012278
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-19",
+      "asset": "bushes-19",
+      "name": "Leafy shrub 19",
+      "position": [
+        -19.21027,
+        -0.056308,
+        -36.683907
+      ],
+      "rotation": [
+        180,
+        -66.187477,
+        180
+      ],
+      "scale": [
+        1.105944,
+        0.770334,
+        0.65491
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-20",
+      "asset": "bushes-20",
+      "name": "Leafy shrub 20",
+      "position": [
+        -4.205048,
+        -0.129737,
+        9.435872
+      ],
+      "rotation": [
+        -180,
+        -51.916832,
+        -180
+      ],
+      "scale": [
+        0.882845,
+        0.657613,
+        0.876961
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-21",
+      "asset": "bushes-21",
+      "name": "Leafy shrub 21",
+      "position": [
+        -15.056995,
+        -0.107948,
+        8.24354
+      ],
+      "rotation": [
+        180,
+        -78.06252,
+        180
+      ],
+      "scale": [
+        0.658565,
+        0.736035,
+        0.645531
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-22",
+      "asset": "bushes-22",
+      "name": "Leafy shrub 22",
+      "position": [
+        -3.222287,
+        -0.118837,
+        17.110914
+      ],
+      "rotation": [
+        180,
+        -73.170686,
+        180
+      ],
+      "scale": [
+        0.810128,
+        0.61453,
+        0.957833
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-23",
+      "asset": "bushes-23",
+      "name": "Leafy shrub 23",
+      "position": [
+        -4.937263,
+        -0.142073,
+        13.337645
+      ],
+      "rotation": [
+        -180,
+        17.211508,
+        -180
+      ],
+      "scale": [
+        1.196856,
+        0.50268,
+        1.005367
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-24",
+      "asset": "bushes-24",
+      "name": "Leafy shrub 24",
+      "position": [
+        -14.963104,
+        -0.111544,
+        9.524359
+      ],
+      "rotation": [
+        -180,
+        89.717056,
+        -180
+      ],
+      "scale": [
+        0.876292,
+        0.65878,
+        1.174991
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-25",
+      "asset": "bushes-25",
+      "name": "Leafy shrub 25",
+      "position": [
+        -2.523113,
+        -0.055512,
+        32.615139
+      ],
+      "rotation": [
+        0,
+        53.148241,
+        0
+      ],
+      "scale": [
+        0.822955,
+        1.08781,
+        1.067956
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-26",
+      "asset": "bushes-26",
+      "name": "Leafy shrub 26",
+      "position": [
+        -14.953078,
+        -0.111216,
+        9.274468
+      ],
+      "rotation": [
+        0,
+        -80.508886,
+        0
+      ],
+      "scale": [
+        0.796704,
+        1.111242,
+        0.683521
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-27",
+      "asset": "bushes-27",
+      "name": "Leafy shrub 27",
+      "position": [
+        -6.295194,
+        -0.070724,
+        -1.069746
+      ],
+      "rotation": [
+        180,
+        -65.917137,
+        180
+      ],
+      "scale": [
+        0.747862,
+        0.843886,
+        0.672253
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-28",
+      "asset": "bushes-28",
+      "name": "Leafy shrub 28",
+      "position": [
+        -12.310118,
+        -0.027528,
+        34.203522
+      ],
+      "rotation": [
+        -180,
+        3.463956,
+        -180
+      ],
+      "scale": [
+        0.912143,
+        0.580705,
+        0.97782
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-29",
+      "asset": "bushes-29",
+      "name": "Leafy shrub 29",
+      "position": [
+        -3.931531,
+        -0.098855,
+        23.088102
+      ],
+      "rotation": [
+        -180,
+        44.312472,
+        -180
+      ],
+      "scale": [
+        0.74307,
+        0.71176,
+        1.01629
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-30",
+      "asset": "bushes-30",
+      "name": "Leafy shrub 30",
+      "position": [
+        -13.216969,
+        -0.129642,
+        16.880312
+      ],
+      "rotation": [
+        0,
+        -47.437486,
+        0
+      ],
+      "scale": [
+        0.881898,
+        0.865271,
+        0.79293
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-31",
+      "asset": "bushes-31",
+      "name": "Leafy shrub 31",
+      "position": [
+        -4.22999,
+        -0.124672,
+        7.858645
+      ],
+      "rotation": [
+        0,
+        -21.185117,
+        0
+      ],
+      "scale": [
+        0.965034,
+        0.878816,
+        1.156499
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-32",
+      "asset": "bushes-32",
+      "name": "Leafy shrub 32",
+      "position": [
+        -12.837944,
+        -0.133578,
+        16.713463
+      ],
+      "rotation": [
+        -180,
+        22.113818,
+        -180
+      ],
+      "scale": [
+        1.068964,
+        0.998638,
+        0.791045
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-33",
+      "asset": "bushes-33",
+      "name": "Leafy shrub 33",
+      "position": [
+        -4.004527,
+        -0.132646,
+        13.726682
+      ],
+      "rotation": [
+        0,
+        -72.861719,
+        0
+      ],
+      "scale": [
+        0.792669,
+        0.657097,
+        0.745206
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-34",
+      "asset": "bushes-34",
+      "name": "Leafy shrub 34",
+      "position": [
+        -9.524478,
+        -0.12264,
+        -30.919113
+      ],
+      "rotation": [
+        0,
+        -67.592362,
+        0
+      ],
+      "scale": [
+        0.899004,
+        0.727368,
+        1.030442
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-35",
+      "asset": "bushes-35",
+      "name": "Leafy shrub 35",
+      "position": [
+        -16.4608,
+        -0.067857,
+        -8.532767
+      ],
+      "rotation": [
+        180,
+        -75.431646,
+        180
+      ],
+      "scale": [
+        0.96814,
+        0.517946,
+        1.026876
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-36",
+      "asset": "bushes-36",
+      "name": "Leafy shrub 36",
+      "position": [
+        -7.905592,
+        -0.017749,
+        -7.545533
+      ],
+      "rotation": [
+        0,
+        51.646888,
+        0
+      ],
+      "scale": [
+        0.645795,
+        0.608252,
+        1.186442
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-37",
+      "asset": "bushes-37",
+      "name": "Leafy shrub 37",
+      "position": [
+        -16.02235,
+        -0.07727,
+        -1.119651
+      ],
+      "rotation": [
+        180,
+        -62.211989,
+        180
+      ],
+      "scale": [
+        0.681924,
+        0.62886,
+        0.600424
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-38",
+      "asset": "bushes-38",
+      "name": "Leafy shrub 38",
+      "position": [
+        -2.659022,
+        -0.05668,
+        31.890989
+      ],
+      "rotation": [
+        -180,
+        39.897249,
+        -180
+      ],
+      "scale": [
+        0.700056,
+        1.144916,
+        1.156238
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-39",
+      "asset": "bushes-39",
+      "name": "Leafy shrub 39",
+      "position": [
+        -3.065057,
+        -0.057032,
+        31.01054
+      ],
+      "rotation": [
+        0,
+        -48.62788,
+        0
+      ],
+      "scale": [
+        1.013602,
+        0.835065,
+        0.94563
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-40",
+      "asset": "bushes-40",
+      "name": "Leafy shrub 40",
+      "position": [
+        -18.425142,
+        -0.082687,
+        -24.561323
+      ],
+      "rotation": [
+        0,
+        -34.487554,
+        0
+      ],
+      "scale": [
+        0.718208,
+        1.029317,
+        1.156906
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-41",
+      "asset": "bushes-41",
+      "name": "Leafy shrub 41",
+      "position": [
+        -8.430349,
+        -0.122251,
+        -30.823975
+      ],
+      "rotation": [
+        -180,
+        -36.443965,
+        -180
+      ],
+      "scale": [
+        0.952894,
+        0.926056,
+        0.728729
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-42",
+      "asset": "bushes-42",
+      "name": "Leafy shrub 42",
+      "position": [
+        -12.39001,
+        -0.030842,
+        33.601791
+      ],
+      "rotation": [
+        0,
+        -72.387613,
+        0
+      ],
+      "scale": [
+        0.926316,
+        0.970706,
+        0.988403
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-43",
+      "asset": "bushes-43",
+      "name": "Leafy shrub 43",
+      "position": [
+        -5.317788,
+        -0.140161,
+        9.729699
+      ],
+      "rotation": [
+        0,
+        -17.095201,
+        0
+      ],
+      "scale": [
+        0.999119,
+        0.668484,
+        0.811999
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-44",
+      "asset": "bushes-44",
+      "name": "Leafy shrub 44",
+      "position": [
+        -14.074534,
+        -0.116369,
+        18.512684
+      ],
+      "rotation": [
+        180,
+        -72.378335,
+        180
+      ],
+      "scale": [
+        1.147612,
+        0.997776,
+        0.984906
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-45",
+      "asset": "bushes-45",
+      "name": "Leafy shrub 45",
+      "position": [
+        -7.36126,
+        -0.035402,
+        -5.102424
+      ],
+      "rotation": [
+        0,
+        -89.385667,
+        0
+      ],
+      "scale": [
+        0.664934,
+        0.851649,
+        1.099868
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-46",
+      "asset": "bushes-46",
+      "name": "Leafy shrub 46",
+      "position": [
+        -19.453672,
+        -0.060935,
+        -32.370209
+      ],
+      "rotation": [
+        0,
+        28.245469,
+        0
+      ],
+      "scale": [
+        0.899733,
+        0.50747,
+        0.992543
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-47",
+      "asset": "bushes-47",
+      "name": "Leafy shrub 47",
+      "position": [
+        -3.595556,
+        -0.108985,
+        20.808014
+      ],
+      "rotation": [
+        -180,
+        25.351671,
+        -180
+      ],
+      "scale": [
+        0.83233,
+        1.074667,
+        0.714538
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-48",
+      "asset": "bushes-48",
+      "name": "Leafy shrub 48",
+      "position": [
+        -13.329655,
+        -0.134072,
+        13.188891
+      ],
+      "rotation": [
+        0,
+        55.086502,
+        0
+      ],
+      "scale": [
+        1.0884,
+        0.570606,
+        0.843965
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-49",
+      "asset": "bushes-49",
+      "name": "Leafy shrub 49",
+      "position": [
+        -9.369025,
+        -0.136415,
+        -32.758286
+      ],
+      "rotation": [
+        -180,
+        61.89342,
+        -180
+      ],
+      "scale": [
+        0.790135,
+        0.924594,
+        0.733482
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-50",
+      "asset": "bushes-50",
+      "name": "Leafy shrub 50",
+      "position": [
+        -18.253145,
+        -0.073744,
+        -30.983681
+      ],
+      "rotation": [
+        0,
+        -89.780991,
+        0
+      ],
+      "scale": [
+        0.798289,
+        0.956554,
+        0.992458
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-51",
+      "asset": "bushes-51",
+      "name": "Leafy shrub 51",
+      "position": [
+        -8.916851,
+        -0.158091,
+        -37.468063
+      ],
+      "rotation": [
+        -180,
+        8.631867,
+        -180
+      ],
+      "scale": [
+        0.979545,
+        0.987183,
+        0.90572
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-52",
+      "asset": "bushes-52",
+      "name": "Leafy shrub 52",
+      "position": [
+        -18.233198,
+        -0.084217,
+        -22.960945
+      ],
+      "rotation": [
+        0,
+        -43.820634,
+        0
+      ],
+      "scale": [
+        0.676888,
+        1.043635,
+        0.954379
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-53",
+      "asset": "bushes-53",
+      "name": "Leafy shrub 53",
+      "position": [
+        -4.527588,
+        -0.134703,
+        16.000006
+      ],
+      "rotation": [
+        -180,
+        -41.821207,
+        -180
+      ],
+      "scale": [
+        1.113702,
+        0.664947,
+        0.823486
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-54",
+      "asset": "bushes-54",
+      "name": "Leafy shrub 54",
+      "position": [
+        -14.362931,
+        -0.122239,
+        13.171799
+      ],
+      "rotation": [
+        0,
+        11.709834,
+        0
+      ],
+      "scale": [
+        0.73665,
+        0.645605,
+        0.99471
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-55",
+      "asset": "bushes-55",
+      "name": "Leafy shrub 55",
+      "position": [
+        -4.039727,
+        -0.03697,
+        34.035812
+      ],
+      "rotation": [
+        0,
+        25.472556,
+        0
+      ],
+      "scale": [
+        1.160594,
+        0.959856,
+        0.638135
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-56",
+      "asset": "bushes-56",
+      "name": "Leafy shrub 56",
+      "position": [
+        -15.452136,
+        -0.100946,
+        6.977477
+      ],
+      "rotation": [
+        -180,
+        -1.53675,
+        -180
+      ],
+      "scale": [
+        1.151021,
+        0.514156,
+        0.641559
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-57",
+      "asset": "bushes-57",
+      "name": "Leafy shrub 57",
+      "position": [
+        -9.079986,
+        -0.095274,
+        -27.78404
+      ],
+      "rotation": [
+        -180,
+        8.203254,
+        -180
+      ],
+      "scale": [
+        0.84396,
+        0.677729,
+        0.977289
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-58",
+      "asset": "bushes-58",
+      "name": "Leafy shrub 58",
+      "position": [
+        -14.472484,
+        -0.120785,
+        12.48386
+      ],
+      "rotation": [
+        -180,
+        51.458827,
+        -180
+      ],
+      "scale": [
+        0.603408,
+        0.891263,
+        0.806436
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-59",
+      "asset": "bushes-59",
+      "name": "Leafy shrub 59",
+      "position": [
+        -4.107358,
+        -0.12667,
+        17.45689
+      ],
+      "rotation": [
+        0,
+        -35.629211,
+        0
+      ],
+      "scale": [
+        1.11625,
+        0.653727,
+        0.720717
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-60",
+      "asset": "bushes-60",
+      "name": "Leafy shrub 60",
+      "position": [
+        -19.146135,
+        -0.060528,
+        -34.066437
+      ],
+      "rotation": [
+        180,
+        -84.924301,
+        180
+      ],
+      "scale": [
+        1.12468,
+        0.737309,
+        1.121747
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-61",
+      "asset": "bushes-61",
+      "name": "Leafy shrub 61",
+      "position": [
+        -9.161162,
+        -0.145636,
+        -34.235111
+      ],
+      "rotation": [
+        0,
+        52.952095,
+        0
+      ],
+      "scale": [
+        1.196126,
+        1.030486,
+        0.937838
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-62",
+      "asset": "bushes-62",
+      "name": "Leafy shrub 62",
+      "position": [
+        -18.047222,
+        -0.081743,
+        -24.465954
+      ],
+      "rotation": [
+        0,
+        65.745486,
+        0
+      ],
+      "scale": [
+        0.930668,
+        0.85921,
+        0.878297
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-63",
+      "asset": "bushes-63",
+      "name": "Leafy shrub 63",
+      "position": [
+        -9.383784,
+        -0.131182,
+        -32.013912
+      ],
+      "rotation": [
+        0,
+        25.373926,
+        0
+      ],
+      "scale": [
+        1.005961,
+        1.136233,
+        1.025219
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-64",
+      "asset": "bushes-64",
+      "name": "Leafy shrub 64",
+      "position": [
+        -2.828516,
+        -0.048907,
+        33.871246
+      ],
+      "rotation": [
+        0,
+        21.334447,
+        0
+      ],
+      "scale": [
+        1.162789,
+        0.948597,
+        0.722436
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-65",
+      "asset": "bushes-65",
+      "name": "Leafy shrub 65",
+      "position": [
+        -12.025642,
+        -0.052238,
+        29.780106
+      ],
+      "rotation": [
+        -180,
+        89.813046,
+        -180
+      ],
+      "scale": [
+        0.844075,
+        1.005174,
+        0.640172
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-66",
+      "asset": "bushes-66",
+      "name": "Leafy shrub 66",
+      "position": [
+        -9.14883,
+        -0.00382,
+        -15.599181
+      ],
+      "rotation": [
+        0,
+        88.380274,
+        0
+      ],
+      "scale": [
+        0.995325,
+        1.146684,
+        0.881585
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-67",
+      "asset": "bushes-67",
+      "name": "Leafy shrub 67",
+      "position": [
+        -13.10385,
+        -0.086121,
+        25.274124
+      ],
+      "rotation": [
+        0,
+        -89.956999,
+        0
+      ],
+      "scale": [
+        0.666906,
+        1.02251,
+        0.745394
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-68",
+      "asset": "bushes-68",
+      "name": "Leafy shrub 68",
+      "position": [
+        -3.175544,
+        -0.094929,
+        23.244963
+      ],
+      "rotation": [
+        0,
+        -36.569778,
+        0
+      ],
+      "scale": [
+        1.069313,
+        0.965239,
+        0.898834
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-69",
+      "asset": "bushes-69",
+      "name": "Leafy shrub 69",
+      "position": [
+        -13.500771,
+        -0.097408,
+        23.348524
+      ],
+      "rotation": [
+        -180,
+        70.756936,
+        -180
+      ],
+      "scale": [
+        0.876931,
+        0.5693,
+        0.752885
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-70",
+      "asset": "bushes-70",
+      "name": "Leafy shrub 70",
+      "position": [
+        -2.739782,
+        -0.045108,
+        35.941372
+      ],
+      "rotation": [
+        -180,
+        22.479325,
+        -180
+      ],
+      "scale": [
+        1.158869,
+        1.055313,
+        1.02316
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-71",
+      "asset": "bushes-71",
+      "name": "Leafy shrub 71",
+      "position": [
+        -3.318392,
+        -0.079098,
+        26.347097
+      ],
+      "rotation": [
+        -180,
+        -13.566341,
+        -180
+      ],
+      "scale": [
+        0.670697,
+        0.860016,
+        0.799919
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-72",
+      "asset": "bushes-72",
+      "name": "Leafy shrub 72",
+      "position": [
+        7.263914,
+        -0.146664,
+        34.857025
+      ],
+      "rotation": [
+        0,
+        12.894322,
+        0
+      ],
+      "scale": [
+        1.021245,
+        0.801985,
+        0.736739
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-73",
+      "asset": "bushes-73",
+      "name": "Leafy shrub 73",
+      "position": [
+        -3.321424,
+        -0.108087,
+        20.56719
+      ],
+      "rotation": [
+        0,
+        -71.2891,
+        0
+      ],
+      "scale": [
+        0.776899,
+        1.000482,
+        0.876689
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-74",
+      "asset": "bushes-74",
+      "name": "Leafy shrub 74",
+      "position": [
+        6.443916,
+        -0.019656,
+        18.127401
+      ],
+      "rotation": [
+        0,
+        73.57221,
+        0
+      ],
+      "scale": [
+        0.703398,
+        0.59743,
+        0.915997
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-75",
+      "asset": "bushes-75",
+      "name": "Leafy shrub 75",
+      "position": [
+        -3.604666,
+        -0.117681,
+        18.731287
+      ],
+      "rotation": [
+        0,
+        -9.526304,
+        0
+      ],
+      "scale": [
+        0.945131,
+        0.932508,
+        1.105226
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-76",
+      "asset": "bushes-76",
+      "name": "Leafy shrub 76",
+      "position": [
+        6.020729,
+        -0.122256,
+        31.518644
+      ],
+      "rotation": [
+        0,
+        -39.876114,
+        0
+      ],
+      "scale": [
+        0.941934,
+        1.121374,
+        0.787944
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-77",
+      "asset": "bushes-77",
+      "name": "Leafy shrub 77",
+      "position": [
+        -2.952892,
+        -0.107912,
+        19.852783
+      ],
+      "rotation": [
+        -180,
+        82.532701,
+        -180
+      ],
+      "scale": [
+        0.883387,
+        0.987014,
+        1.176896
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-78",
+      "asset": "bushes-78",
+      "name": "Leafy shrub 78",
+      "position": [
+        7.27215,
+        -0.03112,
+        20.472864
+      ],
+      "rotation": [
+        -180,
+        77.615875,
+        -180
+      ],
+      "scale": [
+        1.100608,
+        0.944214,
+        0.967678
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-79",
+      "asset": "bushes-79",
+      "name": "Leafy shrub 79",
+      "position": [
+        -2.517859,
+        -0.074386,
+        27.52125
+      ],
+      "rotation": [
+        0,
+        23.106606,
+        0
+      ],
+      "scale": [
+        1.195556,
+        0.787158,
+        0.989903
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-80",
+      "asset": "bushes-80",
+      "name": "Leafy shrub 80",
+      "position": [
+        6.093778,
+        -0.149485,
+        37.445843
+      ],
+      "rotation": [
+        -180,
+        -50.892132,
+        -180
+      ],
+      "scale": [
+        0.707822,
+        0.63015,
+        1.095881
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-81",
+      "asset": "bushes-81",
+      "name": "Leafy shrub 81",
+      "position": [
+        -2.557696,
+        -0.049498,
+        34.777428
+      ],
+      "rotation": [
+        180,
+        -68.690566,
+        180
+      ],
+      "scale": [
+        0.718929,
+        0.75146,
+        0.686785
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-82",
+      "asset": "bushes-82",
+      "name": "Leafy shrub 82",
+      "position": [
+        5.671896,
+        -0.100954,
+        28.782026
+      ],
+      "rotation": [
+        0,
+        30.885781,
+        0
+      ],
+      "scale": [
+        0.994128,
+        0.990301,
+        1.076324
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-83",
+      "asset": "bushes-83",
+      "name": "Leafy shrub 83",
+      "position": [
+        -3.284681,
+        -0.055675,
+        30.988228
+      ],
+      "rotation": [
+        -180,
+        83.881094,
+        -180
+      ],
+      "scale": [
+        1.061694,
+        0.996924,
+        0.691916
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-84",
+      "asset": "bushes-84",
+      "name": "Leafy shrub 84",
+      "position": [
+        5.585242,
+        -0.022062,
+        17.589542
+      ],
+      "rotation": [
+        -180,
+        26.624183,
+        -180
+      ],
+      "scale": [
+        1.029725,
+        0.685839,
+        1.113359
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-85",
+      "asset": "bushes-85",
+      "name": "Leafy shrub 85",
+      "position": [
+        -1.85545,
+        -0.066404,
+        30.721739
+      ],
+      "rotation": [
+        -180,
+        0.668674,
+        -180
+      ],
+      "scale": [
+        0.940436,
+        0.892167,
+        1.149006
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-86",
+      "asset": "bushes-86",
+      "name": "Leafy shrub 86",
+      "position": [
+        6.701559,
+        -0.048993,
+        22.615189
+      ],
+      "rotation": [
+        0,
+        -11.224913,
+        0
+      ],
+      "scale": [
+        1.06196,
+        0.981107,
+        1.149429
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-87",
+      "asset": "bushes-87",
+      "name": "Leafy shrub 87",
+      "position": [
+        -2.397724,
+        -0.04821,
+        36.622211
+      ],
+      "rotation": [
+        -180,
+        2.063256,
+        -180
+      ],
+      "scale": [
+        0.717641,
+        0.560541,
+        0.758601
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-88",
+      "asset": "bushes-88",
+      "name": "Leafy shrub 88",
+      "position": [
+        5.542292,
+        -0.041646,
+        21.119429
+      ],
+      "rotation": [
+        -180,
+        60.932241,
+        -180
+      ],
+      "scale": [
+        1.052832,
+        0.746749,
+        0.90256
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-89",
+      "asset": "bushes-89",
+      "name": "Leafy shrub 89",
+      "position": [
+        -2.132086,
+        -0.086752,
+        24.285082
+      ],
+      "rotation": [
+        -180,
+        -29.017498,
+        -180
+      ],
+      "scale": [
+        0.939191,
+        1.083261,
+        1.015585
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-90",
+      "asset": "bushes-90",
+      "name": "Leafy shrub 90",
+      "position": [
+        6.261863,
+        -0.043384,
+        21.751402
+      ],
+      "rotation": [
+        0,
+        89.613521,
+        0
+      ],
+      "scale": [
+        1.016483,
+        0.56283,
+        1.103865
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-91",
+      "asset": "bushes-91",
+      "name": "Leafy shrub 91",
+      "position": [
+        -3.013719,
+        -0.040052,
+        37.131943
+      ],
+      "rotation": [
+        0,
+        40.028575,
+        0
+      ],
+      "scale": [
+        0.871869,
+        0.802527,
+        0.846674
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-92",
+      "asset": "bushes-92",
+      "name": "Leafy shrub 92",
+      "position": [
+        6.859696,
+        -0.091232,
+        27.423923
+      ],
+      "rotation": [
+        -180,
+        37.405675,
+        -180
+      ],
+      "scale": [
+        0.756708,
+        0.971967,
+        1.135042
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-93",
+      "asset": "bushes-93",
+      "name": "Leafy shrub 93",
+      "position": [
+        -3.468184,
+        -0.120958,
+        17.285572
+      ],
+      "rotation": [
+        -180,
+        79.215686,
+        -180
+      ],
+      "scale": [
+        0.640854,
+        0.724651,
+        0.847924
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-94",
+      "asset": "bushes-94",
+      "name": "Leafy shrub 94",
+      "position": [
+        6.939274,
+        -0.030014,
+        20.188473
+      ],
+      "rotation": [
+        0,
+        69.183597,
+        0
+      ],
+      "scale": [
+        0.804449,
+        0.732448,
+        0.865876
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-95",
+      "asset": "bushes-95",
+      "name": "Leafy shrub 95",
+      "position": [
+        -2.886144,
+        -0.052876,
+        32.444908
+      ],
+      "rotation": [
+        0,
+        -23.459856,
+        0
+      ],
+      "scale": [
+        0.967224,
+        0.823182,
+        0.922223
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-96",
+      "asset": "bushes-96",
+      "name": "Leafy shrub 96",
+      "position": [
+        6.371196,
+        -0.139381,
+        34.110207
+      ],
+      "rotation": [
+        -180,
+        -41.715444,
+        -180
+      ],
+      "scale": [
+        0.955295,
+        0.921362,
+        0.691737
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-97",
+      "asset": "bushes-97",
+      "name": "Leafy shrub 97",
+      "position": [
+        -3.754237,
+        -0.118896,
+        18.760075
+      ],
+      "rotation": [
+        -180,
+        39.473198,
+        -180
+      ],
+      "scale": [
+        1.105458,
+        0.892028,
+        0.916799
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-98",
+      "asset": "bushes-98",
+      "name": "Leafy shrub 98",
+      "position": [
+        7.502752,
+        -0.115742,
+        30.142952
+      ],
+      "rotation": [
+        0,
+        6.948897,
+        0
+      ],
+      "scale": [
+        0.606986,
+        0.587721,
+        0.971081
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-99",
+      "asset": "bushes-99",
+      "name": "Leafy shrub 99",
+      "position": [
+        -2.454806,
+        -0.065948,
+        29.707352
+      ],
+      "rotation": [
+        0,
+        85.572027,
+        0
+      ],
+      "scale": [
+        0.980929,
+        0.748585,
+        0.660713
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-100",
+      "asset": "bushes-100",
+      "name": "Leafy shrub 100",
+      "position": [
+        6.765654,
+        -0.145446,
+        35.004208
+      ],
+      "rotation": [
+        0,
+        -22.675407,
+        0
+      ],
+      "scale": [
+        0.896908,
+        0.855586,
+        0.862952
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-101",
+      "asset": "bushes-101",
+      "name": "Leafy shrub 101",
+      "position": [
+        -2.405424,
+        -0.092634,
+        22.964203
+      ],
+      "rotation": [
+        0,
+        57.547304,
+        0
+      ],
+      "scale": [
+        0.927413,
+        1.08686,
+        0.602362
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-102",
+      "asset": "bushes-102",
+      "name": "Leafy shrub 102",
+      "position": [
+        6.994496,
+        -0.155329,
+        38.05014
+      ],
+      "rotation": [
+        0,
+        -34.858454,
+        0
+      ],
+      "scale": [
+        0.839597,
+        0.577191,
+        0.764477
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-103",
+      "asset": "bushes-103",
+      "name": "Leafy shrub 103",
+      "position": [
+        -2.75871,
+        -0.101125,
+        21.284262
+      ],
+      "rotation": [
+        180,
+        -87.354573,
+        180
+      ],
+      "scale": [
+        0.82458,
+        1.080598,
+        0.646981
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-104",
+      "asset": "bushes-104",
+      "name": "Leafy shrub 104",
+      "position": [
+        5.886331,
+        -0.03381,
+        20.150599
+      ],
+      "rotation": [
+        -180,
+        86.368686,
+        -180
+      ],
+      "scale": [
+        0.664237,
+        1.086069,
+        1.148371
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-105",
+      "asset": "bushes-105",
+      "name": "Leafy shrub 105",
+      "position": [
+        -3.170534,
+        -0.054781,
+        31.372326
+      ],
+      "rotation": [
+        -180,
+        75.992042,
+        -180
+      ],
+      "scale": [
+        1.035502,
+        0.536402,
+        0.794138
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-106",
+      "asset": "bushes-106",
+      "name": "Leafy shrub 106",
+      "position": [
+        7.203169,
+        -0.083549,
+        26.564095
+      ],
+      "rotation": [
+        0,
+        -10.32526,
+        0
+      ],
+      "scale": [
+        0.952161,
+        0.550179,
+        0.800434
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-107",
+      "asset": "bushes-107",
+      "name": "Leafy shrub 107",
+      "position": [
+        -2.397488,
+        -0.069807,
+        28.759377
+      ],
+      "rotation": [
+        -180,
+        -46.072961,
+        -180
+      ],
+      "scale": [
+        0.944148,
+        0.746864,
+        1.175241
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-108",
+      "asset": "bushes-108",
+      "name": "Leafy shrub 108",
+      "position": [
+        6.030757,
+        -0.031041,
+        19.812813
+      ],
+      "rotation": [
+        -180,
+        22.568814,
+        -180
+      ],
+      "scale": [
+        1.174348,
+        0.675026,
+        1.057051
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-109",
+      "asset": "bushes-109",
+      "name": "Leafy shrub 109",
+      "position": [
+        -2.409071,
+        -0.062726,
+        30.677557
+      ],
+      "rotation": [
+        0,
+        -24.704291,
+        0
+      ],
+      "scale": [
+        1.092886,
+        0.793686,
+        0.891031
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-110",
+      "asset": "bushes-110",
+      "name": "Leafy shrub 110",
+      "position": [
+        6.671209,
+        -0.0209,
+        18.557615
+      ],
+      "rotation": [
+        -180,
+        70.769779,
+        -180
+      ],
+      "scale": [
+        0.628929,
+        1.056791,
+        1.042696
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-111",
+      "asset": "bushes-111",
+      "name": "Leafy shrub 111",
+      "position": [
+        -2.079033,
+        -0.051896,
+        36.935188
+      ],
+      "rotation": [
+        -180,
+        -8.589661,
+        -180
+      ],
+      "scale": [
+        1.119981,
+        1.000807,
+        1.049084
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-112",
+      "asset": "bushes-112",
+      "name": "Leafy shrub 112",
+      "position": [
+        6.363229,
+        -0.152536,
+        38.473026
+      ],
+      "rotation": [
+        -180,
+        80.799141,
+        -180
+      ],
+      "scale": [
+        1.178681,
+        0.685451,
+        0.707425
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-113",
+      "asset": "bushes-113",
+      "name": "Leafy shrub 113",
+      "position": [
+        -2.607124,
+        -0.045408,
+        36.791763
+      ],
+      "rotation": [
+        180,
+        -70.204817,
+        180
+      ],
+      "scale": [
+        0.697098,
+        0.537528,
+        0.601314
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-114",
+      "asset": "bushes-114",
+      "name": "Leafy shrub 114",
+      "position": [
+        6.975215,
+        -0.136283,
+        33.122253
+      ],
+      "rotation": [
+        0,
+        -24.741726,
+        0
+      ],
+      "scale": [
+        0.98853,
+        0.74791,
+        0.864383
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-115",
+      "asset": "bushes-115",
+      "name": "Leafy shrub 115",
+      "position": [
+        -2.000911,
+        -0.052224,
+        37.832939
+      ],
+      "rotation": [
+        -180,
+        -4.991954,
+        -180
+      ],
+      "scale": [
+        1.0668,
+        0.871633,
+        1.181472
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-116",
+      "asset": "bushes-116",
+      "name": "Leafy shrub 116",
+      "position": [
+        7.051421,
+        -0.134707,
+        32.832169
+      ],
+      "rotation": [
+        -180,
+        -12.185528,
+        -180
+      ],
+      "scale": [
+        0.863051,
+        0.931119,
+        0.8273
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-117",
+      "asset": "bushes-117",
+      "name": "Leafy shrub 117",
+      "position": [
+        -2.921229,
+        -0.067374,
+        28.845554
+      ],
+      "rotation": [
+        -180,
+        -50.206831,
+        -180
+      ],
+      "scale": [
+        1.180047,
+        0.772522,
+        1.142641
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-118",
+      "asset": "bushes-118",
+      "name": "Leafy shrub 118",
+      "position": [
+        6.451673,
+        -0.027695,
+        19.568316
+      ],
+      "rotation": [
+        0,
+        -56.927237,
+        0
+      ],
+      "scale": [
+        0.983967,
+        0.925203,
+        0.847991
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-119",
+      "asset": "bushes-119",
+      "name": "Leafy shrub 119",
+      "position": [
+        -3.055979,
+        -0.058444,
+        30.692616
+      ],
+      "rotation": [
+        0,
+        48.591924,
+        0
+      ],
+      "scale": [
+        1.033701,
+        1.064328,
+        0.994744
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-120",
+      "asset": "bushes-120",
+      "name": "Leafy shrub 120",
+      "position": [
+        6.20682,
+        -0.043994,
+        21.809914
+      ],
+      "rotation": [
+        0,
+        -27.053551,
+        0
+      ],
+      "scale": [
+        0.647649,
+        0.626587,
+        0.953859
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-121",
+      "asset": "bushes-121",
+      "name": "Leafy shrub 121",
+      "position": [
+        -3.140126,
+        -0.038482,
+        37.188301
+      ],
+      "rotation": [
+        -180,
+        79.819383,
+        -180
+      ],
+      "scale": [
+        0.808018,
+        0.929046,
+        1.042037
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-122",
+      "asset": "bushes-122",
+      "name": "Leafy shrub 122",
+      "position": [
+        6.200703,
+        -0.134906,
+        33.42485
+      ],
+      "rotation": [
+        0,
+        -9.426414,
+        0
+      ],
+      "scale": [
+        1.002618,
+        0.991118,
+        0.985391
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-123",
+      "asset": "bushes-123",
+      "name": "Leafy shrub 123",
+      "position": [
+        -3.123003,
+        -0.100623,
+        21.972961
+      ],
+      "rotation": [
+        -180,
+        44.438547,
+        -180
+      ],
+      "scale": [
+        0.604157,
+        0.709659,
+        0.820614
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-124",
+      "asset": "bushes-124",
+      "name": "Leafy shrub 124",
+      "position": [
+        6.143479,
+        -0.035247,
+        20.544691
+      ],
+      "rotation": [
+        0,
+        41.360933,
+        0
+      ],
+      "scale": [
+        1.187041,
+        0.987193,
+        0.63366
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-125",
+      "asset": "bushes-125",
+      "name": "Leafy shrub 125",
+      "position": [
+        -3.467073,
+        -0.044421,
+        33.388119
+      ],
+      "rotation": [
+        -180,
+        -27.864832,
+        -180
+      ],
+      "scale": [
+        0.78167,
+        0.813259,
+        0.935904
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-126",
+      "asset": "bushes-126",
+      "name": "Leafy shrub 126",
+      "position": [
+        6.025572,
+        -0.150379,
+        38.439667
+      ],
+      "rotation": [
+        0,
+        79.159209,
+        0
+      ],
+      "scale": [
+        1.066235,
+        1.048883,
+        0.677826
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-127",
+      "asset": "bushes-127",
+      "name": "Leafy shrub 127",
+      "position": [
+        -3.552482,
+        -0.084738,
+        25.351463
+      ],
+      "rotation": [
+        180,
+        -65.479738,
+        180
+      ],
+      "scale": [
+        1.096013,
+        0.614176,
+        0.700172
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-128",
+      "asset": "bushes-128",
+      "name": "Leafy shrub 128",
+      "position": [
+        5.895467,
+        -0.023838,
+        18.393679
+      ],
+      "rotation": [
+        180,
+        -79.709834,
+        180
+      ],
+      "scale": [
+        0.970166,
+        0.679057,
+        0.622634
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-129",
+      "asset": "bushes-129",
+      "name": "Leafy shrub 129",
+      "position": [
+        -3.271308,
+        -0.116238,
+        18.231867
+      ],
+      "rotation": [
+        0,
+        -15.594548,
+        0
+      ],
+      "scale": [
+        1.036037,
+        0.6071,
+        1.170018
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "bushes-130",
+      "asset": "bushes-130",
+      "name": "Leafy shrub 130",
+      "position": [
+        7.017246,
+        -0.155981,
+        38.579311
+      ],
+      "rotation": [
+        -180,
+        27.185861,
+        -180
+      ],
+      "scale": [
+        0.830947,
+        0.602509,
+        1.135917
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "wildflowers",
+      "asset": "wildflowers",
+      "name": "Lane wildflowers",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "mountain-0",
+      "asset": "mountain-0",
+      "name": "Near mountain ridge",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "mountain-1",
+      "asset": "mountain-1",
+      "name": "Blue mountain ridge",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "mountain-2",
+      "asset": "mountain-2",
+      "name": "Distant mountain ridge",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "castle",
+      "asset": "castle",
+      "name": "Distant castle",
+      "position": [
+        -18,
+        10,
+        -158
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "island--64",
+      "asset": "island--64",
+      "name": "Floating garden",
+      "position": [
+        -64,
+        44,
+        -178
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "island-88",
+      "asset": "island-88",
+      "name": "Floating garden",
+      "position": [
+        88,
+        57,
+        -245
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "willow-1",
+      "asset": "willow-1",
+      "name": "Weeping willow 1",
+      "position": [
+        -14,
+        -0.525516,
+        -7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "willow-2",
+      "asset": "willow-2",
+      "name": "Weeping willow 2",
+      "position": [
+        -36.5,
+        0.020186,
+        -17
+      ],
+      "rotation": [
+        -180,
+        65.408441,
+        -180
+      ],
+      "scale": [
+        1.45,
+        1.45,
+        1.45
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "ivy",
+      "asset": "ivy",
+      "name": "Cottage ivy",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "forest",
+      "asset": "forest",
+      "name": "Distant forest",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "tree-1",
+      "asset": "tree-1",
+      "name": "Round canopy tree 1",
+      "position": [
+        -5,
+        -0.389765,
+        22
+      ],
+      "rotation": [
+        0,
+        5.686568,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-2",
+      "asset": "tree-2",
+      "name": "Round canopy tree 2",
+      "position": [
+        7,
+        -0.016504,
+        28
+      ],
+      "rotation": [
+        0,
+        40.163489,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-3",
+      "asset": "tree-3",
+      "name": "Round canopy tree 3",
+      "position": [
+        -7,
+        -0.640651,
+        15
+      ],
+      "rotation": [
+        -180,
+        46.025596,
+        -180
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-4",
+      "asset": "tree-4",
+      "name": "Round canopy tree 4",
+      "position": [
+        16,
+        0.015701,
+        19
+      ],
+      "rotation": [
+        0,
+        27.83338,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-5",
+      "asset": "tree-5",
+      "name": "Round canopy tree 5",
+      "position": [
+        -36.5,
+        -0.005309,
+        -28.5
+      ],
+      "rotation": [
+        0,
+        -36.759232,
+        0
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-6",
+      "asset": "tree-6",
+      "name": "Round canopy tree 6",
+      "position": [
+        -37,
+        0.024114,
+        -8
+      ],
+      "rotation": [
+        -180,
+        73.541938,
+        -180
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-7",
+      "asset": "tree-7",
+      "name": "Round canopy tree 7",
+      "position": [
+        33,
+        0.1262472724494207,
+        -16
+      ],
+      "rotation": [
+        -180,
+        70.188739,
+        -180
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-8",
+      "asset": "tree-8",
+      "name": "Round canopy tree 8",
+      "position": [
+        -31,
+        0.050379,
+        15
+      ],
+      "rotation": [
+        -180,
+        24.298716,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-9",
+      "asset": "tree-9",
+      "name": "Round canopy tree 9",
+      "position": [
+        -25,
+        -0.025962,
+        29
+      ],
+      "rotation": [
+        0,
+        84.980585,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-10",
+      "asset": "tree-10",
+      "name": "Round canopy tree 10",
+      "position": [
+        35,
+        0.001334,
+        12
+      ],
+      "rotation": [
+        -180,
+        66.136675,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-11",
+      "asset": "tree-11",
+      "name": "Round canopy tree 11",
+      "position": [
+        -2.5,
+        0.026150621410244504,
+        -40.5
+      ],
+      "rotation": [
+        0,
+        -42.686649,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-12",
+      "asset": "tree-12",
+      "name": "Round canopy tree 12",
+      "position": [
+        13,
+        0.056465,
+        -41
+      ],
+      "rotation": [
+        0,
+        -68.810222,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-14",
+      "asset": "tree-14",
+      "name": "Round canopy tree 14",
+      "position": [
+        14.214782,
+        -0.043896,
+        38.601768
+      ],
+      "rotation": [
+        0,
+        87.729288,
+        0
+      ],
+      "scale": [
+        1.03023,
+        1.03023,
+        1.03023
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-15",
+      "asset": "tree-15",
+      "name": "Round canopy tree 15",
+      "position": [
+        27.038122,
+        0.048179,
+        31.641832
+      ],
+      "rotation": [
+        -180,
+        21.435045,
+        -180
+      ],
+      "scale": [
+        1.064454,
+        1.064454,
+        1.064454
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-16",
+      "asset": "tree-16",
+      "name": "Round canopy tree 16",
+      "position": [
+        37.214783,
+        0.019423,
+        20.801477
+      ],
+      "rotation": [
+        0,
+        -23.161113,
+        0
+      ],
+      "scale": [
+        1.330722,
+        1.330722,
+        1.330722
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-17",
+      "asset": "tree-17",
+      "name": "Round canopy tree 17",
+      "position": [
+        43.7486,
+        0.270338,
+        7.141833
+      ],
+      "rotation": [
+        -180,
+        -54.109904,
+        -180
+      ],
+      "scale": [
+        0.79018,
+        0.79018,
+        0.79018
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-18",
+      "asset": "tree-18",
+      "name": "Round canopy tree 18",
+      "position": [
+        46,
+        0.510593,
+        -8
+      ],
+      "rotation": [
+        -180,
+        -55.005842,
+        -180
+      ],
+      "scale": [
+        1.035908,
+        1.035908,
+        1.035908
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-19",
+      "asset": "tree-19",
+      "name": "Round canopy tree 19",
+      "position": [
+        43.7486,
+        0.93267,
+        -23.141832
+      ],
+      "rotation": [
+        0,
+        62.620723,
+        0
+      ],
+      "scale": [
+        0.812327,
+        0.812327,
+        0.812327
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-20",
+      "asset": "tree-20",
+      "name": "Round canopy tree 20",
+      "position": [
+        37.214783,
+        1.06286,
+        -36.801476
+      ],
+      "rotation": [
+        -180,
+        13.962209,
+        -180
+      ],
+      "scale": [
+        0.946572,
+        0.946572,
+        0.946572
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-21",
+      "asset": "tree-21",
+      "name": "Round canopy tree 21",
+      "position": [
+        27.038122,
+        0.319194,
+        -47.641834
+      ],
+      "rotation": [
+        0,
+        -21.821342,
+        0
+      ],
+      "scale": [
+        0.723861,
+        0.723861,
+        0.723861
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-22",
+      "asset": "tree-22",
+      "name": "Round canopy tree 22",
+      "position": [
+        14.214782,
+        -0.359082,
+        -54.601768
+      ],
+      "rotation": [
+        -180,
+        64.63175,
+        -180
+      ],
+      "scale": [
+        0.752619,
+        0.752619,
+        0.752619
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-23",
+      "asset": "tree-23",
+      "name": "Round canopy tree 23",
+      "position": [
+        -5.5,
+        0.5384752421173208,
+        -59
+      ],
+      "rotation": [
+        0,
+        58.887027,
+        0
+      ],
+      "scale": [
+        1.12202,
+        1.12202,
+        1.12202
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-24",
+      "asset": "tree-24",
+      "name": "Round canopy tree 24",
+      "position": [
+        -14.214782,
+        0.264301,
+        -54.601768
+      ],
+      "rotation": [
+        0,
+        10.732335,
+        0
+      ],
+      "scale": [
+        0.712516,
+        0.712516,
+        0.712516
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-25",
+      "asset": "tree-25",
+      "name": "Round canopy tree 25",
+      "position": [
+        -27.038122,
+        1.064117,
+        -47.641834
+      ],
+      "rotation": [
+        0,
+        45.46047,
+        0
+      ],
+      "scale": [
+        1.008728,
+        1.008728,
+        1.008728
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-26",
+      "asset": "tree-26",
+      "name": "Round canopy tree 26",
+      "position": [
+        -37.214783,
+        0.757505,
+        -36.801476
+      ],
+      "rotation": [
+        0,
+        -28.712052,
+        0
+      ],
+      "scale": [
+        1.288497,
+        1.288497,
+        1.288497
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-27",
+      "asset": "tree-27",
+      "name": "Round canopy tree 27",
+      "position": [
+        -43.7486,
+        0.504343,
+        -23.141832
+      ],
+      "rotation": [
+        0,
+        -43.207649,
+        0
+      ],
+      "scale": [
+        0.985507,
+        0.985507,
+        0.985507
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-28",
+      "asset": "tree-28",
+      "name": "Round canopy tree 28",
+      "position": [
+        -46,
+        0.285394,
+        -8
+      ],
+      "rotation": [
+        0,
+        -49.109627,
+        0
+      ],
+      "scale": [
+        1.214092,
+        1.214092,
+        1.214092
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-29",
+      "asset": "tree-29",
+      "name": "Round canopy tree 29",
+      "position": [
+        -43.7486,
+        -0.002911,
+        7.141833
+      ],
+      "rotation": [
+        0,
+        4.204401,
+        0
+      ],
+      "scale": [
+        0.719282,
+        0.719282,
+        0.719282
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-30",
+      "asset": "tree-30",
+      "name": "Round canopy tree 30",
+      "position": [
+        -37.214783,
+        -0.019423,
+        20.801477
+      ],
+      "rotation": [
+        0,
+        15.173664,
+        0
+      ],
+      "scale": [
+        0.943464,
+        0.943464,
+        0.943464
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-31",
+      "asset": "tree-31",
+      "name": "Round canopy tree 31",
+      "position": [
+        -27.038122,
+        -0.048179,
+        31.641832
+      ],
+      "rotation": [
+        -180,
+        32.628212,
+        -180
+      ],
+      "scale": [
+        0.653834,
+        0.653834,
+        0.653834
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "tree-32",
+      "asset": "tree-32",
+      "name": "Round canopy tree 32",
+      "position": [
+        -14.214782,
+        0.043896,
+        38.601768
+      ],
+      "rotation": [
+        -180,
+        71.150095,
+        -180
+      ],
+      "scale": [
+        0.760484,
+        0.760484,
+        0.760484
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "wayfinding",
+      "asset": "wayfinding",
+      "name": "Village fingerposts",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "kitchen-garden",
+      "asset": "kitchen-garden",
+      "name": "Kitchen garden & pond life",
+      "position": [
+        24,
+        0,
+        -6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": true
+    },
+    {
+      "id": "resident-pip",
+      "asset": "villager-pip",
+      "name": "Pip",
+      "position": [
+        1.4,
+        0.05,
+        7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "resident-maple",
+      "asset": "villager-maple",
+      "name": "Maple",
+      "position": [
+        -5,
+        0.096298,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "resident-moss",
+      "asset": "villager-moss",
+      "name": "Moss",
+      "position": [
+        -0.7,
+        0.05,
+        -8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "resident-luma",
+      "asset": "villager-luma",
+      "name": "Luma",
+      "position": [
+        13.8,
+        0,
+        -6.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "resident-wren",
+      "asset": "wren-caretaker",
+      "name": "Wren",
+      "position": [
+        -38,
+        0,
+        1.5
+      ],
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-5140395c-c4be-4aab-91c3-af3bc7f64418",
+      "asset": "bird-clearing-flowers",
+      "name": "Dove clearing flower border",
+      "position": [
+        -37,
+        -0.12,
+        3.993025
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-ab27aaa3-b1e4-4f68-8765-a1926e7201b9",
+      "asset": "white-dove",
+      "name": "White dove 1",
+      "position": [
+        -35.95,
+        0.01,
+        3.993025
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-3b250fe8-7fe0-4177-bd25-444f11a3a3ff",
+      "asset": "white-dove",
+      "name": "White dove 2",
+      "position": [
+        -35.441154,
+        0.01,
+        4.893025
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-bd1ed549-c9a1-4ad5-9240-6a18f994eeb1",
+      "asset": "white-dove",
+      "name": "White dove 3",
+      "position": [
+        -36.475,
+        0.01,
+        4.902352
+      ],
+      "rotation": [
+        0,
+        -60,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-3f9f136d-6072-470d-9589-114870fcae19",
+      "asset": "white-dove",
+      "name": "White dove 4",
+      "position": [
+        -36,
+        0,
+        2
+      ],
+      "rotation": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-51dc5bc1-8eac-4d9e-b3fb-9f1700034d15",
+      "asset": "white-dove",
+      "name": "White dove 5",
+      "position": [
+        -37.525,
+        0.01,
+        4.993025
+      ],
+      "rotation": [
+        180,
+        -60,
+        180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-e2de452c-043d-4415-a93e-c776cc4015ed",
+      "asset": "white-dove",
+      "name": "White dove 6",
+      "position": [
+        -38.558846,
+        0.01,
+        4.893025
+      ],
+      "rotation": [
+        -180,
+        -30,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-97f4400e-8d9e-4629-bd9c-009efbc40c92",
+      "asset": "white-dove",
+      "name": "White dove 7",
+      "position": [
+        -38.05,
+        0.01,
+        3.993025
+      ],
+      "rotation": [
+        -180,
+        0,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-9c19292f-6e99-42a1-b70e-72e59aa630bb",
+      "asset": "white-dove",
+      "name": "White dove 8",
+      "position": [
+        -38.558846,
+        0.01,
+        3.093025
+      ],
+      "rotation": [
+        -180,
+        30,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-e462248f-4bf5-4245-a3d0-a32bbc8642e5",
+      "asset": "white-dove",
+      "name": "White dove 9",
+      "position": [
+        -37.525,
+        0.01,
+        3.083698
+      ],
+      "rotation": [
+        -180,
+        60,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-bc6d2af6-647f-4891-9897-b5672f9a66c8",
+      "asset": "white-dove",
+      "name": "White dove 10",
+      "position": [
+        -37,
+        0.01,
+        2.193025
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-59a0fcd0-74f2-40f8-8f55-1a6240488922",
+      "asset": "white-dove",
+      "name": "White dove 11",
+      "position": [
+        -36.475,
+        0.01,
+        3.083698
+      ],
+      "rotation": [
+        0,
+        60,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-9369597e-8a0b-4a96-899c-5248fd4a058a",
+      "asset": "white-dove",
+      "name": "White dove 12",
+      "position": [
+        -35.441154,
+        0.01,
+        3.093025
+      ],
+      "rotation": [
+        0,
+        30,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-1a58c8e9-1dbb-49df-9fbc-44af753f543b",
+      "asset": "bench-1",
+      "name": "Oak bench",
+      "position": [
+        -24,
+        0,
+        -30
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.644445,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-f4fe2614-c618-4f95-a777-2bcee0359679",
+      "asset": "tea-terrace",
+      "name": "Tea courtyard paving",
+      "position": [
+        -24,
+        0.02867727470825035,
+        -29.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-a37fdb68-daa7-4dd0-9f44-1f44e438083c",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -30.5,
+        0.0021889620241282728,
+        -26.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-33d90f42-500b-4ee3-91a6-931b836c8b23",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -28,
+        0.04870400533322876,
+        -32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-77f39ea0-446f-4bf8-acbc-8976fa921b8c",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -26.5,
+        0.06147569016718084,
+        -33.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-16d2c818-0a4d-40c7-9041-c660f191e5eb",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -24.5,
+        0.061601576312927966,
+        -34
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-04add4fd-9be0-4a4f-be80-1c5af67c34c1",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -22.5,
+        0.05088307723410275,
+        -34
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-4da2a213-fabb-4996-935e-6ae1a987ab52",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -20.5,
+        0.030448035371557824,
+        -33
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-aabb251e-b067-4ae8-9875-ab9ac46084a7",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -29,
+        0.038220625820518224,
+        -31
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-e979b05c-6057-4c02-97f8-8f5620248aa5",
+      "asset": "bushes-1",
+      "name": "Leafy shrub",
+      "position": [
+        -29,
+        0.023209967905932886,
+        -29
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-meadow-region",
+      "asset": "walkable-region",
+      "name": "Sunrise meadow walkable area",
+      "position": [
+        54,
+        1.633484,
+        21
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.1,
+        1,
+        1.6
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-meadow-path",
+      "asset": "path-curved",
+      "name": "Sunrise meadow path",
+      "position": [
+        4,
+        0,
+        16
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            12,
+            1
+          ],
+          [
+            21,
+            2
+          ],
+          [
+            30,
+            3
+          ],
+          [
+            40,
+            6
+          ],
+          [
+            52,
+            9
+          ]
+        ],
+        "width": 2.3
+      }
+    },
+    {
+      "id": "sunrise-tree-1",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 1",
+      "position": [
+        42,
+        0.184458,
+        12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.08,
+        1.08,
+        1.08
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-2",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 2",
+      "position": [
+        50,
+        1.760212,
+        31
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-3",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 3",
+      "position": [
+        62,
+        1.726269,
+        13
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-4",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 4",
+      "position": [
+        68,
+        3.723373,
+        32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.17,
+        1.17,
+        1.17
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-1",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 1",
+      "position": [
+        31,
+        0.017174,
+        29
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.15,
+        1,
+        1.15
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-2",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 2",
+      "position": [
+        44,
+        1.181541,
+        29
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.1,
+        1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-3",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 3",
+      "position": [
+        57,
+        1.61102,
+        16
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-4",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 4",
+      "position": [
+        62,
+        3.126674,
+        33
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.2,
+        1,
+        1.2
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-meadow-bench",
+      "asset": "oak-bench",
+      "name": "Sunrise meadow bench",
+      "position": [
+        59,
+        2.397839,
+        28
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-5",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 5",
+      "position": [
+        34,
+        0.35791,
+        30
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-6",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 6",
+      "position": [
+        40,
+        1.236871,
+        36
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.18,
+        1.18,
+        1.18
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-7",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 7",
+      "position": [
+        48,
+        0.82911,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-8",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 8",
+      "position": [
+        55,
+        2.61043,
+        37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.04,
+        1.04,
+        1.04
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-9",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 9",
+      "position": [
+        72,
+        3.362419,
+        25
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-10",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 10",
+      "position": [
+        77,
+        2.518538,
+        14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.96,
+        0.96,
+        0.96
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-tree-11",
+      "asset": "tree-1",
+      "name": "Sunrise meadow tree 11",
+      "position": [
+        74,
+        5.064007,
+        37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-5",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 5",
+      "position": [
+        32,
+        -0.037255,
+        10
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-6",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 6",
+      "position": [
+        41,
+        0.046935,
+        6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-7",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 7",
+      "position": [
+        74,
+        3.209725,
+        22
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-8",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 8",
+      "position": [
+        73,
+        5.08206,
+        38
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-9",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 9",
+      "position": [
+        49,
+        2.064794,
+        39
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-10",
+      "asset": "grass-wide",
+      "name": "Sunrise meadow grass 10",
+      "position": [
+        35,
+        1.020615,
+        37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-11",
+      "asset": "grass-patch",
+      "name": "Sunrise meadow grass 11",
+      "position": [
+        61,
+        2.921732,
+        32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sunrise-grass-12",
+      "asset": "grass-patch",
+      "name": "Sunrise meadow grass 12",
+      "position": [
+        66,
+        2.983064,
+        27
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-moon-bridge",
+      "asset": "lamp-moon-bridge",
+      "name": "Moonlit path lamppost",
+      "position": [
+        -4.5,
+        0,
+        8.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-moon-garden",
+      "asset": "lamp-moon-garden",
+      "name": "Moonlit path lamppost",
+      "position": [
+        19,
+        0,
+        -6
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-moon-birds",
+      "asset": "lamp-moon-birds",
+      "name": "Moonlit path lamppost",
+      "position": [
+        -31,
+        0,
+        9
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamp-moon-pond",
+      "asset": "lamp-moon-pond",
+      "name": "Moonlit path lamppost",
+      "position": [
+        -20,
+        0,
+        -29
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-70e866d2-23ae-4155-a62c-42ed3a60c5e0",
+      "asset": "grass-tuft",
+      "name": "Grass tuft",
+      "position": [
+        -3.5,
+        0,
+        -37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-7cbae0c1-aa93-4955-9f96-bfb9f6a97e96",
+      "asset": "grass-tuft",
+      "name": "Grass tuft",
+      "position": [
+        -3,
+        0,
+        -35.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-b07f01b2-d616-49c6-a09a-da43abdfaf71",
+      "asset": "grass-tuft",
+      "name": "Grass tuft",
+      "position": [
+        -3,
+        0,
+        -33.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-5e8a70b3-cc66-4cb3-9bd7-e5844b60d25f",
+      "asset": "grass-tuft",
+      "name": "Grass tuft",
+      "position": [
+        -3.5,
+        0,
+        -32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-b9278f96-1929-4de7-bc21-11d288148ba4",
+      "asset": "grass-tuft",
+      "name": "Grass tuft",
+      "position": [
+        -2,
+        0,
+        -38.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-20a10ede-944c-47be-b7b5-dae6ff7c56c6",
+      "asset": "grass-wide",
+      "name": "Wide meadow grass",
+      "position": [
+        11.5,
+        0,
+        -51
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c47e6e69-f659-45f9-9d0d-e385b8f76703",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0.5,
+        0,
+        -23
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-badea4bd-4028-46a6-a9ac-234efb21fcb9",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        1,
+        0,
+        -25
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-df74c896-8e55-4b9e-8aeb-74338bda9c4d",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0.5,
+        0.001976067412197125,
+        -28.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-57506405-bc8d-4b56-ba83-a39996e3d726",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -26.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-78720e72-9f0a-4585-a61a-c5a8021c22d3",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0.5,
+        0.001976067412197125,
+        -28.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-9ca69984-ec57-4a2a-ba6e-fe287ce347c7",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        1,
+        0.005556374987941192,
+        -29.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-fd936fe4-2a61-49f7-a268-1e67e4d56ac5",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        1,
+        0.00853494451003243,
+        -31.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-3b5e7c98-4d96-4a66-bc92-c0594616248a",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        2,
+        0.020574459944858656,
+        -33
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-9de30c58-8755-4430-8e5d-ab698f05f7b1",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        2.5,
+        0.02806807358688858,
+        -34
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-828c39e7-d82f-4f76-a6e4-719dbc99da5b",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        1.5,
+        0.014730266237166615,
+        -44
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-7fe9ca6d-2ceb-4398-b7e4-ca89a9b37691",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        1,
+        0.013560613308643103,
+        -42
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c8259d8a-5b75-4237-abfc-454b7b1558a0",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        4,
+        0.0442860691354255,
+        -43.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-1d4956ca-cd6a-4404-953b-60ae12240929",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        3,
+        0.03966684055951967,
+        -41.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-2571f45a-d9a0-4869-80f7-808a53a23cd5",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        6,
+        0.050222533468344585,
+        -44.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c788c8f7-b8aa-4ead-a01a-f4af9367c0d4",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        5.5,
+        0.06332487306338117,
+        -42
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-bd893665-d09d-4bd6-9f18-3cdca86ccb88",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0.5,
+        0.006266877275253533,
+        -35
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-01699dd4-a52d-49a0-982b-f700935b2ddb",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0.004530099117947175,
+        -20.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-2a3e209c-080d-4168-aa66-99b0f17de7f3",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -19
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c515f0a6-9e02-4333-aacf-a56c260586bf",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0.006413220250866315,
+        -17
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-2696f1c8-cac7-4f98-9bbd-015e7d54c837",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -15.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-75d4bac1-66c8-48cf-b105-f2e9de4a1e35",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-e9ce076f-bd2c-47dd-a771-33feff4333c6",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -17.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-7e352ca8-3a3b-453c-a056-625b67593d07",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        -21.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-74fd6de6-d516-48d3-bde4-176c4570a844",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0.5,
+        0,
+        -12
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-fcbcc83e-e7cf-40c0-9c6c-e79c30c532fb",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        6,
+        0.06717628077004094,
+        10.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-adfc0594-cac1-4010-953f-677636f4c0af",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        5.5,
+        0.06478967916491792,
+        11
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-67c83db6-96c1-48c2-ac27-c76d774b85cc",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        5.5,
+        0.06566840468575423,
+        11.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-ddfcd50b-4a49-4fbe-a1ab-84e6bb9559a2",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        4.5,
+        0.05613023381074783,
+        11
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-25cc949b-9acd-46e5-b40d-09ee31c40b85",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        3.5,
+        0.04627630883887893,
+        11.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-12ec7da8-8c80-447f-b699-f34e69babada",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        8,
+        0.07276812157696493,
+        16.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-6cf74289-84b2-4b12-a61d-35e6215ca8d1",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        6,
+        0.06473132535946845,
+        16.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-15a9055c-350b-4031-bca9-c92ca9bd0728",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        4,
+        0.04839556201581401,
+        16.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-9a25554f-9806-40f2-ab36-0fb2dadd1fa2",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        41
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-29988a75-aa5b-46a9-9f89-70b402d660bd",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        39
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-0fd3a387-1df0-491d-a99e-a7a5550975dd",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c0421b08-11ff-48f5-a1a7-d443121ed813",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        35
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-2ea9cda9-5846-492d-879a-0a44adf3be69",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        31
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-1a9e3728-3edb-471d-8272-ee9be9d9c2c7",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        28
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-7b3855ee-1571-41af-95e7-10369e9178f9",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0,
+        25
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-eaff2fc7-5bcd-40c6-a122-d8eb27f4ffeb",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        27.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-998de003-38b7-498a-8baf-f3cf972a85e2",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        23.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-c37689ae-441c-45ec-9b57-afd970f33df6",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0,
+        21.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-5825a229-59f8-487c-892a-249477b42f22",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        0,
+        0,
+        37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-944bfbe7-f230-4202-941e-bd6a0e69701a",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0.007106957546822306,
+        38
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-3cdc96ce-d177-4689-b9a4-c0702f54f5fe",
+      "asset": "planting-clearance",
+      "name": "Erased planting area",
+      "position": [
+        -0.5,
+        0.00494523396599551,
+        32.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        1,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-0dc6571d-0dac-43cd-8c84-7a1131df0e73",
+      "asset": "grass-wide",
+      "name": "Wide meadow grass",
+      "position": [
+        22.5,
+        0.012630911971718981,
+        -24.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-cb67fccd-bcaa-452b-b31a-4cbbe036364d",
+      "asset": "grass-patch",
+      "name": "Meadow grass patch",
+      "position": [
+        11.5,
+        0,
+        -24
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "object-6277defc-41a4-402c-8bf9-673af757ba1c",
+      "asset": "grass-patch",
+      "name": "Meadow grass patch",
+      "position": [
+        11.5,
+        0.02724855713282748,
+        -29.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-garden-1",
+      "asset": "edge-lantern-garden-1",
+      "name": "Low stone lantern",
+      "position": [
+        20,
+        0.1,
+        -2.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-garden-2",
+      "asset": "edge-lantern-garden-2",
+      "name": "Low stone lantern",
+      "position": [
+        31.2,
+        0.1,
+        -10.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-garden-3",
+      "asset": "edge-lantern-garden-3",
+      "name": "Low stone lantern",
+      "position": [
+        31.2,
+        0.1,
+        -2.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-pond-1",
+      "asset": "edge-lantern-pond-1",
+      "name": "Low stone lantern",
+      "position": [
+        -30,
+        -0.014695,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-pond-2",
+      "asset": "edge-lantern-pond-2",
+      "name": "Low stone lantern",
+      "position": [
+        -36.4,
+        0.021121,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "edge-lantern-pond-3",
+      "asset": "edge-lantern-pond-3",
+      "name": "Low stone lantern",
+      "position": [
+        -31,
+        -0.004216,
+        -25.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "routes": {
+    "pip": {
+      "points": [
+        [
+          1.4,
+          7
+        ],
+        [
+          3.8,
+          10.8
+        ],
+        [
+          4.7,
+          13.5
+        ],
+        [
+          4,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          25,
+          18
+        ],
+        [
+          34,
+          19
+        ],
+        [
+          44,
+          22
+        ],
+        [
+          56,
+          25
+        ],
+        [
+          50,
+          28
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          28,
+          20
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          4,
+          13.5
+        ],
+        [
+          -0.6,
+          7
+        ]
+      ],
+      "pauses": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3
+      ]
+    }
+  }
+}

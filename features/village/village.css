@@ -760,6 +760,20 @@ kbd {
   width: 100%;
   background: #354032;
 }
+.v-sensitivity > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.v-sensitivity output {
+  font-variant-numeric: tabular-nums;
+}
+.v-sensitivity input[type="range"] {
+  width: 100%;
+  min-height: 36px;
+  accent-color: #658971;
+  cursor: pointer;
+}
 .v-check {
   display: flex;
   align-items: center;

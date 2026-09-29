@@ -1,4 +1,4 @@
-import { BRIDGE, floorHeight, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
+import { BRIDGE, floorHeight, inWalkableWorld, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
 import type { Collider, MovementStatus, WorldContact } from "./environment";
 
 const STEP = 1 / 120;
@@ -50,7 +50,7 @@ export class VillageMovement {
   }
   clear(x: number, z: number, y = floorHeight(x, z)) {
     const r = MOVEMENT.radius;
-    if (Math.abs(x) > 40 || z > 42 || z < -48) return false;
+    if (!inWalkableWorld(x, z)) return false;
     if (Math.abs(x - riverX(z)) < 3.6 && !onBridge(x, z)) return false;
     if (pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
     // Bridge parapets remain barriers in the air; hops do not unlock swimming.

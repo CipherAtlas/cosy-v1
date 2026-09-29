@@ -7,3 +7,7 @@ Whenever creating or adding new village assets, objects, buildings, props, veget
 - Keep editor registrations and saved-layout compatibility in sync when updating or replacing assets. Preserve the original default layout and edit working copies.
 - Keep the layout editor a local development tool on its separate port; do not expose it in the public application.
 - The editor source, tests, and documentation may be committed with village releases, but the deployed static site must contain no editor route, editor UI, editor server, or layout save API. Verify this before publishing.
+
+# Documentation after code changes
+
+After every code change, update the relevant existing documentation in the same change. For village work, record the behavior, checks actually run, and remaining limits in `VILLAGE_BUILD.md`; keep `VILLAGE_HANDOFF.md`, `README.md`, and affected village or layout-editor guides aligned with current behavior. For other features, update their corresponding docs. Distinguish local verification from live or deployed results.

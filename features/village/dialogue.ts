@@ -222,7 +222,7 @@ export class VillagerDialogue {
         b.resident.chatting = true;
       } else if (!b.resident.following && this.clock >= b.nextAmbient && this.clock >= b.talkingUntil) {
         const turn = b.ambient++;
-        const text = weather !== "golden" && turn % 2 === 0 ? b.profile[weather]
+        const text = weather !== "golden" && turn % 2 === 0 ? b.profile[weather === "night" ? "dusk" : weather]
           : b.profile.ambient[turn % b.profile.ambient.length];
         this.say(index, text, 5);
       }

@@ -7,15 +7,17 @@ import { VillageLife } from "../../features/village/life";
 import { GardenScene } from "../../features/village/gardenScene";
 import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeDeskQuill, makeFocusHourglass } from "../../features/village/focusCottageProps";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RESIDENT_IDS, type ResidentRoute, type ResidentId } from "../../features/village/worldLayout";
+import { fenceGeometry } from "../../features/village/fenceGeometry";
 
 export type LayoutItem = {
   id: string; asset: string; name: string; position: [number, number, number];
   rotation: [number, number, number]; scale: [number, number, number]; visible: boolean; locked: boolean;
   path?: { points: [number, number][]; width: number };
 };
-export type Layout = { version: 1; base: "cosy-village-2026-09-27"; name: string; objects: LayoutItem[] };
+export type Layout = { version: 1; base: "cosy-village-2026-09-27"; name: string; objects: LayoutItem[]; routes?: Partial<Record<ResidentId, ResidentRoute>> };
 export type Asset = { id: string; name: string; category: string; template: T.Object3D; thumbnail?: string; shelf: boolean; surface?: boolean; solid?: boolean; path?: LayoutItem["path"] };
-export const PATH_ASSETS = ["custom-path", "path-straight", "path-curved"];
+export const PATH_ASSETS = ["custom-path", "path-straight", "path-curved", "fence-line"];
 export function pathCurve(path: NonNullable<LayoutItem["path"]>, straight = false): T.Curve<T.Vector3> {
   const points = path.points.map(([x, z]) => new T.Vector3(x, .09, z));
   if (!straight) return new T.CatmullRomCurve3(points);
@@ -46,9 +48,17 @@ export function validateLayout(value: unknown, assets?: Map<string, Asset>): Lay
       const a = item[key];
       if (!Array.isArray(a) || a.length !== 3 || a.some(n => !Number.isFinite(n) || Math.abs(n) > (key === "position" ? 2000 : key === "rotation" ? 36000 : 100) || (key === "scale" && n < .01))) throw Error(`Invalid ${key} on ${item.name}.`);
     }
-    if (item.path && (!PATH_ASSETS.includes(item.asset) || !Number.isFinite(item.path.width) || item.path.width < .3 || item.path.width > 20 || !Array.isArray(item.path.points) || item.path.points.length < 2 || item.path.points.length > 100 || item.path.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || Math.abs(n) > 2000)))) throw Error("Invalid path: use 2–100 points and a width of 0.3–20 metres.");
+    if (item.path && (!PATH_ASSETS.includes(item.asset) || !Number.isFinite(item.path.width) || item.path.width < .3 || item.path.width > (item.asset === "fence-line" ? 3 : 20) || !Array.isArray(item.path.points) || item.path.points.length < 2 || item.path.points.length > 100 || item.path.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || Math.abs(n) > 2000)))) throw Error("Invalid path or fence: use 2–100 points and a valid width or height.");
     if (item.path && item.path.points.every(point => Math.hypot(point[0] - item.path!.points[0][0], point[1] - item.path!.points[0][1]) < .01)) throw Error("A path needs two distinct points.");
+    if (item.asset === "fence-line" && item.path && item.path.points.slice(1).reduce((length, point, index) => length + Math.hypot(point[0] - item.path!.points[index][0], point[1] - item.path!.points[index][1]), 0) > 300) throw Error("A fence line can be up to 300 metres long.");
     if (PATH_ASSETS.includes(item.asset) && !item.path) throw Error("A custom path needs its control points.");
+  }
+  if (doc.routes !== undefined) {
+    if (!doc.routes || typeof doc.routes !== "object" || Array.isArray(doc.routes) || Object.keys(doc.routes).some(id => !RESIDENT_IDS.includes(id as ResidentId))) throw Error("Invalid resident routes.");
+    for (const route of Object.values(doc.routes)) {
+      if (!route || !Array.isArray(route.points) || route.points.length < 2 || route.points.length > 100 || route.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || Math.abs(n) > 2000))) throw Error("Resident routes need 2–100 valid points.");
+      if (route.pauses && (!Array.isArray(route.pauses) || route.pauses.length !== route.points.length || route.pauses.some(n => !Number.isFinite(n) || n < 0 || n > 30))) throw Error("Resident route pauses must match its points and stay within 0–30 seconds.");
+    }
   }
   return structuredClone(doc);
 }
@@ -85,6 +95,7 @@ export class LayoutScene {
   original!: Layout;
   world!: World;
   private pathMaterial!: T.Material;
+  readonly defaultRoutes: Partial<Record<ResidentId, ResidentRoute>> = {};
   private generated = new Set<T.BufferGeometry>();
 
   async load(renderer: T.WebGLRenderer, progress: (n: number) => void) {
@@ -123,10 +134,11 @@ export class LayoutScene {
           for (const object of objects) root.attach(object);
         }
         const locked = category === "Landscape" && !id.startsWith("island") || ["wayfinding", "ivy"].includes(id);
-        const shelf = !["terrain", "shore", "river", "river-stones", "meadow-grass", "wildflowers", "forest", "ivy", "wayfinding"].includes(id) && !id.startsWith("mountain") && (!id.startsWith("bench-") || id === "bench-1") && (!id.startsWith("fence-") || id === "fence--1-180") && (!id.startsWith("lamp-") || id === "lamp-20") && (!id.startsWith("path-") || id === "path-2" || name === "Bird clearing approach");
+        const shelf = !["terrain", "shore", "river", "river-stones", "meadow-grass", "wildflowers", "forest", "ivy", "wayfinding"].includes(id) && !this.world.authored.benches.some(bench => bench.id === id) && !this.world.authored.fences.some(fence => fence.id === id) && !id.startsWith("mountain") && (!id.startsWith("bench-") || id === "bench-1") && (!id.startsWith("fence-") || id === "fence--1-180") && (!id.startsWith("lamp-") || id === "lamp-20" || id === "lamp-moon-bridge") && (!id.startsWith("edge-lantern-") || id === "edge-lantern-garden-1") && (!id.startsWith("path-") || id === "path-2" || name === "Bird clearing approach");
         register(id, name, category, root, shelf, locked);
       }
     }
+    this.assets.set("oak-bench", { id: "oak-bench", name: "Oak meadow bench", category: "Furnishings", template: this.assets.get("bench-1")!.template.clone(true), shelf: true, solid: true });
     const kit = await new GLTFLoader().loadAsync("/village/models/garden-pond.glb");
     const garden = new GardenScene(kit.scene, [], () => {}, this.world.gardenSurfaces);
     // Preserve the authored garden as one assembly; planting state remains outside layout files.
@@ -152,6 +164,7 @@ export class LayoutScene {
     spirit.scale.setScalar(.95 / new T.Box3().setFromObject(spirit).getSize(new T.Vector3()).y);
     // Reuse her runtime appearance so the editor cannot drift from the village's caretaker.
     const residents = new VillageLife(spirit, []);
+    residents.residents.forEach((resident, index) => { this.defaultRoutes[RESIDENT_IDS[index]] = { points: structuredClone(resident.route) }; });
     residents.residents.forEach((resident, index) => {
       const actor = resident.root, name = actor.name, position = tuple(actor.position);
       const id = index === 4 ? "wren-caretaker" : `villager-${name.toLowerCase()}`;
@@ -184,6 +197,8 @@ export class LayoutScene {
     this.assets.set("village-window-vista", { id: "village-window-vista", name: "Bridge-view cottage window", category: "Buildings", template: makeBridgeWindow(), shelf: true });
     this.pathMaterial = this.world.gardenSurfaces.paving;
     this.assets.set("custom-path", { id: "custom-path", name: "Curved limestone path", category: "Paths", template: new T.Group(), shelf: false });
+    const fencePath = { points: [[0, 0], [0, -8]] as [number, number][], width: 1.4 };
+    this.assets.set("fence-line", { id: "fence-line", name: "Oak fence line", category: "Furnishings", template: this.makeFence(fencePath), shelf: true, solid: true, path: fencePath });
     const meadow = new T.Mesh(new T.CylinderGeometry(12, 13, 1.2, 48), new T.MeshStandardMaterial({ color: "#98b760", roughness: 1 }));
     meadow.position.y = -.6; meadow.receiveShadow = true; const tile = new T.Group(); tile.add(meadow);
     this.assets.set("meadow-island", { id: "meadow-island", name: "Meadow platform", category: "Landscape", template: tile, shelf: true });
@@ -194,6 +209,11 @@ export class LayoutScene {
       const path = { points, width: 2.4 };
       this.assets.set(id, { id, name, category: "Paths", template: this.makePath(path, id === "path-straight"), shelf: true, path });
     }
+    const clearing = new T.Group();
+    const clearingFill = new T.Mesh(new T.CircleGeometry(1, 40), new T.MeshBasicMaterial({ color: "#f7d6a4", transparent: true, opacity: .12, depthWrite: false, side: T.DoubleSide }));
+    const clearingEdge = new T.Mesh(new T.RingGeometry(.96, 1, 40), new T.MeshBasicMaterial({ color: "#b66f40", transparent: true, opacity: .75, depthWrite: false, side: T.DoubleSide }));
+    for (const mesh of [clearingFill, clearingEdge]) { mesh.rotation.x = -Math.PI / 2; mesh.position.y = .2; clearing.add(mesh); }
+    this.assets.set("planting-clearance", { id: "planting-clearance", name: "Erased planting area", category: "Landscape", template: clearing, shelf: false });
     // Reuse the village's blades, wind material and shadows in small editable patches.
     let grassSource: T.InstancedMesh | undefined;
     this.assets.get("meadow-grass")!.template.traverse(o => { if (o instanceof T.InstancedMesh) grassSource = o; });
@@ -203,8 +223,10 @@ export class LayoutScene {
       const blades = new T.InstancedMesh(grassSource!.geometry, grassSource!.material, count), dummy = new T.Object3D();
       let seed = 71; const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
       for (let i = 0; i < count; i++) {
-        dummy.position.set((random() - .5) * width, 0, (random() - .5) * width);
-        dummy.rotation.y = random() * Math.PI * 2; dummy.scale.setScalar(.65 + random() * .8); dummy.updateMatrix(); blades.setMatrixAt(i, dummy.matrix);
+        const angle = random() * Math.PI * 2, radius = Math.sqrt(random()) * width / 2;
+        const falloff = Math.min(1, (1 - radius / (width / 2)) * 4);
+        dummy.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+        dummy.rotation.y = random() * Math.PI * 2; dummy.scale.setScalar(random() > falloff ? 0 : (.65 + random() * .8) * (.55 + .45 * falloff)); dummy.updateMatrix(); blades.setMatrixAt(i, dummy.matrix);
         blades.setColorAt(i, new T.Color().setHSL(.22 + random() * .055, .55, .48 + random() * .15));
       }
       blades.customDepthMaterial = grassSource!.customDepthMaterial; blades.receiveShadow = true;
@@ -226,6 +248,12 @@ export class LayoutScene {
       const root = new T.Group(); root.add(mesh); const id = `land-tile-${size}`;
       this.assets.set(id, { id, name: `Meadow ground · ${size} m`, category: "Landscape", template: root, shelf: true, surface: true });
     }
+    const region = new T.Group();
+    const fill = new T.Mesh(new T.CircleGeometry(12, 64), new T.MeshBasicMaterial({ color: "#7bbda0", transparent: true, opacity: .18, depthWrite: false, side: T.DoubleSide }));
+    fill.rotation.x = -Math.PI / 2; fill.position.y = .16; region.add(fill);
+    const rim = new T.Mesh(new T.RingGeometry(11.82, 12, 64), new T.MeshBasicMaterial({ color: "#317660", transparent: true, opacity: .7, depthWrite: false, side: T.DoubleSide }));
+    rim.rotation.x = -Math.PI / 2; rim.position.y = .17; region.add(rim);
+    this.assets.set("walkable-region", { id: "walkable-region", name: "Walkable meadow area", category: "Landscape", template: region, shelf: true });
     const hillGeometry = new T.PlaneGeometry(24, 24, 24, 24); hillGeometry.rotateX(-Math.PI / 2);
     const vertices = hillGeometry.attributes.position;
     for (let i = 0; i < vertices.count; i++) {
@@ -240,7 +268,7 @@ export class LayoutScene {
     const rock = new T.Group(); rock.add(boulder); this.assets.set("boulder", { id: "boulder", name: "Mossy boulder", category: "Nature", template: rock, shelf: true });
     for (const asset of this.assets.values()) {
       asset.surface ||= ["terrain", "shore", "meadow-island", "bridge", "dock"].includes(asset.id) || asset.id.startsWith("island-");
-      asset.solid = asset.category === "Buildings" || asset.category === "Bridges" || /^(bench-|fence-|lamp-|tree-|willow-)/.test(asset.id) || ["postbox", "raised-bed", "boulder", "bird-clearing-bench", "bird-feeding-dish"].includes(asset.id);
+      asset.solid = asset.category === "Buildings" || asset.category === "Bridges" || /^(bench-|fence-|lamp-|edge-lantern-|tree-|willow-)/.test(asset.id) || ["oak-bench", "postbox", "raised-bed", "boulder", "bird-clearing-bench", "bird-feeding-dish"].includes(asset.id);
     }
     this.original = { version: 1, base: "cosy-village-2026-09-27", name: "Current village", objects: originals };
     this.apply(this.original); progress(100);
@@ -255,7 +283,7 @@ export class LayoutScene {
         root.removeFromParent(); this.releasePath(root); this.roots.delete(item.id); root = undefined;
       }
       if (!root) {
-        root = item.path ? this.makePath(item.path, item.asset === "path-straight") : this.assets.get(item.asset)!.template.clone(true);
+        root = item.asset === "fence-line" && item.path ? this.makeFence(item.path) : item.path ? this.makePath(item.path, item.asset === "path-straight") : this.assets.get(item.asset)!.template.clone(true);
         root.userData = { layoutId: item.id, asset: item.asset, path: structuredClone(item.path) };
         this.roots.set(item.id, root); this.group.add(root);
       }
@@ -272,17 +300,17 @@ export class LayoutScene {
         const base = object.geometry.userData.flatPositions as number[], attribute = object.geometry.attributes.position;
         for (let i = 0; i < attribute.count; i++) {
           const point = new T.Vector3(base[i * 3], 0, base[i * 3 + 2]).applyMatrix4(object.matrixWorld);
-          const lift = height(point.x, point.z) - anchor + .09;
+          const lift = height(point.x, point.z) - anchor + base[i * 3 + 1];
           attribute.setY(i, Math.abs(object.matrixWorld.elements[5]) > .1 ? lift / object.matrixWorld.elements[5] : .09);
         }
         attribute.needsUpdate = true; object.geometry.computeVertexNormals(); object.geometry.computeBoundingBox(); object.geometry.computeBoundingSphere();
       });
     }
   }
-  conformGrass(height: (x: number, z: number) => number, blocked: (point: T.Vector3) => boolean) {
+  conformGrass(height: (x: number, z: number) => number, blocked: (point: T.Vector3) => boolean, cleared: (x: number, z: number) => boolean) {
     const paths: { bounds: T.Box3; points: T.Vector3[]; width: number }[] = [];
     for (const root of this.roots.values()) {
-      if (!root.visible || !root.userData.path) continue;
+      if (!root.visible || !root.userData.path || root.userData.asset === "fence-line") continue;
       const mesh = root.children[0] as T.Mesh, positions = mesh.geometry.attributes.position, points: T.Vector3[] = [];
       for (let i = 0; i < positions.count; i += 2) points.push(new T.Vector3().fromBufferAttribute(positions, i).add(new T.Vector3().fromBufferAttribute(positions, i + 1)).multiplyScalar(.5).applyMatrix4(root.matrixWorld));
       paths.push({ bounds: new T.Box3().setFromObject(root).expandByScalar(.3), points, width: root.userData.path.width * Math.max(root.scale.x, root.scale.z) / 2 + .2 });
@@ -308,10 +336,31 @@ export class LayoutScene {
           }
           return false;
         });
-        if (covered || blocked(point)) dummy.scale.setScalar(0);
+        if (covered || blocked(point) || cleared(point.x, point.z)) dummy.scale.setScalar(0);
         dummy.updateMatrix(); blades.setMatrixAt(i, dummy.matrix);
       }
       blades.instanceMatrix.needsUpdate = true; blades.computeBoundingBox(); blades.computeBoundingSphere();
+    }
+  }
+  conformWildflowers(cleared: (x: number, z: number) => boolean) {
+    for (const root of this.roots.values()) {
+      if (!root.visible || root.userData.asset !== "wildflowers") continue;
+      const source: T.InstancedMesh[] = [], shown: T.InstancedMesh[] = [];
+      this.assets.get("wildflowers")!.template.traverse(o => { if (o instanceof T.InstancedMesh) source.push(o); });
+      root.traverse(o => { if (o instanceof T.InstancedMesh) shown.push(o); });
+      const matrix = new T.Matrix4(), position = new T.Vector3(), rotation = new T.Quaternion(), scale = new T.Vector3();
+      root.updateMatrixWorld(true);
+      for (let i = 0; i < source[0].count; i++) {
+        source[0].getMatrixAt(i, matrix); matrix.decompose(position, rotation, scale);
+        const worldPoint = position.clone().applyMatrix4(root.matrixWorld);
+        const hidden = cleared(worldPoint.x, worldPoint.z);
+        for (let part = 0; part < source.length; part++) {
+          source[part].getMatrixAt(i, matrix);
+          if (hidden) { matrix.decompose(position, rotation, scale); scale.setScalar(0); matrix.compose(position, rotation, scale); }
+          shown[part].setMatrixAt(i, matrix);
+        }
+      }
+      for (const mesh of shown) { mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingBox(); mesh.computeBoundingSphere(); }
     }
   }
   private releasePath(root: T.Object3D) {
@@ -328,5 +377,10 @@ export class LayoutScene {
     }
     const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3)); geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2)); geo.setIndex(indices); geo.computeVertexNormals(); this.generated.add(geo); geo.userData.flatPositions = positions.slice();
     const mesh = new T.Mesh(geo, this.pathMaterial); mesh.receiveShadow = true; const group = new T.Group(); group.add(mesh); return group;
+  }
+  private makeFence(path: NonNullable<LayoutItem["path"]>) {
+    const geo = fenceGeometry(path.points, path.width); this.generated.add(geo);
+    const mesh = new T.Mesh(geo, this.world.gardenSurfaces.wood); mesh.castShadow = mesh.receiveShadow = true;
+    const group = new T.Group(); group.add(mesh); return group;
   }
 }

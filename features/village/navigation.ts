@@ -1,15 +1,32 @@
-import { floorHeight, type Collider } from "./environment";
+import { floorHeight, surfaceAt, type Collider } from "./environment";
 import { VillageMovement } from "./movement";
+import type { AuthoredWorld } from "./worldLayout";
 
 type Point = [number, number];
-const CELL = .75, MIN_X = -39, MIN_Z = -47.25, WIDTH = 105, HEIGHT = 119;
+const CELL = .75;
 
 /** Shared lazy navigation grid using exactly the player's collision and water rules. */
 export class VillageNavigation {
   private probe: VillageMovement;
-  private walkable = new Int8Array(WIDTH * HEIGHT);
-  constructor(colliders: Collider[]) { this.probe = new VillageMovement(colliders, () => {}); }
-  private point(id: number): Point { return [MIN_X + id % WIDTH * CELL, MIN_Z + Math.floor(id / WIDTH) * CELL]; }
+  private walkable: Int8Array;
+  private minX: number;
+  private minZ: number;
+  private width: number;
+  private height: number;
+  constructor(colliders: Collider[], authored?: AuthoredWorld) {
+    this.probe = new VillageMovement(colliders, () => {});
+    const areas = authored?.walkable ?? [];
+    const extents = areas.map(area => ({ x: Math.hypot(area.radiusX * Math.cos(area.yaw), area.radiusZ * Math.sin(area.yaw)),
+      z: Math.hypot(area.radiusX * Math.sin(area.yaw), area.radiusZ * Math.cos(area.yaw)), area }));
+    this.minX = Math.min(-39, ...extents.map(({ area, x }) => area.x - x));
+    this.minZ = Math.min(-47.25, ...extents.map(({ area, z }) => area.z - z));
+    const maxX = Math.max(39, ...extents.map(({ area, x }) => area.x + x));
+    const maxZ = Math.max(41.25, ...extents.map(({ area, z }) => area.z + z));
+    this.width = Math.min(400, Math.ceil((maxX - this.minX) / CELL) + 1);
+    this.height = Math.min(400, Math.ceil((maxZ - this.minZ) / CELL) + 1);
+    this.walkable = new Int8Array(this.width * this.height);
+  }
+  private point(id: number): Point { return [this.minX + id % this.width * CELL, this.minZ + Math.floor(id / this.width) * CELL]; }
   private valid(id: number) {
     if (id < 0 || id >= this.walkable.length) return false;
     if (!this.walkable[id]) { const [x, z] = this.point(id); this.walkable[id] = this.probe.clear(x, z) ? 1 : -1; }
@@ -20,11 +37,11 @@ export class VillageNavigation {
     return this.probe.canWalkTo(...b);
   }
   private closest(point: Point, connect: boolean) {
-    const cx = Math.round((point[0] - MIN_X) / CELL), cz = Math.round((point[1] - MIN_Z) / CELL);
+    const cx = Math.round((point[0] - this.minX) / CELL), cz = Math.round((point[1] - this.minZ) / CELL);
     let best = -1, distance = Infinity;
     for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
-      const x = cx + dx, z = cz + dz, id = z * WIDTH + x;
-      if (x < 0 || x >= WIDTH || z < 0 || z >= HEIGHT || !this.valid(id)) continue;
+      const x = cx + dx, z = cz + dz, id = z * this.width + x;
+      if (x < 0 || x >= this.width || z < 0 || z >= this.height || !this.valid(id)) continue;
       const p = this.point(id), d = Math.hypot(p[0] - point[0], p[1] - point[1]);
       if (d < distance && (!connect || this.visible(point, p))) { best = id; distance = d; }
     }
@@ -34,7 +51,7 @@ export class VillageNavigation {
     if (this.probe.clear(...to) && this.visible(from, to)) return [to];
     const start = this.closest(from, true), end = this.closest(to, false);
     if (start < 0 || end < 0) return [];
-    const goal = this.point(end), size = WIDTH * HEIGHT;
+    const goal = this.point(end), size = this.width * this.height;
     const costs = new Float32Array(size).fill(Infinity), parents = new Int32Array(size).fill(-1), closed = new Uint8Array(size);
     const heap: { id: number; score: number }[] = [];
     const push = (id: number, score: number) => {
@@ -71,15 +88,16 @@ export class VillageNavigation {
         }
         return smooth;
       }
-      const x = id % WIDTH, z = Math.floor(id / WIDTH), a = this.point(id);
+      const x = id % this.width, z = Math.floor(id / this.width), a = this.point(id);
       for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-        const nx = x + dx, nz = z + dz, next = nz * WIDTH + nx;
-        if (nx < 0 || nx >= WIDTH || nz < 0 || nz >= HEIGHT || closed[next] || !this.valid(next)) continue;
-        const cost = costs[id] + Math.hypot(dx, dz) * CELL;
+        const nx = x + dx, nz = z + dz, next = nz * this.width + nx;
+        if (nx < 0 || nx >= this.width || nz < 0 || nz >= this.height || closed[next] || !this.valid(next)) continue;
+        const b = this.point(next);
+        const cost = costs[id] + Math.hypot(dx, dz) * CELL * (surfaceAt(b[0], b[1]) === "stone" ? .82 : 1);
         if (cost >= costs[next]) continue;
-        const b = this.point(next); if (!this.visible(a, b)) continue;
+        if (!this.visible(a, b)) continue;
         costs[next] = cost; parents[next] = id;
-        push(next, cost + Math.hypot(b[0] - goal[0], b[1] - goal[1]));
+        push(next, cost + Math.hypot(b[0] - goal[0], b[1] - goal[1]) * .82);
       }
     }
     return [];
