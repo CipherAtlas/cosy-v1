@@ -23,31 +23,50 @@ export const readGratitudeEntries = (): GratitudeEntry[] => {
   return raw === null ? [] : parseEntries(JSON.parse(raw));
 };
 
-export const exportGratitudeEntries = (): string =>
-  JSON.stringify({ format: "hearthwillow-notes-v1", entries: readGratitudeEntries() }, null, 2);
+export const exportGratitudeText = (): string => {
+  const notes = readGratitudeEntries().map((entry) =>
+    `[${entry.createdAt}]\n${entry.text.split(/\r\n|\r|\n/).map((line) => `  ${line}`).join("\n")}`
+  );
+  const heading = "Hearthwillow notes\n==================\n\n";
+  return heading + (notes.length ? `${notes.join("\n\n")}\n` : "");
+};
 
-export const importGratitudeEntries = (raw: string): GratitudeEntry[] => {
-  const backup: unknown = JSON.parse(raw);
-  if (backup === null || typeof backup !== "object" ||
-    !("format" in backup) || backup.format !== "hearthwillow-notes-v1" ||
-    !("entries" in backup)) {
+export const importGratitudeText = (raw: string): GratitudeEntry[] => {
+  const lines = raw.replace(/\r\n/g, "\n").split("\n");
+  if (lines[0] !== "Hearthwillow notes" || lines[1] !== "==================" || lines[2] !== "") {
     throw new Error("Unrecognized notes backup");
   }
-  const imported = parseEntries(backup.entries);
+  const imported: Pick<GratitudeEntry, "text" | "createdAt">[] = [];
+  for (let index = 3; index < lines.length;) {
+    if (index === lines.length - 1 && lines[index] === "") break;
+    const date = /^\[([^\]]+)\]$/.exec(lines[index]);
+    if (!date || !Number.isFinite(Date.parse(date[1]))) throw new Error("Invalid note date");
+    index += 1;
+    const textLines: string[] = [];
+    while (index < lines.length && lines[index].startsWith("  ")) {
+      textLines.push(lines[index].slice(2));
+      index += 1;
+    }
+    if (!textLines.length || !textLines.join("\n").trim() || lines[index] !== "") {
+      throw new Error("Invalid note text");
+    }
+    imported.push({ createdAt: date[1], text: textLines.join("\n") });
+    index += 1;
+  }
+
   const existing = readGratitudeEntries();
   const merged = [...existing];
-  const identities = new Set(existing.map((entry) => JSON.stringify([entry.id, entry.text, entry.createdAt])));
-  const ids = new Set(existing.map((entry) => entry.id));
+  const existingCounts = new Map<string, number>();
+  for (const entry of existing) {
+    const key = JSON.stringify([entry.createdAt, entry.text]);
+    existingCounts.set(key, (existingCounts.get(key) ?? 0) + 1);
+  }
+  const importedCounts = new Map<string, number>();
   for (const entry of imported) {
-    const identity = JSON.stringify([entry.id, entry.text, entry.createdAt]);
-    if (identities.has(identity)) continue;
-    if (ids.has(entry.id) && merged.some((saved) =>
-      saved.text === entry.text && saved.createdAt === entry.createdAt
-    )) continue;
-    const restored = ids.has(entry.id) ? { ...entry, id: crypto.randomUUID() } : entry;
-    merged.push(restored);
-    identities.add(identity);
-    ids.add(restored.id);
+    const key = JSON.stringify([entry.createdAt, entry.text]);
+    const count = (importedCounts.get(key) ?? 0) + 1;
+    importedCounts.set(key, count);
+    if (count > (existingCounts.get(key) ?? 0)) merged.push({ ...entry, id: crypto.randomUUID() });
   }
   window.localStorage.setItem(GRATITUDE_KEY, JSON.stringify(merged));
   return merged;

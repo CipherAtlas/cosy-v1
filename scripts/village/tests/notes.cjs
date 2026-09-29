@@ -38,20 +38,43 @@ assert.equal(saved.length, 13, "saving never truncates older notes");
 storage = loadRelease();
 assert.deepEqual(storage.readGratitudeEntries(), saved, "a new release reads the same stored notes");
 
-const backup = storage.exportGratitudeEntries();
+const backup = storage.exportGratitudeText();
 storage.saveGratitudeEntry("Newer local note");
-const restored = storage.importGratitudeEntries(backup);
+const restored = storage.importGratitudeText(backup);
 assert.equal(restored.length, 14, "restoring a backup keeps newer local notes");
-assert.equal(storage.importGratitudeEntries(backup).length, 14, "restoring twice does not duplicate notes");
+assert.equal(storage.importGratitudeText(backup).length, 14, "restoring twice does not duplicate notes");
 
-const collision = JSON.stringify({ format: "hearthwillow-notes-v1", entries: [
-  { id: saved[0].id, text: "Different note with a reused ID", createdAt: "2026-09-02T00:00:00.000Z" }
-] });
-assert.equal(storage.importGratitudeEntries(collision).length, 15, "an ID collision does not drop a different note");
-assert.equal(storage.importGratitudeEntries(collision).length, 15, "restoring a colliding note twice is idempotent");
+const multiline = "First line\n  indented line\n[2026-09-02T00:00:00.000Z]\n";
+storage.saveGratitudeEntry(multiline);
+const textBackup = storage.exportGratitudeText();
+assert.match(textBackup, /^Hearthwillow notes\n/);
+assert.match(textBackup, /  First line\n    indented line/);
+assert.doesNotMatch(textBackup, /"format":/);
+data.set(key, JSON.stringify([]));
+assert.equal(storage.importGratitudeText(textBackup).length, 15, "a text backup restores every note");
+assert.equal(storage.readGratitudeEntries().find(entry => entry.text === multiline)?.text, multiline,
+  "text restore preserves newlines and indentation");
+assert.equal(storage.importGratitudeText(textBackup).length, 15, "restoring text twice does not duplicate notes");
+data.set(key, JSON.stringify([]));
+assert.equal(storage.importGratitudeText(storage.exportGratitudeText()).length, 0,
+  "an empty text backup is valid");
+storage.importGratitudeText(textBackup);
+const twin = { text: "Same moment", createdAt: "2026-09-03T00:00:00.000Z" };
+data.set(key, JSON.stringify([
+  ...storage.readGratitudeEntries(),
+  { ...twin, id: "twin-a" },
+  { ...twin, id: "twin-b" }
+]));
+const twinsBackup = storage.exportGratitudeText();
+data.set(key, JSON.stringify([]));
+assert.equal(storage.importGratitudeText(twinsBackup).filter(entry => entry.text === twin.text).length, 2,
+  "distinct identical notes are preserved");
+assert.equal(storage.importGratitudeText(twinsBackup).filter(entry => entry.text === twin.text).length, 2,
+  "reimporting identical notes is idempotent");
 
 const beforeFailure = data.get(key);
-assert.throws(() => storage.importGratitudeEntries('{"entries":[]}'));
+assert.throws(() => storage.importGratitudeText('{"format":"hearthwillow-notes-v1","entries":[]}'));
+assert.throws(() => storage.importGratitudeText("Hearthwillow notes\n==================\n\n[bad date]\n  note\n"));
 assert.equal(data.get(key), beforeFailure, "invalid backups do not replace notes");
 failWrites = true;
 assert.throws(() => storage.saveGratitudeEntry("Unsaved"));

@@ -67,7 +67,7 @@ export class VillageActivities {
     this.page.position.set(-19.25,1.02,6.35);this.outdoor.add(this.page);
     const liftedPage=add(this.page,new T.PlaneGeometry(.46,.6),paper,0,0,0);liftedPage.rotation.x=-Math.PI/2;
     this.page.visible=false;
-    // Tea has thickness, a handle, liquid and steam; it rises in response to a check-in.
+    // Tea has thickness, a handle, liquid and steam; it rises when the visitor drinks it.
     this.cup.position.set(15.2,1.28,-9.65);this.outdoor.add(this.cup);
     add(this.cup,new T.CylinderGeometry(.23,.22,.035,24),paper,0,0,0);
     add(this.cup,new T.LatheGeometry([new T.Vector2(.12,.035),new T.Vector2(.14,.08),new T.Vector2(.17,.27),new T.Vector2(.145,.27),new T.Vector2(.125,.09)],24),ink,0,0,0);

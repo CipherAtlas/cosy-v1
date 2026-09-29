@@ -117,11 +117,11 @@ export function MintTea(p: GardenControls) {
   return <div className="v-garden-ritual">
     <p>{t("Luma is here to share a cup and admire your garden.", "ルマとお茶を飲みながら、庭を眺めましょう。")}</p>
     <div className="v-garden-bed-actions">
-      {p.garden.carrots > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "carrot" })}>{t("Give Luma a carrot", "ルマにニンジンを渡す")}</button>}
-      {p.garden.radishes > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "radish" })}>{t("Give Luma a radish", "ルマにラディッシュを渡す")}</button>}
-      {p.garden.sunflowers > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "sunflower" })}><Flower size={18} />{t("Give Luma a sunflower", "ルマにひまわりを渡す")}</button>}
-      {p.garden.daisies > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "daisy" })}><Flower size={18} />{t("Give Luma a daisy", "ルマにデイジーを渡す")}</button>}
-      {p.garden.mint > 0 && <button className="v-button" onClick={() => p.onGardenAction({ kind: "gift", crop: "mint" })}><Leaf size={18} />{t("Give Luma mint for special tea", "ルマにミントを渡して特別なお茶に")}</button>}
+      {p.garden.carrots > 0 && <button className="v-button v-gift" data-crop="carrot" onClick={() => p.onGardenAction({ kind: "gift", crop: "carrot" })}>{t("Give Luma a carrot", "ルマにニンジンを渡す")}</button>}
+      {p.garden.radishes > 0 && <button className="v-button v-gift" data-crop="radish" onClick={() => p.onGardenAction({ kind: "gift", crop: "radish" })}>{t("Give Luma a radish", "ルマにラディッシュを渡す")}</button>}
+      {p.garden.sunflowers > 0 && <button className="v-button v-gift" data-crop="sunflower" onClick={() => p.onGardenAction({ kind: "gift", crop: "sunflower" })}><Flower size={18} />{t("Give Luma a sunflower", "ルマにひまわりを渡す")}</button>}
+      {p.garden.daisies > 0 && <button className="v-button v-gift" data-crop="daisy" onClick={() => p.onGardenAction({ kind: "gift", crop: "daisy" })}><Flower size={18} />{t("Give Luma a daisy", "ルマにデイジーを渡す")}</button>}
+      {p.garden.mint > 0 && <button className="v-button v-gift" data-crop="mint" onClick={() => p.onGardenAction({ kind: "gift", crop: "mint" })}><Leaf size={18} />{t("Give Luma mint for special tea", "ルマにミントを渡して特別なお茶に")}</button>}
     </div>
     {p.garden.mintTea > 0 && <><button className="v-button v-primary" onClick={() => p.onGardenAction({ kind: "drink" })}><Coffee size={18} />{t("Drink your special mint tea", "特別なミントティーを飲む")}</button>
       <p>{t(`${p.garden.mintTea} cup${p.garden.mintTea === 1 ? "" : "s"} waiting for you.`, `${p.garden.mintTea}杯のお茶が待っています。`)}</p></>}

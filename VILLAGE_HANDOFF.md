@@ -1,5 +1,13 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — Writing nook and Past notes refresh (local)
+
+The Writing nook has a persistent question label, a ruled paper writing surface and a full-width save action. Past notes opens its own section with a scrollable list of one-line previews; each opens to a full-note view, and returning preserves the list position. Downloads and restores now use readable `.txt` only; old JSON backup files are not accepted by the current local UI. Stored browser notes are unchanged. Local desktop, phone-sized and seven-note scrolling previews, storage regression checks, typecheck and static build passed; physical touch and deployed behavior remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-writing-nook-and-past-notes-refresh-local). No deployment occurred.
+
+## 2026-09-30 — Tea garden panel simplification (local)
+
+The Tea garden activity keeps its welcome and Luma's harvest-gift and mint-tea actions. The six old mood choices and their suggested-place card are gone, along with their panel-only state and styling. Each available harvest gift has a soft crop-colored gradient, while the prepared-tea action retains its stronger primary style. The place ID remains `mood` for existing village routing and tea animation; drinking prepared mint tea still raises the cup. [The build entry](VILLAGE_BUILD.md#2026-09-30-tea-garden-panel-simplification-local) records local checks and limits. No deployment occurred.
+
 ## 2026-09-30 — integrated village release (published)
 
 The local village, chat and puppy changes documented below shipped in [commit `a0c8e2a`](https://github.com/CipherAtlas/cosy-v1/commit/a0c8e2a4175ced5266e8cc8e0ea2dff490216411) through successful [Pages run 36615984264](https://github.com/CipherAtlas/cosy-v1/actions/runs/36615984264). The matching Worker is version `eb42ee2f-ae83-42c2-a5b4-79df3bfaae42`. This includes bench-side clicks, nearby recovery and bridge access, Luma's mint cue, four pettable/following puppies, journal backup safeguards, background world sound, garden countdown fixes and the expanded shared-chat controls. The published Battery graphics default and activity seating remain intact. The [release ledger](VILLAGE_BUILD.md#2026-09-30-integrated-village-release-published) records the merged local checks, public HTTP checks, live shared-village entry and Focus cottage exit. The dated local entries below describe their pre-release checkpoints; statements that work was local or not yet deployed refer to those dates. Live hourly-reset/message delivery, physical touch, Safari 26.6.2 and long-session performance are still open.
@@ -42,7 +50,7 @@ After a mint harvest, a red animated exclamation follows Luma's visible head and
 
 ## 2026-09-29 — journal note retention safeguards (local)
 
-The user reports that all Past notes disappear after updates at the same address and browser. That full-loss cause remains unconfirmed: the repository does not clear the stable `peaceful-room-gratitude-entries` key. A separate confirmed loss path was fixed: `/gratitude` used to keep only the newest eight entries when saving to the same key as Writing nook. Both screens now use the shared storage module, which preserves the full list and refuses to overwrite unreadable data. Writing nook → Past notes has Download notes and Restore backup; restore merges valid JSON backups with existing entries. This remains browser-local and is not a live or cross-device guarantee. A local reload check, storage regression checks, typecheck and static build passed. [Build evidence](VILLAGE_BUILD.md#2026-09-29-journal-note-retention-safeguards-local). No release was made.
+The user reports that all Past notes disappear after updates at the same address and browser. That full-loss cause remains unconfirmed: the repository does not clear the stable `peaceful-room-gratitude-entries` key. A separate confirmed loss path was fixed: `/gratitude` used to keep only the newest eight entries when saving to the same key as Writing nook. Both screens now use the shared storage module, which preserves the full list and refuses to overwrite unreadable data. At this checkpoint, Writing nook → Past notes had Download notes and Restore backup for JSON backups; the current local UI above has since switched both controls to `.txt` only. This remains browser-local and is not a live or cross-device guarantee. A local reload check, storage regression checks, typecheck and static build passed. [Build evidence](VILLAGE_BUILD.md#2026-09-29-journal-note-retention-safeguards-local). No release was made.
 
 ## 2026-09-29 — nearby unstuck recovery (local)
 
@@ -333,7 +341,7 @@ Keep the stable place IDs in [places.ts](features/village/places.ts). Improve th
 | `focus` / Focus cottage | Focus/break timer, intention, pause/resume, persistence | Detailed timber interior, window light, desk, textiles, quiet fire; comfortable still camera while working. |
 | `music` / Village hearth | Music presets and mixer | Open riverside fire clearing beside the road, with three benches facing inward. Preserve clear circulation and the shared hearth anchor; music remains usable everywhere. |
 | `breathe` / Willow pond | Manual breathing exercises and phase timing | Willow canopy, soft water, reeds and wind; stable breathing composition with minimal visual distraction. |
-| `mood` / Tea garden | Mood check-in and suggested next activity | Intimate planted courtyard, tea setting, dappled light; gentle transitions to suggested places. |
+| `mood` / Tea garden | Quiet tea visit, Luma's harvest gifts and prepared mint tea | Intimate planted courtyard, tea setting and dappled light. |
 | `gratitude` / Writing nook | Local notes, history, confirmed deletion | Riverside writing spot, paper and wood detail, distant water; readable notes with a calm stationary background. |
 | `compliment` / Little postbox | Another kind note and Keep | Handcrafted postbox, small garden, soft paper/latch feedback; warm, understated delivery. |
 | `garden` / Kitchen garden | Plant, water, pick; flowers and mint | Four vegetable beds and a mint bed beside tea; 2–5 minute growth after watering, endless seeds/water and no decay. |

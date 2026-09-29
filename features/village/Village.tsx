@@ -877,7 +877,6 @@ export function Village() {
           soundLoading={soundLoading}
           toggleMusic={toggleMusic}
           openRadio={openRadio}
-          travel={openPlace}
           language={language}
           gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace }}
         />

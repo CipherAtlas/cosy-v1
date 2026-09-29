@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Pause,
   Play,
+  ArrowLeft,
   ArrowRight,
   ArrowCounterClockwise,
   Heart,
@@ -13,7 +14,7 @@ import {
 import type { AudioMix, PlaceId } from "./places";
 import type { ActivityMoment } from "./environment";
 import type { FocusSession } from "./useSession";
-import { deleteGratitudeEntry, exportGratitudeEntries, importGratitudeEntries, readGratitudeEntries, saveGratitudeEntry, type GratitudeEntry } from "@/features/gratitude/storage";
+import { deleteGratitudeEntry, exportGratitudeText, importGratitudeText, readGratitudeEntries, saveGratitudeEntry, type GratitudeEntry } from "@/features/gratitude/storage";
 import { BirdActivity, GardenActivity, MintTea, PondFeeding, type GardenControls } from "./GardenActivities";
 
 type Props = {
@@ -28,7 +29,6 @@ type Props = {
   soundLoading: boolean;
   toggleMusic: () => void;
   openRadio: () => void;
-  travel: (id: PlaceId) => void;
   language: "en" | "ja";
   onMoment: (moment: ActivityMoment) => void;
   gardenControls: GardenControls;
@@ -205,7 +205,7 @@ export function Activities(p: Props) {
   if (p.place === "garden") return <GardenActivity {...p.gardenControls} />;
   if (p.place === "breathe") return <Breathing language={p.language} onMoment={p.onMoment} gardenControls={p.gardenControls} />;
   if (p.place === "mood")
-    return <Mood travel={p.travel} language={p.language} onMoment={p.onMoment} gardenControls={p.gardenControls} />;
+    return <TeaGarden language={p.language} gardenControls={p.gardenControls} />;
   if (p.place === "gratitude") return <Journal language={p.language} onMoment={p.onMoment} />;
   return <KindNote language={p.language} onMoment={p.onMoment} />;
 }
@@ -350,29 +350,16 @@ function Breathing({ language, onMoment, gardenControls }: { language: "en" | "j
     </section>
   );
 }
-function Mood({
-  travel,
+function TeaGarden({
   language,
-  onMoment,
   gardenControls,
 }: {
   gardenControls: GardenControls;
-  onMoment: Props["onMoment"];
-  travel: (id: PlaceId) => void;
   language: "en" | "ja";
 }) {
-  const [selected, setSelected] = useState<number | null>(null),
-    ja = language === "ja";
-  const moods = [
-    ["A little tired", "少し疲れた", "breathe"],
-    ["Restless", "落ち着かない", "breathe"],
-    ["Overwhelmed", "いっぱいいっぱい", "music"],
-    ["Lonely", "さみしい", "compliment"],
-    ["Doing okay", "ふつう", "focus"],
-    ["Peaceful", "穏やか", "gratitude"],
-  ] as const;
+  const ja = language === "ja";
   return (
-    <section className="v-activity v-paper">
+    <section className="v-activity v-paper v-tea">
       <h2>{ja ? "今、どんな気持ちですか？" : "How are you arriving?"}</h2>
       <p>
         {ja
@@ -380,57 +367,41 @@ function Mood({
           : "Take a sip of tea. There is room for all of it."}
       </p>
       <MintTea {...gardenControls} />
-      <div className="v-moods">
-        {moods.map((m, i) => (
-          <button
-            key={m[0]}
-            className="v-chip"
-            aria-pressed={selected === i}
-            onClick={() => { setSelected(i); onMoment({kind:"tea"}); }}
-          >
-            {m[ja ? 1 : 0]}
-          </button>
-        ))}
-      </div>
-      {selected !== null && (
-        <div className="v-suggestion" role="status">
-          <p>
-            {ja
-              ? "少しゆっくりしてみませんか。"
-              : ["Let the pond set a slower pace.","A few breaths by the water might help.","There is a warm seat by the fire.","A kind note is waiting at the postbox.","The cottage is ready when you are.","Keep a little of this feeling in your journal."][selected]}
-          </p>
-          <button
-            className="v-button v-primary"
-            onClick={() => travel(moods[selected][2])}
-          >
-            {ja ? "行ってみる" : "Take me there"}
-            <ArrowRight size={17} />
-          </button>
-        </div>
-      )}
     </section>
   );
 }
 function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
   const ja = language === "ja";
   const importInput = useRef<HTMLInputElement>(null);
+  const historyButton = useRef<HTMLButtonElement>(null);
+  const viewHeading = useRef<HTMLHeadingElement>(null);
+  const noteList = useRef<HTMLDivElement>(null);
+  const listScroll = useRef(0);
+  const previousView = useRef<"write" | "list" | "note">("write");
   const [text, setText] = useState(""),
     [entries, setEntries] = useState<GratitudeEntry[]>([]),
     [status, setStatus] = useState(""),
     [readFailed, setReadFailed] = useState(false),
-    [history, setHistory] = useState(false),
+    [view, setView] = useState<"write" | "list" | "note">("write"),
+    [selectedId, setSelectedId] = useState<string | null>(null),
     [remove, setRemove] = useState<string | null>(null);
+  const selectedEntry = entries.find((entry) => entry.id === selectedId);
+  const showNote = view === "note" && selectedEntry !== undefined;
+  const formatDate = (createdAt: string) => new Date(createdAt).toLocaleDateString(
+    ja ? "ja-JP" : "en-GB",
+    { day: "numeric", month: "long", year: "numeric" },
+  );
   const download = () => {
     try {
-      const url = URL.createObjectURL(new Blob([exportGratitudeEntries()], { type: "application/json" }));
+      const url = URL.createObjectURL(new Blob([exportGratitudeText()], { type: "text/plain;charset=utf-8" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = "hearthwillow-notes.json";
+      link.download = "hearthwillow-notes.txt";
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setStatus(ja ? "メモのバックアップをダウンロードしました。" : "Notes backup downloaded.");
+      setStatus(ja ? "メモをテキストファイルに保存しました。" : "Notes saved as a text file.");
     } catch {
-      setStatus(ja ? "バックアップを作れませんでした。" : "Could not create the notes backup.");
+      setStatus(ja ? "メモをダウンロードできませんでした。" : "Could not download your notes.");
     }
   };
   useEffect(() => {
@@ -444,135 +415,152 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
         : "Saved notes could not be read. Your stored data has not been changed.");
     }
   }, [ja]);
+  useEffect(() => {
+    if (previousView.current === view) return;
+    previousView.current = view;
+    if (view === "write") historyButton.current?.focus();
+    else {
+      if (view === "list" && noteList.current) noteList.current.scrollTop = listScroll.current;
+      viewHeading.current?.focus();
+    }
+  }, [view]);
   return (
-    <section className="v-activity v-paper v-journal">
-      <h2>{ja ? "今日、心に残ったこと。" : "Something worth keeping."}</h2>
-      <p>{ja ? "小さなことでも、十分です。" : "A small thing is enough."}</p>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!text.trim()) return;
-          try {
-            setEntries(saveGratitudeEntry(text.trim()));
-            setReadFailed(false);
-            setText("");
-            onMoment({kind:"save"});
-            setStatus(
-              ja ? "この端末に保存しました。" : "Kept safely on this device.",
-            );
-          } catch {
-            setStatus(ja
-              ? "保存できませんでした。文章をコピーしてください。保存済みのメモは変更していません。"
-              : "This browser could not save. Please copy your note. Stored notes were not changed.");
-          }
-        }}
-      >
-        <label className="sr-only" htmlFor="v-note">
-          {ja ? "感謝のメモ" : "Gratitude note"}
-        </label>
-        <textarea
-          id="v-note"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            onMoment({kind:"write"});
+    <section className={`v-activity v-paper v-journal${view !== "write" ? " v-journal-library" : ""}`}>
+      {view === "write" ? (
+        <>
+          <h2>{ja ? "今日、心に残ったこと。" : "Something worth keeping."}</h2>
+          <p>{ja ? "小さなことでも、十分です。" : "A small thing is enough."}</p>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!text.trim()) return;
+            try {
+              setEntries(saveGratitudeEntry(text.trim()));
+              setReadFailed(false);
+              setText("");
+              onMoment({kind:"save"});
+              setStatus(ja ? "この端末に保存しました。" : "Kept safely on this device.");
+            } catch {
+              setStatus(ja
+                ? "保存できませんでした。文章をコピーしてください。保存済みのメモは変更していません。"
+                : "This browser could not save. Please copy your note. Stored notes were not changed.");
+            }
+          }}>
+            <div className="v-journal-entry">
+              <label htmlFor="v-note">
+                {ja ? "今日、ありがとうと思ったことは？" : "What brought a little warmth to your day?"}
+              </label>
+              <textarea id="v-note" value={text} maxLength={10000} onChange={(e) => {
+                setText(e.target.value);
+                onMoment({kind:"write"});
+                if (!readFailed) setStatus("");
+              }} />
+            </div>
+            <div className="v-journal-actions">
+              <button disabled={!text.trim()} className="v-button v-primary v-journal-save" type="submit">
+                {ja ? "残す" : "Keep this thought"}
+              </button>
+              <button ref={historyButton} className="v-journal-history" type="button" onClick={() => {
+                if (!readFailed) setStatus("");
+                setView("list");
+              }}>
+                <span>{ja ? "これまでのメモ" : "Past notes"}</span>
+                <span className="v-journal-count">{entries.length}</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          </form>
+        </>
+      ) : (
+        <>
+          <button className="v-journal-back" type="button" onClick={() => {
             if (!readFailed) setStatus("");
-          }}
-          maxLength={10000}
-          placeholder={
-            ja
-              ? "今日、ありがとうと思ったこと…"
-              : "What brought a little warmth to your day?"
-          }
-        />
-        <div className="v-actions">
-          <button
-            disabled={!text.trim()}
-            className="v-button v-primary"
-            type="submit"
-          >
-            {ja ? "残す" : "Keep this thought"}
+            if (showNote) {
+              setSelectedId(null);
+              setRemove(null);
+              setView("list");
+            } else setView("write");
+          }}>
+            <ArrowLeft size={17} aria-hidden="true" />
+            {showNote ? (ja ? "メモ一覧へ" : "All notes") : (ja ? "書く画面へ" : "Back to writing")}
           </button>
-          <button
-            className="v-text-button"
-            type="button"
-            onClick={() => setHistory(!history)}
-          >
-            {ja ? "これまでのメモ" : "Past notes"}
-            {entries.length > 0 ? ` (${entries.length})` : ""}
-          </button>
-        </div>
-      </form>
-      <p className="v-save-status" role="status">
-        {status}
-      </p>
-      {history && (
-        <div className="v-notes">
-          <div className="v-actions">
-            <button className="v-button" type="button" onClick={download}>{ja ? "メモをダウンロード" : "Download notes"}</button>
-            <button className="v-button" type="button" onClick={() => importInput.current?.click()}>{ja ? "バックアップを復元" : "Restore backup"}</button>
-            <input ref={importInput} className="sr-only" type="file" accept="application/json,.json" aria-label={ja ? "メモのバックアップファイル" : "Notes backup file"} onChange={async event => {
-              const file = event.target.files?.[0];
-              event.target.value = "";
-              if (!file) return;
-              try {
-                const restored = importGratitudeEntries(await file.text());
-                setEntries(restored);
-                setReadFailed(false);
-                setStatus(ja ? "バックアップを復元しました。既存のメモも残っています。" : "Backup restored. Existing notes were kept.");
-              } catch {
-                setStatus(ja ? "バックアップを復元できませんでした。保存済みのメモは変更していません。" : "Could not restore this backup. Stored notes were not changed.");
-              }
-            }} />
+          <div className="v-journal-library-heading">
+            <h2 ref={viewHeading} tabIndex={-1}>{showNote ? (ja ? "残したメモ" : "A kept thought.") : (ja ? "これまでのメモ" : "Past notes")}</h2>
+            {!showNote && <span className="v-journal-count">{entries.length}</span>}
           </div>
-          {entries.length === 0 && !readFailed ? (
-            <p>
-              {ja
-                ? "最初のメモをここに。"
-                : "Your first thought can live here."}
-            </p>
-          ) : entries.length > 0 ? (
-            entries.map((e) => (
-              <article key={e.id}>
-                <p>{e.text}</p>
-                <footer>
-                  <time>
-                    {new Date(e.createdAt).toLocaleDateString(
-                      ja ? "ja-JP" : "en-GB",
-                      { day: "numeric", month: "short" },
-                    )}
-                  </time>
-                  {remove === e.id ? (
-                    <span>
-                      <button
-                        onClick={() => {
-                          try {
-                            setEntries(deleteGratitudeEntry(e.id));
-                            setRemove(null);
-                          } catch {
-                            setStatus(ja
-                              ? "メモを削除できませんでした。保存済みのメモは変更していません。"
-                              : "Could not delete this note. Stored notes were not changed.");
-                          }
-                        }}
-                      >
-                        {ja ? "削除する" : "Delete"}
-                      </button>
-                      <button onClick={() => setRemove(null)}>
-                        {ja ? "戻る" : "Keep"}
-                      </button>
-                    </span>
-                  ) : (
-                    <button onClick={() => setRemove(e.id)}>
-                      {ja ? "削除" : "Remove"}
-                    </button>
-                  )}
-                </footer>
+          {showNote ? (
+            <>
+              <article className="v-journal-open-note">
+                <p>{selectedEntry.text}</p>
+                <time dateTime={selectedEntry.createdAt}>{formatDate(selectedEntry.createdAt)}</time>
               </article>
-            ))
-          ) : null}
-        </div>
+              <div className="v-journal-delete">
+                {remove === selectedEntry.id ? (
+                  <>
+                    <span>{ja ? "このメモを削除しますか？" : "Delete this note?"}</span>
+                    <button type="button" onClick={() => {
+                      try {
+                        setEntries(deleteGratitudeEntry(selectedEntry.id));
+                        setRemove(null);
+                        setSelectedId(null);
+                        setView("list");
+                        setStatus(ja ? "メモを削除しました。" : "Note deleted.");
+                      } catch {
+                        setStatus(ja
+                          ? "メモを削除できませんでした。保存済みのメモは変更していません。"
+                          : "Could not delete this note. Stored notes were not changed.");
+                      }
+                    }}>{ja ? "削除する" : "Delete"}</button>
+                    <button type="button" onClick={() => setRemove(null)}>{ja ? "戻る" : "Keep"}</button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => setRemove(selectedEntry.id)}>{ja ? "このメモを削除" : "Remove this note"}</button>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="v-journal-list" ref={noteList} onScroll={(event) => {
+                listScroll.current = event.currentTarget.scrollTop;
+              }}>
+                {entries.length === 0 && !readFailed ? (
+                  <p>{ja ? "最初のメモをここに。" : "Your first thought can live here."}</p>
+                ) : (
+                  entries.map((entry) => (
+                    <button className="v-journal-note-row" key={entry.id} type="button" onClick={() => {
+                      if (!readFailed) setStatus("");
+                      listScroll.current = noteList.current?.scrollTop ?? 0;
+                      setSelectedId(entry.id);
+                      setView("note");
+                    }}>
+                      <span className="v-journal-note-preview">{entry.text.trimStart().split(/\r\n|\r|\n/)[0]}</span>
+                      <span className="v-journal-note-date">{formatDate(entry.createdAt)}</span>
+                      <ArrowRight size={17} aria-hidden="true" />
+                    </button>
+                  ))
+                )}
+              </div>
+              <div className="v-journal-backups">
+                <button className="v-button" type="button" onClick={download}>{ja ? "メモをダウンロード" : "Download notes"}</button>
+                <button className="v-button" type="button" onClick={() => importInput.current?.click()}>{ja ? "バックアップを復元" : "Restore backup"}</button>
+                <input ref={importInput} className="sr-only" type="file" accept=".txt,text/plain" aria-label={ja ? "メモのバックアップファイル" : "Notes backup file"} onChange={async event => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (!file) return;
+                  try {
+                    const restored = importGratitudeText(await file.text());
+                    setEntries(restored);
+                    setReadFailed(false);
+                    setStatus(ja ? "バックアップを復元しました。既存のメモも残っています。" : "Backup restored. Existing notes were kept.");
+                  } catch {
+                    setStatus(ja ? "バックアップを復元できませんでした。保存済みのメモは変更していません。" : "Could not restore this backup. Stored notes were not changed.");
+                  }
+                }} />
+              </div>
+            </>
+          )}
+        </>
       )}
+      <p className="v-save-status" role="status">{status}</p>
     </section>
   );
 }
