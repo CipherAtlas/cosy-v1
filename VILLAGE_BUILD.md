@@ -1,10 +1,12 @@
 # Cosy Village — implementation and evidence ledger
 
-## 2026-09-29 Battery-first graphics default (local)
+## 2026-09-29 Battery-first graphics default (published)
 
 Every visit now starts at the Battery tier, including browsers with older saved Detailed or Automatic values. Settings still offers Detailed and Automatic on demand, but the graphics choice lasts only for the current visit. The browser preference record no longer saves graphics quality; weather, sound, language and mouse sensitivity continue to use their existing storage. The engine also starts at Battery before the React settings effect runs, so its initial drawing buffer and shadow budget do not briefly use Detailed. The editor and its saved layouts are unchanged.
 
 The production-configured static export, `npm run typecheck` and `git diff --check` passed; the export contains no editor route or layout save API. A local exported-app check in WebKit 26.5 found a fresh visitor at Battery with a 1088×612 drawing buffer at 1280×720 viewport. Selecting Detailed raised it to 1280×720 for that visit; reloading returned to Battery and removed the legacy quality field from browser storage. A separate browser with a saved Detailed preference also started in Battery and retained its saved 140% mouse sensitivity. No page errors were captured. These are local checks; Safari 26.6.2 and long-session FPS still require visitor validation.
+
+[Commit `fde27d0`](https://github.com/CipherAtlas/cosy-v1/commit/fde27d0fa1c14a73fdec62ba4cd49d9e93b483d3) was published at [cosy.sabarg.com](https://cosy.sabarg.com/) through successful [Pages run 36599362905](https://github.com/CipherAtlas/cosy-v1/actions/runs/36599362905). A live WebKit 26.5 check found Battery selected on a fresh visit with a 1088×612 buffer at 1280×720; selecting Detailed used 1280×720, and reloading returned to Battery with no saved graphics quality. A browser with a legacy saved Detailed choice also started in Battery and retained 140% mouse sensitivity. No page errors were captured. This verifies the published default and choice behavior; Safari 26.6.2 freeze frequency and sustained FPS remain unverified.
 
 ## 2026-09-29 scenery performance release
 

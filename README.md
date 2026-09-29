@@ -41,6 +41,7 @@ The lighting-shader change skips point lights outside their existing illuminatio
 The Safari-stall fix shows a full-screen preparation view when Time & weather changes, prepares the new lighting shaders before revealing the scene, and uses only the two nearest fixture lights plus the local spirit's ground light. Detailed now reduces its drawing-buffer scale after sustained low FPS while keeping its scenery and shadows. The [Safari investigation and local checks](VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local) explain the trade-off and remaining device limits. Published through the [Pages release](VILLAGE_BUILD.md#2026-09-29-scenery-performance-release); Safari 26.6.2 behavior remains to be tested.
 
 Every village visit starts with **Gentle on battery** graphics. Detailed and Automatic remain choices in Settings for that visit; earlier saved graphics choices do not override the new starting mode. Weather, sound, language and mouse sensitivity remain saved separately.
+The [Battery graphics release](VILLAGE_BUILD.md#2026-09-29-battery-first-graphics-default-published) records the deployed check and remaining Safari performance limits.
 
 ## Shared village
 

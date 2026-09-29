@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-09-29 — Battery-first graphics default (local)
+## 2026-09-29 — Battery-first graphics default (published)
 
-The village now starts each visit in Gentle on battery, even when an older preference record says Detailed or Automatic. Choosing Detailed or Automatic in Settings affects that visit only; other saved preferences remain. The engine starts at the Battery tier before scene loading. Local exported WebKit checks covered a fresh visit, Detailed opt-in, reload to Battery, a legacy saved Detailed value and preserved mouse sensitivity; the static export and TypeScript check passed. Safari 26.6.2 performance remains open. See [the build entry](VILLAGE_BUILD.md#2026-09-29-battery-first-graphics-default-local).
+The village now starts each visit in Gentle on battery, even when an older preference record says Detailed or Automatic. Choosing Detailed or Automatic in Settings affects that visit only; other saved preferences remain. The engine starts at the Battery tier before scene loading. [Commit `fde27d0`](https://github.com/CipherAtlas/cosy-v1/commit/fde27d0fa1c14a73fdec62ba4cd49d9e93b483d3) shipped through successful [Pages run 36599362905](https://github.com/CipherAtlas/cosy-v1/actions/runs/36599362905). Local export, TypeScript and live WebKit 26.5 checks passed for the default, Detailed opt-in, reload, legacy preference and preserved mouse sensitivity. Safari 26.6.2 freeze frequency and sustained FPS remain open. See [the build entry](VILLAGE_BUILD.md#2026-09-29-battery-first-graphics-default-published).
 
 ## 2026-09-29 — scenery performance release
 
