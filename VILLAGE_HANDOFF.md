@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — Tea garden and Writing nook release (published)
+
+The Tea garden panel cleanup and Writing nook/Past notes refresh shipped in [commit `11d8aa0`](https://github.com/CipherAtlas/cosy-v1/commit/11d8aa06a05c781abfc666f187541832800fc06c) through successful [Pages run 36623639211](https://github.com/CipherAtlas/cosy-v1/actions/runs/36623639211). Local note-storage checks, typecheck and the static export passed. Live Chrome opened both panels without captured page errors; public root/activity routes returned 200 and private editor/admin/layout-save routes returned 404. Browser notes retain their existing storage key, while the new backup controls use `.txt` only. Live backup round-trip, every gift color, physical touch and screen-reader behavior remain open. [Release evidence](VILLAGE_BUILD.md#2026-09-30-tea-garden-and-writing-nook-release-published). The local entries below describe earlier checkpoints.
+
 ## 2026-09-30 — Writing nook and Past notes refresh (local)
 
 The Writing nook has a persistent question label, a ruled paper writing surface and a full-width save action. Past notes opens its own section with a scrollable list of one-line previews; each opens to a full-note view, and returning preserves the list position. Downloads and restores now use readable `.txt` only; old JSON backup files are not accepted by the current local UI. Stored browser notes are unchanged. Local desktop, phone-sized and seven-note scrolling previews, storage regression checks, typecheck and static build passed; physical touch and deployed behavior remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-writing-nook-and-past-notes-refresh-local). No deployment occurred.

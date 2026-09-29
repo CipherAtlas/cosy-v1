@@ -1,5 +1,11 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-30 Tea garden and Writing nook release (published)
+
+The Tea garden simplification and Writing nook refresh below shipped in [commit `11d8aa0`](https://github.com/CipherAtlas/cosy-v1/commit/11d8aa06a05c781abfc666f187541832800fc06c) through successful [Pages run 36623639211](https://github.com/CipherAtlas/cosy-v1/actions/runs/36623639211). The Worker did not change. Notes remain in the same browser storage; Download notes and Restore backup now use readable `.txt` files, and the former JSON backup format is not accepted by the new UI.
+
+Local release checks passed: `node scripts/village/tests/notes.cjs`, `npm run typecheck`, the production-configured static export (22 pages), and `git diff --check`. The export includes the public root and activity pages without an editor, admin or layout-save route. In a local browser, the Tea garden showed no old mood choices and the Writing nook showed its writing form and Past notes control. After deployment, `/`, `/mood/` and `/gratitude/` returned HTTP 200; `/admin/`, `/api/layouts` and `/tools/village-editor/` returned 404. A fresh live Chrome session entered the village and opened both changed panels: Tea garden showed Luma's carrot and mint gifts with no mood-choice buttons; Writing nook showed the labelled form and a separate Past notes section with Download notes and Restore backup. No page errors were captured. Live browser backup download/restore, gift-button color on every crop, physical touch and screen-reader behavior remain unverified. The dated local sections below retain their pre-release limits.
+
 ## 2026-09-30 Writing nook and Past notes refresh (local)
 
 The Writing nook presents its question as a persistent label above a ruled writing surface, with a subtle green binding edge and a clearer focus state. **Keep this thought** fills the available width and becomes dark green when a note is entered. **Past notes** opens a separate section in place of the writing form. Its vertically scrollable list shows one line and the date for each note; opening a row shows the complete note, with a route back to the list and a confirmed Remove action. The writing draft survives navigation between these views. The narrow-screen panel keeps the actions reachable.
