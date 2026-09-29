@@ -46,7 +46,7 @@ export class VillageEngine {
   private player = new T.Group();
   private character?: T.Object3D;
   private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement }>();
-  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number }>();
+  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
   private sharedSpawnPlaced = false;
@@ -864,7 +864,16 @@ export class VillageEngine {
       element.remove();
       this.chatBubbles.delete(id);
     }, 6000);
-    this.chatBubbles.set(id, { element, timer });
+    this.chatBubbles.set(id, { element, timer, messageId: entry.messageId });
+  }
+  removeChatBubbles(messageIds: string[]) {
+    const removed = new Set(messageIds);
+    for (const [id, bubble] of this.chatBubbles) {
+      if (!bubble.messageId || !removed.has(bubble.messageId)) continue;
+      clearTimeout(bubble.timer);
+      bubble.element.remove();
+      this.chatBubbles.delete(id);
+    }
   }
   private seatPoint(bench: VillageBench, index: 0 | 1) {
     const offset = index === 0 ? -.68 : .68;

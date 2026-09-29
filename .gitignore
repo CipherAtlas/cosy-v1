@@ -29,3 +29,7 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# local Python tools
+__pycache__/
+*.pyc

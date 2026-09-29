@@ -335,6 +335,7 @@ export function Village() {
         engine.current?.showChatBubble(entry, sharedSelfIdRef.current, selfName);
         if (!chatOpenRef.current) { setChatUnread(true); setChatPulse(value => value + 1); }
       },
+      onChatModerated: removedMessageIds => engine.current?.removeChatBubbles(removedMessageIds),
       onDisconnect: () => {
         if (cancelled) return;
         sharedConnectedRef.current = false;

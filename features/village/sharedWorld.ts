@@ -1,7 +1,7 @@
 import { readGarden, type GardenAction, type GardenState } from "./garden";
 
 export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; z: number; heading: number };
-export type SharedChatEntry = { id?: string; name: string; message: string };
+export type SharedChatEntry = { id?: string; messageId?: string; name: string; message: string };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
   sendChat: (message: string) => void;
@@ -15,6 +15,7 @@ type WorldMessage =
   | { type: "leave"; id: string }
   | { type: "garden"; garden: GardenState; event: { action: GardenAction; actor: string; x: number; z: number } }
   | { type: "chat"; chatHour: number; entry: SharedChatEntry }
+  | { type: "chat_sync"; chatHour: number; chat: SharedChatEntry[]; removedMessageIds: string[] }
   | { type: "hour"; chatHour: number }
   | { type: "error"; message: string };
 
@@ -22,6 +23,7 @@ export function connectSharedWorld(options: {
   getPose: () => { x: number; z: number; heading: number } | null;
   onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
   onChat: (entry: SharedChatEntry) => void;
+  onChatModerated?: (removedMessageIds: string[]) => void;
   onAction: (event: { action: GardenAction; x: number; z: number; isSelf: boolean }) => void;
   onDisconnect: () => void;
 }): Promise<SharedWorldConnection> {
@@ -102,6 +104,11 @@ export function connectSharedWorld(options: {
           chat = [...chat, message.entry].slice(-80);
           publish();
           options.onChat(message.entry);
+        } else if (message.type === "chat_sync") {
+          chatHour = message.chatHour;
+          chat = message.chat;
+          publish();
+          options.onChatModerated?.(message.removedMessageIds);
         } else if (message.type === "hour") {
           chatHour = message.chatHour;
           chat = [];

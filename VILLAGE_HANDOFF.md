@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-29 — local chat admin
+
+`tools/village-admin/` provides a loopback-only page for viewing the current shared chat, removing one message, or clearing the current hour. Its Python proxy reads a mode-0600 local secret file or prompts in the terminal, sends authenticated requests to the Worker over HTTPS, and does not give the secret to the browser. The Worker gives new and older current-hour messages stable IDs, persists removals, and broadcasts `chat_sync` so updated visitor clients remove entries and matching overhead bubbles. Clear all checks the displayed hour. The local test and release state is in [the build entry](VILLAGE_BUILD.md#2026-09-29-local-chat-admin). The admin page is outside the public static export.
+
 ## 2026-09-29 — Battery-first graphics default (published)
 
 The village now starts each visit in Gentle on battery, even when an older preference record says Detailed or Automatic. Choosing Detailed or Automatic in Settings affects that visit only; other saved preferences remain. The engine starts at the Battery tier before scene loading. [Commit `fde27d0`](https://github.com/CipherAtlas/cosy-v1/commit/fde27d0fa1c14a73fdec62ba4cd49d9e93b483d3) shipped through successful [Pages run 36599362905](https://github.com/CipherAtlas/cosy-v1/actions/runs/36599362905). Local export, TypeScript and live WebKit 26.5 checks passed for the default, Detailed opt-in, reload, legacy preference and preserved mouse sensitivity. Safari 26.6.2 freeze frequency and sustained FPS remain open. See [the build entry](VILLAGE_BUILD.md#2026-09-29-battery-first-graphics-default-published).
