@@ -14,11 +14,11 @@
 
 ## Safari scenery preparation and night lighting
 
-[Desktop](scenery-loading-desktop.png) and [390×844 mobile](scenery-loading-mobile.png) captures show the full-screen preparation view from the local exported app. [All-fixture night](scenery-night-all-lamps.png) and [nearby-light night](scenery-night-nearby-lamps.png) are 1280×720 local production-module renderer captures from the same entrance view; the latter shows the reduced distant ground lighting after limiting active fixture and spirit lights. The [build entry](../../../VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local) records WebKit timing, source/build checks and the unverified Safari 26.6.2 and deployed boundaries.
+[Desktop](scenery-loading-desktop.png) and [390×844 mobile](scenery-loading-mobile.png) captures show the full-screen preparation view from the local exported app. [All-fixture night](scenery-night-all-lamps.png) and [nearby-light night](scenery-night-nearby-lamps.png) are 1280×720 local production-module renderer captures from the same entrance view; the latter shows the reduced distant ground lighting after limiting active fixture and spirit lights. The [build entry](../../../VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local) records WebKit timing, source/build checks and the unverified Safari 26.6.2 and sustained-performance boundaries. The [release entry](../../../VILLAGE_BUILD.md#2026-09-29-scenery-performance-release) records the successful Pages run and live flow checks.
 
 ## Activity spirit seating
 
-[Local renderer results](seating-living-checks.json) cover six staged activities at visitor slot 1000, exit framing, reduced motion, private focus and overlapping visitors at the hearth. [Focus chair](seating-cottage.png) and [hearth seat](seating-activity-music.png) are production-module renderer captures without React controls. [The build entry](../../../VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-local) records the eight-activity placement and eight-bench regressions with verification limits. Nothing here is live-site or physical-device evidence.
+[Local renderer results](seating-living-checks.json) cover six staged activities at visitor slot 1000, exit framing, reduced motion, private focus and overlapping visitors at the hearth. [Focus chair](seating-cottage.png) and [hearth seat](seating-activity-music.png) are production-module renderer captures without React controls. [The build entry](../../../VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-published) records the eight-activity placement and eight-bench regressions with verification limits. Nothing here is live-site or physical-device evidence.
 
 ## Local layout studio
 

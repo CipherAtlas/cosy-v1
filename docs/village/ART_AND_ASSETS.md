@@ -50,7 +50,7 @@ Nine physical posts now mark the entrance, two junctions and six destinations. T
 
 Directional shadows use a fixed weighted 16-sample PCF filter instead of the installed Three r186 randomized five-sample pattern. Detailed quality refreshes every frame; low quality is capped at roughly 30 Hz. The shadow anchor advances by small texel-scale steps instead of two-meter jumps. Existing vegetation shader hooks are preserved. Inspect [current shadows](evidence/polish-soft-shadows.png) and [entrance](evidence/polish-entrance.png); target-device performance and complete lighting acceptance remain open.
 
-The later local Safari-stall pass keeps all authored night lanterns, lit glass and halos, while the playable scene gives real-time point-light ground illumination to the two fixtures nearest the visitor and to the visitor's own spirit. Distant ground pools are dimmer; compare the [all-fixture](evidence/scenery-night-all-lamps.png) and [nearby-light](evidence/scenery-night-nearby-lamps.png) entrance captures. The editor night preview continues to show all fixture lights for placement. This is a performance trade-off awaiting live visual acceptance.
+The Safari-stall pass keeps all authored night lanterns, lit glass and halos, while the playable scene gives real-time point-light ground illumination to the two fixtures nearest the visitor and to the visitor's own spirit. Distant ground pools are dimmer; compare the [all-fixture](evidence/scenery-night-all-lamps.png) and [nearby-light](evidence/scenery-night-nearby-lamps.png) entrance captures. The editor night preview continues to show all fixture lights for placement. This is a performance trade-off awaiting live visual acceptance.
 
 ## Latest direction — colorful fantasy and a white spirit
 

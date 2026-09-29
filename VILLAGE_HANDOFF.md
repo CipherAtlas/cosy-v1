@@ -54,9 +54,21 @@ The [build entry](VILLAGE_BUILD.md#2026-09-29-village-puppies-local) records the
 
 The empty chat input now says “Press "Enter" to type!” Enter already opens and focuses chat from exploration. This copy change has only local verification. See [the build entry](VILLAGE_BUILD.md#2026-09-29-shared-chat-input-prompt-local).
 
+## 2026-09-29 — Battery-first graphics default (published)
+
+The village now starts each visit in Gentle on battery, even when an older preference record says Detailed or Automatic. Choosing Detailed or Automatic in Settings affects that visit only; other saved preferences remain. The engine starts at the Battery tier before scene loading. [Commit `fde27d0`](https://github.com/CipherAtlas/cosy-v1/commit/fde27d0fa1c14a73fdec62ba4cd49d9e93b483d3) shipped through successful [Pages run 36599362905](https://github.com/CipherAtlas/cosy-v1/actions/runs/36599362905). Local export, TypeScript and live WebKit 26.5 checks passed for the default, Detailed opt-in, reload, legacy preference and preserved mouse sensitivity. Safari 26.6.2 freeze frequency and sustained FPS remain open. See [the build entry](VILLAGE_BUILD.md#2026-09-29-battery-first-graphics-default-published).
+
+## 2026-09-29 — scenery performance release
+
+[Commit `0e28033`](https://github.com/CipherAtlas/cosy-v1/commit/0e280330bae77722f9fe3b57e4fe808e66f3df74) was published at [cosy.sabarg.com](https://cosy.sabarg.com/) through successful [Pages run 36596636065](https://github.com/CipherAtlas/cosy-v1/actions/runs/36596636065). The public root and sampled scene assets returned HTTP 200. Live WebKit 26.5 showed and completed Rain and Night preparation screens, and an activity opened and returned without captured page errors. This verifies the release path and basic flow; Safari 26.6.2 and sustained FPS remain open. The [build entry](VILLAGE_BUILD.md#2026-09-29-scenery-performance-release) contains the exact checks.
+
 ## 2026-09-29 — Safari scenery stalls and Detailed budget (local)
 
 The visitor's published Safari 26.6.2 build froze for 4–5 seconds on scenery changes at 1920×960 Detailed. Its 27 FPS report compared with 60 FPS after the battery preference had automatically reached Minimal at 1018×509 with shadows off; this changes pixel load by about 3.56×, plus geometry and shadow work. A local WebKit 26.5 direct night switch reproduced a roughly 6.6-second render-submission stall as lighting shader programs changed. The local fix shows a full-screen preparation view, compiles the target lighting asynchronously before revealing it, limits runtime point lights to the two nearest fixtures plus the local spirit, and lets Detailed lower only its drawing-buffer scale after sustained low FPS while retaining geometry and shadows. The editor night preview still shows all fixture lights. Focused local WebKit/exported-app checks and before/after night captures are in [the build ledger](VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local). This has not been deployed or tested in Safari 26.6.2; the exact cause of unrelated long-session pauses remains open.
+
+## 2026-09-29 — activity spirit seating (published)
+
+The Worker gives each visitor a persistent increasing slot number, which had been pushing the spirit progressively farther from every activity's fixed camera and the focus cottage chair. Activity staging now uses its authored position regardless of slot. Outdoor activity visitors may overlap; the focus cottage interior shows only the local spirit. Benches retain two side seats, with later visitors sharing an occupied side instead of being rejected. An 81-check production-scene regression covers all eight activities and high slot numbers. The local renderer passed the six-scene activity, solo-focus, camera-return and reduced-motion checks at slot 1000; a separate browser regression passed seating and overflow checks across all eight benches. Typecheck and the static export passed. React panels, the live Worker, deployed site and physical devices were not retested. The change shipped on main through the successful Pages run above; live two-visitor seating remains unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-published).
 
 ## 2026-09-29 — activity spirit seating (local)
 

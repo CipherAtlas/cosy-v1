@@ -73,7 +73,7 @@ The existing kitchen garden and pond life are a locked assembly by default. Indi
 
 Scroll zoom is faster and follows the cursor. Camera movement and panning stay at least 1.5 m above supporting ground; typing in fields does not move the camera. Camera collision remains active when intentional object layering is enabled. Existing saved layouts and protected presets are loaded without rearranging their objects.
 
-Perspective, top-down view, a ground grid, position/rotation snapping, four lighting previews (including Starlit night) and an uncluttered Preview mode are available. Preview always has a visible **Back to editor** button; Escape also returns. The editor's night preview shows every fixture light for placement; the local playable renderer limits real-time ground lighting to the two fixtures nearest its visitor while retaining every lantern's lit glass and halo.
+Perspective, top-down view, a ground grid, position/rotation snapping, four lighting previews (including Starlit night) and an uncluttered Preview mode are available. Preview always has a visible **Back to editor** button; Escape also returns. The editor's night preview shows every fixture light for placement; the playable renderer limits real-time ground lighting to the two fixtures nearest its visitor while retaining every lantern's lit glass and halo.
 
 **Moonlit path lamppost** is a reusable Furnishings asset with a rendered shelf preview. Place it in a working copy, then select, move, rotate or scale it like other props; those transforms are stored in the layout JSON. The playable scene also has four new lamps near the bridge, tea garden, bird clearing and pond. Protected presets remain unchanged and do not gain those positions automatically.
 
