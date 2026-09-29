@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-29 — activity spirit seating (release candidate)
+
+The Worker gives each visitor a persistent increasing slot number, which had been pushing the spirit progressively farther from every activity's fixed camera and the focus cottage chair. Activity staging now uses its authored position regardless of slot. Outdoor activity visitors may overlap; the focus cottage interior shows only the local spirit. Benches retain two side seats, with later visitors sharing an occupied side instead of being rejected. An 81-check production-scene regression covers all eight activities and high slot numbers. The local renderer passed the six-scene activity, solo-focus, camera-return and reduced-motion checks at slot 1000; a separate browser regression passed seating and overflow checks across all eight benches. Typecheck and the static export passed. React panels, the live Worker, deployed site and physical devices were not retested. Publication is pending. See [the build entry](VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-release-candidate).
+
 ## 2026-09-29 — saved My village layout and editor controls (local)
 
 The newest named **My village** working copy has been applied to `public/village/world-layout.json` with its 345 objects plus six newer garden/pond lanterns, for 351 playable objects. The saved copy and protected presets were not modified; Apply created a backup in `tools/village-editor/layouts/.history/`. The saved planting clearings now affect the local game. Three cottages and the spire use saved positions/facing in runtime geometry and collision; three trees moved and one tree was removed. Other legacy props, bridges, activity anchors, garden behavior and cameras still follow their code-authored positions.

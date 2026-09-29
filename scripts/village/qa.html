@@ -268,11 +268,17 @@ const activityMoment=id=>id==='focus'?{kind:'focus',running:true,progress:.35}:i
 document.querySelector('#living').onclick=async()=>{
  if(!engine)return report('Load the village first.');
  consoleErrors=[];const results=[];engine.setWeather('golden');engine.setBlocked(false);
+ engine.setSharedIdentity(1000,'#e6a5b0');
  for(const id of ['focus','music','breathe','mood','gratitude','compliment']){
   engine.travel(id);engine.setActivityMoment(activityMoment(id));await delay(1400);
   const expected=ACTIVITY_STAGES[id].actor,actual=engine.player.position.toArray();
   if(!engine.player.visible||actual.some((v,i)=>Math.abs(v-expected[i])>.01))throw Error(id+' spirit staging failed');
   if(!engine.camera.view?.enabled)throw Error(id+' scene does not make room for controls');
+  if(id==='focus'||id==='music'){
+   engine.setRemoteVisitors([{id:'same-seat',name:'Nearby visitor',color:'#a4d5ae',slot:999,x:expected[0],z:expected[2],heading:ACTIVITY_STAGES[id].yaw}]);
+   if(engine.remoteVisitors.get('same-seat')?.group.visible !== (id==='music'))throw Error(id+' shared visitor visibility is wrong');
+   engine.setRemoteVisitors([]);
+  }
   await capture('activity-'+id+'.png');results.push({id,actor:actual,visible:true});
  }
  for(const [name,position,look] of [['water-detail',[-5,2.5,13],[-11,-.3,1]],['fire-detail',[-3.8,1.65,-16.7],[-5.8,.8,-19]]]){

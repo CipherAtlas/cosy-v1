@@ -293,7 +293,6 @@ export class VillageEngine {
       near: (id: PlaceId | null) => void;
       nearBench?: (id: string | null) => void;
       seat?: (id: string | null) => void;
-      seatFull?: () => void;
       scatterBirds?: () => void;
       interact: (id: PlaceId) => void;
       error: (message: string) => void;
@@ -851,15 +850,10 @@ export class VillageEngine {
   private resolveSeatCollision() {
     const bench = this.seatedBench, index = this.seatedIndex;
     if (!bench || index === null) return;
-    if ([...this.remoteVisitors.values()].some(remote => {
-      const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
-      return seat?.bench.id === bench.id && seat.index === null;
-    })) { this.stand(); this.callbacks.seatFull?.(); return; }
     const occupied = this.seatOccupants(bench);
     if (!(occupied.get(index) ?? []).some(slot => slot < (this.sharedSlot ?? Infinity))) return;
     const other = index === 0 ? 1 : 0;
-    if (occupied.has(other)) { this.stand(); this.callbacks.seatFull?.(); }
-    else this.seatedIndex = other;
+    if (!occupied.has(other)) this.seatedIndex = other;
   }
   setSharedIdentity(slot: number, color: string) {
     if (this.sharedSlot === slot && this.sharedColor === color) return;
@@ -974,6 +968,7 @@ export class VillageEngine {
       const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
       remote.target.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
       remote.heading = visitor.heading;
+      remote.group.visible = this.place !== "focus";
     }
     this.resolveSeatCollision();
   }
@@ -1017,6 +1012,7 @@ export class VillageEngine {
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = true;
     if (this.birds) this.birds.group.visible = id !== "focus";
+    this.remoteVisitors.forEach(remote => { remote.group.visible = id !== "focus"; });
     const arrival = this.movement?.position;
     this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
@@ -1100,8 +1096,7 @@ export class VillageEngine {
     if (!bench || this.blocked || this.place || this.seatedBench || this.nearBench?.id !== id) return;
     const occupied = this.seatOccupants(bench);
     const preferred = this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
-    const index = preferred.find(value => !occupied.has(value));
-    if (index === undefined) { this.callbacks.seatFull?.(); return; }
+    const index = preferred.find(value => !occupied.has(value)) ?? preferred[0];
     this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = bench;
@@ -1291,7 +1286,7 @@ export class VillageEngine {
       this.character.scale.set(this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4),this.spiritScale*(this.seatedBench ? .86 : 1+squash),this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4));
       this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
     }
-    this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale,this.sharedSlot);
+    this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
     const scatterAge = this.elapsed - this.birdFeedAt;
     if (this.character && scatterAge < 1.6 && !this.reducedMotion) {
       this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
@@ -1408,7 +1403,8 @@ export class VillageEngine {
     for (const [id, bubble] of this.chatBubbles) {
       const origin = this.remoteVisitors.get(id)?.group.position ?? this.player.position;
       const point = this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0)).project(this.camera);
-      bubble.element.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
+      bubble.element.hidden = (this.place === "focus" && this.remoteVisitors.has(id)) ||
+        point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
       if (!bubble.element.hidden) {
         bubble.element.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
         bubble.element.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;

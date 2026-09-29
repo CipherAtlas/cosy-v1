@@ -387,7 +387,6 @@ export function Village() {
           near: setNear,
           nearBench: setNearBench,
           seat: setSeatedBench,
-          seatFull: () => setNotice(preferences.current.language === "ja" ? "このベンチは満席です。別のベンチをどうぞ。" : "This bench is full. Try another one."),
           scatterBirds: () => onGardenAction({ kind: "feedBirds" }),
           interact: openPlace,
           error: (msg) => {

@@ -1,4 +1,8 @@
-# Village implementation evidence — updated 2026-09-27
+# Village implementation evidence — updated 2026-09-29
+
+## Activity spirit seating
+
+[Local renderer results](seating-living-checks.json) cover six staged activities at visitor slot 1000, exit framing, reduced motion, private focus and overlapping visitors at the hearth. [Focus chair](seating-cottage.png) and [hearth seat](seating-activity-music.png) are production-module renderer captures without React controls. [The build entry](../../../VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-release-candidate) records the eight-activity placement and eight-bench regressions with verification limits. Nothing here is live-site or physical-device evidence.
 
 ## Local layout studio
 
