@@ -452,6 +452,11 @@ export async function checkGardenDetails(engine, capture, save) {
   check(garden.clocks.filter(clock => clock.sprite.visible).length === 3, 'Only growing beds show a world countdown');
   const first = garden.clocks[2].text; await delay(1100);
   check(garden.clocks[2].text !== first, 'World countdown visibly advances with real elapsed time');
+  const expired = { ...state, beds: state.beds.map((bed, i) => i === 2 ? { ...bed, wateredAt: Date.now() - GROWTH_MS.radish } : bed) };
+  engine.setGarden(expired); await delay(100);
+  check(!garden.clocks[2].sprite.visible && garden.clocks.filter(clock => clock.sprite.visible).length === 2,
+    'Expired growing beds hide their world countdown before the shared state updates');
+  engine.setGarden(state);
   check(BEDS[MINT_BED].x === BEDS[0].x && BEDS[MINT_BED].z - BEDS[2].z === BEDS[2].z - BEDS[0].z, 'Mint aligns with the left column and equal row spacing');
   const m = engine.movement; let samples = 0;
   for (let z = -11.4; z <= .6; z += .15) { if (!m.clear(24.7, z)) throw Error(`Central aisle obstructed at ${z.toFixed(2)}`); samples++; }

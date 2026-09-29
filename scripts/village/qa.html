@@ -2,7 +2,7 @@
 <style>body{margin:0;background:#17251f;color:#fff;font:14px system-ui}#scene{width:1280px;height:720px}nav{padding:12px;display:flex;gap:10px;flex-wrap:wrap}button{padding:10px}pre{white-space:pre-wrap;padding:16px}audio{width:280px}</style>
 <link rel="stylesheet" href="/village.css"><style>#scene{position:relative;isolation:isolate;overflow:hidden}#scene .v-villager-bubble{box-sizing:border-box;font-family:system-ui}#scene .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}</style>
 <script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>
-<div id="scene"></div><nav><button id="load">Load village</button><button id="garden">Review garden, pond and companions</button><button id="nearby-interactions">Check nearby interaction keys</button><button id="garden-details">Check garden labels and countdowns</button><button id="gentle-growth">Check growing garden and Luma tea</button><button id="garden-audio">Check garden sounds</button><button id="cosy-feedback">Check happy ducks and activity cameras</button><button id="garden-motion">Record garden and pond</button><button id="roaming">Check roaming and street clearance</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Record soundscape</button><button id="polish">Review navigation and shadows</button><button id="living">Review living activities</button><button id="rituals">Record water fire and activities</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
+<div id="scene"></div><nav><button id="load">Load village</button><button id="garden">Review garden, pond and companions</button><button id="nearby-interactions">Check nearby interaction keys</button><button id="garden-details">Check garden labels and countdowns</button><button id="gentle-growth">Check growing garden and Luma tea</button><button id="garden-audio">Check garden sounds</button><button id="cosy-feedback">Check happy ducks and activity cameras</button><button id="garden-motion">Record garden and pond</button><button id="roaming">Check roaming and street clearance</button><button id="residents">Check villager approaches</button><button id="approach">Watch Pip approach</button><button id="dialogue">Check villager dialogue</button><button id="meet-pip">Meet Pip</button><button id="meet-maple">Meet Maple</button><button id="meet-moss">Meet Moss</button><button id="meet-luma">Meet Luma</button><button id="luma-harvest-cue">Preview Luma mint cue</button><button id="portrait">Portrait / desktop</button><button id="capture">Capture entrance</button><button id="motion">Record movement</button><button id="profile">Profile 2 minutes</button><button id="cottage">Capture cottage</button><button id="bridgeSide">Bridge profile</button><button id="bridge">Capture bridge</button><button id="rain">Capture rain</button><button id="dusk">Capture dusk</button><button id="art">Review art pass</button><button id="fantasy">Review fantasy village</button><button id="views">Capture all views</button><button id="hearth">Capture hearth</button><button id="up">Look up</button><button id="down">Look down</button><button id="rear">Rear valley</button><button id="signal">Verify audio output</button><button id="audit">Audit scene</button><button id="exits">Test activity exits</button><button id="lifecycle">Test audio lifecycle</button><button id="audio">Record soundscape</button><button id="polish">Review navigation and shadows</button><button id="living">Review living activities</button><button id="rituals">Record water fire and activities</button></nav><pre id="status">Ready.</pre><section id="samples"></section>
 <script>window.addEventListener("error",event=>{document.querySelector("#status").textContent="LOAD ERROR: "+(event.message||event.target.src)},true);window.addEventListener("unhandledrejection",event=>{document.querySelector("#status").textContent="LOAD ERROR: "+event.reason});document.querySelector("#status").textContent="Loading verification modules…";</script>
 <script type="module">
 import {VillageEngine} from './modules/features/village/VillageEngine.js';
@@ -72,6 +72,14 @@ for(const [i,id] of ['pip','maple','moss','luma'].entries())document.querySelect
  const resident=engine.life.residents[i];resident.movement.settle(...resident.route[0]);resident.root.position.set(resident.movement.position.x,resident.movement.position.y,resident.movement.position.z);resident.pause=120;
  engine.movement.settle(resident.root.position.x,resident.root.position.z+3.3);engine.yaw=0;engine.pitch=.15;engine.distance=3.8;
  report('Meeting '+resident.root.name);
+};
+document.querySelector('#luma-harvest-cue').onclick=()=>{
+ if(!engine)return report('Load the village first.');
+ engine.setBlocked(false);engine.setLanguage('en');engine.setWeather('golden');
+ engine.travel('mood');engine.setPlace(null);
+ engine.setGarden({...engine.gardenState,mint:1});
+ engine.callbacks.visitTea=()=>{engine.travel('mood');report('E opened tea with Luma.');};
+ report('Luma has mint to share. Press E beside her.');
 };
 document.querySelector('#portrait').onclick=()=>{const portrait=host.clientWidth>700;host.style.width=portrait?'390px':'1280px';host.style.height=portrait?'844px':'720px';report(portrait?'390 x 844 layout':'1280 x 720 layout')};
 async function capture(name,camera=engine.camera){engine.renderer.render(engine.scene,camera);await new Promise(resolve=>engine.renderer.domElement.toBlob(async b=>{await save(name,b);resolve()},'image/png'));report('Saved '+name);}
@@ -268,11 +276,17 @@ const activityMoment=id=>id==='focus'?{kind:'focus',running:true,progress:.35}:i
 document.querySelector('#living').onclick=async()=>{
  if(!engine)return report('Load the village first.');
  consoleErrors=[];const results=[];engine.setWeather('golden');engine.setBlocked(false);
+ engine.setSharedIdentity(1000,'#e6a5b0');
  for(const id of ['focus','music','breathe','mood','gratitude','compliment']){
   engine.travel(id);engine.setActivityMoment(activityMoment(id));await delay(1400);
   const expected=ACTIVITY_STAGES[id].actor,actual=engine.player.position.toArray();
   if(!engine.player.visible||actual.some((v,i)=>Math.abs(v-expected[i])>.01))throw Error(id+' spirit staging failed');
   if(!engine.camera.view?.enabled)throw Error(id+' scene does not make room for controls');
+  if(id==='focus'||id==='music'){
+   engine.setRemoteVisitors([{id:'same-seat',name:'Nearby visitor',color:'#a4d5ae',slot:999,x:expected[0],z:expected[2],heading:ACTIVITY_STAGES[id].yaw}]);
+   if(engine.remoteVisitors.get('same-seat')?.group.visible !== (id==='music'))throw Error(id+' shared visitor visibility is wrong');
+   engine.setRemoteVisitors([]);
+  }
   await capture('activity-'+id+'.png');results.push({id,actor:actual,visible:true});
  }
  for(const [name,position,look] of [['water-detail',[-5,2.5,13],[-11,-.3,1]],['fire-detail',[-3.8,1.65,-16.7],[-5.8,.8,-19]]]){

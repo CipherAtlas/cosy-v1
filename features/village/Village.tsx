@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   ArrowDown,
@@ -16,6 +17,7 @@ import {
   SpeakerSlash,
   X,
   UsersThree,
+  PawPrint,
 } from "@phosphor-icons/react";
 import {
   PLACES,
@@ -33,6 +35,7 @@ import { isRadioStationId, isRadioTrack, RADIO_PAGE_SIZE, RADIO_STATIONS, search
 import type { RadioTrack } from "./soundtrack";
 import { HarvestInventory } from "./GardenActivities";
 import { VillageAudio } from "./audio";
+import { PUPPY_INFO, type NearbyPuppy } from "./puppies";
 import { useSession } from "./useSession";
 import type { ActivityMoment, MovementStatus } from "./environment";
 import type { VillageEngine } from "./VillageEngine";
@@ -85,6 +88,8 @@ export function Village() {
   const [chatUnread, setChatUnread] = useState(false);
   const [chatPulse, setChatPulse] = useState(0);
   const [chatDraft, setChatDraft] = useState("");
+  const [chatCooldownUntil, setChatCooldownUntil] = useState(0);
+  const [, setChatClock] = useState(0);
   const chatInput = useRef<HTMLInputElement>(null);
   const chatLog = useRef<HTMLDivElement>(null);
   const [companions, setCompanions] = useState<string[]>([]);
@@ -125,7 +130,10 @@ export function Village() {
   const [notice, setNotice] = useState("");
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
+  const [nearPuppy, setNearPuppy] = useState<NearbyPuppy | null>(null);
+  const [followingPuppy, setFollowingPuppy] = useState<NearbyPuppy | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
+  const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
   const enterRef = useRef(false);
   const ja = language === "ja",
     t = (en: string, jp: string) => (ja ? jp : en);
@@ -271,10 +279,10 @@ export function Village() {
   }, []);
   useEffect(() => {
     const refresh = () => {
-      if (sharedTrialModeRef.current) return;
       const next = growGarden(gardenRef.current);
       if (next === gardenRef.current) return;
       gardenRef.current = next; setGarden(next); engine.current?.setGarden(next);
+      if (sharedTrialModeRef.current) return;
       try { localStorage.setItem(GARDEN_KEY, JSON.stringify(next)); setGardenStorageError(false); }
       catch { setGardenStorageError(true); }
     };
@@ -333,6 +341,8 @@ export function Village() {
         engine.current?.showChatBubble(entry, sharedSelfIdRef.current, selfName);
         if (!chatOpenRef.current) { setChatUnread(true); setChatPulse(value => value + 1); }
       },
+      onChatModerated: removedMessageIds => engine.current?.removeChatBubbles(removedMessageIds),
+      onChatCooldown: until => { if (!cancelled) setChatCooldownUntil(until); },
       onDisconnect: () => {
         if (cancelled) return;
         sharedConnectedRef.current = false;
@@ -368,9 +378,15 @@ export function Village() {
     import("./VillageEngine")
       .then(async ({ VillageEngine }) => {
         if (cancelled) return;
+        setFollowingPuppy(null);
         local = new VillageEngine(canvas.current!, {
           progress: setProgress,
           movement: setMovement,
+          recovered: result => setNotice(result === "nearby"
+            ? preferences.current.language === "ja" ? "近くの安全な場所に戻りました。" : "Moved to nearby safe ground."
+            : result === "entrance"
+              ? preferences.current.language === "ja" ? "近くに安全な場所がないため、村の入り口に戻りました。" : "No clear ground nearby, so you returned to the village entrance."
+              : preferences.current.language === "ja" ? "安全な場所が見つかりませんでした。" : "Could not find safe ground."),
           mouseLook: setMouseLook,
           companion: toggleCompanion,
           crumbs: id => onGardenAction({ kind: id === "wren" ? "birdCrumbs" : "crumbs" }),
@@ -379,6 +395,19 @@ export function Village() {
           gardenSound: (kind, position) => audio.current?.gardenEffect(kind, position),
           nearGarden: setNearGarden,
           gardenInteract: interactGarden,
+          nearPuppy: setNearPuppy,
+          puppyFollowing: puppy => {
+            setFollowingPuppy(puppy);
+            setNotice(preferences.current.language === "ja"
+              ? puppy
+                ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}が後ろをついてきます。`
+                : "子犬はいつもの場所に戻ります。"
+              : puppy ? `${puppy.name} trots along behind you.` : "Your puppy heads back to their usual spot.");
+          },
+          puppySound: (breed, position, kind) => audio.current?.puppyEffect(breed, position, kind),
+          puppyPetted: puppy => setNotice(preferences.current.language === "ja"
+            ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}はしっぽを振って喜んでいます。`
+            : `${puppy.name} wags happily and leans into your hand.`),
           contact: event => audio.current?.contact(event),
           environment: frame => audio.current?.setEnvironment(frame),
           ready: () => {
@@ -387,7 +416,6 @@ export function Village() {
           near: setNear,
           nearBench: setNearBench,
           seat: setSeatedBench,
-          seatFull: () => setNotice(preferences.current.language === "ja" ? "このベンチは満席です。別のベンチをどうぞ。" : "This bench is full. Try another one."),
           scatterBirds: () => onGardenAction({ kind: "feedBirds" }),
           interact: openPlace,
           error: (msg) => {
@@ -429,9 +457,9 @@ export function Village() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineAttempt, openPlace]);
   useEffect(() => {
-    engine.current?.setBlocked(!entered || panel !== null);
+    engine.current?.setBlocked(!entered || panel !== null || sceneryLoading !== null);
     enterRef.current = entered;
-  }, [entered, panel]);
+  }, [entered, panel, sceneryLoading]);
   useEffect(() => {
     document.documentElement.lang = language;
     engine.current?.setLanguage(language);
@@ -443,8 +471,21 @@ export function Village() {
     engine.current?.setMouseSensitivity(mouseSensitivity);
   }, [mouseSensitivity]);
   useEffect(() => {
-    engine.current?.setWeather(weather);
     audio.current?.setWeather(weather);
+    const local = engine.current;
+    if (!local) return;
+    if (!entered || !ready) { local.setWeather(weather); return; }
+    let cancelled = false;
+    setSceneryLoading(weather);
+    // Let the full-screen state paint before WebGL prepares the new lighting.
+    const timer = window.setTimeout(() => {
+      void local.prepareWeather(weather).catch(() => {
+        if (!cancelled) setNotice(t("The sky could not finish preparing. Try again.", "空の準備が終わりませんでした。もう一度お試しください。"));
+      }).finally(() => { if (!cancelled) setSceneryLoading(null); });
+    }, 50);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+    // A weather change is the transition; entry and readiness are handled by load().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weather]);
   useEffect(() => {
     if (!preferencesLoaded || weatherMode !== "auto") return;
@@ -506,6 +547,16 @@ export function Village() {
     if (chatOpen && chatLog.current) chatLog.current.scrollTop = chatLog.current.scrollHeight;
   }, [sharedChat, chatOpen]);
   useEffect(() => {
+    if (!chatCooldownUntil) return;
+    const timer = window.setInterval(() => {
+      if (Date.now() >= chatCooldownUntil) {
+        setChatCooldownUntil(0);
+        window.clearInterval(timer);
+      } else setChatClock(value => value + 1);
+    }, 200);
+    return () => window.clearInterval(timer);
+  }, [chatCooldownUntil]);
+  useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
@@ -544,6 +595,7 @@ export function Village() {
         setNotice(t("The radio could not connect, so village music is playing.", "ラジオに接続できなかったため、村の音楽を再生しています。"));
       }
       if (result && !result.ambience) setNotice(t("Some nature recordings could not load. Music is still available; turn sound off and on to retry.", "環境音の一部を読み込めませんでした。音楽は再生できます。音をオフにして再度お試しください。"));
+      else if (result && !result.puppies) setNotice(t("Some puppy sounds could not load. Turn sound off and on to retry.", "子犬の声の一部を読み込めませんでした。音をオフにして再度お試しください。"));
     } catch {
       audio.current?.stop();
       setSound(false);
@@ -631,6 +683,9 @@ export function Village() {
   const current = PLACES.find((p) => p.id === place),
     nearPlace = PLACES.find((p) => p.id === near);
   const showWorldInteraction = entered && !place;
+  const chatCooldownSeconds = Math.min(3, Math.ceil(Math.max(0, chatCooldownUntil - Date.now()) / 1000));
+  const chatPeople = chatOpen ? [...sharedPeople].sort((a, b) => a.id === sharedSelfId ? -1 : b.id === sharedSelfId ? 1 : 0) : [];
+  const chatPeopleList = chatOpen && <div className="v-shared-people-list">{chatPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>;
   const nearBirds = nearPlace?.id === "birds" || seatedBench === "bird-clearing-bench";
   const birdMealBusy = birdStatus === "crumbs" || birdStatus === "eating" || birdStatus === "happy";
   const showActivityPanel = entered && place && !activityCompact;
@@ -654,6 +709,17 @@ export function Village() {
     >
       <div className="v-canvas" ref={canvas} />
       <div className="v-shade" aria-hidden="true" />
+      {sceneryLoading && typeof document !== "undefined" && createPortal(<div className="v-scenery-loading" role="status" aria-live="polite" aria-busy="true">
+        <div className="v-scenery-loading-content">
+          <Leaf size={35} weight="light" aria-hidden="true" />
+          <h2>{t("Preparing the sky", "空を準備しています")}</h2>
+          <p>{sceneryLoading === "night" ? t("Starlit night", "星降る夜")
+            : sceneryLoading === "dusk" ? t("Blue hour", "薄暮")
+            : sceneryLoading === "rain" ? t("Rainy afternoon", "雨の午後")
+            : t("Golden hour", "夕暮れ")}</p>
+          <span className="v-scenery-loading-line" aria-hidden="true" />
+        </div>
+      </div>, document.body)}
       <header className="v-header">
         <button
           className="v-wordmark"
@@ -742,6 +808,7 @@ export function Village() {
             <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>{t("Move", "移動")}</span>
             <span><kbd>Shift</kbd>{t("Hold to run", "押して走る")}</span>
             <span><kbd>E</kbd>{t("Interact", "調べる")}</span>
+            <span><kbd>R</kbd>{t("Recover", "安全な場所へ")}</span>
             <span>{mouseLook === "locked" ? t("Mouse to look · Esc to release", "マウスで見回す · Escで解除")
               : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
                 : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
@@ -789,6 +856,7 @@ export function Village() {
               onPointerUp={() => engine.current?.walkKey(" ", false)}
               onPointerCancel={() => engine.current?.walkKey(" ", false)}
               onLostPointerCapture={() => engine.current?.walkKey(" ", false)}>{t("Jump", "ジャンプ")}</button>
+            <button onClick={() => engine.current?.resetPosition()}>{t("Unstuck", "安全な場所へ")}</button>
           </div>
         </>
       )}
@@ -840,7 +908,33 @@ export function Village() {
         {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
         {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
         {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{garden.crumbPouch ? t("Scatter sourdough crumbs", "サワードウのパンくずを撒く") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")}<Bird size={17} /></button>}
-        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !nearBench && !seatedBench && !nearbyAction && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
+        {showWorldInteraction && followingPuppy && <button className="v-interact v-puppy-home" aria-keyshortcuts="H" onClick={() => engine.current?.sendPuppyHome()}
+          onKeyDown={event => {
+            if (event.key.toLowerCase() === "h" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+              event.preventDefault(); event.stopPropagation(); engine.current?.sendPuppyHome();
+            }
+          }}>
+          <kbd aria-hidden="true">H</kbd>{t(`Send ${followingPuppy.name} home`, `${followingPuppy.name === PUPPY_INFO[followingPuppy.breed].name ? PUPPY_INFO[followingPuppy.breed].japanese : followingPuppy.name}を元の場所に戻す`)}
+        </button>}
+        {showWorldInteraction && nearPuppy && !nearBench && !seatedBench && !nearbyAction && !nearBirds && <div className="v-puppy-actions">
+          <button className="v-interact" aria-keyshortcuts="E" onClick={() => engine.current?.petPuppy(nearPuppy.id)}
+            onKeyDown={event => {
+              if (event.key.toLowerCase() === "e" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+                event.preventDefault(); event.stopPropagation(); engine.current?.petPuppy(nearPuppy.id);
+              }
+            }}>
+            <kbd aria-hidden="true">E</kbd>{t(`Pet ${nearPuppy.name}`, `${nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name}をなでる`)}<PawPrint size={17} />
+          </button>
+          {followingPuppy?.id !== nearPuppy.id && <button className="v-interact" aria-keyshortcuts="P" onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}
+            onKeyDown={event => {
+              if (event.key.toLowerCase() === "p" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+                event.preventDefault(); event.stopPropagation(); engine.current?.togglePuppyFollow(nearPuppy.id);
+              }
+            }}>
+            <kbd aria-hidden="true">P</kbd>{t(`Walk with ${nearPuppy.name}`, `${nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name}と歩く`)}
+          </button>}
+        </div>}
+        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </button>}
       </div>}
@@ -852,12 +946,29 @@ export function Village() {
         </button>
         {chatOpen && <section className="v-shared-chat" aria-label="Hearthwillow chat">
           <div className="v-shared-chat-header"><h2>Hearthwillow chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close Hearthwillow chat"><X size={18} /></button></div>
-          <div className="v-shared-people">{sharedPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>
+          {chatPeople.length > 0 && <div className="v-shared-people">
+            {chatPeople.length > 3 && <details>
+              <summary>See everyone here ({chatPeople.length})</summary>
+              {chatPeopleList}
+            </details>}
+            {chatPeople.length <= 3 && chatPeopleList}
+          </div>}
           <p className="v-shared-chat-note">Everyone is in Hearthwillow. Messages clear each hour{sharedChatHour ? `, next at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} your time` : ""}.</p>
-          <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => <p key={index}><strong>{entry.name}</strong> {entry.message}</p>) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
-          <form onSubmit={event => { event.preventDefault(); const message = chatDraft.trim(); if (message && sharedTrialRef.current) { sharedTrialRef.current.sendChat(message); setChatDraft(""); } }}>
-            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => event.stopPropagation()} maxLength={180} placeholder="Say something kind…" disabled={sharedStatus !== "Connected"} />
-            <button type="submit" disabled={!chatDraft.trim() || sharedStatus !== "Connected"}>Send</button>
+          <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => {
+            const sentAt = typeof entry.sentAt === "number" && Number.isFinite(entry.sentAt) ? new Date(entry.sentAt) : null;
+            return <p key={index}><strong>{entry.name}</strong> {entry.message}{sentAt && Number.isFinite(sentAt.getTime()) && <time className="v-shared-chat-time" dateTime={sentAt.toISOString()}>{sentAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</time>}</p>;
+          }) : <p className="v-shared-chat-empty">Say hello to the other blobs.</p>}</div>
+          <form onSubmit={event => {
+            event.preventDefault();
+            const message = chatDraft.trim();
+            if (!message || Date.now() < chatCooldownUntil) return;
+            if (sharedTrialRef.current?.sendChat(message)) setChatDraft("");
+            else setNotice(t("Chat isn't ready yet. Your message is still here.", "チャットの準備ができていません。メッセージは入力欄に残っています。"));
+          }}>
+            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => { event.stopPropagation(); if (event.key === "Enter" && Date.now() < chatCooldownUntil) event.preventDefault(); }} maxLength={180} placeholder='Press "Enter" to type!' disabled={sharedStatus !== "Connected"} />
+            <button type="submit" disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
+              {chatCooldownSeconds > 0 ? `Send in ${chatCooldownSeconds}s` : "Send"}
+            </button>
           </form>
         </section>}
       </div>}
@@ -921,12 +1032,16 @@ export function Village() {
                     [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
                     ["Esc", t("Release the mouse / close", "マウスを解除 / 閉じる")],
                     [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
+                    [t("Click or tap a bench side", "ベンチの左右をクリック・タップ"), t("Sit on that side", "選んだ側に座る")],
                     [t("Drag while settled", "ひと休み中にドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
-                    ["R", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
+                    ["G", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
+                    ["R", t("Move to nearby safe ground if stuck", "動けなくなったら近くの安全な場所へ")],
                     ["Shift", t("Hold to dash", "長押しでダッシュ")],
                     ["Space", t("Jump", "ジャンプ")],
-                    ["E", t("Tend plants, sit, or enjoy a nearby activity", "植物のお世話・座る・近くの場所に入る")],
+                    ["E", t("Pet a puppy, tend plants, sit, enter an activity, or share harvest over tea with Luma", "子犬をなでる・植物のお世話・座る・近くの場所に入る・ルマと収穫をお茶で分かち合う")],
+                    ["P", t("Invite a nearby puppy to walk with you", "近くの子犬と一緒に歩く")],
+                    ["H", t("Send your puppy home", "子犬を元の場所に戻す")],
                     ["Enter", t("Message the village", "村のチャットに入力")],
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],

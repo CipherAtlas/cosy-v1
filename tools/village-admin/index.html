@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hearthwillow chat admin</title>
+  <link rel="stylesheet" href="/admin.css">
+  <script src="/admin.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>Hearthwillow chat</h1><p id="connection">Connecting to the village…</p></div>
+      <button id="refresh" type="button">Refresh</button>
+    </header>
+    <section aria-label="Current chat">
+      <div class="section-heading"><h2>Current hour</h2><button id="clear" class="danger" type="button" disabled>Clear all messages</button></div>
+      <p id="status" role="status" aria-live="polite">Loading messages…</p>
+      <div id="messages" class="messages"></div>
+    </section>
+  </main>
+</body>
+</html>

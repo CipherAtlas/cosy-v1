@@ -1,21 +1,21 @@
 import * as T from "three";
 import { BRIDGE, bridgeHeight, type Collider } from "./environment";
 
-/** Solid masonry arch, continuous paving and parapets, using the movement deck profile. */
+/** Solid masonry arch with paving and bank-side rail access, using the movement deck profile. */
 export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, colliders: Collider[]) {
   const bridge = new T.Group(); bridge.name = "Stone arch bridge";
   const masonry = stone.clone(); masonry.name = "Bridge limestone"; masonry.color.set("#c2c4b4");
   const { x: center, z, length, width } = BRIDGE;
   const start = center - length / 2, divisions = 64;
-  function archStrip(low: number, high: number, depth: number, offsetZ: number) {
+  function archStrip(low: number, high: number, depth: number, offsetZ: number, spanLength = length) {
     const shape = new T.Shape();
     for (let i = 0; i <= divisions; i++) {
-      const x = start + i * length / divisions;
+      const x = start + i * spanLength / divisions;
       if (i === 0) shape.moveTo(x, bridgeHeight(x) + high);
       else shape.lineTo(x, bridgeHeight(x) + high);
     }
     for (let i = divisions; i >= 0; i--) {
-      const x = start + i * length / divisions; shape.lineTo(x, bridgeHeight(x) + low);
+      const x = start + i * spanLength / divisions; shape.lineTo(x, bridgeHeight(x) + low);
     }
     shape.closePath();
     const geometry = new T.ExtrudeGeometry(shape, { depth, bevelEnabled: false, steps: 1 });
@@ -49,21 +49,26 @@ export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, c
   };
   for (const side of [-1, 1]) {
     const wallZ = z + side * (width / 2 + .22);
-    archStrip(0, .72, .44, wallZ - .22).name = "Continuous stone parapet";
+    const wallLength = side === 1 ? length - BRIDGE.northEastOpening : length;
+    archStrip(0, .72, .44, wallZ - .22, wallLength).name = "Stone parapet";
     for (let i = 0; i < 26; i++) {
-      const x = start + (i + .5) * length / 26;
-      const cap = block(x, bridgeHeight(x) + .81, wallZ, length / 26 - .014, .18, .54);
+      const x = start + (i + .5) * wallLength / 26;
+      const cap = block(x, bridgeHeight(x) + .81, wallZ, wallLength / 26 - .014, .18, .54);
       cap.rotation.z = Math.atan2(bridgeHeight(x + .01) - bridgeHeight(x - .01), .02);
     }
     for (let i = 0; i < 24; i++) {
-      const x = start + (i + .5) * length / 24;
-      colliders.push({ x, z: wallZ, w: length / 24, d: .44, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91 });
+      const x = start + (i + .5) * wallLength / 24;
+      colliders.push({ x, z: wallZ, w: wallLength / 24, d: .44, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91 });
     }
-    // Bank-bound abutments and larger end stones make the crossing visibly supported.
+    // Leave a bank-side opening beside the eastern approach, instead of enclosing a dead end.
     for (const end of [-1, 1]) {
-      const x = center + end * (length / 2 - .45);
-      block(x, -.24, wallZ, 1.35, .7, .72);
-      const postX = center + end * (length / 2 - .17), postFloor = bridgeHeight(postX);
+      const bankOpening = side === 1 && end === 1;
+      if (!bankOpening) {
+        const x = center + end * (length / 2 - .45);
+        block(x, -.24, wallZ, 1.35, .7, .72);
+      }
+      const postX = bankOpening ? start + wallLength - .17 : center + end * (length / 2 - .17);
+      const postFloor = bridgeHeight(postX);
       block(postX, postFloor + .47, wallZ, .5, .94, .64);
       colliders.push({ x: postX, z: wallZ, w: .5, d: .64, bottom: postFloor, top: postFloor + .94 });
     }

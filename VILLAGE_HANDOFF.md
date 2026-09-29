@@ -1,5 +1,79 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — local chat timestamps (local)
+
+New shared-chat entries store the Worker's send time and show a small timestamp beside each message in the viewing computer's local time and hour format. Older current-hour entries without a recorded send time stay visible without a timestamp. A focused Worker/client test confirms persistence and delivery; typecheck and the static export passed. A local browser preview with a mock WebSocket room showed the local time beside the new message and no time beside an older entry. Live deployment remains unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-local-chat-timestamps-local). No deployment occurred.
+
+## 2026-09-30 — shared chat participant list (local)
+
+The chat shows up to three visitor names directly. With four or more, **See everyone here (count)** opens a short, independently scrollable name list with the current visitor first. This keeps the fixed chat and composer usable as the room grows toward its 64-visitor cap. A local mock room with 64 visitors and 40 messages verified the collapsed layout and inspected the bounded list in the browser DOM. Live load, physical touch and screen reader behavior remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-shared-chat-participant-list-local). No deployment occurred.
+
+## 2026-09-30 — dialogue and animal action keycaps (local)
+
+NPC conversation actions and nearby puppy actions now keep clear square shortcut keycaps inside bordered, touchable buttons on desktop and phone layouts. NPC keys are F/C/B/E; puppy keys are E/P/H, including when a puppy button has focus. Puppy buttons expose the shortcuts with `aria-keyshortcuts` without repeating the visual letter in their accessible names. The rule is in `AGENTS.md`. Typecheck, 40 local dialogue checks and desktop/touch CSS checks passed; physical devices, the full React puppy overlay and deployed behavior remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-30-dialogue-and-animal-action-keycaps-local). No deployment occurred.
+
+## 2026-09-29 — bench side selection (local)
+
+Near a bench, visitors can click or tap the half they want, including the birdwatching bench and layout-authored benches. The bench-sized hit area follows its rotation and scale; tapping seats on release, while dragging continues camera look. E and the Sit button still choose an open side automatically, and shared seating remains available when both sides are occupied. The Controls guide names the gesture. TypeScript, local Chrome checks for both sides of all eight benches, touch, pointer lock and drag, the existing seating/camera regressions, and the root static export passed. The full React overlay, physical devices and live site were not tested. This has not been deployed. See [the build entry](VILLAGE_BUILD.md#2026-09-29-bench-side-selection-local).
+
+## 2026-09-29 — fixed and resizable shared chat (local)
+
+The chat now opens at a fixed 320 × 390 px size. Messages scroll inside it, and the lower-right corner resizes its width and height within the viewport. A local desktop drag and 390 × 844 viewport check passed; a live shared-world message stream, physical touch resizing and the deployed site remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-29-fixed-and-resizable-shared-chat-local). No deployment occurred.
+
+## 2026-09-29 — local chat admin (published)
+
+`tools/village-admin/` has a loopback-only admin page for the current shared chat. Start it from the repository root with `python3 tools/village-admin/server.py`, then open `http://127.0.0.1:3052/`; the [operator guide](tools/village-admin/README.md) covers the private secret, controls, stopping and troubleshooting. Its Python proxy reads a private mode-0600 secret file or prompts in the terminal, sends authenticated requests to the Worker over HTTPS, and does not give the secret to the browser. The page offers Remove per message and Clear all messages for the current hour. The Worker assigns stable message IDs, persists removal and broadcasts `chat_sync` so updated clients remove entries and matching overhead bubbles. Clear all also sends the established `hour` reset event to clear older open clients. The Worker and matching client shipped in [`747a27c`](https://github.com/CipherAtlas/cosy-v1/commit/747a27c109b1186a8be222fabf955ae45137bbb2) through successful [Pages run 36612482359](https://github.com/CipherAtlas/cosy-v1/actions/runs/36612482359). The follow-up Worker version `4938111e-591c-4083-8fb2-52d34f3555cb` cleared the user's already-open production tab after a second Clear all. Individual removal in an older tab still needs a reload. See [the build entry](VILLAGE_BUILD.md#2026-09-29-local-chat-admin).
+
+## 2026-09-29 — automatic shared chat reset (local)
+
+The shared chat's hourly alarm now clears and broadcasts the new UTC hour even after the Worker hibernates and wakes with no new message. The Worker restores the saved chat hour for the alarm to compare; a room without a saved chat starts uninitialized so its first connection schedules the same hourly cycle. The client's open log clears on the hour event, and an unsent draft remains available. A focused local Worker/client simulation, syntax checks and typecheck passed; the live alarm and deployed site have not been checked. See [the build entry](VILLAGE_BUILD.md#2026-09-29-automatic-shared-chat-reset-local). No deployment occurred.
+
+## 2026-09-29 — background world sound (local)
+
+Rain, river, fire and wind now continue with recorded music after a tab is hidden or the browser is minimized, while Sound off, master mute and individual mixer levels still apply. The mixer no longer mutes ambience on visibility changes, and the three short recordings use Web Audio loops with crossfaded seams so background timer throttling cannot interrupt them. Hidden-page effects remain suppressed. A local Chrome check simulated hidden visibility and stalled timers and measured non-silent output through multiple seams; actual minimized windows, other browsers/devices and listening quality remain open. No deployment occurred. See [the build entry](VILLAGE_BUILD.md#2026-09-29-background-world-sound-local).
+
+## 2026-09-29 — Luma mint interaction cue (local)
+
+After a mint harvest, a red animated exclamation follows Luma's visible head and her **Share your harvest over tea** button stays open and highlighted until the last mint is given away. E beside Luma activates the same tea action as the button. Nearby NPC actions show boxed keys like Chat's F. Reduced motion keeps the exclamation still. This is local only; see [the build entry](VILLAGE_BUILD.md#2026-09-29-luma-mint-interaction-cue-local) for checks and limits.
+
+## 2026-09-29 — journal note retention safeguards (local)
+
+The user reports that all Past notes disappear after updates at the same address and browser. That full-loss cause remains unconfirmed: the repository does not clear the stable `peaceful-room-gratitude-entries` key. A separate confirmed loss path was fixed: `/gratitude` used to keep only the newest eight entries when saving to the same key as Writing nook. Both screens now use the shared storage module, which preserves the full list and refuses to overwrite unreadable data. Writing nook → Past notes has Download notes and Restore backup; restore merges valid JSON backups with existing entries. This remains browser-local and is not a live or cross-device guarantee. A local reload check, storage regression checks, typecheck and static build passed. [Build evidence](VILLAGE_BUILD.md#2026-09-29-journal-note-retention-safeguards-local). No release was made.
+
+## 2026-09-29 — nearby unstuck recovery (local)
+
+R now recovers a stuck spirit onto nearby collision-checked ground; G takes over the quick-glide toggle. Touch exploration has an Unstuck button. The pictured east bridge-end gap beside the lamppost now has a direct bank-side opening through the shortened north parapet, with the masonry and collision boundary aligned. The deck profile and central rails remain. A focused regression crosses the opening in both directions and still checks R recovery, both bridge approaches and the middle. This is local only; see [the build entry](VILLAGE_BUILD.md#2026-09-29-nearby-unstuck-recovery-local) for verification and remaining limits.
+
+## 2026-09-29 — village puppies (local)
+
+Four original Blender puppies now load from `puppies.glb`: Mochi the corgi at the entrance, Kiko the Shiba on the cottage lane, Biscuit the beagle west of the bridge, and Cloud the Samoyed on the northern path. Their saved layout objects drive position, facing, scale and short collision-aware patrols. Nearby E or the Pet button starts a spirit reach, puppy nuzzle/wag/hop, two happy yips and brief floating hearts. Nearby P or **Walk with** invites one puppy to follow just behind the spirit; H or **Send home** dismisses it, and inviting another switches companions. The follower uses collision-aware paths, waits during activities and catches up after long travel. Follow state is local to this visit and is not shared with remote visitors. The yips are four edited cuts from a CC0 recording, routed through the existing spatial Effects bus after explicit sound activation. Reduced motion removes wagging, hopping and hearts. The local studio exposes each breed with a rendered preview and supports transform save/reload and Apply; protected presets and named working copies were not rewritten.
+
+The [build entry](VILLAGE_BUILD.md#2026-09-29-village-puppies-local) records the Blender source, sound provenance, local browser/editor checks and evidence. This work is local only. Headphone/speaker judgment, physical touch, sustained frame time and live deployment remain open.
+
+## 2026-09-29 — shared chat input prompt (local)
+
+The empty chat input now says “Press "Enter" to type!” Enter already opens and focuses chat from exploration. This copy change has only local verification. See [the build entry](VILLAGE_BUILD.md#2026-09-29-shared-chat-input-prompt-local).
+
+## 2026-09-29 — Safari scenery stalls and Detailed budget (local)
+
+The visitor's published Safari 26.6.2 build froze for 4–5 seconds on scenery changes at 1920×960 Detailed. Its 27 FPS report compared with 60 FPS after the battery preference had automatically reached Minimal at 1018×509 with shadows off; this changes pixel load by about 3.56×, plus geometry and shadow work. A local WebKit 26.5 direct night switch reproduced a roughly 6.6-second render-submission stall as lighting shader programs changed. The local fix shows a full-screen preparation view, compiles the target lighting asynchronously before revealing it, limits runtime point lights to the two nearest fixtures plus the local spirit, and lets Detailed lower only its drawing-buffer scale after sustained low FPS while retaining geometry and shadows. The editor night preview still shows all fixture lights. Focused local WebKit/exported-app checks and before/after night captures are in [the build ledger](VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local). This has not been deployed or tested in Safari 26.6.2; the exact cause of unrelated long-session pauses remains open.
+
+## 2026-09-29 — activity spirit seating (local)
+
+The Worker gives each visitor a persistent increasing slot number, which had been pushing the spirit progressively farther from every activity's fixed camera and the focus cottage chair. Activity staging now uses its authored position regardless of slot. Outdoor activity visitors may overlap; the focus cottage interior shows only the local spirit. Benches retain two side seats, with later visitors sharing an occupied side instead of being rejected. An 81-check production-scene regression covers all eight activities and high slot numbers. The local renderer passed the six-scene activity, solo-focus, camera-return and reduced-motion checks at slot 1000; a separate browser regression passed seating and overflow checks across all eight benches. Typecheck and the static export passed. React panels, the live Worker, deployed site and physical devices were not retested. No deployment occurred. See [the build entry](VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-local).
+
+## 2026-09-29 — point-light shader investigation (local)
+
+The live Firefox report near the bridge was 10 FPS in Golden hour on an M4 MacBook Air at 1920×965 Detailed graphics; intermittent 2 FPS was reported but did not reproduce in an isolated local run. The local runtime now skips point-light shading beyond each light's exact cutoff radius, preserving the lighting result. Native Firefox bridge captures retain the scene and show no WebGL error. A synchronized render probe showed a substantial night improvement; Golden-hour timings were variable and do not prove a win. The performance report now keeps low-FPS and longest-frame/render-submission evidence for the next episode. This is a local change only; sustained and live behavior remain open. See [the investigation ledger](VILLAGE_BUILD.md#2026-09-29-point-light-shader-performance-investigation-local).
+
+## 2026-09-29 — completed garden countdowns (local)
+
+The world and garden-panel growth clocks now hide at the deadline, including when a shared snapshot still says `growing`. Connected clients advance completed beds locally each second, and the Worker advances growth before validating a harvest, so a ripe crop can be picked once the Worker reaches the same deadline. Typecheck, Worker syntax, diff checks and a simulated early/completed harvest check passed. The focused world-clock browser regression was added but its QA preview controls did not initialize in the in-app browser; panel, live Worker and clock-skew behavior remain unverified. No deployment occurred. See [the build entry](VILLAGE_BUILD.md#2026-09-29-completed-garden-countdowns-local).
+
+## 2026-09-29 — rapid shared-chat messages (local)
+
+The shared chat client now disables Send and blocks Enter for 3.1 seconds after a send, matching the Worker's three-second per-visitor limit. The input remains editable and a follow-up sentence stays there until the visitor sends it after the cooldown. The prior automatic queue is removed. A focused cooldown test, typecheck, production-configured static export and local browser flow with a rate-limited localhost WebSocket server passed. The Worker and live site are unchanged; deployed delivery and tab-close recovery remain unverified. See [the build entry](VILLAGE_BUILD.md#2026-09-29-rapid-shared-chat-follow-up-local).
+
 ## 2026-09-29 — saved My village layout and editor controls (local)
 
 The newest named **My village** working copy has been applied to `public/village/world-layout.json` with its 345 objects plus six newer garden/pond lanterns, for 351 playable objects. The saved copy and protected presets were not modified; Apply created a backup in `tools/village-editor/layouts/.history/`. The saved planting clearings now affect the local game. Three cottages and the spire use saved positions/facing in runtime geometry and collision; three trees moved and one tree was removed. Other legacy props, bridges, activity anchors, garden behavior and cameras still follow their code-authored positions.
@@ -186,7 +260,7 @@ Published application: [`738e408`](https://github.com/CipherAtlas/cosy-v1/commit
 
 Hosting moved to [cosy.sabarg.com](https://cosy.sabarg.com/) with root-path export commit [`ec0da2d`](https://github.com/CipherAtlas/cosy-v1/commit/ec0da2d52eae51b0ddc5b6f1e7d822c2a3b2e1ec) and successful [Pages run 36257520921](https://github.com/CipherAtlas/cosy-v1/actions/runs/36257520921). Browser storage is origin-specific and does not transfer from the old `github.io` address. See [domain release evidence](VILLAGE_BUILD.md#2026-09-26-custom-domain-release).
 
-Current movement: WASD/arrows glide, R toggles quick glide, Shift dashes continuously, and Space jumps. Click the desktop canvas to capture the mouse; Escape, menus, activities, blur and disposal release it. Touch retains dragging and direction buttons. Ground clicks/taps do not move the player. No stamina, exhaustion, recovery or energy UI remains. Preserve the [movement/input contracts](docs/village/MOVEMENT_AND_WORLD.md).
+Current movement: WASD/arrows glide, G toggles quick glide, Shift dashes continuously, Space jumps, and R moves a stuck spirit to nearby safe ground. Click the desktop canvas to capture the mouse; Escape, menus, activities, blur and disposal release it. Touch retains dragging and direction buttons plus Unstuck. Ground clicks/taps do not move the player. No stamina, exhaustion, energy recovery or energy UI remains. Preserve the [movement/input contracts](docs/village/MOVEMENT_AND_WORLD.md).
 
 Current village: all four residents roam wider multi-point circuits, including Luma leaving the tea garden. Three bilingual timber fingerposts replace the older nine-sign layout. The hearth's road-facing east side is open; full sign/bench footprints are verified outside the streets. Dialogue retains both languages and the existing personalities with dark green panels, cream serif text and visible keyboard hints.
 

@@ -4,6 +4,7 @@ import { HEARTH, riverX } from "./environment";
 import { RecordedSoundtrack, soundtrackFor, type RadioTrack } from "./soundtrack";
 import { withBasePath } from "@/lib/basePath";
 import type { GardenSound } from "./garden";
+import type { PuppyBreed } from "./worldLayout";
 
 type Voice = { source: AudioScheduledSourceNode; nodes: AudioNode[]; end: number; effect: boolean };
 
@@ -32,7 +33,7 @@ export class VillageAudio {
   private mix: AudioMix = DEFAULT_MIX;
   private place: PlaceId | null = null;
   private environment: EnvironmentFrame = { listener: [0, 1.4, 20], forward: [0, 0, -1], wind: .3, weather: "golden", sheltered: false };
-  private recordings = new Map<string, { buffer: AudioBuffer; gain: GainNode; next: number }>();
+  private recordings = new Map<string, { buffer: AudioBuffer; gain: GainNode; playing: boolean }>();
   private loading?: Promise<boolean>;
   private loadAbort = new AbortController();
   private noise?: AudioBuffer;
@@ -41,6 +42,7 @@ export class VillageAudio {
   private nextDetail = 0;
   private steps = new Map<Surface, AudioBuffer[]>();
   private gardenSounds = new Map<GardenSound, AudioBuffer>();
+  private puppySounds = new Map<PuppyBreed, AudioBuffer>();
   private lastStep = -1;
   private onVisibility = () => this.apply();
 
@@ -86,11 +88,40 @@ export class VillageAudio {
       try {
         const response = await fetch(withBasePath(`/village/audio/world/${name}.mp3`), { signal: this.loadAbort.signal });
         if (!response.ok) return;
-        const buffer = await this.context!.decodeAudioData(await response.arrayBuffer());
-        if (!this.disposed) this.recordings.set(name, { buffer, gain: name === "fire" ? this.fire! : name === "stream" ? this.water! : this.rain!, next: 0 });
+        const buffer = this.loopableRecording(await this.context!.decodeAudioData(await response.arrayBuffer()));
+        if (!this.disposed) this.recordings.set(name, { buffer, gain: name === "fire" ? this.fire! : name === "stream" ? this.water! : this.rain!, playing: false });
       } catch { /* Report partial ambience availability; retry missing recordings on the next start. */ }
     })).then(() => this.recordings.size === 3).finally(() => { this.loading = undefined; });
     return this.loading;
+  }
+  private loopableRecording(buffer: AudioBuffer) {
+    const fade = Math.min(Math.floor(buffer.sampleRate * .8), Math.floor(buffer.length / 4));
+    if (!fade) return buffer;
+    const length = buffer.length - fade;
+    const loop = this.context!.createBuffer(buffer.numberOfChannels, length, buffer.sampleRate);
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+      const input = buffer.getChannelData(channel), output = loop.getChannelData(channel);
+      output.set(input.subarray(fade, length));
+      for (let i = 0; i < fade; i++) {
+        const blend = i / fade;
+        output[length - fade + i] = input[length + i] * (1 - blend) + input[i] * blend;
+      }
+    }
+    return loop;
+  }
+  private async loadPuppySounds() {
+    const breeds: PuppyBreed[] = ["corgi", "shiba", "beagle", "samoyed"];
+    await Promise.all(breeds.map(async (breed, index) => {
+      if (this.puppySounds.has(breed)) return;
+      const names = ["mochi", "kiko", "biscuit", "cloud"];
+      try {
+        const response = await fetch(withBasePath(`/village/audio/puppies/${names[index]}-yip.mp3`), { signal: this.loadAbort.signal });
+        if (!response.ok) return;
+        const buffer = await this.context!.decodeAudioData(await response.arrayBuffer());
+        if (!this.disposed) this.puppySounds.set(breed, buffer);
+      } catch { /* The village and other audio remain usable if an optional bark fails. */ }
+    }));
+    return this.puppySounds.size === 4;
   }
   async start() {
     if (this.disposed) throw new Error("Audio was disposed.");
@@ -112,8 +143,9 @@ export class VillageAudio {
         await this.soundtrack!.leaveRadio(cue);
       }
     };
-    const [ambience] = await Promise.all([
+    const [ambience, puppies] = await Promise.all([
       this.loadWorldRecordings(),
+      this.loadPuppySounds(),
       startMusic(),
     ]);
     if (this.disposed) throw new Error("Audio was disposed.");
@@ -121,7 +153,7 @@ export class VillageAudio {
     if (this.mix.master === 0) await c.suspend();
     this.schedule();
     if (!this.timer) this.timer = setInterval(() => this.schedule(), 80);
-    return { recorded: true, ambience, radioFailed };
+    return { recorded: true, ambience, puppies, radioFailed };
   }
   stop() {
     this.enabled = false;
@@ -132,7 +164,7 @@ export class VillageAudio {
     this.suspension = setTimeout(() => {
       if (!this.enabled && !this.disposed) {
         this.soundtrack?.pause(); this.clearVoices();
-        this.recordings.forEach(recording => recording.next = 0);
+        this.recordings.forEach(recording => recording.playing = false);
         void this.context?.suspend();
       }
     }, 350);
@@ -144,7 +176,7 @@ export class VillageAudio {
     this.soundtrack?.request(soundtrackFor(m, this.place, this.environment), true);
     if (this.enabled && this.context) {
       if (m.master === 0) {
-        this.soundtrack?.pause(); this.clearVoices(); this.recordings.forEach(r => r.next = 0);
+        this.soundtrack?.pause(); this.clearVoices(); this.recordings.forEach(r => r.playing = false);
         void this.context.suspend();
       } else {
         if (wasMasterSilent) void this.context.resume();
@@ -200,7 +232,7 @@ export class VillageAudio {
     this.master?.gain.setTargetAtTime(this.enabled ? this.mix.master * .65 : 0, c.currentTime, .12);
     this.music?.gain.setTargetAtTime(this.musicPaused ? 0 : this.mix.music * 1.6, c.currentTime, .5);
     this.effects?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.effects ?? .6), c.currentTime, .2);
-    this.ambience?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.ambience ?? .5), c.currentTime, .8);
+    this.ambience?.gain.setTargetAtTime(this.mix.ambience ?? .5, c.currentTime, .8);
     this.applyWorld();
   }
   private applyWorld() {
@@ -252,14 +284,11 @@ export class VillageAudio {
     this.soundtrack?.request(soundtrackFor(this.mix, this.place, this.environment));
     this.soundtrack?.tick();
     for (const recording of this.recordings.values()) {
-      if (recording.next > c.currentTime + .2) continue;
-      const when = Math.max(c.currentTime, recording.next), duration = recording.buffer.duration, fade = .8;
-      const source = c.createBufferSource(), gain = c.createGain(); source.buffer = recording.buffer;
-      gain.gain.setValueAtTime(0, when); gain.gain.linearRampToValueAtTime(1, when + fade);
-      gain.gain.setValueAtTime(1, when + duration - fade); gain.gain.linearRampToValueAtTime(0, when + duration);
+      if (recording.playing) continue;
+      const source = c.createBufferSource(), gain = c.createGain(); source.buffer = recording.buffer; source.loop = true;
+      gain.gain.setValueAtTime(0, c.currentTime); gain.gain.linearRampToValueAtTime(1, c.currentTime + .8);
       source.connect(gain).connect(recording.gain);
-      if (this.track(source, [gain], when + duration)) source.start(when);
-      recording.next = when + duration - fade;
+      if (this.track(source, [gain], Infinity)) { source.start(); recording.playing = true; }
     }
     if (!document.hidden && c.currentTime > this.nextDetail) {
       this.nextDetail = c.currentTime + 7 + Math.random() * 10;
@@ -359,6 +388,20 @@ export class VillageAudio {
     source.connect(gain).connect(pan).connect(this.effects!);
     if (this.track(source, [gain, pan], c.currentTime + buffer.duration / .96, true)) source.start();
   }
+  puppyEffect(breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") {
+    const c = this.context, buffer = this.puppySounds.get(breed);
+    if (!this.enabled || !c || !buffer || c.state !== "running" || document.hidden || this.mix.master === 0 || this.mix.effects === 0) return;
+    const listener = this.environment.listener;
+    if (Math.hypot(position[0] - listener[0], position[1] - listener[1], position[2] - listener[2]) > 22) return;
+    for (let i = 0; i < (kind === "happy" ? 2 : 1); i++) {
+      const when = c.currentTime + i * .23;
+      const source = c.createBufferSource(), gain = c.createGain(), pan = this.panner(position, 2.5);
+      source.buffer = buffer; source.playbackRate.value = .97 + Math.random() * .07 + (kind === "happy" && i === 1 ? .07 : 0);
+      gain.gain.value = kind === "happy" ? (i ? .24 : .34) : .19;
+      source.connect(gain).connect(pan).connect(this.effects!);
+      if (this.track(source, [gain, pan], when + buffer.duration / source.playbackRate.value, true)) source.start(when);
+    }
+  }
   chime() {
     if (!this.enabled || !this.context || document.hidden) return;
     const c = this.context;
@@ -376,7 +419,7 @@ export class VillageAudio {
     this.disposed = true; this.stop(); clearTimeout(this.suspension); this.loadAbort.abort();
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.clearVoices(); this.loops.forEach(s => { s.stop(); s.disconnect(); }); this.recordings.clear(); this.steps.clear(); this.soundtrack?.dispose();
-    this.gardenSounds.clear();
+    this.gardenSounds.clear(); this.puppySounds.clear();
     void this.context?.close();
   }
 }

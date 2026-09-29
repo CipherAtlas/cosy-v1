@@ -32,7 +32,7 @@ export function GardenActivity(p: GardenControls) {
           : bed.stage === "sprout" ? t(`A little water, then about ${minutes} minutes`, `水をあげたら、約${minutes}分で育ちます`)
           : bed.stage === "growing" ? t("Growing quietly. Go enjoy the village.", "のんびり成長中。村でゆっくりしてね。")
           : t("Ready whenever you are", "好きなときに収穫してね")}</span></div>
-        {bed.stage === "growing" && <div className="v-growth-clock" role="img" aria-label={t(`${cropName}: ${growthTimeLeft(bed, now)} until ready`, `${cropName}：収穫まで ${growthTimeLeft(bed, now)}`)}>
+        {bed.stage === "growing" && growthProgress(bed, now) < 1 && <div className="v-growth-clock" role="img" aria-label={t(`${cropName}: ${growthTimeLeft(bed, now)} until ready`, `${cropName}：収穫まで ${growthTimeLeft(bed, now)}`)}>
           <svg viewBox="0 0 56 56" aria-hidden="true"><circle className="v-growth-track" cx="28" cy="28" r="24" />
             <circle className="v-growth-progress" cx="28" cy="28" r="24" pathLength="1" strokeDasharray={`${growthProgress(bed, now)} 1`} transform="rotate(-90 28 28)" /></svg>
           <span aria-hidden="true">{growthTimeLeft(bed, now)}</span>

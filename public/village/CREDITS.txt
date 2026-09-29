@@ -81,3 +81,15 @@ runtime models/dove.glb; generator scripts/village/create_dove.py.
 White plumage, scalloped wings, rosy cheeks and tiny peach feet use vertex colors.
 Wren uses the original spirit with original flower/scarf/pouch accessories.
 No third-party models or textures. The two-note coo is an original Web Audio effect.
+
+Village puppies (2026-09-29) — original Cosy project artwork.
+Mochi, Kiko, Biscuit and Cloud modeled in Blender 5.2.1 LTS.
+Editable source: assets/village/puppies.blend; generator: scripts/village/create_puppies.py.
+Runtime model: models/puppies.glb. No third-party character models or textures.
+
+Puppy bark recordings — Brandon Morris (submitted by HaelDB).
+Source: https://opengameart.org/content/dog-barking-mono
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Four short cuts were trimmed, filtered, pitched and normalized for individual dogs.
+The original recording is archived at assets/village/audio/dog-barking-source.wav;
+file hashes and modifications are in docs/village/puppy-sound-manifest.json.

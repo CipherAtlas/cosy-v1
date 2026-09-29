@@ -132,7 +132,7 @@ export class VillageActivities {
     this.page.visible=false;
     this.changedAt=this.time;
   }
-  update(time:number,place:PlaceId|null,reduced:boolean,player:T.Group,character:T.Object3D|undefined,scale:number,sharedSlot:number|null=null) {
+  update(time:number,place:PlaceId|null,reduced:boolean,player:T.Group,character:T.Object3D|undefined,scale:number) {
     const dt=Math.min(.1,time-this.time);
     this.time=time;
     const t=reduced?0:time, age=time-this.changedAt, moment=this.moment;
@@ -175,19 +175,6 @@ export class VillageActivities {
     this.motes.instanceMatrix.needsUpdate=true;
     if(!place)return;
     const pose=ACTIVITY_STAGES[place];player.position.fromArray(pose.actor);player.rotation.y=pose.yaw;
-    if (sharedSlot !== null) {
-      const viewX = pose.look[0] - pose.camera[0], viewZ = pose.look[2] - pose.camera[2];
-      const length = Math.hypot(viewX, viewZ) || 1;
-      const side = sharedSlot % 2 === 0 ? -1 : 1;
-      const pair = Math.floor(sharedSlot / 2);
-      const lateral = (place === "focus" ? .7 : 1.2) + pair % 3 * .65;
-      const depth = Math.floor(pair / 3) * .75;
-      if (place === "breathe" && sharedSlot < 2) player.position.x += side;
-      else {
-        player.position.x += -viewZ / length * side * lateral + viewX / length * depth;
-        player.position.z += viewX / length * side * lateral + viewZ / length * depth;
-      }
-    }
     if(character) {
       const bob=reduced?0:Math.sin(t*1.7)*.025;
       character.position.y=.62+bob+(place==="breathe"&&!reduced?breath*.12:0);

@@ -9,6 +9,7 @@ import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, make
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RESIDENT_IDS, type ResidentRoute, type ResidentId } from "../../features/village/worldLayout";
 import { fenceGeometry } from "../../features/village/fenceGeometry";
+import { PUPPY_INFO } from "../../features/village/puppies";
 
 export type LayoutItem = {
   id: string; asset: string; name: string; position: [number, number, number];
@@ -151,10 +152,18 @@ export class LayoutScene {
       const id = `garden-${name.toLowerCase()}`;
       this.assets.set(id, { id, name: name === "WateringCan" ? "Watering can" : name, category: ["WateringCan", "Basket"].includes(name) ? "Furnishings" : "Nature", template: root, shelf: true });
     }
-    const [doveKit, spiritKit] = await Promise.all([
+    const [doveKit, spiritKit, puppyKit] = await Promise.all([
       new GLTFLoader().loadAsync("/village/models/dove.glb?v=1"),
       new GLTFLoader().loadAsync("/village/models/spirit.glb?v=1"),
+      new GLTFLoader().loadAsync("/village/models/puppies.glb?v=1"),
     ]);
+    for (const [breed, info] of Object.entries(PUPPY_INFO)) {
+      const model = puppyKit.scene.getObjectByName(info.model);
+      if (!model) throw Error(`Missing ${info.model} puppy model.`);
+      const template = model.clone(true);
+      template.traverse(node => { if (node instanceof T.Mesh) node.castShadow = node.receiveShadow = true; });
+      this.assets.set(`puppy-${breed}`, { id: `puppy-${breed}`, name: `${info.name} · ${info.breed}`, category: "Puppies", template, shelf: true });
+    }
     const dove = doveKit.scene.getObjectByName("Dove")!;
     dove.getObjectByName("DoveWingLeft")!.rotation.z = 1.12;
     dove.getObjectByName("DoveWingRight")!.rotation.z = -1.12;

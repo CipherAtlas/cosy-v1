@@ -1,0 +1,67 @@
+{
+  "pass": true,
+  "activities": [
+    {
+      "id": "focus",
+      "actor": [
+        108.65,
+        0.15,
+        -0.65
+      ],
+      "visible": true
+    },
+    {
+      "id": "music",
+      "actor": [
+        -5.8,
+        0.4,
+        -16.1
+      ],
+      "visible": true
+    },
+    {
+      "id": "breathe",
+      "actor": [
+        -23,
+        0.24,
+        -5.5
+      ],
+      "visible": true
+    },
+    {
+      "id": "mood",
+      "actor": [
+        13.9,
+        0.4,
+        -10
+      ],
+      "visible": true
+    },
+    {
+      "id": "gratitude",
+      "actor": [
+        -18.2,
+        0.05,
+        6.6
+      ],
+      "visible": true
+    },
+    {
+      "id": "compliment",
+      "actor": [
+        3.05,
+        0.05,
+        0.35
+      ],
+      "visible": true
+    }
+  ],
+  "reducedMotion": true,
+  "exitFramingRestored": true,
+  "errors": [],
+  "stats": {
+    "fps": 96,
+    "draws": 338,
+    "triangles": 2631674
+  }
+}

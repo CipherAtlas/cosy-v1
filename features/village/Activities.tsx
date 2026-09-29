@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Pause,
   Play,
@@ -13,6 +13,7 @@ import {
 import type { AudioMix, PlaceId } from "./places";
 import type { ActivityMoment } from "./environment";
 import type { FocusSession } from "./useSession";
+import { deleteGratitudeEntry, exportGratitudeEntries, importGratitudeEntries, readGratitudeEntries, saveGratitudeEntry, type GratitudeEntry } from "@/features/gratitude/storage";
 import { BirdActivity, GardenActivity, MintTea, PondFeeding, type GardenControls } from "./GardenActivities";
 
 type Props = {
@@ -410,47 +411,39 @@ function Mood({
     </section>
   );
 }
-type Entry = { id: string; text: string; createdAt: string };
 function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Props["onMoment"] }) {
   const ja = language === "ja";
+  const importInput = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(""),
-    [entries, setEntries] = useState<Entry[]>([]),
+    [entries, setEntries] = useState<GratitudeEntry[]>([]),
     [status, setStatus] = useState(""),
+    [readFailed, setReadFailed] = useState(false),
     [history, setHistory] = useState(false),
     [remove, setRemove] = useState<string | null>(null);
+  const download = () => {
+    try {
+      const url = URL.createObjectURL(new Blob([exportGratitudeEntries()], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "hearthwillow-notes.json";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStatus(ja ? "メモのバックアップをダウンロードしました。" : "Notes backup downloaded.");
+    } catch {
+      setStatus(ja ? "バックアップを作れませんでした。" : "Could not create the notes backup.");
+    }
+  };
   useEffect(() => {
     try {
-      const v = JSON.parse(
-        localStorage.getItem("peaceful-room-gratitude-entries") || "[]",
-      );
-      if (Array.isArray(v))
-        setEntries(
-          v.filter(
-            (e) =>
-              typeof e?.text === "string" &&
-              typeof e?.createdAt === "string" &&
-              typeof e?.id === "string",
-          ),
-        );
-    } catch {}
-  }, []);
-  function persist(next: Entry[]) {
-    try {
-      localStorage.setItem(
-        "peaceful-room-gratitude-entries",
-        JSON.stringify(next),
-      );
-      setEntries(next);
-      return true;
+      setEntries(readGratitudeEntries());
+      setReadFailed(false);
     } catch {
-      setStatus(
-        ja
-          ? "保存できませんでした。文章をコピーしてください。"
-          : "This browser could not save. Please copy your note.",
-      );
-      return false;
+      setReadFailed(true);
+      setStatus(ja
+        ? "保存済みのメモを読み込めませんでした。データは変更していません。"
+        : "Saved notes could not be read. Your stored data has not been changed.");
     }
-  }
+  }, [ja]);
   return (
     <section className="v-activity v-paper v-journal">
       <h2>{ja ? "今日、心に残ったこと。" : "Something worth keeping."}</h2>
@@ -459,21 +452,18 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
         onSubmit={(e) => {
           e.preventDefault();
           if (!text.trim()) return;
-          if (
-            persist([
-              {
-                id: crypto.randomUUID(),
-                text: text.trim(),
-                createdAt: new Date().toISOString(),
-              },
-              ...entries,
-            ])
-          ) {
+          try {
+            setEntries(saveGratitudeEntry(text.trim()));
+            setReadFailed(false);
             setText("");
             onMoment({kind:"save"});
             setStatus(
               ja ? "この端末に保存しました。" : "Kept safely on this device.",
             );
+          } catch {
+            setStatus(ja
+              ? "保存できませんでした。文章をコピーしてください。保存済みのメモは変更していません。"
+              : "This browser could not save. Please copy your note. Stored notes were not changed.");
           }
         }}
       >
@@ -486,7 +476,7 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
           onChange={(e) => {
             setText(e.target.value);
             onMoment({kind:"write"});
-            setStatus("");
+            if (!readFailed) setStatus("");
           }}
           maxLength={10000}
           placeholder={
@@ -518,13 +508,30 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
       </p>
       {history && (
         <div className="v-notes">
-          {entries.length === 0 ? (
+          <div className="v-actions">
+            <button className="v-button" type="button" onClick={download}>{ja ? "メモをダウンロード" : "Download notes"}</button>
+            <button className="v-button" type="button" onClick={() => importInput.current?.click()}>{ja ? "バックアップを復元" : "Restore backup"}</button>
+            <input ref={importInput} className="sr-only" type="file" accept="application/json,.json" aria-label={ja ? "メモのバックアップファイル" : "Notes backup file"} onChange={async event => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (!file) return;
+              try {
+                const restored = importGratitudeEntries(await file.text());
+                setEntries(restored);
+                setReadFailed(false);
+                setStatus(ja ? "バックアップを復元しました。既存のメモも残っています。" : "Backup restored. Existing notes were kept.");
+              } catch {
+                setStatus(ja ? "バックアップを復元できませんでした。保存済みのメモは変更していません。" : "Could not restore this backup. Stored notes were not changed.");
+              }
+            }} />
+          </div>
+          {entries.length === 0 && !readFailed ? (
             <p>
               {ja
                 ? "最初のメモをここに。"
                 : "Your first thought can live here."}
             </p>
-          ) : (
+          ) : entries.length > 0 ? (
             entries.map((e) => (
               <article key={e.id}>
                 <p>{e.text}</p>
@@ -539,8 +546,14 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
                     <span>
                       <button
                         onClick={() => {
-                          persist(entries.filter((n) => n.id !== e.id));
-                          setRemove(null);
+                          try {
+                            setEntries(deleteGratitudeEntry(e.id));
+                            setRemove(null);
+                          } catch {
+                            setStatus(ja
+                              ? "メモを削除できませんでした。保存済みのメモは変更していません。"
+                              : "Could not delete this note. Stored notes were not changed.");
+                          }
                         }}
                       >
                         {ja ? "削除する" : "Delete"}
@@ -557,7 +570,7 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
                 </footer>
               </article>
             ))
-          )}
+          ) : null}
         </div>
       )}
     </section>

@@ -1,5 +1,22 @@
 import * as T from "three";
 
+// Three evaluates every point light's BRDF for every shaded pixel, even beyond
+// its cutoff radius where distance attenuation is exactly zero. Keep the same
+// lighting result while skipping that work for the village's local lamps.
+export function skipDistantPointLights() {
+  const source = T.ShaderChunk.lights_fragment_begin;
+  const guard = "if (pointLight.distance <= 0.0 || dot(pointLight.position - geometryPosition, pointLight.position - geometryPosition) < pointLight.distance * pointLight.distance) {";
+  if (source.includes(guard)) return;
+  const start = "\t\tpointLight = pointLights[ i ];";
+  const end = "\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );";
+  const from = source.indexOf(start), to = source.indexOf(end, from);
+  if (from < 0 || to < 0) return;
+  T.ShaderChunk.lights_fragment_begin = source.slice(0, from) + start + `
+    ${guard}` +
+    source.slice(from + start.length, to) + end + `
+    }` + source.slice(to + end.length);
+}
+
 // Three r186 uses five randomly rotated PCF samples. A fixed weighted grid gives
 // this slow, bright scene a smooth penumbra without screen-space grain.
 const shadowChunk = T.ShaderChunk.shadowmap_pars_fragment.replace(

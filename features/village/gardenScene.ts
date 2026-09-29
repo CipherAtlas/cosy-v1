@@ -339,11 +339,12 @@ export class GardenScene {
       const growth = this.state.beds[i].stage === "growing" ? .18 + growthProgress(this.state.beds[i]) * .82 : 1;
       bed.root.scale.set(1, bed.scale * growth, 1);
       const clock = this.clocks[i], value = this.state.beds[i];
-      clock.sprite.visible = value.stage === "growing";
-      const text = growthTimeLeft(value);
+      const now = Date.now(), progress = growthProgress(value, now);
+      clock.sprite.visible = value.stage === "growing" && progress < 1;
+      const text = growthTimeLeft(value, now);
       if (clock.sprite.visible && clock.text !== text) {
         clock.text = text;
-        const c = clock.canvas.getContext("2d")!, progress = growthProgress(value);
+        const c = clock.canvas.getContext("2d")!;
         c.clearRect(0, 0, 192, 192); c.fillStyle = "#faf3de";
         c.beginPath(); c.arc(96, 96, 84, 0, Math.PI * 2); c.fill();
         c.lineWidth = 9; c.strokeStyle = "#d7dfc6"; c.beginPath(); c.arc(96, 96, 69, 0, Math.PI * 2); c.stroke();

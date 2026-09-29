@@ -1,10 +1,10 @@
 import { readGarden, type GardenAction, type GardenState } from "./garden";
 
 export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; z: number; heading: number };
-export type SharedChatEntry = { id?: string; name: string; message: string };
+export type SharedChatEntry = { id?: string; messageId?: string; name: string; message: string; sentAt?: number };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
-  sendChat: (message: string) => void;
+  sendChat: (message: string) => boolean;
   close: () => void;
 };
 
@@ -15,6 +15,7 @@ type WorldMessage =
   | { type: "leave"; id: string }
   | { type: "garden"; garden: GardenState; event: { action: GardenAction; actor: string; x: number; z: number } }
   | { type: "chat"; chatHour: number; entry: SharedChatEntry }
+  | { type: "chat_sync"; chatHour: number; chat: SharedChatEntry[]; removedMessageIds: string[] }
   | { type: "hour"; chatHour: number }
   | { type: "error"; message: string };
 
@@ -22,6 +23,8 @@ export function connectSharedWorld(options: {
   getPose: () => { x: number; z: number; heading: number } | null;
   onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
   onChat: (entry: SharedChatEntry) => void;
+  onChatModerated?: (removedMessageIds: string[]) => void;
+  onChatCooldown: (until: number) => void;
   onAction: (event: { action: GardenAction; x: number; z: number; isSelf: boolean }) => void;
   onDisconnect: () => void;
 }): Promise<SharedWorldConnection> {
@@ -39,12 +42,20 @@ export function connectSharedWorld(options: {
     let connectedOnce = false;
     let closed = false;
     let lastPose: { x: number; z: number; heading: number } | null = null;
+    let nextChatAt = 0;
     const publish = (gardenChanged = false) => options.onState({
       selfId, visitors: [...visitors.values()], garden, gardenChanged, chatHour, chat,
     });
     const connection: SharedWorldConnection = {
       sendGarden: action => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "garden", action })); },
-      sendChat: message => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "chat", message })); },
+      sendChat: message => {
+        if (socket?.readyState !== WebSocket.OPEN || Date.now() < nextChatAt) return false;
+        try { socket.send(JSON.stringify({ type: "chat", message })); }
+        catch { return false; }
+        nextChatAt = Date.now() + 3100; // The Worker accepts one message per visitor every 3 seconds.
+        options.onChatCooldown(nextChatAt);
+        return true;
+      },
       close: () => {
         closed = true;
         window.clearInterval(interval);
@@ -65,6 +76,8 @@ export function connectSharedWorld(options: {
           joined = true;
           retryDelay = 1000;
           lastPose = null;
+          nextChatAt = 0;
+          options.onChatCooldown(0);
           selfId = message.selfId;
           visitors.clear();
           for (const visitor of message.visitors) visitors.set(visitor.id, visitor);
@@ -102,6 +115,11 @@ export function connectSharedWorld(options: {
           chat = [...chat, message.entry].slice(-80);
           publish();
           options.onChat(message.entry);
+        } else if (message.type === "chat_sync") {
+          chatHour = message.chatHour;
+          chat = message.chat;
+          publish();
+          options.onChatModerated?.(message.removedMessageIds);
         } else if (message.type === "hour") {
           chatHour = message.chatHour;
           chat = [];

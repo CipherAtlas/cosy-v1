@@ -80,6 +80,38 @@ export async function checkDialogue(engine) {
     check(visible().length === 1, 'Overlapping residents do not stack unreadable bubbles');
     residents.forEach((r, i) => r.root.position.set(-4.5 + i * 3, 0, -3)); update(30);
     check(visible().length <= 2, 'At most two ambient bubbles appear together');
+    dialogue.dispose();
+    let teaVisits = 0;
+    dialogue = new VillagerDialogue(host, { residents }, [], () => interactions++, {
+      companion: () => {}, crumbs: () => {}, visitTea: () => teaVisits++,
+    });
+    dialogue.resize(1280, 720); dialogue.setEnabled(true);
+    residents.forEach((r, i) => r.root.position.set(i === 3 ? 0 : 100, 0, 0));
+    player.set(0, 0, 2.4); update();
+    const luma = host.querySelector('[data-villager="luma"]');
+    const tea = luma.querySelector('[data-tea]');
+    const mark = host.querySelector('.v-luma-attention');
+    check(tea.querySelector('kbd')?.textContent === 'E' &&
+      luma.querySelector('.v-villager-actions button kbd')?.textContent === 'C',
+      'Luma actions show boxed E and C keys beside their buttons');
+    check(mark.hidden && !tea.classList.contains('has-harvest'), 'Luma has no harvest cue before mint is picked');
+    dialogue.setMintAvailable(true); update();
+    check(!mark.hidden && tea.classList.contains('has-harvest'), 'Mint highlights tea and shows Luma attention cue');
+    check(tea.getAttribute('aria-label').startsWith('Mint ready.'), 'The mint cue has an accessible action name');
+    dialogue.setLanguage('ja');
+    check(tea.getAttribute('aria-label').startsWith('ミントの収穫があります。'), 'The mint cue is named in Japanese too');
+    dialogue.setLanguage('en');
+    update(6.1);
+    check(!luma.classList.contains('is-compact') && !tea.hidden, 'Luma keeps the harvest action visible after greeting expires');
+    tea.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', bubbles: true }));
+    check(teaVisits === 1, 'E on the focused tea button enters the same interaction');
+    dialogue.setMintAvailable(false); update();
+    check(mark.hidden && !tea.classList.contains('has-harvest'), 'Sharing the last mint clears both cues');
+    check(!dialogue.visitTea(), 'E cannot activate tea while its button is folded away');
+    dialogue.talk(3); update();
+    check(dialogue.visitTea() && teaVisits === 2, 'Tea remains directly available when its button is visible without mint');
+    player.set(0, 0, 10); update();
+    check(!dialogue.visitTea() && teaVisits === 2, 'Tea shortcut cannot activate from far away');
     if (engine) {
       engine.setBlocked(true);
       check(engine.dialogue.layer.hidden, 'Engine menus suppress conversations');

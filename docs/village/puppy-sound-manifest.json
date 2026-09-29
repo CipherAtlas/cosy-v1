@@ -1,0 +1,38 @@
+{
+  "source": "https://opengameart.org/content/dog-barking-mono",
+  "sourceFile": "assets/village/audio/dog-barking-source.wav",
+  "author": "Brandon Morris (submitted by HaelDB)",
+  "license": "CC0 1.0, selected from OpenGameArt's dual CC0 / OGA-BY listing",
+  "changes": "Four individual barks trimmed, high/low-pass filtered, gently pitched, faded, normalized and encoded as mono MP3.",
+  "clips": [
+    {
+      "name": "mochi",
+      "file": "public/village/audio/puppies/mochi-yip.mp3",
+      "bytes": 2349,
+      "sha256": "194132ea918a7e71a2f780a96321e23daff58753d3d4355f980eeb5af913f7a1",
+      "pitchRatio": 1.31
+    },
+    {
+      "name": "kiko",
+      "file": "public/village/audio/puppies/kiko-yip.mp3",
+      "bytes": 2061,
+      "sha256": "7ae1275f4e138902eb6d6228bcae1281eb99f8bc5c4a70bc1e3bff9b90bbb3a8",
+      "pitchRatio": 1.23
+    },
+    {
+      "name": "biscuit",
+      "file": "public/village/audio/puppies/biscuit-yip.mp3",
+      "bytes": 2637,
+      "sha256": "7a15f35a32a241072dca37d431876b3e8b298404988cf7932d238a402acb903c",
+      "pitchRatio": 1.11
+    },
+    {
+      "name": "cloud",
+      "file": "public/village/audio/puppies/cloud-yip.mp3",
+      "bytes": 3213,
+      "sha256": "1cb351fdd5049d22d674166dd830db4c44bfd099e45f85f5977ae1f5a135d7b9",
+      "pitchRatio": 1.18
+    }
+  ],
+  "preview": "docs/village/evidence/puppy-yips.mp3"
+}

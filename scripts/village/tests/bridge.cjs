@@ -3,7 +3,7 @@ const path = require('node:path');
 const T = require('three');
 const build = process.argv[2];
 const { buildBridge } = require(path.join(build, 'bridge.js'));
-const { BRIDGE, bridgeHeight } = require(path.join(build, 'environment.js'));
+const { BRIDGE, bridgeHeight, onBridge } = require(path.join(build, 'environment.js'));
 const { VillageMovement } = require(path.join(build, 'movement.js'));
 const colliders = [];
 const bridge = buildBridge(new T.MeshStandardMaterial(), new T.MeshStandardMaterial(), colliders);
@@ -38,3 +38,35 @@ for (const direction of [-1, 1]) {
  assert(Math.abs(m.position.z-BRIDGE.z)<BRIDGE.width/2-.25,'Parapet must contain a jump');
 }
 console.log('PASS bank-to-bank traversal in both directions and both parapet barriers');
+for (const offset of [-5.4, 0, 5.4]) {
+ const m = new VillageMovement(colliders, () => {});
+ m.settle(BRIDGE.x + offset, BRIDGE.z + 1.35);
+ const spot = m.recoverySpot();
+ assert(spot, 'Recovery must find nearby ground at the bridge');
+ assert(Math.hypot(spot.x - m.position.x, spot.z - m.position.z) <= 12.01);
+ assert(!onBridge(spot.x, spot.z), 'Recovery must leave the bridge');
+ assert(m.clear(spot.x, spot.z), 'Recovery destination must pass movement collision');
+ if (offset) assert(Math.sign(spot.x - BRIDGE.x) === Math.sign(offset), 'Recovery should keep the player on the same bank');
+}
+console.log('PASS bridge recovery reaches nearby clear ground without crossing banks');
+// The reported pinch point is between the eastern end stone and the path lamp.
+const approachColliders = [...colliders, { x: -4.5, z: 8.5, w: .4, d: .4, top: 3.5 }];
+const northRailZ = BRIDGE.z + BRIDGE.width / 2 + .22;
+ray.set(new T.Vector3(-5.5, 4, northRailZ), new T.Vector3(0, -1, 0));
+assert(ray.intersectObject(bridge, true)[0].point.y < .3, 'The bank-side opening must be visible, not hidden behind a stone rail');
+ray.set(new T.Vector3(-7, 4, northRailZ), new T.Vector3(0, -1, 0));
+assert(ray.intersectObject(bridge, true)[0].point.y > 1, 'The remaining parapet must still protect the raised bridge');
+const approach = new VillageMovement(approachColliders, () => {});
+for (const x of [-5.8, -5.5, -5.2]) {
+ approach.settle(x, 6);
+ assert(approach.canWalkTo(x, 3.5), 'The bank-side gap must connect directly to the bridge deck');
+ for (let i = 0; i < 180; i++) approach.update(1 / 60, { x: 0, z: -1, run: false, sprint: false, blocked: false });
+ assert(approach.position.z < 3.5, 'Walking toward the bridge must pass through the opened approach');
+ approach.settle(x, 3.5);
+ assert(approach.canWalkTo(x, 6), 'The opening must also allow a safe exit to the bank');
+}
+approach.settle(-5.5, 6);
+const landing = approach.recoverySpot();
+assert(landing && landing.x > approach.position.x, 'The east-bank recovery must move away from the end stone');
+assert(approach.clear(landing.x, landing.z) && !onBridge(landing.x, landing.z));
+console.log('PASS pictured bridge-end gap is walkable in both directions and still has recovery');

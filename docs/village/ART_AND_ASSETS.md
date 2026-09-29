@@ -1,6 +1,10 @@
 # Art direction, lighting, and asset production
 
-Updated: 2026-09-27. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
+Updated: 2026-09-29. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
+
+## Village puppies — 2026-09-29 local
+
+Mochi the corgi, Kiko the Shiba Inu, Biscuit the beagle and Cloud the Samoyed were modeled in isolated Blender 5.2.1 LTS with painted vertex colors, rounded forms, distinct ears/tails and small face details. [Generator](../../scripts/village/create_puppies.py), editable `assets/village/puppies.blend`, runtime `public/village/models/puppies.glb`, [manifest](puppies-manifest.json) and [lineup render](evidence/puppies-blender.png) are the source trail. Each dog has nine named rigid parts for walking, nuzzling, tail wagging and petting reactions; no texture files or third-party character assets were used. Four nearby village placements are in the playable layout and the local editor's Puppies shelf. The close view is intentionally rounded and stylized; final art judgment should include an in-world daylight pass on the user's display.
 
 ## White dove and bird clearing — 2026-09-27
 
@@ -45,6 +49,8 @@ Speech uses dark green panels, cream serif text and pastel resident names. The C
 Nine physical posts now mark the entrance, two junctions and six destinations. The entrance directory and painted labels use shared English/Japanese place names, warm wood, pale faces and colored arrows. Reverse-side arrows reverse direction correctly. The player retains its movement heading when idle.
 
 Directional shadows use a fixed weighted 16-sample PCF filter instead of the installed Three r186 randomized five-sample pattern. Detailed quality refreshes every frame; low quality is capped at roughly 30 Hz. The shadow anchor advances by small texel-scale steps instead of two-meter jumps. Existing vegetation shader hooks are preserved. Inspect [current shadows](evidence/polish-soft-shadows.png) and [entrance](evidence/polish-entrance.png); target-device performance and complete lighting acceptance remain open.
+
+The later local Safari-stall pass keeps all authored night lanterns, lit glass and halos, while the playable scene gives real-time point-light ground illumination to the two fixtures nearest the visitor and to the visitor's own spirit. Distant ground pools are dimmer; compare the [all-fixture](evidence/scenery-night-all-lamps.png) and [nearby-light](evidence/scenery-night-nearby-lamps.png) entrance captures. The editor night preview continues to show all fixture lights for placement. This is a performance trade-off awaiting live visual acceptance.
 
 ## Latest direction — colorful fantasy and a white spirit
 

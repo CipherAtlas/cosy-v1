@@ -1,0 +1,18 @@
+{
+  "id": "puppies-v1",
+  "breeds": [
+    "corgi",
+    "shiba",
+    "beagle",
+    "samoyed"
+  ],
+  "source": "assets/village/puppies.blend",
+  "runtime": "public/village/models/puppies.glb",
+  "creator": "Original project artwork, Blender 5.2.1 LTS",
+  "license": "Original project artwork; no third-party character assets or textures.",
+  "bytes": 1956804,
+  "sha256": "35e3da3b7d713c0eb8deb0a594cf014ea319e16af79ca6ebc2acd1c0ce9c93ab",
+  "triangles": 58516,
+  "textures": 0,
+  "animatedPartsPerDog": 9
+}

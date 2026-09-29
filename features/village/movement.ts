@@ -53,14 +53,37 @@ export class VillageMovement {
     if (!inWalkableWorld(x, z)) return false;
     if (Math.abs(x - riverX(z)) < 3.6 && !onBridge(x, z)) return false;
     if (pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
-    // Bridge parapets remain barriers in the air; hops do not unlock swimming.
-    if (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 && Math.abs(z - 3) > BRIDGE.width / 2 - r && Math.abs(z - 3) < BRIDGE.width / 2 + 0.4) return false;
+    // Keep the rails solid in the air while leaving the visible east-bank opening walkable.
+    const railDistance = Math.abs(z - BRIDGE.z);
+    if (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 &&
+      railDistance > BRIDGE.width / 2 - r && railDistance < BRIDGE.width / 2 + .4 &&
+      (z < BRIDGE.z || x < BRIDGE.x + BRIDGE.length / 2 - BRIDGE.northEastOpening)) return false;
     return !this.colliders.some(c => {
       if (y >= (c.top ?? 8) || y + MOVEMENT.height <= (c.bottom ?? -1)) return false;
       const dx = Math.max(Math.abs(x - c.x) - c.w / 2, 0);
       const dz = Math.max(Math.abs(z - c.z) - c.d / 2, 0);
       return dx * dx + dz * dz < r * r;
     });
+  }
+  recoverySpot() {
+    const origin = this.position;
+    const awayFromRiver = origin.x < riverX(origin.z) ? Math.PI : 0;
+    for (let radius = 1.5; radius <= 12; radius += .75) {
+      for (let step = 0; step < 16; step++) {
+        const angle = awayFromRiver + step * Math.PI / 8;
+        const x = origin.x + Math.cos(angle) * radius;
+        const z = origin.z + Math.sin(angle) * radius;
+        if (onBridge(x, z) || onPondDock(x, z) || Math.abs(x - riverX(z)) < 4.2 || pondDistance(x, z) < 1.1) continue;
+        const floor = floorHeight(x, z);
+        if (!this.clear(x, z, floor)) continue;
+        // Leave room for the whole spirit and reject sharp edges beside the landing point.
+        const margin = .55;
+        if ([[margin, 0], [-margin, 0], [0, margin], [0, -margin]].some(([dx, dz]) =>
+          !this.clear(x + dx, z + dz) || Math.abs(floorHeight(x + dx, z + dz) - floor) > .25)) continue;
+        return { x, z };
+      }
+    }
+    return null;
   }
   private emit(kind: WorldContact["kind"], impact = 0) {
     const { x, y, z } = this.position;

@@ -1,6 +1,6 @@
 # Recorded music and world sound
 
-Updated: 2026-09-28. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+Updated: 2026-09-29. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
 
 ## Personal lo-fi radio design — disabled 2026-09-28
 
@@ -15,6 +15,10 @@ The catalog and streams depend on Audius availability. Artist pages are linked b
 The local addition uses seven original cached procedural effects in `VillageAudio.gardenEffect`: planting, watering, picking, pouring mint tea, crumbs, splash and a soft duck call. They use the existing effects/master buses, explicit Sound activation, visibility guard, distance attenuation and 16-voice effect budget; simple view uses centered output. Fish landing and occasional nearby ducks can play effects while wandering. The recorded music above is unchanged.
 
 [Sound checks](evidence/garden-garden-audio.json) verify non-silent output for all seven effects plus activation/mute/off/disposal and voice limits. [Short preview](evidence/garden-garden-sounds.webm) records the production master bus. Perceptual headphone/speaker balance and physical-phone sound remain unreviewed.
+
+## Puppy yips — 2026-09-29 local
+
+Each of the four breeds has one short recorded bark cut, with subtle runtime pitch variation. Petting schedules a second, lighter yip; an occasional nearby bark gives the village a little life without constant repetition. The four clips come from Brandon Morris's [CC0 dog barking recording](https://opengameart.org/content/dog-barking-mono) and are archived with the [source and modification manifest](puppy-sound-manifest.json); [listen to the four clips](evidence/puppy-yips.mp3). They are decoded only after explicit sound activation, routed through the existing Effects/master buses, spatially attenuated, capped by the existing effect voice budget and silenced by Effects mute or a hidden tab. The browser check verified decode and scheduling, but headphone/speaker judgment and phone output remain open.
 
 ## The requirement
 
@@ -39,9 +43,9 @@ Two HTML media elements stream through separate Web Audio gains into the music b
 
 ## A real world soundscape
 
-`audio.ts` decodes three short recordings after explicit activation: stream water, rain and fireplace. The beds overlap with 0.8-second gain fades to hide excerpt boundaries. Rain responds to weather and the rain slider. Stream and fire use distance attenuation and panning; the stream emitter follows the nearest river segment, while fire switches between the shared hearth and sheltered cottage anchors.
+`audio.ts` decodes three short recordings after explicit activation: stream water, rain and fireplace. Each decoded bed has a 0.8-second crossfaded seam and plays as a continuous Web Audio loop, independent of page timers. Rain responds to weather and the rain slider. Stream and fire use distance attenuation and panning; the stream emitter follows the nearest river segment, while fire switches between the shared hearth and sheltered cottage anchors.
 
-Shared gusts still drive a quiet filtered wind layer. Sparse birds, spirit takeoff/landing, paper, door and completion effects remain locally synthesized effects. The request to stop procedural **music** does not remove these responsive effects. Hovering spirits do not produce walking footsteps. Hidden tabs mute world ambience/effects; intentionally enabled music can continue.
+Shared gusts still drive a quiet filtered wind layer. Sparse birds, spirit takeoff/landing, paper, door and completion effects remain locally synthesized effects. The request to stop procedural **music** does not remove these responsive effects. Hovering spirits do not produce walking footsteps. Enabled music and world ambience continue in hidden tabs; movement and interaction effects are suppressed until the page is visible again.
 
 Outdoor listener position follows the spirit, with camera-facing orientation. Settled activities use their authored listening position. Shelter reduces/filter outdoor sound. Firefox's legacy listener methods remain supported when AudioParam coordinates are unavailable.
 
@@ -49,7 +53,7 @@ Outdoor listener position follows the spirit, with camera-facing orientation. Se
 
 - Separate music, ambience and effects buses feed a master compressor. Existing levels are preserved; old preferences default to `Follow the scenery` without changing notes or timers.
 - Stop fades for 350 ms, pauses both recordings, clears temporary sources and suspends the context. Master zero also pauses/suspends; world-only unmute resumes without restarting music.
-- Only two long recordings stream at once. Three short nature beds are decoded; non-effect voices are capped at 32 and effects at 16, including release tails. No full music tracks are decoded into Web Audio buffers.
+- Only two long recordings stream at once. Three short nature beds are decoded and loop from Web Audio sources; non-effect voices are capped at 32 and effects at 16, including release tails. No full music tracks are decoded into Web Audio buffers.
 - Partial nature failure is reported. Missing beds are retried on the next explicit start. Disposal aborts fetches, stops media and generated sources, removes listeners and closes the audio context.
 - Local audio payload added by this pass is about 13.7 MB on disk, loaded on demand after activation. This is not an initial-page transfer measurement or constrained-network benchmark.
 

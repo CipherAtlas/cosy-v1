@@ -1,0 +1,23 @@
+:root { font-family: system-ui, -apple-system, sans-serif; color: #254238; background: #f6f4e9; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 760px; margin: 0 auto; padding: clamp(20px, 5vw, 52px) 20px; }
+header, .section-heading, article { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+header { margin-bottom: 42px; }
+h1 { margin: 0 0 7px; font: 34px/1.1 Georgia, serif; }
+h2 { margin: 0; font: 23px Georgia, serif; }
+header p, #status { margin: 0; color: #65786e; font-size: 14px; }
+.section-heading { margin-bottom: 13px; }
+#status { min-height: 24px; margin-bottom: 12px; }
+.messages { border-top: 1px solid #d6ddd3; }
+article { padding: 18px 0; border-bottom: 1px solid #d6ddd3; align-items: flex-start; }
+article > div { min-width: 0; }
+article strong { font-size: 14px; }
+article p { margin: 5px 0 0; overflow-wrap: anywhere; line-height: 1.45; }
+button { min-height: 40px; padding: 8px 14px; border: 1px solid #becfc2; border-radius: 9px; background: #fffdf5; color: #254238; font: 600 13px system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+button:hover:not(:disabled) { background: #ebf0e8; }
+button:focus-visible { outline: 3px solid #567f67; outline-offset: 2px; }
+button:disabled { opacity: .5; cursor: default; }
+button.danger { border-color: #dfbdb4; color: #8c3934; }
+button.danger:hover:not(:disabled) { background: #fff0eb; }
+@media (max-width: 500px) { header { align-items: flex-start; } h1 { font-size: 29px; } .section-heading { align-items: flex-start; } article { gap: 10px; } }

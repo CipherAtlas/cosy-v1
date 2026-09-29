@@ -13,9 +13,14 @@ const formatDate = (iso: string) =>
 export default function GratitudePage() {
   const [value, setValue] = useState("");
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
+  const [storageError, setStorageError] = useState(false);
 
   useEffect(() => {
-    setEntries(readGratitudeEntries());
+    try {
+      setEntries(readGratitudeEntries());
+    } catch {
+      setStorageError(true);
+    }
   }, []);
 
   const onSave = (event: FormEvent<HTMLFormElement>) => {
@@ -26,8 +31,13 @@ export default function GratitudePage() {
       return;
     }
 
-    setEntries(saveGratitudeEntry(next));
-    setValue("");
+    try {
+      setEntries(saveGratitudeEntry(next));
+      setValue("");
+      setStorageError(false);
+    } catch {
+      setStorageError(true);
+    }
   };
 
   return (
@@ -52,12 +62,13 @@ export default function GratitudePage() {
             Save locally
           </button>
         </form>
+        {storageError && <p role="alert" className="text-sm text-room-text">Notes could not be read or saved in this browser. Any text you entered remains above; please copy it before leaving.</p>}
 
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-room-muted">Recent entries</p>
-          {entries.length === 0 ? (
+          {entries.length === 0 && !storageError ? (
             <p className="text-sm text-room-muted">Your notes stay here, on this device.</p>
-          ) : (
+          ) : entries.length > 0 ? (
             <ul className="space-y-2">
               {entries.map((entry) => (
                 <li key={entry.id} className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
@@ -66,7 +77,7 @@ export default function GratitudePage() {
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </div>
       </div>
     </FeatureFrame>

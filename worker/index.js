@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { freshGarden, readGarden, gardenAction, gardenActionAllowed } from "../features/village/garden.ts";
+import { freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed } from "../features/village/garden.ts";
 
 const MAX_VISITORS = 64;
 const adjectives = ["Relaxed", "Sleepy", "Cosy", "Sunny", "Gentle", "Snuggly", "Cheerful", "Drowsy", "Mellow", "Kind", "Rosy", "Dreamy", "Soft", "Warm", "Little", "Jolly", "Calm", "Cloudy", "Happy", "Fluffy"];
@@ -31,13 +31,33 @@ function send(socket, message) {
   catch { /* A closed connection is removed by webSocketClose. */ }
 }
 
+async function authorized(request, token) {
+  const header = request.headers.get("Authorization") || "";
+  if (typeof token !== "string" || token.length < 32 || !header.startsWith("Bearer ")) return false;
+  const supplied = header.slice(7);
+  if (supplied.length < 32 || supplied.length > 512) return false;
+  const encoder = new TextEncoder();
+  const [expectedHash, suppliedHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(token)),
+    crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
+  ]);
+  const expected = new Uint8Array(expectedHash);
+  const actual = new Uint8Array(suppliedHash);
+  let difference = 0;
+  for (let index = 0; index < expected.length; index++) difference |= expected[index] ^ actual[index];
+  return difference === 0;
+}
+
 export class VillageWorld extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
     this.garden = readGarden(JSON.stringify(ctx.storage.kv.get("garden") || freshGarden()));
     const savedChat = ctx.storage.kv.get("chat");
-    this.chatHour = Math.floor(Date.now() / 3_600_000);
-    this.chat = savedChat?.hour === this.chatHour ? savedChat.entries : [];
+    this.chatHour = savedChat?.hour ?? -1;
+    this.chat = (savedChat?.entries ?? []).map(entry => entry.messageId ? entry : { ...entry, messageId: crypto.randomUUID() });
+    if (savedChat && this.chat.some((entry, index) => entry !== savedChat.entries[index])) {
+      ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+    }
   }
 
   sockets() { return this.ctx.getWebSockets(); }
@@ -64,6 +84,34 @@ export class VillageWorld extends DurableObject {
   async alarm() { this.rollHour(); }
 
   async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/admin/chat") {
+      this.rollHour();
+      if (request.method === "GET") return Response.json({ chatHour: this.chatHour, entries: this.chat });
+      if (request.method === "DELETE") {
+        if (request.headers.get("If-Match") !== `"${this.chatHour}"`) {
+          return new Response("Chat hour changed", { status: 409 });
+        }
+        const removedMessageIds = this.chat.map(entry => entry.messageId);
+        this.chat = [];
+        this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+        // Older open clients already understand this reset event.
+        this.broadcast({ type: "hour", chatHour: this.chatHour });
+        this.broadcast({ type: "chat_sync", chatHour: this.chatHour, chat: this.chat, removedMessageIds });
+        return Response.json({ chatHour: this.chatHour, entries: this.chat });
+      }
+      return new Response("Method not allowed", { status: 405 });
+    }
+    const removeMatch = /^\/admin\/chat\/([0-9a-f-]{36})$/.exec(url.pathname);
+    if (removeMatch && request.method === "DELETE") {
+      this.rollHour();
+      const index = this.chat.findIndex(entry => entry.messageId === removeMatch[1]);
+      if (index < 0) return new Response("Message no longer exists", { status: 404 });
+      this.chat.splice(index, 1);
+      this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+      this.broadcast({ type: "chat_sync", chatHour: this.chatHour, chat: this.chat, removedMessageIds: [removeMatch[1]] });
+      return Response.json({ chatHour: this.chatHour, entries: this.chat });
+    }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") return new Response("WebSocket required", { status: 426 });
     this.rollHour();
     if (this.sockets().length >= MAX_VISITORS) return new Response("Village full", { status: 503 });
@@ -106,6 +154,7 @@ export class VillageWorld extends DurableObject {
     } else if (message.type === "garden" && validAction(message.action, this.garden.beds.length)) {
       const action = message.action;
       if ((action.kind === "feed" || action.kind === "feedBirds") && !visitor.crumbPouch) return;
+      this.garden = growGarden(this.garden);
       if (action.kind !== "feedBirds" && !gardenActionAllowed(this.garden, action)) return;
       if (action.kind === "crumbs" || action.kind === "birdCrumbs") {
         visitor.crumbPouch = true;
@@ -121,7 +170,7 @@ export class VillageWorld extends DurableObject {
       visitor.lastChat = now;
       socket.serializeAttachment(visitor);
       this.rollHour();
-      const entry = { id: visitor.id, name: visitor.name, message: text };
+      const entry = { id: visitor.id, messageId: crypto.randomUUID(), name: visitor.name, message: text, sentAt: now };
       this.chat = [...this.chat, entry].slice(-80);
       this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
       this.broadcast({ type: "chat", chatHour: this.chatHour, entry });
@@ -138,6 +187,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/health") return Response.json({ ok: true });
+    if (url.pathname.startsWith("/admin/")) {
+      if (!await authorized(request, env.VILLAGE_ADMIN_TOKEN)) return new Response("Unauthorized", { status: 401 });
+      return env.VILLAGE.getByName("one-shared-village").fetch(request);
+    }
     if (url.pathname !== "/" || request.method !== "GET") return new Response("Not found", { status: 404 });
     const origin = request.headers.get("Origin");
     if (origin !== "https://cosy.sabarg.com" && origin !== "http://127.0.0.1:3051") return new Response("Forbidden", { status: 403 });

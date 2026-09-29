@@ -18,7 +18,7 @@ let clipboard: LayoutItem[] = [];
 let pasteCount = 0;
 let contextPoint: [number, number, number] | null = null;
 let extendingPath: string | null = null;
-const categories = ["All", "Buildings", "Bridges", "Nature", "Villagers", "Furnishings", "Paths", "Landscape"];
+const categories = ["All", "Buildings", "Bridges", "Nature", "Villagers", "Puppies", "Furnishings", "Paths", "Landscape"];
 let state: DocumentState;
 let selection: string[] = [];
 let category = "All", tab = "assets", activeTool = "select", placement: string | null = null;

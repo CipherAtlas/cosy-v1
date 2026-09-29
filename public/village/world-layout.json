@@ -7757,6 +7757,46 @@
       ],
       "visible": true,
       "locked": false
+    },
+    {
+      "id": "puppy-mochi",
+      "asset": "puppy-corgi",
+      "name": "Mochi",
+      "position": [3.1, 0, 18.5],
+      "rotation": [0, 195, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "puppy-kiko",
+      "asset": "puppy-shiba",
+      "name": "Kiko",
+      "position": [3, 0, -12],
+      "rotation": [0, 25, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "puppy-biscuit",
+      "asset": "puppy-beagle",
+      "name": "Biscuit",
+      "position": [-18, 0, 0.3],
+      "rotation": [0, 90, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "puppy-cloud",
+      "asset": "puppy-samoyed",
+      "name": "Cloud",
+      "position": [-1, 0, -29],
+      "rotation": [0, 25, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
     }
   ],
   "routes": {

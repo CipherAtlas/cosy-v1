@@ -8,6 +8,8 @@ import { buildWorld, type VillageBench, type World } from "./world";
 import { VillageMovement } from "./movement";
 import { createAtmosphere } from "./atmosphere";
 import { BirdFlock, type BirdStatus } from "./birds";
+import { PuppyPack, type NearbyPuppy } from "./puppies";
+import type { PuppyBreed } from "./worldLayout";
 import { VillageLife } from "./life";
 import { CompanionHands } from "./companionWalk";
 import { VillagerDialogue } from "./dialogue";
@@ -15,7 +17,7 @@ import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
 import { GARDEN_TARGETS, HARVEST_COMPLIMENTS, freshGarden, nearbyGardenAction, type GardenState, type GardenAction, type GardenSound } from "./garden";
 import type { ActivityMoment } from "./environment";
-import { softenShadowEdges } from "./shadows";
+import { skipDistantPointLights, softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
 import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
@@ -31,6 +33,10 @@ export class VillageEngine {
   private life?: VillageLife;
   private companionHands = new CompanionHands();
   private birds?: BirdFlock;
+  private puppies?: PuppyPack;
+  private nearPuppy: NearbyPuppy | null = null;
+  private puppyPetAt = -100;
+  private puppyPetTarget = new T.Vector3();
   private birdFeedAt = -100;
   private dialogue?: VillagerDialogue;
   private activities?: VillageActivities;
@@ -46,7 +52,7 @@ export class VillageEngine {
   private player = new T.Group();
   private character?: T.Object3D;
   private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement }>();
-  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number }>();
+  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
   private sharedSpawnPlaced = false;
@@ -74,7 +80,14 @@ export class VillageEngine {
     id: number;
     x: number;
     y: number;
+    startX: number;
+    startY: number;
+    seat?: { id: string; index: 0 | 1 };
   };
+  private benchRaycaster = new T.Raycaster();
+  private benchPointer = new T.Vector2();
+  private benchMatrix = new T.Matrix4();
+  private benchHit = new T.Vector3();
   private mouseLook: "free" | "locked" | "drag" = "free";
   private wantsMouseLook = false;
   private pointerLockPending = false;
@@ -90,11 +103,17 @@ export class VillageEngine {
   private seatedIndex: 0 | 1 | null = null;
   private quality: Quality = "auto";
   private graphicsTier: GraphicsTier = "detailed";
+  private detailedRenderScale = 1;
+  private sceneryPrepareId = 0;
   private qualityChangedAt = 0;
   private slowSamples = 0;
   private frameSum = 0;
   private frames = 0;
   private statsTime = 0;
+  private lowestFps = Infinity;
+  private longestFrameMs = 0;
+  private longestRenderSubmitMs = 0;
+  private lastSceneryPrepareMs = 0;
   private reducedMotion = false;
   private motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   private sun = new T.DirectionalLight("#ffe0ad", 4.1);
@@ -121,7 +140,7 @@ export class VillageEngine {
   private treeFrustum = new T.Frustum();
   private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
-  private spiritLights = Array.from({ length: 4 }, () => new T.PointLight("#ffd17d", 0, 5, 2));
+  private spiritLights = [new T.PointLight("#ffd17d", 0, 5, 2)];
   private spiritGlowColor = new T.Color("#ffd58e");
   private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
@@ -146,15 +165,22 @@ export class VillageEngine {
       e.preventDefault();
     this.keys.add(e.key.toLowerCase());
     if (e.key === " " && !e.repeat && !this.seatedBench) this.movement?.jump();
-    if (e.key.toLowerCase() === "r" && !e.repeat) this.toggleRun();
+    if (e.key.toLowerCase() === "r" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.resetPosition();
+    if (e.key.toLowerCase() === "g" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.toggleRun();
     if (e.key.toLowerCase() === "f" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.talk();
     if (e.key.toLowerCase() === "c" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.invite();
     if (e.key.toLowerCase() === "b" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.bread();
+    if (e.key.toLowerCase() === "p" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && this.nearPuppy)
+      this.togglePuppyFollow(this.nearPuppy.id);
+    if (e.key.toLowerCase() === "h" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey)
+      this.sendPuppyHome();
     if (e.key.toLowerCase() === "e" && !e.repeat && !this.place) {
+      if (this.dialogue?.visitTea()) return;
       if (this.seatedBench) this.stand();
       else if (this.nearBench) this.sit(this.nearBench.id);
       else if (this.nearGarden && nearbyGardenAction(this.nearGarden, this.gardenState)) this.callbacks.gardenInteract?.(this.nearGarden);
       else if (this.near === "birds") this.callbacks.scatterBirds?.();
+      else if (this.nearPuppy) this.petPuppy(this.nearPuppy.id);
       else if (this.near && this.near !== "garden") this.callbacks.interact(this.near);
     }
   };
@@ -183,18 +209,34 @@ export class VillageEngine {
   private onDown = (e: PointerEvent) => {
     if (this.blocked || e.button !== 0 || this.pointer) return;
     this.renderer.domElement.focus({ preventScroll: true });
-    if (document.pointerLockElement === this.renderer.domElement) return;
+    const canvas = this.renderer.domElement;
+    const locked = document.pointerLockElement === canvas;
+    const rect = canvas.getBoundingClientRect();
+    const seat = this.pickBenchSeat(locked ? rect.left + rect.width / 2 : e.clientX,
+      locked ? rect.top + rect.height / 2 : e.clientY);
+    if (locked) {
+      if (seat) this.sit(seat.id, seat.index);
+      return;
+    }
     this.pointer = {
       id: e.pointerId,
       x: e.clientX,
       y: e.clientY,
+      startX: e.clientX,
+      startY: e.clientY,
+      seat: seat ?? undefined,
     };
-    if (e.pointerType === "mouse" && !this.place) this.captureMouse();
-    else this.renderer.domElement.setPointerCapture(e.pointerId);
+    if (seat || e.pointerType !== "mouse" || this.place) canvas.setPointerCapture(e.pointerId);
+    else this.captureMouse();
   };
   private onMove = (e: PointerEvent) => {
-    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked
-      || (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag")) return;
+    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked) return;
+    if (this.pointer.seat) {
+      if (Math.hypot(e.clientX - this.pointer.startX, e.clientY - this.pointer.startY) < 8) return;
+      this.pointer.seat = undefined;
+      if (e.pointerType === "mouse") this.setMouseLook("drag");
+    }
+    if (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag") return;
     const dx = e.clientX - this.pointer.x,
       dy = e.clientY - this.pointer.y;
     const lookStep = .004 * (e.pointerType === "mouse" ? this.mouseSensitivity : 1);
@@ -211,8 +253,10 @@ export class VillageEngine {
   };
   private onUp = (e: PointerEvent) => {
     if (this.pointer?.id !== e.pointerId) return;
+    const { seat, startX, startY } = this.pointer;
     this.pointer = undefined;
     if (this.renderer.domElement.hasPointerCapture(e.pointerId)) this.renderer.domElement.releasePointerCapture(e.pointerId);
+    if (seat && Math.hypot(e.clientX - startX, e.clientY - startY) < 8) this.sit(seat.id, seat.index);
   };
   private onMouseMove = (e: MouseEvent) => {
     if (document.pointerLockElement !== this.renderer.domElement || this.blocked || this.place) return;
@@ -293,12 +337,12 @@ export class VillageEngine {
       near: (id: PlaceId | null) => void;
       nearBench?: (id: string | null) => void;
       seat?: (id: string | null) => void;
-      seatFull?: () => void;
       scatterBirds?: () => void;
       interact: (id: PlaceId) => void;
       error: (message: string) => void;
       stats: (fps: number, draws: number, triangles: number) => void;
       movement: (status: MovementStatus) => void;
+      recovered?: (result: "nearby" | "entrance" | "unavailable") => void;
       contact: (event: WorldContact) => void;
       environment: (frame: EnvironmentFrame) => void;
       mouseLook?: (mode: "free" | "locked" | "drag") => void;
@@ -309,6 +353,10 @@ export class VillageEngine {
       gardenSound?: (kind: GardenSound, position: [number, number, number]) => void;
       nearGarden?: (id: string | null) => void;
       gardenInteract?: (id: string) => void;
+      nearPuppy?: (puppy: NearbyPuppy | null) => void;
+      puppyFollowing?: (puppy: NearbyPuppy | null) => void;
+      puppyPetted?: (puppy: NearbyPuppy) => void;
+      puppySound?: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void;
     },
   ) {
     this.renderer = new T.WebGLRenderer({
@@ -325,7 +373,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Hearthwillow village. Use arrow keys or WASD to move, R to glide faster, hold Shift to run, Space to jump. Click to capture the mouse, move it to look, and press Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to tend nearby plants, sit, or enter activities; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for crumbs when close.",
+      "Walkable Hearthwillow village. Use arrow keys or WASD to move, G to glide faster, hold Shift to run, Space to jump, or R to move to nearby safe ground if stuck. Click to capture the mouse, move it to look, and press Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to pet a nearby puppy, tend plants, sit, enter activities, or share harvest over tea with nearby Luma; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for crumbs when close.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -383,13 +431,14 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const [world, gltf, gardenKit, dove] = await Promise.all([
+    const [world, gltf, gardenKit, dove, puppyKit] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
         withBasePath("/village/models/spirit.glb?v=1"),
       ),
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
+      new GLTFLoader().loadAsync(withBasePath("/village/models/puppies.glb?v=1")),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -456,13 +505,18 @@ export class VillageEngine {
       this.callbacks.gardenSound?.("crumbs", [BIRD_CLEARING.x, .4, BIRD_CLEARING.z]);
     });
     this.scene.add(this.birds.group);
+    this.puppies = new PuppyPack(puppyKit.scene, world.authored.puppies, world.colliders, world.authored,
+      (breed, position, kind) => this.callbacks.puppySound?.(breed, position, kind));
+    this.scene.add(this.puppies.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
       companion: id => this.callbacks.companion?.(id), crumbs: id => this.callbacks.crumbs?.(id), visitTea: () => this.callbacks.visitTea?.(),
     });
+    this.dialogue.setMintAvailable(this.gardenState.mint > 0);
     this.dialogue.setLanguage(this.language);
     this.dialogue.setEnabled(!this.blocked && !this.place);
     this.resize();
     this.buildInterior();
+    skipDistantPointLights();
     softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
       rainPositions = new Float32Array(1200 * 6);
@@ -691,7 +745,8 @@ export class VillageEngine {
     if (!w || !h) return;
     this.statsTime = this.qualityChangedAt = performance.now();
     this.frameSum = this.frames = this.slowSamples = 0;
-    this.renderer.setPixelRatio(graphicsPixelRatio(this.graphicsTier, w, h, window.devicePixelRatio));
+    this.renderer.setPixelRatio(graphicsPixelRatio(this.graphicsTier, w, h, window.devicePixelRatio) *
+      (this.graphicsTier === "detailed" ? this.detailedRenderScale : 1));
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.compactView = w <= 700;
@@ -724,6 +779,7 @@ export class VillageEngine {
   setQuality(q: Quality) {
     this.quality = q;
     this.graphicsTier = initialGraphicsTier(q);
+    if (q === "high") this.detailedRenderScale = 1;
     this.applyGraphicsTier();
   }
   private applyGraphicsTier() {
@@ -760,14 +816,52 @@ export class VillageEngine {
       drawingBuffer: [gl.drawingBufferWidth, gl.drawingBufferHeight],
       preference: this.quality,
       tier: this.graphicsTier,
+      detailedRenderScale: this.detailedRenderScale,
       shadows: this.renderer.shadowMap.enabled,
       antialias: gl.getContextAttributes()?.antialias,
       contextLost: gl.isContextLost(),
+      weather: this.weather,
+      lowestFps: Number.isFinite(this.lowestFps) ? this.lowestFps : null,
+      longestFrameMs: Math.round(this.longestFrameMs),
+      longestRenderSubmitMs: Math.round(this.longestRenderSubmitMs),
+      lastSceneryPrepareMs: Math.round(this.lastSceneryPrepareMs),
+      shaderPrograms: this.renderer.info.programs?.length ?? 0,
     };
   }
   setWeather(w: Weather) {
     this.weather = w;
     this.renderer.shadowMap.needsUpdate = this.place !== "focus";
+  }
+  async prepareWeather(w: Weather) {
+    if (this.disposed || !this.world || this.weather === w) return;
+    const prepareId = ++this.sceneryPrepareId;
+    const start = performance.now();
+    this.renderer.setAnimationLoop(null);
+    this.clearKeys();
+    this.setWeather(w);
+    this.weatherBlend.rain = w === "rain" ? 1 : 0;
+    this.weatherBlend.dusk = w === "dusk" ? 1 : 0;
+    this.weatherBlend.night = w === "night" ? 1 : 0;
+    this.updateLighting(0);
+    this.updateSpiritLights();
+    if (this.rain) this.rain.visible = w === "rain" && this.place !== "focus";
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+      if (this.disposed || prepareId !== this.sceneryPrepareId) return;
+      const now = performance.now();
+      this.bridgeWindowTime = -1000;
+      this.renderBridgeWindow(now, this.elapsed);
+      this.renderer.shadowMap.needsUpdate = this.place !== "focus";
+      this.renderer.render(this.scene, this.camera);
+    } finally {
+      if (!this.disposed && prepareId === this.sceneryPrepareId && !this.renderer.getContext().isContextLost()) {
+        this.lastSceneryPrepareMs = performance.now() - start;
+        this.lastTime = 0;
+        this.statsTime = this.qualityChangedAt = performance.now();
+        this.frameSum = this.frames = this.slowSamples = 0;
+        this.renderer.setAnimationLoop((time) => this.frame(time));
+      }
+    }
   }
   private updateLighting(dt: number) {
     const speed = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 2.4);
@@ -794,6 +888,7 @@ export class VillageEngine {
     fog.color.lerp(this.lightColor.set("#172544"), night);
     fog.density = .0046 + rain * .005 + dusk * .001 + night * .0007;
     this.world?.setWeather(rain, dusk, night);
+    this.world?.updateLampLights(this.player.position.x, this.player.position.z);
     this.atmosphere.setWeather(rain, dusk, night);
     if (Math.abs(night - this.spiritGlowApplied) > .015 || night === 0 && this.spiritGlowApplied !== 0) {
       this.glowSpirit(this.player, night);
@@ -802,7 +897,7 @@ export class VillageEngine {
       this.spiritGlowApplied = night;
     }
   }
-  setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); }
+  setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); this.dialogue?.setMintAvailable(state.mint > 0); }
   getPlayerPose() { return { x: this.player.position.x, z: this.player.position.z, heading: this.player.rotation.y }; }
   showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) {
     const id = entry.id ?? (entry.name === selfName ? selfId : [...this.remoteVisitors].find(([, remote]) => remote.name === entry.name)?.[0]);
@@ -817,11 +912,32 @@ export class VillageEngine {
       element.remove();
       this.chatBubbles.delete(id);
     }, 6000);
-    this.chatBubbles.set(id, { element, timer });
+    this.chatBubbles.set(id, { element, timer, messageId: entry.messageId });
+  }
+  removeChatBubbles(messageIds: string[]) {
+    const removed = new Set(messageIds);
+    for (const [id, bubble] of this.chatBubbles) {
+      if (!bubble.messageId || !removed.has(bubble.messageId)) continue;
+      clearTimeout(bubble.timer);
+      bubble.element.remove();
+      this.chatBubbles.delete(id);
+    }
   }
   private seatPoint(bench: VillageBench, index: 0 | 1) {
     const offset = index === 0 ? -.68 : .68;
     return { x: bench.x + Math.cos(bench.facing) * offset, z: bench.z - Math.sin(bench.facing) * offset };
+  }
+  private pickBenchSeat(clientX: number, clientY: number) {
+    const bench = this.nearBench;
+    if (!bench || this.blocked || this.place || this.seatedBench) return null;
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    this.benchPointer.set((clientX - rect.left) / rect.width * 2 - 1, 1 - (clientY - rect.top) / rect.height * 2);
+    this.benchRaycaster.setFromCamera(this.benchPointer, this.camera);
+    this.benchMatrix.makeRotationY(bench.facing).setPosition(bench.x, 0, bench.z).invert();
+    const hit = this.benchRaycaster.ray.clone().applyMatrix4(this.benchMatrix).intersectBox(bench.hitBox, this.benchHit);
+    if (!hit) return null;
+    return { id: bench.id, index: (hit.x < 0 ? 0 : 1) as 0 | 1 };
   }
   private visitorSeat(x: number, z: number, heading: number) {
     for (const bench of this.world?.benches ?? []) {
@@ -851,15 +967,10 @@ export class VillageEngine {
   private resolveSeatCollision() {
     const bench = this.seatedBench, index = this.seatedIndex;
     if (!bench || index === null) return;
-    if ([...this.remoteVisitors.values()].some(remote => {
-      const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
-      return seat?.bench.id === bench.id && seat.index === null;
-    })) { this.stand(); this.callbacks.seatFull?.(); return; }
     const occupied = this.seatOccupants(bench);
     if (!(occupied.get(index) ?? []).some(slot => slot < (this.sharedSlot ?? Infinity))) return;
     const other = index === 0 ? 1 : 0;
-    if (occupied.has(other)) { this.stand(); this.callbacks.seatFull?.(); }
-    else this.seatedIndex = other;
+    if (!occupied.has(other)) this.seatedIndex = other;
   }
   setSharedIdentity(slot: number, color: string) {
     if (this.sharedSlot === slot && this.sharedColor === color) return;
@@ -918,22 +1029,12 @@ export class VillageEngine {
   }
   private updateSpiritLights() {
     const night = this.weatherBlend.night;
-    if (night < .01) { this.spiritLights.forEach(light => { light.visible = false; }); return; }
-    const origin = this.player.position;
-    const others = [
-      ...(this.life?.residents.map(resident => resident.root) ?? []),
-      ...[...this.remoteVisitors.values()].map(remote => remote.group),
-    ].filter(root => root.visible && root.position.distanceToSquared(origin) < 144);
-    others.sort((a, b) => a.position.distanceToSquared(origin) - b.position.distanceToSquared(origin));
-    const nearby = [this.player, ...others.slice(0, this.spiritLights.length - 1)];
-    this.spiritLights.forEach((light, index) => {
-      const root = nearby[index];
-      light.visible = !!root;
-      if (root) {
-        light.position.copy(root.position); light.position.y += 1.05;
-        light.intensity = night * (index === 0 ? 2.8 : 1.9);
-      }
-    });
+    const light = this.spiritLights[0];
+    light.visible = night >= .01;
+    if (light.visible) {
+      light.position.copy(this.player.position); light.position.y += 1.05;
+      light.intensity = night * 2.8;
+    }
   }
   setRemoteVisitors(visitors: SharedVisitor[]) {
     if (!this.character) return;
@@ -974,6 +1075,7 @@ export class VillageEngine {
       const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
       remote.target.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
       remote.heading = visitor.heading;
+      remote.group.visible = this.place !== "focus";
     }
     this.resolveSeatCollision();
   }
@@ -996,6 +1098,27 @@ export class VillageEngine {
   setCompanions(ids: string[]) {
     this.companions = ids; this.life?.setCompanions(ids); this.life?.setActivity(this.place);
   }
+  petPuppy(id: string) {
+    if (this.blocked || this.place || this.seatedBench || !this.puppies?.pet(id, this.player.position)) return false;
+    const puppy = this.puppies.puppies.find(value => value.info.id === id)!;
+    this.puppyPetAt = this.elapsed;
+    this.puppyPetTarget.copy(puppy.actor.position);
+    this.callbacks.puppyPetted?.(puppy.info);
+    return true;
+  }
+  togglePuppyFollow(id: string) {
+    if (this.blocked || this.place || this.seatedBench || !this.puppies) return false;
+    if (this.puppies.follower?.id === id) return this.sendPuppyHome();
+    const puppy = this.puppies.invite(id, this.player.position, this.player.rotation.y);
+    if (!puppy) return false;
+    this.callbacks.puppyFollowing?.(puppy);
+    return true;
+  }
+  sendPuppyHome() {
+    if (this.blocked || this.place || !this.puppies?.dismiss()) return false;
+    this.callbacks.puppyFollowing?.(null);
+    return true;
+  }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
   setPlace(id: PlaceId | null) {
     if (id !== "mood") this.dialogue?.clearTeaSpeech();
@@ -1017,6 +1140,8 @@ export class VillageEngine {
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = true;
     if (this.birds) this.birds.group.visible = id !== "focus";
+    if (this.puppies) this.puppies.group.visible = id !== "focus";
+    this.remoteVisitors.forEach(remote => { remote.group.visible = id !== "focus"; });
     const arrival = this.movement?.position;
     this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
@@ -1070,8 +1195,13 @@ export class VillageEngine {
     this.setPlace(id);
   }
   resetPosition() {
-    const x = .3, z = 20;
-    if (!this.movement?.clear(x, z)) return false;
+    if (this.blocked || this.place || !this.movement) return false;
+    const nearby = this.movement.recoverySpot();
+    const { x, z } = nearby ?? { x: .3, z: 20 };
+    if (!this.movement.clear(x, z)) {
+      this.callbacks.recovered?.("unavailable");
+      return false;
+    }
     this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = null;
@@ -1079,29 +1209,30 @@ export class VillageEngine {
     this.callbacks.seat?.(null);
     this.movement.settle(x, z);
     this.player.position.set(x, floorHeight(x, z), z);
-    this.player.rotation.y = this.walkingHeading = Math.PI;
-    this.yaw = 0;
-    this.pitch = .15;
+    this.player.rotation.y = this.walkingHeading;
     this.near = null;
     this.nearBench = null;
     this.nearGarden = null;
+    this.nearPuppy = null;
     this.callbacks.near(null);
     this.callbacks.nearBench?.(null);
     this.callbacks.nearGarden?.(null);
+    this.callbacks.nearPuppy?.(null);
     this.updateWalkingCamera();
     this.camera.position.copy(this.cameraGoal);
     this.currentLook.copy(this.lookGoal);
     this.camera.lookAt(this.currentLook);
     this.reportMovement(true);
+    this.callbacks.recovered?.(nearby ? "nearby" : "entrance");
     return true;
   }
-  sit(id: string) {
+  sit(id: string, selectedSide?: 0 | 1) {
     const bench = this.world?.benches.find(value => value.id === id);
     if (!bench || this.blocked || this.place || this.seatedBench || this.nearBench?.id !== id) return;
     const occupied = this.seatOccupants(bench);
-    const preferred = this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
-    const index = preferred.find(value => !occupied.has(value));
-    if (index === undefined) { this.callbacks.seatFull?.(); return; }
+    const preferred = selectedSide !== undefined ? [selectedSide, selectedSide === 0 ? 1 : 0] as const
+      : this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
+    const index = preferred.find(value => !occupied.has(value)) ?? preferred[0];
     this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = bench;
@@ -1189,10 +1320,11 @@ export class VillageEngine {
   private updateWalkingCamera() {
     this.lookGoal.copy(this.player.position).add(this.temp.set(0, 1.35, 0));
     this.lookGoal.y += Math.max(0, -Math.sin(this.pitch)) * 2.4;
+    const distance = this.seatedBench ? 3 : this.distance + (this.puppies?.follower ? 1.3 : 0);
     this.cameraGoal.copy(this.player.position).add(this.temp.set(
-      Math.sin(this.yaw) * Math.cos(this.pitch) * (this.seatedBench ? 3 : this.distance),
-      1.35 + Math.sin(this.pitch) * (this.seatedBench ? 3 : this.distance),
-      Math.cos(this.yaw) * Math.cos(this.pitch) * (this.seatedBench ? 3 : this.distance),
+      Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
+      1.35 + Math.sin(this.pitch) * distance,
+      Math.cos(this.yaw) * Math.cos(this.pitch) * distance,
     ));
     this.cameraRay.origin.copy(this.lookGoal);
     this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
@@ -1224,6 +1356,8 @@ export class VillageEngine {
   private frame(now: number) {
     if (this.disposed || document.hidden) return;
     const frameDelta = this.lastTime ? (now - this.lastTime) / 1000 : 0.016;
+    if (now - this.qualityChangedAt > 4000)
+      this.longestFrameMs = Math.max(this.longestFrameMs, frameDelta * 1000);
     let dt = Math.min(frameDelta, 0.06);
     this.lastTime = now;
     this.elapsed += dt;
@@ -1279,27 +1413,56 @@ export class VillageEngine {
         distance: Math.hypot(Math.max(0, Math.abs(p.x - this.player.position.x) - ("halfWidth" in p ? p.halfWidth : 0)), p.z - this.player.position.z),
       })).filter(p => p.distance < p.radius).sort((a, b) => a.distance - b.distance)[0]?.id ?? null;
       if (target !== this.nearGarden) { this.nearGarden = target; this.callbacks.nearGarden?.(target); }
+      const puppy = this.puppies?.nearest(this.player.position) ?? null;
+      if (puppy?.id !== this.nearPuppy?.id) { this.nearPuppy = puppy; this.callbacks.nearPuppy?.(puppy); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
     this.companionHands.reset();
     if (this.character) {
       const bob = this.reducedMotion || this.blocked || this.seatedBench ? 0 : Math.sin(this.elapsed*2.8)*.065;
       this.character.position.y = .62 + bob;
+      this.character.position.z = 0;
       this.character.rotation.x = T.MathUtils.lerp(this.character.rotation.x, this.seatedBench ? -.08 : this.reducedMotion ? 0 : movement.speed*.022, 1-Math.exp(-dt*8));
       this.character.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*1.7)*.035;
       const squash = this.reducedMotion ? 0 : movement.landing>0 ? -.1 : movement.takeoff>0 ? .09 : 0;
       this.character.scale.set(this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4),this.spiritScale*(this.seatedBench ? .86 : 1+squash),this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4));
       this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
     }
-    this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale,this.sharedSlot);
+    this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
     const scatterAge = this.elapsed - this.birdFeedAt;
     if (this.character && scatterAge < 1.6 && !this.reducedMotion) {
       this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
       this.spiritFins.forEach((fin, i) => { fin.rotation.z = Math.sin(scatterAge * 5 + i) * .4; });
     }
+    const petAge = this.elapsed - this.puppyPetAt;
+    if (this.character && petAge < 2.2 && movement.speed < .12) {
+      const dx = this.puppyPetTarget.x - this.player.position.x, dz = this.puppyPetTarget.z - this.player.position.z;
+      const angle = Math.atan2(dx, dz);
+      const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+      this.player.rotation.y += turn * (1 - Math.exp(-dt * 8));
+      if (!this.reducedMotion) {
+        const reach = Math.sin(Math.min(1, petAge / 2.2) * Math.PI);
+        this.character.rotation.x = reach * .24;
+        this.character.position.z = reach * .15;
+        this.spiritFins.forEach((fin, i) => { fin.rotation.z = (i % 2 ? -1 : 1) * reach * .42; });
+      }
+    }
     if (this.place) {
       this.updateActivityCamera(this.place);
-    } else this.updateWalkingCamera();
+    } else {
+      this.updateWalkingCamera();
+      if (petAge < 2.2 && movement.speed < .12) {
+        const dx = this.puppyPetTarget.x - this.player.position.x, dz = this.puppyPetTarget.z - this.player.position.z;
+        const length = Math.hypot(dx, dz) || 1, directionX = dx / length, directionZ = dz / length;
+        const sideX = -directionZ, sideZ = directionX;
+        const middleX = this.player.position.x + dx * .5, middleZ = this.player.position.z + dz * .5;
+        const side = (this.camera.position.x - middleX) * sideX + (this.camera.position.z - middleZ) * sideZ >= 0 ? 1 : -1;
+        this.lookGoal.set(middleX, this.player.position.y + .86, middleZ);
+        const distance = this.camera.aspect < .85 ? 4.8 : 3.15;
+        this.cameraGoal.set(middleX + sideX * side * distance - directionX * .65,
+          this.player.position.y + 2.2, middleZ + sideZ * side * distance - directionZ * .65);
+      }
+    }
     if (this.rain) {
       this.rain.visible = this.weather === "rain" && this.place !== "focus";
       this.rain.position.copy(this.player.position);
@@ -1323,6 +1486,8 @@ export class VillageEngine {
     this.updateLighting(dt);
     this.atmosphere.update(t, this.camera.position);
     this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place, this.camera.quaternion, this.player.rotation.y);
+    this.puppies?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place,
+      this.camera.quaternion, this.player.rotation.y);
     if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),
       !this.place && !this.blocked && !this.seatedBench && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
     if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);
@@ -1394,9 +1559,12 @@ export class VillageEngine {
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
     }
     this.updateSpiritLights();
+    const renderStart = performance.now();
     this.renderBridgeWindow(now, t);
     if (this.place === "focus") this.sun.intensity = 0;
     this.renderer.render(this.scene, this.camera);
+    if (now - this.qualityChangedAt > 4000)
+      this.longestRenderSubmitMs = Math.max(this.longestRenderSubmitMs, performance.now() - renderStart);
     for (const remote of this.remoteVisitors.values()) {
       const point = this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0)).project(this.camera);
       remote.label.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || this.place === "focus";
@@ -1408,7 +1576,8 @@ export class VillageEngine {
     for (const [id, bubble] of this.chatBubbles) {
       const origin = this.remoteVisitors.get(id)?.group.position ?? this.player.position;
       const point = this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0)).project(this.camera);
-      bubble.element.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
+      bubble.element.hidden = (this.place === "focus" && this.remoteVisitors.has(id)) ||
+        point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
       if (!bubble.element.hidden) {
         bubble.element.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
         bubble.element.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
@@ -1419,14 +1588,20 @@ export class VillageEngine {
     this.frames++;
     if (now - this.statsTime > 2000) {
       const fps = Math.round(this.frames / this.frameSum);
+      if (now - this.qualityChangedAt > 4000) this.lowestFps = Math.min(this.lowestFps, fps);
       this.callbacks.stats(
         fps,
         this.renderer.info.render.calls,
         this.renderer.info.render.triangles,
       );
       this.slowSamples = fps < 45 ? this.slowSamples + 1 : 0;
+      if (this.quality === "high" && this.graphicsTier === "detailed" &&
+          this.slowSamples >= 2 && now - this.qualityChangedAt > 4000 && this.detailedRenderScale > .67) {
+        this.detailedRenderScale = Math.max(.67, Math.round((this.detailedRenderScale - .16) * 100) / 100);
+        this.resize();
+      }
       // Keep the selected preference: automatic and battery modes can step down again.
-      // Ignore startup/resizing and isolated slow samples; explicit Detailed stays fixed.
+      // Ignore startup/resizing and isolated slow samples; Detailed keeps its scene tier while its drawing buffer adapts.
       if (this.quality !== "high" && this.graphicsTier !== "minimal" &&
           now - this.qualityChangedAt > 4000 && (fps < 24 || this.slowSamples >= 2)) {
         this.graphicsTier = slowerGraphicsTier(this.graphicsTier);

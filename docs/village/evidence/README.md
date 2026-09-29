@@ -1,4 +1,24 @@
-# Village implementation evidence — updated 2026-09-27
+# Village implementation evidence — updated 2026-09-29
+
+## Luma mint interaction cue
+
+[Local Chrome dialogue results](luma-cue-villager-dialogue.json) cover 44 assertions for mint highlighting, the overhead marker, the persistent tea button, boxed keys and English/Japanese accessible names. A separate local scene check visually inspected the marker and button and opened tea with E; see the [build entry](../../../VILLAGE_BUILD.md#2026-09-29-luma-mint-interaction-cue-local) for limits. No live or physical-device verification is claimed.
+
+## East bridge approach
+
+[Local bridge-side renderer view](bridge-safety-bridge-side.png) shows the shortened north parapet and its bank-side opening beside the east approach. [The build entry](../../../VILLAGE_BUILD.md#2026-09-29-nearby-unstuck-recovery-local) records the focused movement, collision and raycast checks. This image is a static module capture; visitor input, physical touch and the live site remain unverified.
+
+## Village puppies
+
+[Blender lineup](puppies-blender.png) shows the four original models. [Desktop](puppy-petting-desktop.png) and [390×844 mobile](puppy-petting-mobile.png) captures show Mochi's petting response in the local exported app; [desktop follow](puppy-follow-desktop.png) and [mobile follow](puppy-follow-mobile.png) show the invited companion while walking. [Four-yip preview](puppy-yips.mp3) uses the recorded and edited CC0 source. [Engine checks](puppy-checks.json) cover placement, patrol clearance, petting, follow and catch-up, reduced motion and sound behavior; [studio checks](puppy-editor-checks.json) cover the four shelf previews, transform persistence and isolated Apply. See the [build entry](../../../VILLAGE_BUILD.md#2026-09-29-village-puppies-local) for provenance and limits. These are local results, with no live-site or physical-device acceptance claim.
+
+## Safari scenery preparation and night lighting
+
+[Desktop](scenery-loading-desktop.png) and [390×844 mobile](scenery-loading-mobile.png) captures show the full-screen preparation view from the local exported app. [All-fixture night](scenery-night-all-lamps.png) and [nearby-light night](scenery-night-nearby-lamps.png) are 1280×720 local production-module renderer captures from the same entrance view; the latter shows the reduced distant ground lighting after limiting active fixture and spirit lights. The [build entry](../../../VILLAGE_BUILD.md#2026-09-29-safari-scenery-stalls-and-detailed-budget-local) records WebKit timing, source/build checks and the unverified Safari 26.6.2 and deployed boundaries.
+
+## Activity spirit seating
+
+[Local renderer results](seating-living-checks.json) cover six staged activities at visitor slot 1000, exit framing, reduced motion, private focus and overlapping visitors at the hearth. [Focus chair](seating-cottage.png) and [hearth seat](seating-activity-music.png) are production-module renderer captures without React controls. [The build entry](../../../VILLAGE_BUILD.md#2026-09-29-activity-spirit-seating-local) records the eight-activity placement and eight-bench regressions with verification limits. Nothing here is live-site or physical-device evidence.
 
 ## Local layout studio
 

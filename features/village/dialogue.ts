@@ -16,10 +16,12 @@ export class VillagerDialogue {
   private nearest = -1;
   private clock = 0;
   private teaSpeechUntil = 0;
+  private mintAvailable = false;
   private width = 0;
   private height = 0;
   private anchor = new T.Vector3();
   private projected = new T.Vector3();
+  private attentionProjected = new T.Vector3();
   private ray = new T.Ray();
   private hit = new T.Vector3();
   private boxes: T.Box3[];
@@ -61,18 +63,52 @@ export class VillagerDialogue {
       const actions = document.createElement("div"); actions.className = "v-villager-actions";
       const companion = document.createElement("button"); companion.type = "button";
       companion.addEventListener("click", () => this.invite(index));
+      const companionLabel = document.createElement("span");
+      const companionKey = document.createElement("kbd"); companionKey.textContent = "C"; companionKey.setAttribute("aria-hidden", "true");
+      companion.append(companionLabel, companionKey);
+      companion.addEventListener("keydown", event => {
+        if (event.key.toLowerCase() === "c" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          event.preventDefault(); event.stopPropagation(); this.invite(index);
+        }
+      });
       companion.setAttribute("aria-keyshortcuts", "C"); actions.append(companion);
       const crumbs = document.createElement("button"); crumbs.type = "button";
       crumbs.addEventListener("click", () => this.bread(index));
+      const crumbsLabel = document.createElement("span");
+      const crumbsKey = document.createElement("kbd"); crumbsKey.textContent = "B"; crumbsKey.setAttribute("aria-hidden", "true");
+      crumbs.append(crumbsLabel, crumbsKey);
+      crumbs.addEventListener("keydown", event => {
+        if (event.key.toLowerCase() === "b" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          event.preventDefault(); event.stopPropagation(); this.bread(index);
+        }
+      });
       crumbs.setAttribute("aria-keyshortcuts", "B");
       if (profile.id === "maple" || profile.id === "wren") actions.append(crumbs);
+      let tea: HTMLButtonElement | undefined;
+      let teaLabel: HTMLSpanElement | undefined;
+      let attention: HTMLSpanElement | undefined;
       if (profile.id === "luma") {
-        const tea = document.createElement("button"); tea.type = "button"; tea.dataset.tea = "true";
-        tea.addEventListener("click", () => { this.onTalk(); this.actions?.visitTea?.(); }); actions.append(tea);
+        tea = document.createElement("button"); tea.type = "button"; tea.dataset.tea = "true";
+        teaLabel = document.createElement("span");
+        const teaKey = document.createElement("kbd"); teaKey.textContent = "E"; teaKey.setAttribute("aria-hidden", "true");
+        tea.append(teaLabel, teaKey);
+        tea.setAttribute("aria-keyshortcuts", "E");
+        tea.addEventListener("click", () => this.visitTea()); actions.append(tea);
+        tea.addEventListener("keydown", event => {
+          if (event.key.toLowerCase() === "e" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+            event.preventDefault(); event.stopPropagation(); this.visitTea();
+          }
+        });
+        attention = document.createElement("span");
+        attention.className = "v-luma-attention";
+        attention.textContent = "!";
+        attention.setAttribute("aria-hidden", "true");
+        attention.hidden = true;
+        this.layer.append(attention);
       }
       element.append(text, footer, actions);
       this.layer.append(element);
-      return { resident, profile, element, text, name, button, buttonLabel, companion, crumbs, actions, line: profile.greeting,
+      return { resident, profile, element, text, name, button, buttonLabel, companion, companionLabel, crumbs, crumbsLabel, tea, teaLabel, attention, actions, line: profile.greeting,
         greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0,
         visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "", actionState: "" };
     });
@@ -86,6 +122,15 @@ export class VillagerDialogue {
   }
 
   resize(width: number, height: number) { this.width = width; this.height = height; this.bubbles.forEach(b => { b.measured = ""; }); }
+
+  setMintAvailable(available: boolean) {
+    if (this.mintAvailable === available) return;
+    this.mintAvailable = available;
+    const luma = this.bubbles[3];
+    luma.tea?.classList.toggle("has-harvest", available);
+    this.actionLabels(luma);
+    luma.measured = "";
+  }
 
   setLanguage(language: "en" | "ja") {
     this.language = language;
@@ -105,16 +150,19 @@ export class VillagerDialogue {
     }
   }
   private actionLabels(b: typeof this.bubbles[number]) {
-    const state = `${this.language}:${b.resident.following}`;
+    const state = `${this.language}:${b.resident.following}:${b.tea ? this.mintAvailable : ""}`;
     if (b.actionState === state) return;
     b.actionState = state;
     const ja = this.language === "ja";
-    b.companion.textContent = b.resident.following ? (ja ? "またね · C" : "See you later · C") : (ja ? "一緒に歩く · C" : "Walk with me · C");
+    b.companionLabel.textContent = b.resident.following ? (ja ? "またね" : "See you later") : (ja ? "一緒に歩く" : "Walk with me");
     b.companion.setAttribute("aria-label", b.resident.following ? (ja ? `${b.profile.name.ja}と別れる` : `Let ${b.profile.name.en} wander`) : (ja ? `${b.profile.name.ja}を誘う` : `Invite ${b.profile.name.en} to walk with you`));
     b.companion.setAttribute("aria-pressed", String(b.resident.following));
-    const tea = b.actions.querySelector("[data-tea]");
-    if (tea) tea.textContent = ja ? "収穫を持ってお茶をしよう" : "Share your harvest over tea";
-    b.crumbs.textContent = b.profile.id === "wren" ? (ja ? "サワードウのパンくずをもらう · B" : "Ask for sourdough crumbs · B") : ja ? "パンくずをもらう · B" : "Ask for bread crumbs · B";
+    if (b.teaLabel) b.teaLabel.textContent = ja ? "収穫を持ってお茶をしよう" : "Share your harvest over tea";
+    if (b.tea) b.tea.setAttribute("aria-label", this.mintAvailable
+      ? ja ? "ミントの収穫があります。収穫を持ってお茶をしよう" : "Mint ready. Share your harvest over tea"
+      : b.teaLabel!.textContent);
+    b.crumbsLabel.textContent = b.profile.id === "wren" ? (ja ? "サワードウのパンくずをもらう" : "Ask for sourdough crumbs") : ja ? "パンくずをもらう" : "Ask for bread crumbs";
+    b.crumbs.setAttribute("aria-label", b.crumbsLabel.textContent);
   }
   invite(index = this.nearest) {
     const b = this.bubbles[index];
@@ -130,6 +178,14 @@ export class VillagerDialogue {
     this.announcement.textContent = b.line[this.language];
   }
 
+  visitTea() {
+    const b = this.bubbles[3];
+    if (!this.enabled || this.nearest !== 3 || !b.visible || b.distance > 4.5
+      || b.element.classList.contains("is-compact") || !this.actions?.visitTea) return false;
+    this.onTalk(); this.actions.visitTea();
+    return true;
+  }
+
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
     this.layer.hidden = !enabled && this.clock >= this.teaSpeechUntil;
@@ -137,7 +193,8 @@ export class VillagerDialogue {
       this.nearest = -1;
       this.announcement.textContent = "";
       this.bubbles.forEach(b => {
-        b.element.hidden = true; b.visible = false; b.talkingUntil = 0; b.resident.chatting = false;
+        b.element.hidden = true; if (b.attention) b.attention.hidden = true;
+        b.visible = false; b.talkingUntil = 0; b.resident.chatting = false;
       });
     }
   }
@@ -210,9 +267,18 @@ export class VillagerDialogue {
       const distanceToCamera = this.anchor.distanceTo(camera.position);
       this.ray.origin.copy(camera.position);
       this.ray.direction.subVectors(this.anchor, camera.position).normalize();
-      b.visible = b.distance < 15 && this.projected.z > -1 && this.projected.z < 1
-        && Math.abs(this.projected.x) < 1 && Math.abs(this.projected.y) < 1
-        && !this.boxes.some(box => this.ray.intersectBox(box, this.hit) && this.hit.distanceTo(camera.position) < distanceToCamera - .2);
+      const unobstructed = !this.boxes.some(box => this.ray.intersectBox(box, this.hit) && this.hit.distanceTo(camera.position) < distanceToCamera - .2);
+      b.visible = b.distance < 15 && unobstructed && this.projected.z > -1 && this.projected.z < 1
+        && Math.abs(this.projected.x) < 1 && Math.abs(this.projected.y) < 1;
+      if (b.attention) {
+        this.attentionProjected.copy(b.resident.root.position);
+        this.attentionProjected.y += 1.25 * b.resident.root.scale.y;
+        this.attentionProjected.project(camera);
+        b.attention.hidden = !this.mintAvailable || b.distance >= 35 || !unobstructed
+          || this.attentionProjected.z < -1 || this.attentionProjected.z > 1
+          || Math.abs(this.attentionProjected.x) >= 1 || Math.abs(this.attentionProjected.y) >= 1;
+        if (!b.attention.hidden) b.attention.style.transform = `translate3d(${(this.attentionProjected.x * .5 + .5) * this.width - 15}px, ${(-this.attentionProjected.y * .5 + .5) * this.height - 38}px, 0)`;
+      }
       if (!b.visible) { b.element.hidden = true; b.button.hidden = true; return; }
       if (b.distance < 4.5 && (this.nearest < 0 || b.distance < this.bubbles[this.nearest].distance)) this.nearest = index;
       if (!b.resident.following && !b.greetingSeen && b.distance < 2.5) {
@@ -241,10 +307,10 @@ export class VillagerDialogue {
       b.button.hidden = !canChat;
       b.actions.hidden = !canChat || !this.actions;
       this.actionLabels(b);
-      const compact = canChat && this.clock >= b.until;
+      const compact = canChat && this.clock >= b.until && !(b.tea && this.mintAvailable);
       b.element.classList.toggle("is-compact", compact);
       b.element.hidden = false;
-      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}:${compact}`;
+      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}:${compact}:${b.attention && this.mintAvailable}`;
       if (b.measured !== measureKey) {
         b.width = b.element.offsetWidth; b.height = b.element.offsetHeight; b.measured = measureKey;
       }

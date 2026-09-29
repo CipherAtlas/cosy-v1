@@ -11,10 +11,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     const checks = await page.evaluate(async () => {
       const { VillageEngine } = await import('/modules/features/village/VillageEngine.js');
       const { gardenAction } = await import('/modules/features/village/garden.js');
-      const near = [], seats = [], full = [];
+      const near = [], seats = [];
       const engine = new VillageEngine(document.querySelector('#scene'), {
         progress: () => {}, ready: () => {}, near: id => near.push(id),
-        nearBench: id => near.push(id), seat: id => seats.push(id), seatFull: () => full.push(true),
+        nearBench: id => near.push(id), seat: id => seats.push(id),
         interact: () => {}, error: message => { throw Error(message); },
         stats: () => {}, movement: () => {}, contact: () => {}, environment: () => {},
       });
@@ -44,13 +44,16 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
           if (Math.hypot(engine.player.position.x - right.x, engine.player.position.z - right.z) > .01)
             throw Error(`${bench.id}: player did not take the empty right seat`);
           engine.stand(); tick();
+          engine.setRemoteVisitors([
+            { id: 'other', name: 'Other', color: '#a4d5ae', slot: 1, ...left, heading: bench.facing },
+            { id: 'third', name: 'Third', color: '#b0c8e3', slot: 2, ...right, heading: bench.facing },
+          ]);
+          engine.sit(bench.id); tick();
+          const stacked = engine.sharedSlot !== null && engine.sharedSlot % 2 === 1 ? right : left;
+          if (engine.seatedBench?.id !== bench.id || Math.hypot(engine.player.position.x - stacked.x, engine.player.position.z - stacked.z) > .01)
+            throw Error(`${bench.id}: a third visitor could not share an occupied seat`);
+          engine.stand(); tick();
           if (bench === engine.world.benches[0]) {
-            engine.setRemoteVisitors([
-              { id: 'other', name: 'Other', color: '#a4d5ae', slot: 1, ...left, heading: bench.facing },
-              { id: 'third', name: 'Third', color: '#b0c8e3', slot: 2, ...right, heading: bench.facing },
-            ]);
-            engine.sit(bench.id);
-            if (engine.seatedBench || full.length !== 1) throw Error('A full bench accepted a third visitor');
             engine.setRemoteVisitors([]);
             engine.setSharedIdentity(2, '#e6a5b0');
             engine.sit(bench.id); tick();
@@ -60,16 +63,29 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
               throw Error('Simultaneous arrivals did not resolve to separate seats');
             engine.stand(); tick();
             engine.setRemoteVisitors([{ id: 'older-client', name: 'Older client', color: '#a4d5ae', slot: 3, x: bench.x, z: bench.z, heading: bench.facing }]);
-            engine.sit(bench.id);
-            if (engine.seatedBench || full.length !== 2) throw Error('A centered visitor from an older client was overlapped');
+            engine.sit(bench.id); tick();
+            if (engine.seatedBench?.id !== bench.id) throw Error('A centered visitor prevented shared seating');
+            engine.stand(); tick();
             engine.setRemoteVisitors([]);
             engine.sit(bench.id); tick();
             engine.setRemoteVisitors([{ id: 'older-client', name: 'Older client', color: '#a4d5ae', slot: 3, x: bench.x, z: bench.z, heading: bench.facing }]);
-            if (engine.seatedBench || full.length !== 3) throw Error('A newly arrived older client was overlapped');
+            tick();
+            if (engine.seatedBench?.id !== bench.id) throw Error('A newly arrived centered visitor made the player stand');
+            engine.stand(); tick();
           }
           engine.setRemoteVisitors([]);
           benches.push(bench.id);
         }
+        engine.travel('focus'); tick();
+        engine.setRemoteVisitors([{ id: 'focus-visitor', name: 'Focus visitor', color: '#a4d5ae', slot: 1, x: 108.65, z: -.65, heading: Math.PI }]);
+        if (engine.remoteVisitors.get('focus-visitor')?.group.visible) throw Error('Another visitor appeared inside the private focus cottage');
+        engine.setPlace(null); tick();
+        if (!engine.remoteVisitors.get('focus-visitor')?.group.visible) throw Error('Visitor stayed hidden after leaving focus');
+        engine.setRemoteVisitors([]);
+        engine.travel('music'); tick();
+        engine.setRemoteVisitors([{ id: 'music-visitor', name: 'Music visitor', color: '#a4d5ae', slot: 1, x: -5.8, z: -16.1, heading: Math.PI }]);
+        if (!engine.remoteVisitors.get('music-visitor')?.group.visible) throw Error('Overlapping visitors were hidden at the hearth');
+        engine.setRemoteVisitors([]); engine.setPlace(null); tick();
         engine.movement.settle(-37, 4); tick();
         if (engine.near !== 'birds') throw Error('Bird clearing does not offer nearby scattering');
         if (engine.gardenState.crumbPouch) throw Error('Test expected no crumb pouch');
@@ -79,7 +95,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
           throw Error('First scatter should work with a pouch; repeat should wait for the flock');
         engine.movement.settle(24.6, -2.7); tick();
         if (engine.near === 'garden') throw Error('Walking into the kitchen garden still offers a scene transition');
-        return { benches, nearBirds: true, scatterRequiresPouch: true, noGardenTransition: true, simultaneousSeatResolved: true, olderClientProtected: true, seatEvents: seats.length, fullBenchNotices: full.length, nearEvents: near.length };
+        return { benches, nearBirds: true, scatterRequiresPouch: true, noGardenTransition: true, simultaneousSeatResolved: true, overflowStacks: true, focusPrivate: true, sharedActivityVisible: true, seatEvents: seats.length, nearEvents: near.length };
       } finally { engine.dispose(); }
     });
     if (errors.length) throw Error(errors.join('\n'));

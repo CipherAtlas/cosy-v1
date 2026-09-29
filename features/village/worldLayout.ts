@@ -4,6 +4,8 @@ export type WorldPoint = [number, number];
 export type ResidentId = "pip" | "maple" | "moss" | "luma" | "wren";
 export const RESIDENT_IDS: ResidentId[] = ["pip", "maple", "moss", "luma", "wren"];
 export type ResidentRoute = { points: WorldPoint[]; pauses?: number[] };
+export type PuppyBreed = "corgi" | "shiba" | "beagle" | "samoyed";
+export type PuppyPlacement = { id: string; name: string; breed: PuppyBreed; x: number; y: number; z: number; yaw: number; scale: [number, number, number] };
 export type AuthoredWorld = {
   paths: { id: string; points: WorldPoint[]; spine: WorldPoint[]; bounds: [number, number, number, number]; width: number; straight: boolean }[];
   fences: { id: string; points: WorldPoint[]; height: number }[];
@@ -13,11 +15,12 @@ export type AuthoredWorld = {
   walkable: { id: string; x: number; z: number; radiusX: number; radiusZ: number; yaw: number }[];
   trees: { id: string; x: number; z: number; y: number; rotation: [number, number, number]; scale: [number, number, number] }[];
   benches: { id: string; x: number; y: number; z: number; yaw: number; scale: [number, number, number] }[];
+  puppies: PuppyPlacement[];
   routes: Partial<Record<ResidentId, ResidentRoute>>;
 };
 
 type WorldItem = {
-  id: string; asset: string; position: [number, number, number]; rotation: [number, number, number];
+  id: string; asset: string; name?: string; position: [number, number, number]; rotation: [number, number, number];
   scale: [number, number, number]; visible: boolean; path?: { points: WorldPoint[]; width: number };
 };
 type WorldLayout = { version: number; base: string; objects: WorldItem[]; routes?: Partial<Record<ResidentId, ResidentRoute>> };
@@ -27,7 +30,7 @@ export function projectWorldLayout(source: unknown): AuthoredWorld {
   const layout = source as WorldLayout;
   if (!layout || layout.version !== 1 || layout.base !== "cosy-village-2026-09-27" || !Array.isArray(layout.objects))
     throw Error("The playable world layout has an unsupported format.");
-  const result: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], routes: {} };
+  const result: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], puppies: [], routes: {} };
   for (const item of layout.objects) {
     if (!item?.visible || !Array.isArray(item.position) || !Array.isArray(item.rotation) || !Array.isArray(item.scale)) continue;
     const [x, y, z] = item.position;
@@ -60,6 +63,12 @@ export function projectWorldLayout(source: unknown): AuthoredWorld {
     if (item.asset === "walkable-region") result.walkable.push({ id: item.id, x, z, radiusX: 12 * item.scale[0], radiusZ: 12 * item.scale[2], yaw: item.rotation[1] * Math.PI / 180 });
     if (/^tree-\d+$/.test(item.asset)) result.trees.push({ id: item.id, x, y, z, rotation: item.rotation.map(value => value * Math.PI / 180) as [number, number, number], scale: item.scale });
     if (item.asset === "oak-bench") result.benches.push({ id: item.id, x, y, z, yaw: item.rotation[1] * Math.PI / 180, scale: item.scale });
+    if (item.asset.startsWith("puppy-")) {
+      const breed = item.asset.slice(6);
+      if (["corgi", "shiba", "beagle", "samoyed"].includes(breed))
+        result.puppies.push({ id: item.id, name: item.name?.slice(0, 100) || breed, breed: breed as PuppyBreed, x, y, z,
+          yaw: item.rotation[1] * Math.PI / 180, scale: item.scale });
+    }
   }
   if (layout.routes) for (const id of RESIDENT_IDS) {
     const route = layout.routes[id]; if (!route) continue;
