@@ -1,5 +1,12 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — five-minute IP kicks published
+
+The local console at `http://127.0.0.1:3052/` is restarted and has active Players online / Kick for 5 minutes controls; the 293-row private archive and background capture are preserved. Source `d433ad0`, Worker version `8693cad0-6aba-4320-9693-e59756ea6206` and successful [Pages run 36752254287](https://github.com/CipherAtlas/cosy-v1/actions/runs/36752254287) publish only the scoped kick/client/console changes on the previous public village. Pending shared-actor, dog, bird and cottage work remains local.
+
+Live production visitors confirmed the keyboard kick, same-IP disconnection, exact full-screen copy, stopped playback/removed canvas, focused heading and refused reload. After the actual five-minute cooldown, reloading admitted the same IP again with a connected, loaded village. No browser page errors were captured during the successful live flow. The live layout matches the previous release and all seven checked public admin/editor/save/player routes remain 404. Existing visitors must reload before they can be kicked and receive the new screen. See [the release ledger](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-kick-release-published) for complete evidence and remaining limits.
+
+
 ## 2026-09-30 — scoped IP kick release preparation
 
 The approved release is prepared on published base `e173c03`, with kicking and the private console/archive preserved; pending shared-actor/world-asset work stays local. The isolated 22-page production export, sequential typecheck, focused kick/chat tests, 27 device-gate checks, seven Python tests, syntax checks and 19 actual exported-app browser checks passed. Layout bytes match the published base, and private admin/editor tools are excluded. The pre-existing reduced-motion hydration warning was reproduced on the old live site and remains outside this release. [Release preparation and limits](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-kick-release-preparation). Worker/client publication and restarting the local console are in progress under the user's approval.

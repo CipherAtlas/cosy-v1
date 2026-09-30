@@ -1,5 +1,16 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-30 — five-minute IP kick release (published)
+
+Published scoped source commit `d433ad01e98428198623e6e705c534e35f9d0751` to [the live village](https://cosy.sabarg.com/). The matching Worker was deployed first as version `8693cad0-6aba-4320-9693-e59756ea6206`; its preceding rollback version is `de2ce640-370e-4fd7-81f8-4163fd97055b`. [Pages run 36752254287](https://github.com/CipherAtlas/cosy-v1/actions/runs/36752254287) completed both build and deployment successfully for that source commit. This release isolates kicking and the private console/archive from the unfinished actor, dog, bird and cottage work; it retains the previously published world/layout.
+
+Live Chrome verification entered two controlled visitors through the production client/Worker, loaded both scenes, entered/exited the focus cottage and used Pip's chat control. After the approved Python console restart, the fresh visitors had enabled kick buttons. Keyboard activation kicked both controlled sessions; the Worker reported three same-IP sessions disconnected in total. Both test visitors displayed the exact full-screen message, with their canvases removed, media paused and heading focused. A reload during the cooldown was refused and neither visitor remained in the player list. After the actual five-minute cooldown, reloading admitted the same IP again with a connected, loaded village. No browser page errors were captured during the successful live flow.
+
+The restarted console retained all 293 archive rows, its private file mode and healthy background capture. The live layout SHA-256 matches the isolated release and published base (`d9e934682fe6e139bb2d5b75f42a614f3934acbde11f37ff23b9e211106f6e32`). All seven checked public admin/editor/save/player paths returned 404. [Release checks and screenshot](docs/village/evidence/player-kick-release/checks.json) record the live results without visitor identities, chat contents, IPs or secrets. The preceding release-preparation entry records the passed isolated build/typecheck, protocol/console tests and 19 full-app local browser checks.
+
+Older connected sessions need to reload before their kick controls and the updated screen work. Everyone sharing an IP shares its cooldown; changing IP bypasses an IP restriction. Controlled-clock tests cover storage reconstruction, exact expiry and separate-IP isolation; live Worker hibernation/restart and physical-device/audio-listening acceptance remain unobserved. The existing reduced-motion page-transition hydration issue reproduced before this release remains outside this change.
+
+
 ## 2026-09-30 — five-minute IP kick release preparation
 
 The authorized release is isolated from published base `e173c03`: player-list/kick routes and persisted IP cooldowns, terminal shared-client handling, the full-screen kick message, and the existing private console/archive with its new player controls. The in-progress shared-actor ownership rewrite, four-dog layout and bird scenery remain local and are excluded. The published Worker removes kicked visitor/seat presence immediately; the local audit additionally releases its pending shared-actor ownership. No dependencies, credentials, migrations, workflow or deployment configuration changes are included.

@@ -1,0 +1,87 @@
+{
+  "source_commit": "d433ad01e98428198623e6e705c534e35f9d0751",
+  "worker_version": "8693cad0-6aba-4320-9693-e59756ea6206",
+  "worker_rollback_version": "de2ce640-370e-4fd7-81f8-4163fd97055b",
+  "pages_run": 36752254287,
+  "local_browser_checks": [
+    "Console lists all connected players",
+    "Kick has a 44 px keyboard-accessible target",
+    "Keyboard kick removes both sessions using the same IP",
+    "Other IP stays connected",
+    "Other visitor keeps the scene",
+    "Exact return-later copy is visible",
+    "Kicked screen replaces scene and controls",
+    "Village media playback stops after the kick",
+    "Focus moves to the kick heading",
+    "Kick screen fills 1280\u00d7720",
+    "Kick copy stays within the desktop window",
+    "Kick screen fills 1366\u00d7768",
+    "Kick copy stays within the desktop window",
+    "Kick screen fills 1024\u00d7640",
+    "Kick copy stays within the desktop window",
+    "Reduced-motion kick screen is still",
+    "Reloading during cooldown still replaces the scene",
+    "Refused re-entry never appears online"
+  ],
+  "release_source_sha256": {
+    "worker/index.js": "9f41cb216da8b1a347d664ac2528a1bac0ae92eb9ade63a4e35e361f946d2a93",
+    "features/village/Village.tsx": "4f6e4db69d3cd3e3ad92d9b0b076a8d9a5482f895d9130c16496aa60575fbbe1",
+    "features/village/sharedWorld.ts": "2be6184a7ff9347be428c34429ceba5101fe38c2810c5acbed9ca359168c2031",
+    "features/village/village.css": "76b62dd1e8ce37c617e6a0f58876059e7d8cb80d74af9c9bafbb1a444aab6d64"
+  },
+  "published_layout_sha256": "d9e934682fe6e139bb2d5b75f42a614f3934acbde11f37ff23b9e211106f6e32",
+  "scope": "Published village plus IP kicks and private console/archive; pending actor/assets excluded.",
+  "pages_conclusion": "success",
+  "pages_run_url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36752254287",
+  "live_site": "https://cosy.sabarg.com/",
+  "local_console": "http://127.0.0.1:3052/",
+  "verified_at_utc": "2026-09-30T17:50:27.653732+00:00",
+  "local_browser_check_count": 19,
+  "live_browser": {
+    "checks": [
+      "Two live visitors entered with loaded scenes and connected to the production Worker",
+      "Live focus cottage entry and exit returned to the village",
+      "Live local villager conversation rendered",
+      "Restarted local console lists fresh live players with enabled kick controls",
+      "Keyboard kick disconnects both same-IP live sessions for five minutes",
+      "Both visitors see the exact full-screen message with canvas removed and media paused",
+      "Live kick screen fills the laptop viewport and focuses the message",
+      "Reload during cooldown is refused and kicked visitors remain absent from the live list",
+      "The real five-minute cooldown expired and reload admitted the same IP again",
+      "No captured browser errors during live entry, kick, refused reload, and re-entry"
+    ],
+    "errors": [],
+    "kickedCount": 3,
+    "until": 1790790574385,
+    "kickRequestAt": 1790790274079,
+    "rejoinedAt": 1790790578486
+  },
+  "live_private_paths": {
+    "/tools/village-admin/": 404,
+    "/tools/village-editor/": 404,
+    "/village-editor/": 404,
+    "/admin/": 404,
+    "/api/layouts": 404,
+    "/api/layouts/save": 404,
+    "/api/players": 404
+  },
+  "worker_live_paths": {
+    "/health": 200,
+    "/admin/players": 401
+  },
+  "console_restart": {
+    "rowsBeforeRestart": 293,
+    "rowsAfterRestart": 293,
+    "fileMode": "0o600",
+    "captureHealthy": true,
+    "playerApiHealthy": true
+  },
+  "limits": [
+    "Existing visitor sessions must reload for IP fingerprints and the updated kick screen.",
+    "Shared-IP sessions share the cooldown; changing IP bypasses an IP restriction.",
+    "Worker storage reconstruction, exact boundary and separate-IP behavior have controlled-clock/local evidence; production hibernation/restart remains unobserved.",
+    "Physical-device and audio-listening acceptance remains open.",
+    "Existing reduced-motion page-transition hydration mismatch is outside this release."
+  ],
+  "screenshot": "kicked-screen.png"
+}
