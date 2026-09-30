@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-01",
+  "scope": "Local release preparation only; no live results recorded yet",
+  "browserSuites": {
+    "shared": {
+      "count": 26,
+      "checks": [
+        "Three real browser clients join one Worker",
+        "Busy dogs show disabled Pet controls to other visitors",
+        "Busy dogs show disabled Walk controls to other visitors",
+        "The observer sees the held dog stay still",
+        "The accepted trick reaches both observing clients",
+        "Conflicting keyboard-equivalent trick requests are rejected",
+        "A completed shared trick keeps its list open",
+        "Walking ownership reaches the collecting visitor",
+        "Observers see the walking dog move with its actual owner",
+        "Socket disconnect releases walking ownership on the other clients",
+        "Reconnect receives current shared actors without abandoned owners",
+        "Observers see the shared pet clip without entering the owner's pet camera",
+        "A real browser can claim a resident conversation",
+        "Another browser cannot collect a resident engaged in a conversation",
+        "The conversation owner can invite the shared resident",
+        "The accepted resident invitation reaches the owner's renderer",
+        "The third browser cannot sit on a full bench",
+        "Two accepted bench visitors occupy different physical seats",
+        "Standing frees a seat for the waiting visitor",
+        "Bench feeding waits for a grant and keeps each visitor's crumbs private",
+        "Observers receive the same accepted flock serving time",
+        "Private focus shows no other visitors",
+        "Both visitors can independently use the private focus cottage",
+        "Shared village fits 1280\u00d7720",
+        "Shared village fits 1024\u00d7640",
+        "No captured browser page errors"
+      ],
+      "errors": []
+    },
+    "cottage": {
+      "count": 17,
+      "checks": [
+        "1280 \u00d7 720: compact timer fits",
+        "1280 \u00d7 720: napping cat stays clear of the timer and screen edges",
+        "1280 \u00d7 720: timer is translucent without overflow",
+        "1366 \u00d7 768: compact timer fits",
+        "1366 \u00d7 768: napping cat stays clear of the timer and screen edges",
+        "1366 \u00d7 768: timer is translucent without overflow",
+        "1024 \u00d7 640: compact timer fits",
+        "1024 \u00d7 640: napping cat stays clear of the timer and screen edges",
+        "1024 \u00d7 640: timer is translucent without overflow",
+        "Pet button has a square E keycap and 44 px target",
+        "Click starts petting and returns canvas focus",
+        "Active pet button is disabled",
+        "Actual E starts the same pet action",
+        "E produces immediate button press feedback",
+        "Reduced nap stays still",
+        "Exit removes the pet control and pauses the cat",
+        "No page errors or WebGL shader/sampler warnings"
+      ],
+      "errors": []
+    },
+    "cottageEditor": {
+      "count": 40,
+      "checks": [
+        "cottage-cat has a rendered shelf preview",
+        "cottage-cat can be placed",
+        "cottage-cat supports position, facing and scale",
+        "cottage-couch has a rendered shelf preview",
+        "cottage-couch can be placed",
+        "cottage-couch supports position, facing and scale",
+        "cottage-reading-lamp has a rendered shelf preview",
+        "cottage-reading-lamp can be placed",
+        "cottage-reading-lamp supports position, facing and scale",
+        "cottage-fern has a rendered shelf preview",
+        "cottage-fern can be placed",
+        "cottage-fern supports position, facing and scale",
+        "cottage-botanical-print has a rendered shelf preview",
+        "cottage-botanical-print can be placed",
+        "cottage-botanical-print supports position, facing and scale",
+        "cottage-cat-cushion has a rendered shelf preview",
+        "cottage-cat-cushion can be placed",
+        "cottage-cat-cushion supports position, facing and scale",
+        "village-window-vista has a rendered shelf preview",
+        "village-window-vista can be placed",
+        "village-window-vista supports position, facing and scale",
+        "cottage-writing-chair has a rendered shelf preview",
+        "cottage-writing-chair can be placed",
+        "cottage-writing-chair supports position, facing and scale",
+        "cottage-books has a rendered shelf preview",
+        "cottage-books can be placed",
+        "cottage-books supports position, facing and scale",
+        "cottage-pottery has a rendered shelf preview",
+        "cottage-pottery can be placed",
+        "cottage-pottery supports position, facing and scale",
+        "cottage-book-shelf has a rendered shelf preview",
+        "cottage-book-shelf can be placed",
+        "cottage-book-shelf supports position, facing and scale",
+        "cottage-pottery-shelf has a rendered shelf preview",
+        "cottage-pottery-shelf can be placed",
+        "cottage-pottery-shelf supports position, facing and scale",
+        "All cottage asset transforms survive a named file save",
+        "All cottage saved transforms survive reload",
+        "Playable layout and both protected presets are byte-identical",
+        "Editor has no page errors"
+      ],
+      "errors": []
+    },
+    "bowlEditor": {
+      "count": 5,
+      "checks": [
+        "Updated bowl has a rendered shelf preview",
+        "Existing asset ID remains placeable and selectable",
+        "Position, rotation and scale survive working-copy save/reload",
+        "Both protected presets remain byte-identical",
+        "No editor page errors"
+      ],
+      "errors": []
+    }
+  },
+  "sourceTypecheck": "passed",
+  "productionStaticExport": "22 pages passed",
+  "privateToolingExport": "no matching routes, UI, server or save API",
+  "layoutSha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab",
+  "workerOwnershipScenarios": 66,
+  "birdCircuitChecks": 18,
+  "deviceGateChecks": 27,
+  "sharedRendererChecks": 21,
+  "collisionParity": {
+    "colliders": 113,
+    "benches": 7
+  },
+  "regressions": [
+    "shared client",
+    "IP kick",
+    "chat hour",
+    "chat cooldown",
+    "chat admin"
+  ],
+  "firstThreeClientRun": "Petting wait timed out during concurrent browser work; unchanged sequential rerun passed 26 checks",
+  "limits": [
+    "Production Cloudflare and live site pending",
+    "Safari and physical hardware unverified",
+    "64-client runtime load and long sessions unverified"
+  ]
+}

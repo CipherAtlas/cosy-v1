@@ -30,7 +30,7 @@ const path = require('node:path');
       });
       await engine.load(); engine.setQuality('low'); engine.setBlocked(false); engine.renderer.setAnimationLoop(null);
       const pack = engine.puppies;
-      check(pack.puppies.length === 6, 'Six Blender puppies load from the playable layout');
+      check(pack.puppies.length === 4, 'Four Blender puppies load from the playable layout');
       for (const puppy of pack.puppies) {
         check(puppy.body && puppy.head && puppy.ears.length === 2 && puppy.legs.length === 4 && puppy.tail, `${puppy.info.name} has animated pivots`);
         check(puppy.movement.clear(puppy.actor.position.x, puppy.actor.position.z), `${puppy.info.name} begins on safe ground`);
@@ -88,10 +88,12 @@ const path = require('node:path');
       check(pack.followers.length === 2 && following.at(-1).includes(kiko.info.id), 'A second invitation keeps both dogs walking together');
       check(engine.togglePuppyFollow(mochi.info.id) && pack.followers.length === 1, 'One dog can go home without dismissing the other');
       engine.movement.settle(0, 30); engine.player.position.copy(engine.movement.position);
-      for (let frame = 0; frame < 3600; frame++)
+      let returnedHome = false;
+      for (let frame = 0; frame < 3600; frame++) {
         pack.update(1 / 60, 51 + frame / 60, engine.player.position, false, true, undefined, Math.PI);
-      const homeGap = Math.hypot(mochi.actor.position.x - mochi.route[0][0], mochi.actor.position.z - mochi.route[0][1]);
-      check(homeGap < 5, 'Released puppy returns toward its familiar patrol');
+        returnedHome ||= Math.hypot(mochi.actor.position.x - mochi.route[0][0], mochi.actor.position.z - mochi.route[0][1]) < .6;
+      }
+      check(returnedHome, 'Released puppy reaches home before continuing its long patrol');
       check(mochi.movement.clear(mochi.actor.position.x, mochi.actor.position.z), 'Returning puppy stays on walkable ground');
       check(!engine.petPuppy(mochi.info.id), 'Petting is rejected from a distance');
       engine.setPlace('focus'); check(!pack.group.visible, 'Puppies stay out of the private focus room');

@@ -4,17 +4,8 @@ import type { PlaceId } from "./places";
 import type { ActivityMoment, Collider } from "./environment";
 import { makeDeskQuill, makeFocusHourglass } from "./focusCottageProps";
 
-// Actor and camera are authored together so the interaction remains visible beside the DOM controls.
-export const ACTIVITY_STAGES: Record<PlaceId, { actor: [number,number,number]; yaw: number; camera: [number,number,number]; look: [number,number,number] }> = {
-  focus: { actor:[108.65,.15,-.65],yaw:Math.PI,camera:[111.3,2.65,2.5],look:[108.8,1.25,-1.65] },
-  music: { actor:[-5.8,.4,-16.1],yaw:Math.PI,camera:[-.9,2.8,-15.5],look:[-5.8,1,-18.1] },
-  breathe: { actor:[-23,.24,-5.5],yaw:Math.PI,camera:[-18.5,3.7,-2],look:[-26,.5,-9] },
-  mood: { actor:[13.9,.4,-10],yaw:Math.PI/2,camera:[11.6,2.6,-12.2],look:[15.9,1.2,-10] },
-  gratitude: { actor:[-18.2,.05,6.6],yaw:-Math.PI/2,camera:[-16.5,2.8,7.7],look:[-19.1,1.2,6.5] },
-  compliment: { actor:[3.05,.05,.35],yaw:Math.PI,camera:[5.2,2.4,-3.2],look:[3,1.25,-.4] },
-  birds: { actor:[-37,.4,6.5],yaw:Math.PI,camera:[-31,4.5,11],look:[-37,.7,4] },
-  garden: { actor:[24.6,.05,-5.4],yaw:Math.PI,camera:[30.5,5.8,1.5],look:[24.7,.6,-7] },
-};
+import { ACTIVITY_STAGES } from "./sharedActors";
+export { ACTIVITY_STAGES } from "./sharedActors";
 
 export class VillageActivities {
   readonly outdoor = new T.Group();

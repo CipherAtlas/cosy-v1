@@ -25,7 +25,7 @@ const crypto = require('node:crypto');
       check(true, `${breed} is in the shelf with a rendered preview`);
     }
     const initial = await page.evaluate(() => cosyStudio.snapshot());
-    check(initial.layout.objects.filter(o => o.asset.startsWith('puppy-')).length === 6, 'Six pups are in the playable working copy');
+    check(initial.layout.objects.filter(o => o.asset.startsWith('puppy-')).length === 4, 'Four pups are in the playable working copy');
     await page.locator('#scene-tab').click();
     await page.locator('#search').fill('Mochi');
     await page.locator('#scene-list .scene-select').filter({ hasText: 'Mochi' }).click();
@@ -41,7 +41,7 @@ const crypto = require('node:crypto');
       const spot = await page.evaluate(offset => cosyStudio.screenPoint('puppy-mochi', [offset, 0, 0]), 2.3 + index * 1.5);
       await page.mouse.click(spot.x, spot.y);
       const placed = await page.evaluate(breed => cosyStudio.snapshot().layout.objects.filter(o => o.asset === `puppy-${breed}`).length, breed);
-      check(placed === 2, `An additional ${breed} can be placed from the library`);
+      check(placed === (breed === 'beagle' ? 2 : 1), `An additional ${breed} can be placed from the library`);
     }
     await page.getByLabel('Layout name', { exact: true }).fill('Puppy layout QA');
     await page.getByLabel('Layout name', { exact: true }).press('Tab');
@@ -56,7 +56,7 @@ const crypto = require('node:crypto');
     await page.locator('#layouts').click(); await page.locator('#apply-game').click();
     await page.waitForTimeout(500);
     const playable = await (await page.request.get(`${url}/api/playable`)).json();
-    check(playable.layout.objects.find(o => o.id === 'puppy-mochi').position[0] === 3.4 && ['beagle','collie','shepherd'].every(breed => playable.layout.objects.filter(o => o.asset === `puppy-${breed}`).length === 2),
+    check(playable.layout.objects.find(o => o.id === 'puppy-mochi').position[0] === 3.4 && ['beagle','collie','shepherd'].every(breed => playable.layout.objects.filter(o => o.asset === `puppy-${breed}`).length === (breed === 'beagle' ? 2 : 1)),
       'Apply carries puppy placement into the isolated playable layout');
     check(hash() === before, 'Protected preset is byte-identical');
     check(errors.length === 0, 'Editor has no page errors');

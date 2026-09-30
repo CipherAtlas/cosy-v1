@@ -6,7 +6,7 @@ import { BIRD_CLEARING } from "../../features/village/environment";
 import { BIRD_LANDING_SPOTS } from "../../features/village/birds";
 import { VillageLife } from "../../features/village/life";
 import { GardenScene } from "../../features/village/gardenScene";
-import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeDeskQuill, makeFocusHourglass } from "../../features/village/focusCottageProps";
+import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeDeskQuill, makeFocusHourglass, cottageMaterials, makeCottageCouch, makeCottageLamp, makeCottageFern, makeCottagePrint, makeCatCushion, makeCottageChair, makeCottageBooks, makeCottagePottery, makeCottageWallShelf } from "../../features/village/focusCottageProps";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RESIDENT_IDS, type ResidentRoute, type ResidentId } from "../../features/village/worldLayout";
 import { fenceGeometry } from "../../features/village/fenceGeometry";
@@ -156,10 +156,11 @@ export class LayoutScene {
       const id = `garden-${name.toLowerCase()}`;
       this.assets.set(id, { id, name: name === "WateringCan" ? "Watering can" : name, category: ["WateringCan", "Basket"].includes(name) ? "Furnishings" : "Nature", template: root, shelf: true });
     }
-    const [doveKit, spiritKit, puppyKit] = await Promise.all([
+    const [doveKit, spiritKit, puppyKit, catKit] = await Promise.all([
       new GLTFLoader().loadAsync("/village/models/dove.glb?v=1"),
       new GLTFLoader().loadAsync("/village/models/spirit.glb?v=3"),
       new GLTFLoader().loadAsync("/village/models/puppies.glb?v=4"),
+      new GLTFLoader().loadAsync("/village/models/cottage-cat.glb?v=1"),
     ]);
     for (const [breed, info] of Object.entries(PUPPY_INFO)) {
       const model = puppyKit.scene.getObjectByName(info.model);
@@ -208,6 +209,22 @@ export class LayoutScene {
     this.assets.set("desk-quill", { id: "desk-quill", name: "Desk quill", category: "Furnishings", template: makeDeskQuill(), shelf: true });
     this.assets.set("focus-hourglass", { id: "focus-hourglass", name: "Focus hourglass", category: "Furnishings", template: makeFocusHourglass().hourglass, shelf: true });
     this.assets.set("village-window-vista", { id: "village-window-vista", name: "Bridge-view cottage window", category: "Buildings", template: makeBridgeWindow(), shelf: true });
+    const cottageSurfaces = cottageMaterials();
+    for (const [id, name, template, category] of [
+      ["cottage-cat", "Cream & caramel cottage cat", catKit.scene, "Animals"],
+      ["cottage-couch", "Sage linen couch", makeCottageCouch(cottageSurfaces), "Furnishings"],
+      ["cottage-reading-lamp", "Pleated reading lamp", makeCottageLamp(), "Furnishings"],
+      ["cottage-fern", "Fern in ceramic pot", makeCottageFern(), "Nature"],
+      ["cottage-botanical-print", "Framed botanical print", makeCottagePrint(), "Furnishings"],
+      ["cottage-cat-cushion", "Cat’s woven nap cushion", makeCatCushion(cottageSurfaces), "Furnishings"],
+      ["cottage-writing-chair", "Cushioned oak writing chair", makeCottageChair(cottageSurfaces), "Furnishings"],
+      ["cottage-books", "Clothbound cottage books", makeCottageBooks(), "Furnishings"],
+      ["cottage-pottery", "Hand-thrown glazed pottery", makeCottagePottery(), "Furnishings"],
+      ["cottage-book-shelf", "Oak cottage book shelf", makeCottageWallShelf(cottageSurfaces), "Furnishings"],
+      ["cottage-pottery-shelf", "Oak cottage pottery shelf", makeCottageWallShelf(cottageSurfaces, "pottery"), "Furnishings"],
+    ] as [string, string, T.Object3D, string][]) {
+      this.assets.set(id, { id, name, category, template, shelf: true });
+    }
     this.pathMaterial = this.world.gardenSurfaces.paving;
     this.assets.set("custom-path", { id: "custom-path", name: "Curved limestone path", category: "Paths", template: new T.Group(), shelf: false });
     const fencePath = { points: [[0, 0], [0, -8]] as [number, number][], width: 1.4 };

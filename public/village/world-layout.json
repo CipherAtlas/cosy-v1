@@ -7784,8 +7784,8 @@
       "id": "puppy-mochi",
       "asset": "puppy-corgi",
       "name": "Mochi",
-      "position": [3.1, 0, 18.5],
-      "rotation": [0, 195, 0],
+      "position": [30, 0.05, 19],
+      "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "visible": true,
       "locked": false
@@ -7794,8 +7794,8 @@
       "id": "puppy-kiko",
       "asset": "puppy-shiba",
       "name": "Kiko",
-      "position": [3, 0, -12],
-      "rotation": [0, 25, 0],
+      "position": [17, 0.05, -5.8],
+      "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "visible": true,
       "locked": false
@@ -7804,8 +7804,8 @@
       "id": "puppy-biscuit",
       "asset": "puppy-beagle",
       "name": "Biscuit",
-      "position": [-18, 0, 0.3],
-      "rotation": [0, 90, 0],
+      "position": [-29, 0.05, 3],
+      "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "visible": true,
       "locked": false
@@ -7814,28 +7814,8 @@
       "id": "puppy-cloud",
       "asset": "puppy-samoyed",
       "name": "Cloud",
-      "position": [-1, 0, -29],
-      "rotation": [0, 25, 0],
-      "scale": [1, 1, 1],
-      "visible": true,
-      "locked": false
-    },
-    {
-      "id": "puppy-fern",
-      "asset": "puppy-collie",
-      "name": "Fern",
-      "position": [5.4, 0, 17],
-      "rotation": [0, 210, 0],
-      "scale": [1, 1, 1],
-      "visible": true,
-      "locked": false
-    },
-    {
-      "id": "puppy-atlas",
-      "asset": "puppy-shepherd",
-      "name": "Atlas",
-      "position": [6.6, 0, 19.2],
-      "rotation": [0, 220, 0],
+      "position": [-1, 0.05, -29],
+      "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "visible": true,
       "locked": false

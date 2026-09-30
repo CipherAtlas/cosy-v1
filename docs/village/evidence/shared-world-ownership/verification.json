@@ -1,0 +1,13 @@
+{
+  "sourceAndLayoutParity": true,
+  "privateToolsExcluded": true,
+  "colliders": 113,
+  "benches": 7,
+  "staticPages": 22,
+  "typecheck": "passed",
+  "browserChecks": 26,
+  "workerChecks": 66,
+  "rendererChecks": 21,
+  "deployed": false,
+  "layoutSha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab"
+}

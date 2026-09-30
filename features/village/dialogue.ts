@@ -27,8 +27,8 @@ export class VillagerDialogue {
   private boxes: T.Box3[];
   private bubbles;
 
-  constructor(host: HTMLElement, life: VillageLife, colliders: Collider[], private onTalk: () => void,
-    private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void }) {
+  constructor(host: HTMLElement, private life: VillageLife, colliders: Collider[], private onTalk: () => void,
+    private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void; talk?: (id: string) => void }) {
     this.layer.className = "v-villager-dialogue";
     this.layer.hidden = true;
     this.layer.setAttribute("role", "group");
@@ -109,7 +109,7 @@ export class VillagerDialogue {
       element.append(text, footer, actions);
       this.layer.append(element);
       return { resident, profile, element, text, name, button, buttonLabel, companion, companionLabel, crumbs, crumbsLabel, tea, teaLabel, attention, actions, line: profile.greeting,
-        greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0,
+        greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0, sharedSpeech: "",
         visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "", actionState: "" };
     });
     this.layer.append(this.announcement);
@@ -167,13 +167,17 @@ export class VillagerDialogue {
   invite(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || !this.actions) return;
+    if (!this.life.available(b.profile.id)) return;
     this.onTalk(); this.actions.companion(b.profile.id); this.actionLabels(b); b.measured = "";
+    if (this.life.shared) return;
     this.say(index, b.resident.following ? line("A little company? I'd love that.", "一緒にお散歩？うれしいな。") : line("See you around. I'll be right here in the village.", "またね。村でのんびりしてるね。"), 4);
   }
   bread(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || !["maple", "wren"].includes(b.profile.id) || !this.actions) return;
+    if (!this.life.available(b.profile.id)) return;
     this.onTalk(); this.actions.crumbs(b.profile.id);
+    if (this.life.shared) return;
     this.say(index, b.profile.id === "wren" ? b.profile.chat[0] : line("For the little duckies! This little pouch always has a few more.", "小さなアヒルたちにどうぞ！この袋には、いつでもパンくずがあるよ。"), 6);
     this.announcement.textContent = b.line[this.language];
   }
@@ -182,6 +186,7 @@ export class VillagerDialogue {
     const b = this.bubbles[3];
     if (!this.enabled || this.nearest !== 3 || !b.visible || b.distance > 4.5
       || b.element.classList.contains("is-compact") || !this.actions?.visitTea) return false;
+    if (!this.life.available(b.profile.id)) return false;
     this.onTalk(); this.actions.visitTea();
     return true;
   }
@@ -224,6 +229,13 @@ export class VillagerDialogue {
   talk(index = this.nearest) {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || index !== this.nearest) return;
+    if (!this.life.available(b.profile.id)) return;
+    if (this.life.shared) {
+      this.onTalk();
+      if (b.profile.id === "wren") this.actions?.crumbs(b.profile.id);
+      else this.actions?.talk?.(b.profile.id);
+      return;
+    }
     if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 6; b.resident.chatting = true; return; }
     this.onTalk();
     this.say(index, b.profile.chat[b.chat++ % b.profile.chat.length], 6);
@@ -259,7 +271,12 @@ export class VillagerDialogue {
     const candidates: number[] = [];
     this.bubbles.forEach((b, index) => {
       b.distance = b.resident.root.position.distanceTo(player);
-      b.resident.chatting = b.distance <= 5.5 && this.clock < b.talkingUntil;
+      if (!this.life.shared) b.resident.chatting = b.distance <= 5.5 && this.clock < b.talkingUntil;
+      const shared = this.life.sharedState(b.profile.id);
+      const speechKey = `${shared?.startedAt}:${shared?.speech?.en}`;
+      if (shared?.speech && b.sharedSpeech !== speechKey) { b.sharedSpeech = speechKey; this.say(index, shared.speech, 6); }
+      const available = this.life.available(b.profile.id);
+      [b.button, b.companion, b.crumbs, b.tea].forEach(button => { if (button) button.disabled = !available; });
       if (b.distance > 7) b.greetingSeen = false;
       this.anchor.copy(b.resident.root.position);
       this.anchor.y += 2.12 * b.resident.root.scale.y;
@@ -281,7 +298,7 @@ export class VillagerDialogue {
       }
       if (!b.visible) { b.element.hidden = true; b.button.hidden = true; return; }
       if (b.distance < 4.5 && (this.nearest < 0 || b.distance < this.bubbles[this.nearest].distance)) this.nearest = index;
-      if (!b.resident.following && !b.greetingSeen && b.distance < 2.5) {
+      if (!this.life.shared && !b.resident.following && !b.greetingSeen && b.distance < 2.5) {
         b.greetingSeen = true;
         this.say(index, b.profile.greeting, 5);
         b.talkingUntil = this.clock + 4;

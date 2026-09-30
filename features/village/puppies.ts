@@ -1,4 +1,5 @@
 import * as T from "three";
+import { PUPPY_PATROLS, type SharedActor } from "./sharedActors";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { PuppyAnimation } from "./puppyAnimation";
 import { floorHeight, type Collider } from "./environment";
@@ -15,7 +16,7 @@ export const PUPPY_INFO: Record<PuppyBreed, { model: string; name: string; breed
   collie: { model: "Fern", name: "Fern", breed: "Border Collie", japanese: "ファーン" },
   shepherd: { model: "Atlas", name: "Atlas", breed: "German Shepherd", japanese: "アトラス" },
 };
-export type NearbyPuppy = { id: string; name: string; breed: PuppyBreed };
+export type NearbyPuppy = { id: string; name: string; breed: PuppyBreed; owner?: string | null };
 export type PuppyCommand = "sit" | "dance" | "spin" | "bow" | "wave" | "roll";
 export const PUPPY_TRICKS: { command: PuppyCommand; key: string; english: string; japanese: string }[] = [
   { command: "sit", key: "Z", english: "Sit", japanese: "おすわり" },
@@ -37,14 +38,6 @@ type Puppy = {
   sharedStartedAt: number | null;
 };
 
-const PATROLS: Record<PuppyBreed, [number, number][]> = {
-  corgi: [[0, 0], [1.6, -1.6], [2.5, -3.2], [.5, -3.8]],
-  shiba: [[0, 0], [1.3, -2], [2.5, -3.5], [.2, -3.8]],
-  beagle: [[0, 0], [-1.3, .8], [-2, 2.3], [-.4, 3.1]],
-  samoyed: [[0, 0], [1, -2], [1.4, -4.5], [-.8, -3.7]],
-  collie: [[0, 0], [1, 1.2], [-1, 2.4], [-1.8, .4]],
-  shepherd: [[0, 0], [-1.3, .8], [-1.8, 2.4], [.3, 2.7]],
-};
 const FOLLOW_DISTANCE = 1.55;
 const FOLLOW_SIDE = .8;
 
@@ -69,6 +62,32 @@ export class PuppyPack {
   private followHeading = 0;
   private previousPlayer = new T.Vector3();
   private interactionId: string | null = null;
+  private sharedStates: Map<string, SharedActor> | null = null;
+  private selfId = "";
+  private sharedClock = 0;
+
+  applyShared(states: SharedActor[], selfId: string, time: number) {
+    this.selfId = selfId; this.sharedClock = time - Date.now();
+    const initial = !this.sharedStates;
+    this.sharedStates = new Map(states.filter(state => state.kind === "puppy").map(state => [state.id, state]));
+    this.followingIds = states.filter(state => state.kind === "puppy" && state.following && state.owner === selfId).map(state => state.id);
+    for (const puppy of this.puppies) {
+      const state = this.sharedStates.get(puppy.info.id);
+      if (!state) continue;
+      if (initial || puppy.actor.position.distanceTo(new T.Vector3(state.x, state.y, state.z)) > 4) puppy.actor.position.set(state.x, state.y, state.z);
+      const newAction = puppy.sharedStartedAt !== state.startedAt || puppy.command !== state.action;
+      if (!initial && newAction && (state.mode === "pet" || state.mode === "trick" && ["dance", "spin"].includes(state.action ?? "")))
+        this.onSound(puppy.info.breed, [state.x, state.y + .6, state.z], "happy");
+      if (state.mode === "trick" && state.action && newAction)
+        puppy.animation.start(state.action, Math.max(0, (time - state.startedAt) / 1000));
+      if (state.mode === "pet" && (!puppy.petting || puppy.sharedStartedAt !== state.startedAt)) puppy.animation.start("pet", Math.max(0, (time - state.startedAt) / 1000));
+      puppy.petting = state.mode === "pet";
+      puppy.petTarget = state.mode === "petApproach" ? [state.x, state.z] : null;
+      puppy.command = state.mode === "trick" ? state.action : null;
+      puppy.sharedStartedAt = state.startedAt;
+    }
+  }
+  get sharedFollowers() { return this.followers; }
 
   constructor(source: T.Object3D, clips: T.AnimationClip[], placements: PuppyPlacement[], colliders: Collider[], authored: AuthoredWorld,
     private onSound: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void) {
@@ -95,7 +114,7 @@ export class PuppyPack {
         placement.x + dx * Math.cos(placement.yaw) + dz * Math.sin(placement.yaw),
         placement.z - dx * Math.sin(placement.yaw) + dz * Math.cos(placement.yaw),
       ];
-      const route = PATROLS[placement.breed].map(point).filter(([x, z]) => movement.clear(x, z));
+      const route = PUPPY_PATROLS[placement.breed].map(point).filter(([x, z]) => movement.clear(x, z));
       if (!route.length) route.push([placement.x, placement.z]);
       const hearts = [0, 1].map(i => {
         const mesh = new T.Mesh(heartGeometry(), new T.MeshBasicMaterial({ color: i ? "#ffd9a4" : "#f2a9b3", transparent: true, opacity: 0, side: T.DoubleSide, depthWrite: false }));
@@ -168,11 +187,11 @@ export class PuppyPack {
     if (this.pettingPuppy) return null;
     const held = this.puppies.find(puppy => puppy.info.id === this.interactionId);
     if (held && Math.hypot(player.x - held.actor.position.x, player.z - held.actor.position.z) < 2.65
-      && held.movement.canWalkTo(player.x, player.z)) return held.info;
+      && held.movement.canWalkTo(player.x, player.z)) return { ...held.info, owner: this.sharedStates?.get(held.info.id)?.owner };
     this.interactionId = null;
-    const closest = this.puppies.filter(p => !p.petting && !p.petTarget).map(p => ({ p, distance: Math.hypot(player.x - p.actor.position.x, player.z - p.actor.position.z) }))
+    const closest = this.puppies.filter(p => this.sharedStates || !p.petting && !p.petTarget).map(p => ({ p, distance: Math.hypot(player.x - p.actor.position.x, player.z - p.actor.position.z) }))
       .filter(value => value.distance < 2.35 && value.p.movement.canWalkTo(player.x, player.z)).sort((a, b) => a.distance - b.distance)[0];
-    return closest?.p.info ?? null;
+    return closest ? { ...closest.p.info, owner: this.sharedStates?.get(closest.p.info.id)?.owner } : null;
   }
 
   setInteraction(id: string | null) { this.interactionId = id; }
@@ -197,7 +216,7 @@ export class PuppyPack {
     }
   }
 
-  get pettingPuppy() { return this.puppies.find(puppy => puppy.petting || puppy.petTarget) ?? null; }
+  get pettingPuppy() { return this.puppies.find(puppy => (puppy.petting || puppy.petTarget) && (!this.sharedStates || this.sharedStates.get(puppy.info.id)?.owner === this.selfId)) ?? null; }
 
   petContact(heading = 0, side = -1): T.Vector3 | null {
     const puppy = this.pettingPuppy;
@@ -281,6 +300,32 @@ export class PuppyPack {
 
   update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, active: boolean,
     cameraRotation?: T.Quaternion, playerHeading = 0) {
+    if (this.sharedStates) {
+      const now = Date.now() + this.sharedClock;
+      for (const puppy of this.puppies) {
+        const state = this.sharedStates.get(puppy.info.id);
+        if (!state) continue;
+        const blend = 1 - Math.exp(-delta * 18);
+        puppy.actor.position.lerp(new T.Vector3(state.x, state.y, state.z), blend);
+        puppy.movement.position = { x: puppy.actor.position.x, y: floorHeight(puppy.actor.position.x, puppy.actor.position.z), z: puppy.actor.position.z };
+        puppy.heading = state.heading;
+        puppy.actor.rotation.y += Math.atan2(Math.sin(state.heading - puppy.actor.rotation.y), Math.cos(state.heading - puppy.actor.rotation.y)) * blend;
+        const age = Math.max(0, (now - state.startedAt) / 1000);
+        puppy.commandAge = age; puppy.petAge = state.mode === "pet" ? age : 100;
+        const action = puppy.command ?? (puppy.petting ? "pet" : null);
+        if (action) puppy.animation.actions[action].time = age;
+        puppy.animation.update(action ? 0 : delta, state.speed, puppy.command, puppy.petting, reduced, true, delta);
+        puppy.hearts.forEach((heart, index) => {
+          const heartAge = age - .35 - index * .28;
+          heart.visible = puppy.petting && !reduced && heartAge > 0 && heartAge < 1.45;
+          if (!heart.visible) return;
+          heart.position.set(index ? .25 : -.23, .95 + heartAge * .28, .65);
+          if (cameraRotation) heart.quaternion.copy(cameraRotation);
+          (heart.material as T.MeshBasicMaterial).opacity = Math.min(1, heartAge * 5, (1.45 - heartAge) * 3);
+        });
+      }
+      return;
+    }
     if (active && this.followingIds.length) {
       const last = this.playerTrail.at(-1)!;
       const travel = Math.hypot(player.x - last[0], player.z - last[1]);

@@ -14,12 +14,26 @@ Open [http://127.0.0.1:3052/](http://127.0.0.1:3052/) in a browser. Keep that Te
 
 The launcher reads `~/.config/cosy-village/chat-admin-token` if that private file exists and is readable only by your account (mode `0600`). Otherwise it prompts for the secret in Terminal. Do not put the secret in the command, a URL, Git, or browser storage. The local server sends it to the Worker over HTTPS; the browser never receives it. The default connection is the production village Worker.
 
-## Use the controls
+## Kick a player for five minutes
 
-- **Players online** lists currently connected visitors by their village names and refreshes every five seconds. Its **Refresh** button reloads the list immediately.
-- **Kick for 5 minutes** immediately disconnects that player and every other session using the same public IP. The Worker refuses re-entry from that IP for exactly five minutes, including a new tab, reload or Worker restart. Trying again does not extend the cooldown. A stale player row reports that the player has left rather than kicking someone else.
-- Kicked visitors see **“You've been kicked from this village. Log back in later!”** on the same forest-green full-screen background used when preparing a new sky. The village scene, audio and reconnect timers stop. After the five minutes, visitors can reload and enter again; the screen does not automatically rejoin.
-- Visitors connected before the kick-capable Worker update need to reconnect before their **Kick** button becomes available. The console shows a reconnect note for those sessions. A shared home, office or VPN IP means everyone using it shares the cooldown; changing IP can bypass an IP-based kick.
+1. Open the [local console](http://127.0.0.1:3052/) and find the visitor's village name under **Players online**. The list refreshes every five seconds; use its **Refresh** button to check immediately.
+2. Click that visitor's **Kick for 5 minutes** button, or focus it with Tab and press Enter or Space. The kick takes effect immediately without a confirmation dialog. Player controls are briefly disabled while the request runs.
+3. Check the status below the player list for confirmation. The kicked visitor disappears from the list; if several sessions shared that IP, the status also reports how many were disconnected.
+
+The kick disconnects every session using the same public IP and blocks that IP for exactly five minutes from the successful kick. Reloads and new tabs remain blocked, and another entry attempt does not extend the cooldown. The Worker retains the expiry across restarts; closing or restarting this local console does not cancel it. Everyone using a shared home, office or VPN IP shares the cooldown. Changing IP can bypass an IP-based restriction.
+
+Kicked visitors see **“You've been kicked from this village. Log back in later!”** on the same forest-green full-screen background used when preparing a new sky. Their village scene, audio and reconnect timers stop. After five minutes, they can reload and enter again; the screen does not automatically rejoin. Kicking does not remove chat messages or their captured archive copies, and does not delete personal notes or preferences.
+
+### If a kick is unavailable
+
+- **Reconnect needed for IP kick:** this visitor's connection has no IP fingerprint, usually because it predates the Worker update. Ask them to reload the village, then refresh **Players online**. Their button stays disabled until their new connection has an IP fingerprint. Already-open village tabs also need a reload to receive the new kick screen.
+- **That player is no longer connected. Refresh the players list:** the visitor left before the request reached the Worker. Refresh and choose a currently connected visitor; the stale row cannot kick a replacement player.
+- **The admin API is not available on this Worker yet:** the console is pointed at a Worker without the player API. The production Worker is already updated; for a local test, use the matching kick-capable Worker. After updating the console source, restart its Python server and reload the admin page.
+
+Live verification covered same-IP disconnection, the full-screen message, stopped playback, refused reload and successful re-entry after an actual five-minute wait. See [the published checks and remaining limits](../../VILLAGE_BUILD.md#2026-09-30--five-minute-ip-kick-release-published).
+
+## Manage chat and browse the archive
+
 - **Refresh** reloads the current hour's messages; the page also refreshes every five seconds.
 - **Remove** deletes that message from the shared chat immediately.
 - **Clear all messages** asks for confirmation, then empties the current hour. If the hour changed since the page loaded, the Worker rejects the request; refresh and try again.
@@ -47,6 +61,6 @@ For an isolated local Worker test, start Wrangler separately and pass `--worker-
 
 ## Access boundary
 
-The Python server binds only to `127.0.0.1`, checks the browser's Host, Origin and local session token on changes, and has no public Next.js route. The Worker checks the admin secret for every admin request, including player lists and kicks. It derives the IP fingerprint from [Cloudflare's client IP headers](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip), preferring the original IPv6 address when supplied. Only a SHA-256 fingerprint is retained in private socket attachments and temporary cooldown storage; raw IPs and fingerprints never appear in public visitor messages or the console. The local token file must remain private; deleting it removes this Mac's saved access. See [the original release record](../../VILLAGE_BUILD.md#2026-09-29-local-chat-admin) and [the published kick checks](../../VILLAGE_BUILD.md#2026-09-30-five-minute-ip-kick-release-published).
+The Python server binds only to `127.0.0.1`, checks the browser's Host, Origin and local session token on changes, and has no public Next.js route. The Worker checks the admin secret for every admin request, including player lists and kicks. It derives the IP fingerprint from [Cloudflare's client IP headers](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-connecting-ip), preferring the original IPv6 address when supplied. Only a SHA-256 fingerprint is retained in private socket attachments and temporary cooldown storage; raw IPs and fingerprints never appear in public visitor messages or the console. The local token file must remain private; deleting it removes this Mac's saved access. See [the original release record](../../VILLAGE_BUILD.md#2026-09-29-local-chat-admin) and [the published kick checks](../../VILLAGE_BUILD.md#2026-09-30--five-minute-ip-kick-release-published).
 
 After the matching Worker/client release, restart an already-running Python console to load its new player API handlers, then reload the browser page. This preserves the existing seven-day archive.

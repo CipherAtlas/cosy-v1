@@ -1,0 +1,159 @@
+{
+  "checks": [
+    "Exactly four dogs spawn",
+    "Homes are over 23 m apart",
+    "Mochi reaches segment 1/7",
+    "Mochi reaches segment 2/7",
+    "Mochi reaches segment 3/7",
+    "Mochi reaches segment 4/7",
+    "Mochi reaches segment 5/7",
+    "Mochi reaches segment 6/7",
+    "Mochi reaches segment 7/7",
+    "Mochi's circuit exceeds 30 m",
+    "Kiko reaches segment 1/7",
+    "Kiko reaches segment 2/7",
+    "Kiko reaches segment 3/7",
+    "Kiko reaches segment 4/7",
+    "Kiko reaches segment 5/7",
+    "Kiko reaches segment 6/7",
+    "Kiko reaches segment 7/7",
+    "Kiko's circuit exceeds 30 m",
+    "Biscuit reaches segment 1/10",
+    "Biscuit reaches segment 2/10",
+    "Biscuit reaches segment 3/10",
+    "Biscuit reaches segment 4/10",
+    "Biscuit reaches segment 5/10",
+    "Biscuit reaches segment 6/10",
+    "Biscuit reaches segment 7/10",
+    "Biscuit reaches segment 8/10",
+    "Biscuit reaches segment 9/10",
+    "Biscuit reaches segment 10/10",
+    "Biscuit's circuit exceeds 30 m",
+    "Cloud reaches segment 1/8",
+    "Cloud reaches segment 2/8",
+    "Cloud reaches segment 3/8",
+    "Cloud reaches segment 4/8",
+    "Cloud reaches segment 5/8",
+    "Cloud reaches segment 6/8",
+    "Cloud reaches segment 7/8",
+    "Cloud reaches segment 8/8",
+    "Cloud's circuit exceeds 30 m",
+    "Mochi stays on safe ground through 210 s",
+    "Mochi advances around its entire circuit",
+    "Mochi wanders over 10 m from a tiny local loop",
+    "Kiko stays on safe ground through 210 s",
+    "Kiko advances around its entire circuit",
+    "Kiko wanders over 10 m from a tiny local loop",
+    "Biscuit stays on safe ground through 210 s",
+    "Biscuit advances around its entire circuit",
+    "Biscuit wanders over 10 m from a tiny local loop",
+    "Cloud stays on safe ground through 210 s",
+    "Cloud advances around its entire circuit",
+    "Cloud wanders over 10 m from a tiny local loop",
+    "Runtime colliders match the shared Worker manifest",
+    "No browser page errors"
+  ],
+  "metrics": [
+    {
+      "name": "Mochi",
+      "home": [
+        30,
+        0.05,
+        19
+      ],
+      "points": 7,
+      "length": 49.05410417997433,
+      "visited": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "minX": 24.312270408883588,
+      "maxX": 45.695308980358405,
+      "minZ": 18.303853194992527,
+      "maxZ": 27.833971196499785,
+      "unsafe": 0
+    },
+    {
+      "name": "Kiko",
+      "home": [
+        17,
+        0.05,
+        -5.8
+      ],
+      "points": 7,
+      "length": 31.369849821483598,
+      "visited": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "minX": 8.297131675209963,
+      "maxX": 18.91846742942794,
+      "minZ": -14.485905198853976,
+      "maxZ": -5.8,
+      "unsafe": 0
+    },
+    {
+      "name": "Biscuit",
+      "home": [
+        -29,
+        0.05,
+        3
+      ],
+      "points": 10,
+      "length": 55.44098670054549,
+      "visited": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "minX": -37.66563608796091,
+      "maxX": -18.01358708805644,
+      "minZ": -4.167017845311981,
+      "maxZ": 3,
+      "unsafe": 0
+    },
+    {
+      "name": "Cloud",
+      "home": [
+        -1,
+        0.05,
+        -29
+      ],
+      "points": 8,
+      "length": 38.32692382258609,
+      "visited": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "minX": -3.180008653879796,
+      "maxX": 0.7811682978022045,
+      "minZ": -31.82094404958039,
+      "maxZ": -15.334397294047282,
+      "unsafe": 0
+    }
+  ],
+  "minHome": 28.000714276603734
+}

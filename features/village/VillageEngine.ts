@@ -23,8 +23,10 @@ import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type W
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
 import type { SharedChatEntry, SharedVisitor, SharedSwingRide, SharedPuppyTrick } from "./sharedWorld";
-import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal } from "./focusCottageProps";
+import { cottageMaterials, makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeCottageCouch, makeCottageLamp, makeCottageFern, makeCottagePrint, makeCatCushion, makeCottageChair, makeCottageBooks, makeCottagePottery, makeCottageWallShelf } from "./focusCottageProps";
+import { CottageCat, type CottageCatStatus } from "./cottageCat";
 import { SWING_MAX_ANGLE, type SwingSeat } from "./swings";
+import type { SharedActors, SharedInteraction, InteractionResult } from "./sharedActors";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -53,12 +55,22 @@ export class VillageEngine {
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
   private character?: T.Object3D;
-  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number }>();
+  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null }>();
   private pendingPuppyTricks = new Map<string, SharedPuppyTrick>();
   private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
   private sharedSpawnPlaced = false;
+  private sharedMode = false;
+  private sharedConnected = false;
+  private sharedSelfId = "";
+  private sharedActors: SharedActors | null = null;
+  private sharedInteraction: ((request: SharedInteraction) => Promise<InteractionResult>) | null = null;
+  private pendingInteractions = new Set<string>();
+  private heldPuppy: string | null = null;
+  private activitySeat: 0 | 1 | null = null;
+  private activityPosition: [number, number, number] | null = null;
+  private lastSharedFollowers = "";
   private visitorLabelPoint = new T.Vector3();
   private movement?: VillageMovement;
   private running = false;
@@ -136,9 +148,11 @@ export class VillageEngine {
   private direction = new T.Vector3();
   private temp = new T.Vector3();
   private indoor?: T.Group;
+  private cottageCat?: CottageCat;
+  private catPetTarget = new T.Vector3();
   private coffeeSteam: T.Mesh[] = [];
   private bridgeWindow?: T.WebGLRenderTarget;
-  private bridgeCamera = new T.PerspectiveCamera(56, 576 / 512, .12, 1100);
+  private bridgeCamera = new T.PerspectiveCamera(56, 400 / 345, .12, 1100);
   private bridgeWindowTime = -1000;
   private rain?: T.LineSegments;
   private weather: Weather = "golden";
@@ -157,6 +171,11 @@ export class VillageEngine {
       if (this.seatedBench && !this.blocked) this.stand();
       this.releaseMouseLook();
       this.clearKeys();
+      return;
+    }
+    if (this.place === "focus" && !this.blocked && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === "e"
+      && !(e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable]:not([contenteditable='false'])"))) {
+      if (this.petCottageCat()) e.preventDefault();
       return;
     }
     if (
@@ -386,9 +405,11 @@ export class VillageEngine {
       nearGarden?: (id: string | null) => void;
       gardenInteract?: (id: string) => void;
       nearPuppy?: (puppy: NearbyPuppy | null) => void;
+      cottageCat?: (status: CottageCatStatus) => void;
       puppyFollowing?: (puppies: NearbyPuppy[]) => void;
       puppyPetted?: (puppy: NearbyPuppy) => void;
       puppyCommanded?: (puppy: NearbyPuppy, command: PuppyCommand) => void;
+      sharedNotice?: (message: string) => void;
       puppySound?: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void;
     },
   ) {
@@ -464,7 +485,7 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const [world, gltf, gardenKit, dove, puppyKit] = await Promise.all([
+    const [world, gltf, gardenKit, dove, puppyKit, catKit] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
         withBasePath("/village/models/spirit.glb?v=3"),
@@ -472,6 +493,7 @@ export class VillageEngine {
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/puppies.glb?v=4")),
+      new GLTFLoader().loadAsync(withBasePath("/village/models/cottage-cat.glb?v=1")),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -545,12 +567,16 @@ export class VillageEngine {
     this.scene.add(this.puppies.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
       companion: id => this.callbacks.companion?.(id), crumbs: id => this.callbacks.crumbs?.(id), visitTea: () => this.callbacks.visitTea?.(),
+      talk: id => { if (this.sharedMode) this.requestShared({ kind: "resident", id, action: "talk" }, () => {}); },
     });
     this.dialogue.setMintAvailable(this.gardenState.mint > 0);
     this.dialogue.setLanguage(this.language);
     this.dialogue.setEnabled(!this.blocked && !this.place);
+    if (this.sharedActors) this.setSharedActors(this.sharedActors, this.sharedSelfId);
     this.resize();
     this.buildInterior();
+    this.cottageCat = new CottageCat(catKit.scene, status => this.callbacks.cottageCat?.(status));
+    this.indoor!.add(this.cottageCat.root);
     skipDistantPointLights();
     softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
@@ -582,37 +608,14 @@ export class VillageEngine {
     this.renderer.setAnimationLoop((t) => this.frame(t));
   }
   private buildInterior() {
-    // A compact furnished cottage interior, loaded with the shared world materials.
+    // Indoor surfaces use their own subtle textures and metre-scaled UVs.
     const g = new T.Group();
     g.position.set(110, 0, 0);
     this.scene.add(g);
     this.indoor = g;
     g.visible = false;
-    const materials: T.Material[] = [];
-    this.world?.group.traverse((o) => {
-      if (o instanceof T.Mesh && !Array.isArray(o.material))
-        materials.push(o.material);
-    });
-    const woodSource =
-      materials.find(
-        (m) =>
-          m instanceof T.MeshStandardMaterial &&
-          m.name === "Village oak",
-      ) || new T.MeshStandardMaterial({ color: "#644d32" });
-    const stoneSource =
-      materials.find(
-        (m) =>
-          m instanceof T.MeshStandardMaterial &&
-          m.name === "Village limestone",
-      ) || new T.MeshStandardMaterial({ color: "#888374" });
-    const wooden = (woodSource as T.MeshStandardMaterial).clone();
-    wooden.vertexColors = false; wooden.color.set("#efd5aa"); wooden.roughness = .82;
-    const stone = (stoneSource as T.MeshStandardMaterial).clone();
-    stone.vertexColors = false; stone.color.set("#dbceb2");
-    const plaster = new T.MeshStandardMaterial({
-      color: "#ddc6a2",
-      roughness: 1,
-    });
+    const surfaces = cottageMaterials();
+    const wooden = surfaces.wood, stone = surfaces.stone, plaster = surfaces.plaster;
     const cube = (
       m: T.Material,
       x: number,
@@ -622,20 +625,26 @@ export class VillageEngine {
       h: number,
       d: number,
     ) => {
-      const o = new T.Mesh(new T.BoxGeometry(w, h, d), m);
+      const geometry = new T.BoxGeometry(w, h, d), p = geometry.attributes.position, n = geometry.attributes.normal, uv = geometry.attributes.uv;
+      for (let i = 0; i < p.count; i++) {
+        if (Math.abs(n.getY(i)) > .5) uv.setXY(i, (p.getX(i) + x) / 2, (p.getZ(i) + z) / 2);
+        else if (Math.abs(n.getZ(i)) > .5) uv.setXY(i, (p.getX(i) + x) / 2, (p.getY(i) + y) / 2);
+        else uv.setXY(i, (p.getZ(i) + z) / 2, (p.getY(i) + y) / 2);
+      }
+      const o = new T.Mesh(geometry, m);
       o.position.set(x, y, z);
       o.receiveShadow = true;
       o.castShadow = true;
       g.add(o);
       return o;
     };
-    cube(wooden, 0, -0.13, 0, 9, 0.2, 9);
+    cube(surfaces.floor, 0, -0.13, 0, 9, 0.2, 9);
     cube(wooden, 0, 4.9, 0, 9, 0.15, 9);
     cube(plaster, 0, 2.5, -4.5, 9, 5, 0.25);
     cube(plaster, 0, 2.5, 4.5, 9, 5, 0.25);
     cube(plaster, 4.5, 2.5, 0, 0.25, 5, 9);
     cube(plaster, -4.5, 2.5, 0, 0.25, 5, 9);
-    const panel = wooden.clone(); panel.color.set("#ba916b");
+    const panel = surfaces.plaster.clone(); panel.color.set("#788679");
     // The room remains enclosed when the focus camera is dragged around the desk.
     for (const z of [-4.31, 4.31]) {
       cube(panel, 0, .58, z, 8.8, 1.16, .085);
@@ -651,12 +660,12 @@ export class VillageEngine {
       cube(wooden, x, 4.5, 0, 0.2, 0.2, 9);
     }
     for (const x of [-4, 0, 2, 4]) cube(wooden, x, 2.2, -4.3, 0.18, 4.5, 0.18);
-    this.bridgeWindow = new T.WebGLRenderTarget(384, 342, { depthBuffer: true });
+    this.bridgeWindow = new T.WebGLRenderTarget(400, 345, { depthBuffer: true });
     this.bridgeWindow.texture.colorSpace = T.SRGBColorSpace;
     const window = makeBridgeWindow(this.bridgeWindow.texture);
     window.position.set(-2.1, 1.23, -4.12);
     g.add(window);
-    cube(wooden, -1.6, 1, -2, 3, 0.16, 1.4);
+    cube(wooden, -1.6, 1, -2, 3.4, 0.16, 1.4);
     for (const x of [-2.85, -0.35])
       for (const z of [-2.5, -1.5]) cube(wooden, x, 0.45, z, 0.12, 0.95, 0.12);
     const journal = makeDeskJournal();
@@ -664,10 +673,10 @@ export class VillageEngine {
     journal.rotation.y = .12;
     g.add(journal);
     const inkwell = makeDeskInkwell();
-    inkwell.position.set(-1.15, 1.08, -1.8);
+    inkwell.position.set(-1.15, 1.08, -2.36);
     g.add(inkwell);
     const coffeeCup = makeCoffeeCup();
-    coffeeCup.position.set(-.65, 1.08, -1.85);
+    coffeeCup.position.set(-.72, 1.08, -2.43);
     coffeeCup.traverse(object => {
       if (object instanceof T.Mesh && object.name.startsWith("Coffee steam")) this.coffeeSteam.push(object);
     });
@@ -702,35 +711,27 @@ export class VillageEngine {
     f.position.set(112.7, .82, -3.38);this.scene.add(f);
     f.visible=false;f.userData.interior=true;f.userData.light=this.indoorLight;f.userData.coal=embers;
     this.world?.flames.push(f);
-    const cloth = new T.MeshStandardMaterial({ color: "#b26756", roughness: 1 });
-    const linen = new T.MeshStandardMaterial({ color: "#c6ba97", roughness: 1, side: T.DoubleSide });
+    const cloth = surfaces.rug, linen = surfaces.linen;
     cube(cloth, -.6, .006, .1, 4.8, .018, 3.2);
     for (const z of [-1.37, -1.25, 1.42, 1.54]) cube(linen, -.6, .021, z, 4.6, .012, .025);
     for (const x of [-2.85, 1.65]) cube(linen, x, .021, .1, .025, .012, 2.85);
-    // A grounded spindle chair, tucked beside the writing desk.
-    cube(wooden, -1.4, .56, -.7, .7, .12, .72);
-    for (const x of [-1.69, -1.11]) for (const z of [-.98, -.42]) cube(wooden, x, .26, z, .065, .52, .065);
-    for (const x of [-1.7, -1.55, -1.4, -1.25, -1.1]) cube(wooden, x, .98, -.39, .045, .78, .045);
-    cube(wooden, -1.4, 1.39, -.39, .74, .1, .1);
-    cube(cloth, -1.4, .65, -.7, .62, .08, .61);
-    for (const x of [-3.95, -.24]) {
-      const curtain = new T.PlaneGeometry(.52, 2.7, 12, 1);
-      const vertices = curtain.attributes.position;
-      for (let i = 0; i < vertices.count; i++) vertices.setZ(i, Math.sin(vertices.getX(i) * 34) * .045);
-      curtain.computeVertexNormals(); const mesh = new T.Mesh(curtain, linen);
-      mesh.position.set(x, 2.5, -3.99); g.add(mesh);
-    }
-    cube(wooden, -2.1, 3.98, -4, 3.72, .065, .065);
+    for (const x of [-2.95, 1.75]) for (let i = 0; i < 36; i++) cube(linen, x, .019, -1.35 + i * .083, .12, .012, .015);
+    const chair = makeCottageChair(surfaces); chair.position.set(-1.4, 0, -.7); g.add(chair);
     for (const side of [-1, 1]) for (let row = 0; row < 5; row++) cube(stone, 2.7 + side * 1.02, .23 + row * .44, -3.53, .35, .39, .42);
     for (let i = 0; i < 7; i++) cube(stone, 1.84 + i * .285, 2.4, -3.48, .26, .3, .48);
     cube(wooden, 1.5, 3.45, -4.04, 3.4, .12, .55);
-    const pottery = new T.MeshStandardMaterial({ color: "#70877b", roughness: .55 });
-    for (const [x, scale] of [[.25, .18], [1, .23], [2.45, .15]]) {
-      const vase = new T.Mesh(new T.LatheGeometry([new T.Vector2(.45, 0), new T.Vector2(.75, .3), new T.Vector2(.8, 1), new T.Vector2(.35, 1.5), new T.Vector2(.38, 1.8)], 16), pottery);
-      vase.scale.setScalar(scale); vase.position.set(x, 3.51, -4.02); g.add(vase);
-    }
-    const windowBounce = new T.PointLight("#ffd19a", 7, 8, 2);
+    const pottery = makeCottagePottery(); pottery.position.set(2.35, 3.51, -4.02); g.add(pottery);
+    const mantelBooks = makeCottageBooks(); mantelBooks.position.set(.45, 3.51, -4.02); g.add(mantelBooks);
+    const bookShelf = makeCottageWallShelf(surfaces); bookShelf.position.set(.65, 2.16, -4.02); g.add(bookShelf);
+    const upperShelf = makeCottageWallShelf(surfaces, "pottery"); upperShelf.position.set(.65, 2.94, -4.02); g.add(upperShelf);
+    const cushion = makeCatCushion(surfaces); cushion.position.set(.5, 0, -.3); g.add(cushion);
+    const couch = makeCottageCouch(surfaces); couch.position.set(3.5, 0, -.4); couch.rotation.y = -Math.PI / 2; g.add(couch);
+    const lamp = makeCottageLamp(); lamp.position.set(3.5, 0, -2.2); g.add(lamp);
+    const fern = makeCottageFern(); fern.position.set(3.65, 0, 1.55); g.add(fern);
+    const print = makeCottagePrint(); print.position.set(4.15, 1.75, -.5); print.rotation.y = -Math.PI / 2; g.add(print);
+    const windowBounce = new T.PointLight("#ffe1b5", 5, 8, 2);
     windowBounce.position.set(-2.1, 2.7, -3.3); g.add(windowBounce);
+    const lampGlow = new T.PointLight("#ffd4a0", 2.3, 4, 2); lampGlow.position.set(3.5, 1.6, -2.2); g.add(lampGlow);
     // Batch static furniture while retaining light and flame objects independently.
     g.updateMatrixWorld(true);
     const interiorInverse = g.matrixWorld.clone().invert();
@@ -738,13 +739,13 @@ export class VillageEngine {
     const pieces: T.Mesh[] = [];
     g.traverse(o => {
       if (!(o instanceof T.Mesh) || Array.isArray(o.material) || o.material.transparent) return;
-      const geometry = o.geometry.clone().applyMatrix4(interiorInverse.clone().multiply(o.matrixWorld));
+      const geometry = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(interiorInverse.clone().multiply(o.matrixWorld));
       const list = batches.get(o.material) ?? []; list.push(geometry); batches.set(o.material, list); pieces.push(o);
     });
     pieces.forEach(o => { o.removeFromParent(); o.geometry.dispose(); });
     batches.forEach((parts, material) => {
       const geometry = mergeGeometries(parts); parts.forEach(p => p.dispose());
-      if (geometry) { const mesh = new T.Mesh(geometry, material); g.add(mesh); }
+      if (geometry) { const mesh = new T.Mesh(geometry, material); mesh.receiveShadow = mesh.castShadow = true; g.add(mesh); }
     });
     this.indoorLight.position.set(112.7, 2, -2.8);
   }
@@ -767,6 +768,8 @@ export class VillageEngine {
     this.world.group.visible = true;
     this.life?.residents.forEach(resident => { resident.root.visible = !resident.following; });
     this.atmosphere.update(time, windowCamera.position);
+    // Direct cottage entry can precede the first outdoor frame/shadow allocation.
+    if (this.renderer.shadowMap.enabled && !this.sun.shadow.map) this.renderer.shadowMap.needsUpdate = true;
     this.renderer.setRenderTarget(this.bridgeWindow);
     this.renderer.render(this.scene, windowCamera);
     this.renderer.setRenderTarget(null);
@@ -807,6 +810,10 @@ export class VillageEngine {
     this.birds?.setLanguage(language);
     this.world?.setLanguage(language);
     this.garden?.setLanguage(language);
+  }
+  petCottageCat() {
+    if (this.blocked || this.place !== "focus") return false;
+    return this.cottageCat?.pet() ?? false;
   }
   setMouseSensitivity(value: number) {
     if (Number.isFinite(value)) this.mouseSensitivity = T.MathUtils.clamp(value, .25, 2);
@@ -938,18 +945,59 @@ export class VillageEngine {
     const pendulum = swing && this.ridingSwing ? swing.pendulums[this.ridingSwing.index] : null;
     return { x: this.player.position.x, y: this.player.position.y, z: this.player.position.z, heading: this.player.rotation.y,
       swing: pendulum && this.ridingSwing ? { ...this.ridingSwing, angle: pendulum.angle,
-        velocity: this.blocked || this.place ? 0 : pendulum.velocity } : null };
+        velocity: this.blocked || this.place ? 0 : pendulum.velocity } : null,
+      bench: this.seatedBench && this.seatedIndex !== null ? { id: this.seatedBench.id, index: this.seatedIndex }
+        : this.place && this.activitySeat !== null ? { id: { music: "bench-1", mood: "bench-4", birds: "bird-clearing-bench" }[this.place as "music" | "mood" | "birds"], index: this.activitySeat } : null,
+      activity: this.place, active: !document.hidden && !this.blocked, holdingPuppy: this.heldPuppy };
   }
-  getPuppyTrick(id: string, command: PuppyCommand): SharedPuppyTrick | null {
-    const puppy = this.puppies?.puppies.find(value => value.info.id === id);
-    return puppy ? { id, command, x: puppy.actor.position.x, z: puppy.actor.position.z,
-      heading: puppy.heading, startedAt: Date.now() } : null;
+  setSharedInteraction(handler: (request: SharedInteraction) => Promise<InteractionResult>) {
+    this.sharedMode = true; this.sharedInteraction = handler;
+  }
+  setSharedConnected(connected: boolean) {
+    this.sharedConnected = connected;
+    if (!connected) { this.heldPuppy = null; this.puppies?.cancelPet(); this.puppyTrickId = null; this.leaveSwing(); this.stand(); }
+  }
+  private requestShared(request: SharedInteraction, accepted: (result: InteractionResult) => void) {
+    if (!this.sharedMode) return false;
+    const key = JSON.stringify(request);
+    if (this.pendingInteractions.has(key)) return true;
+    if (!this.sharedConnected || !this.sharedInteraction) { this.callbacks.sharedNotice?.("Wait for the village to reconnect."); return true; }
+    this.pendingInteractions.add(key);
+    const selfId = this.sharedSelfId;
+    void this.sharedInteraction(request).then(result => {
+      if (this.disposed || !this.sharedConnected || selfId !== this.sharedSelfId) return;
+      if (result.ok) accepted(result);
+      else this.callbacks.sharedNotice?.(result.reason ?? "That interaction is busy. Try again in a moment.");
+    }).catch(() => { if (!this.disposed) this.callbacks.sharedNotice?.("The village didn't respond. Try again."); })
+      .finally(() => this.pendingInteractions.delete(key));
+    return true;
+  }
+  setSharedActors(world: SharedActors, selfId: string) {
+    this.sharedActors = world; this.sharedSelfId = selfId;
+    this.puppies?.applyShared(world.actors, selfId, world.time);
+    this.life?.applyShared(world.actors, selfId, world.time);
+    this.birds?.applyShared(world.birds, world.time);
+    this.garden?.syncShared(world.time, world.epoch, world.pondFeedAt);
+    this.life?.syncSharedGift(world.gift, world.time);
+    const followers = this.puppies?.sharedFollowers ?? [];
+    const following = world.actors.filter(actor => actor.kind === "puppy" && actor.following && actor.owner === selfId).map(actor => actor.id).sort().join("|");
+    if (following !== this.lastSharedFollowers) { this.lastSharedFollowers = following; this.callbacks.puppyFollowing?.(followers); }
+  }
+  setActivitySeat(index: 0 | 1 | undefined, position?: [number, number, number]) {
+    this.activitySeat = index ?? null; this.activityPosition = position ?? null;
   }
   showPuppyTrick(trick: SharedPuppyTrick) {
     if (this.puppies) this.puppies.sharedTrick(trick);
     else this.pendingPuppyTricks.set(trick.id, trick);
   }
-  setPuppyInteraction(id: string | null) { this.puppies?.setInteraction(id); }
+  setPuppyInteraction(id: string | null) {
+    const previous = this.heldPuppy; this.heldPuppy = id;
+    this.puppies?.setInteraction(id);
+    if (this.sharedMode) {
+      if (previous && previous !== id) this.requestShared({ kind: "puppy", id: previous, action: "release" }, () => {});
+      if (id && previous !== id) this.requestShared({ kind: "puppy", id, action: "hold" }, () => {});
+    }
+  }
   swingOccupied(id: string, index: 0 | 1) {
     return [...this.remoteVisitors.values()].some(remote => remote.swing?.id === id && remote.swing.index === index);
   }
@@ -1008,6 +1056,10 @@ export class VillageEngine {
   private seatOccupants(bench: VillageBench) {
     const occupants = new Map<0 | 1, number[]>();
     for (const remote of this.remoteVisitors.values()) {
+      if (this.sharedMode) {
+        if (remote.bench?.id === bench.id) occupants.set(remote.bench.index, [remote.slot]);
+        continue;
+      }
       const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
       if (seat?.bench.id !== bench.id) continue;
       for (const index of seat.index === null ? [0, 1] as const : [seat.index]) {
@@ -1019,6 +1071,7 @@ export class VillageEngine {
     return occupants;
   }
   private resolveSeatCollision() {
+    if (this.sharedMode) return;
     const bench = this.seatedBench, index = this.seatedIndex;
     if (!bench || index === null) return;
     const occupied = this.seatOccupants(bench);
@@ -1122,7 +1175,7 @@ export class VillageEngine {
         group.position.set(visitor.x, height, visitor.z);
         group.rotation.y = visitor.heading;
         this.scene.add(group);
-        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: this.elapsed };
+        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: this.elapsed, bench: null, activity: null };
         this.remoteVisitors.set(visitor.id, remote);
       }
       if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
@@ -1131,18 +1184,20 @@ export class VillageEngine {
       remote.label.style.setProperty("--visitor-color", visitor.color);
       remote.target.set(visitor.x, height, visitor.z);
       remote.heading = visitor.heading;
+      remote.bench = visitor.bench ?? null; remote.activity = visitor.activity ?? null;
       const ride = visitor.swing;
       const swing = ride && [0, 1].includes(ride.index) && [ride.angle, ride.velocity].every(Number.isFinite)
         && this.world?.swings.find(value => value.placement.id === ride.id);
       if (JSON.stringify(remote.swing) !== JSON.stringify(swing ? ride : null)) remote.swingReceivedAt = this.elapsed;
       remote.swing = swing && ride ? { ...ride } : null;
-      remote.group.visible = this.place !== "focus";
+      remote.group.visible = this.place !== "focus" && visitor.activity !== "focus";
     }
     this.resolveSeatCollision();
   }
   gardenAction(action: GardenAction, source?: { x: number; z: number }, animateSelf = true) {
     if ((action.kind === "feed" || action.kind === "feedBirds") && !source && !this.gardenState.crumbPouch) return false;
     if (action.kind === "feedBirds") {
+      if (this.sharedMode) { if (animateSelf) this.birdFeedAt = this.elapsed; return true; }
       const origin = source ? new T.Vector3(source.x, floorHeight(source.x, source.z), source.z) : this.player.position;
       const accepted = this.birds?.feed(origin) ?? false;
       if (accepted && animateSelf) this.birdFeedAt = this.elapsed;
@@ -1153,22 +1208,38 @@ export class VillageEngine {
     if (animateSelf) this.life?.gardenMoment(action);
     if (action.kind === "gift" && this.place === "mood") this.dialogue?.sayAtTea(HARVEST_COMPLIMENTS[action.crop]);
     if (action.kind === "gift" && action.crop === "mint" || action.kind === "drink") this.activities?.setMintTea(true);
-    if (action.kind === "drink") this.setActivityMoment({ kind: "tea" });
+    if (action.kind === "drink" && animateSelf) this.setActivityMoment({ kind: "tea" });
     return true;
   }
   setCompanions(ids: string[]) {
     this.companions = ids; this.life?.setCompanions(ids); this.life?.setActivity(this.place);
   }
   get sittingAtBirdBench() { return !this.blocked && !this.place && this.seatedBench?.birdClearing === true; }
-  petPuppy(id: string) {
-    if (this.blocked || this.place || this.seatedBench || !this.movement?.grounded || this.movement.speed > .18 || !this.puppies?.pet(id, this.player.position)) return false;
-    const puppy = this.puppies.puppies.find(value => value.info.id === id)!;
+  private puppyPetStance(id: string) {
+    const puppy = this.puppies?.puppies.find(puppy => puppy.info.id === id);
+    if (!puppy || !this.movement) return;
     const bearing = Math.atan2(puppy.actor.position.x - this.player.position.x, puppy.actor.position.z - this.player.position.z) + Math.PI;
-    const beside = .38 * puppy.actor.scale.y + .426 * this.spiritScale;
-    const ahead = -(1.14 - .43 * puppy.actor.scale.y);
-    const side = [-1, 1].find(value => this.movement!.canWalkTo(
+    const beside = .38 * puppy.actor.scale.y + .426 * this.spiritScale, ahead = -(1.14 - .43 * puppy.actor.scale.y);
+    return ([-1, 1] as const).find(value => this.movement!.canWalkTo(
       this.player.position.x + Math.sin(bearing) * ahead + Math.cos(bearing) * value * beside,
       this.player.position.z + Math.cos(bearing) * ahead - Math.sin(bearing) * value * beside));
+  }
+  petPuppy(id: string, accepted = false, sharedSide: -1 | 1 = -1) {
+    if (!accepted && this.sharedMode) {
+      if (this.blocked || this.place || this.seatedBench || !this.movement?.grounded || this.movement.speed > .18) return false;
+      const side = this.puppyPetStance(id);
+      if (side === undefined) { this.callbacks.sharedNotice?.("Make a little room to pet your dog."); return false; }
+      this.requestShared({ kind: "puppy", id, action: "pet" }, () => this.petPuppy(id, true, side)); return true;
+    }
+    if (accepted) {
+      const puppy = this.puppies?.puppies.find(puppy => puppy.info.id === id);
+      if (!puppy) return false;
+      this.puppyPetTarget.copy(puppy.actor.position); this.puppyPetSide = sharedSide;
+      this.callbacks.puppyPetted?.(puppy.info); return true;
+    }
+    if (this.blocked || this.place || this.seatedBench || !this.movement?.grounded || this.movement.speed > .18 || !this.puppies?.pet(id, this.player.position)) return false;
+    const puppy = this.puppies.puppies.find(value => value.info.id === id)!;
+    const side = this.puppyPetStance(id);
     if (side === undefined) { this.puppies.cancelPet(); return false; }
     this.puppyPetSide = side;
     this.puppyPetTarget.copy(puppy.actor.position);
@@ -1177,6 +1248,12 @@ export class VillageEngine {
   }
   commandPuppy(id: string, command: PuppyCommand) {
     if (this.blocked || this.place || this.seatedBench) return false;
+    if (this.sharedMode) {
+      this.requestShared({ kind: "puppy", id, action: command }, () => {
+        const puppy = this.puppies?.puppies.find(puppy => puppy.info.id === id);
+        if (puppy) { this.puppyTrickId = id; this.callbacks.puppyCommanded?.(puppy.info, command); }
+      }); return true;
+    }
     const puppy = this.puppies?.command(id, command, this.player.position);
     if (!puppy) return false;
     this.puppyTrickId = id;
@@ -1185,6 +1262,9 @@ export class VillageEngine {
   }
   togglePuppyFollow(id: string) {
     if (this.blocked || this.place || this.seatedBench || !this.puppies) return false;
+    if (this.sharedMode) {
+      this.requestShared({ kind: "puppy", id, action: this.puppies.followers.some(puppy => puppy.id === id) ? "home" : "walk" }, () => {}); return true;
+    }
     if (this.puppies.followers.some(puppy => puppy.id === id)) {
       this.puppies.dismiss(id);
     } else if (!this.puppies.invite(id, this.player.position, this.player.rotation.y)) return false;
@@ -1192,13 +1272,18 @@ export class VillageEngine {
     return true;
   }
   sendPuppyHome() {
+    if (this.sharedMode) {
+      for (const puppy of this.puppies?.followers ?? []) this.requestShared({ kind: "puppy", id: puppy.id, action: "home" }, () => {});
+      return true;
+    }
     if (this.blocked || this.place || !this.puppies?.dismiss().length) return false;
     this.callbacks.puppyFollowing?.([]);
     return true;
   }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
+  get currentPlace() { return this.place; }
   setPlace(id: PlaceId | null) {
-    if (id && this.ridingSwing) this.leaveSwing();
+    if (id && this.ridingSwing) this.leaveSwing(false);
     if (id !== "mood") this.dialogue?.clearTeaSpeech();
     if (id && this.seatedBench) {
       this.seatedBench = null;
@@ -1215,11 +1300,12 @@ export class VillageEngine {
     if (id === "mood") this.activities?.setMintTea(this.gardenState.mintTea > 0);
     this.renderer.shadowMap.needsUpdate = id !== "focus";
     this.place = id;
+    if (!id) this.activityPosition = null;
     if (this.world) this.world.group.visible = id !== "focus";
     if (this.life) this.life.group.visible = true;
     if (this.birds) this.birds.group.visible = id !== "focus";
     if (this.puppies) this.puppies.group.visible = id !== "focus";
-    this.remoteVisitors.forEach(remote => { remote.group.visible = id !== "focus"; });
+    this.remoteVisitors.forEach(remote => { remote.group.visible = id !== "focus" && remote.activity !== "focus"; });
     const arrival = this.movement?.position;
     this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
@@ -1242,6 +1328,7 @@ export class VillageEngine {
     this.player.visible = true;
     this.resize();
     if (this.indoor) this.indoor.visible = id === "focus";
+    this.cottageCat?.enter(id === "focus");
     this.indoorLight.intensity = id === "focus" ? 10 : 0;
     if (id === "focus") this.bridgeWindowTime = -1000;
     this.world?.flames.forEach((f) => {
@@ -1307,13 +1394,16 @@ export class VillageEngine {
     this.callbacks.recovered?.(nearby ? "nearby" : "entrance");
     return true;
   }
-  sit(id: string, selectedSide?: 0 | 1) {
+  sit(id: string, selectedSide?: 0 | 1, accepted = false) {
     const bench = this.world?.benches.find(value => value.id === id);
     if (!bench || this.blocked || this.place || this.seatedBench || this.ridingSwing || this.nearBench?.id !== id) return;
+    if (!accepted && this.requestShared({ kind: "bench", id, ...(selectedSide === undefined ? {} : { index: selectedSide }) },
+      result => this.sit(id, result.index, true))) return;
     const occupied = this.seatOccupants(bench);
     const preferred = selectedSide !== undefined ? [selectedSide, selectedSide === 0 ? 1 : 0] as const
       : this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
-    const index = preferred.find(value => !occupied.has(value)) ?? preferred[0];
+    const index = accepted ? selectedSide : preferred.find(value => !occupied.has(value));
+    if (index === undefined) { this.callbacks.sharedNotice?.("That bench is occupied. Try another bench."); return; }
     this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = bench;
@@ -1325,6 +1415,7 @@ export class VillageEngine {
   stand() {
     const bench = this.seatedBench;
     if (!bench) return;
+    if (this.sharedMode && this.sharedConnected) this.requestShared({ kind: "leave" }, () => {});
     const seat = this.seatPoint(bench, this.seatedIndex ?? 0);
     const exits = [1.35, 1.8, -1.35].map(offset => ({
       x: seat.x + Math.sin(bench.facing) * offset,
@@ -1348,11 +1439,12 @@ export class VillageEngine {
     } else this.keys.delete(key);
   }
   toggleRun() { this.running = !this.running; this.reportMovement(true); }
-  rideSwing(id: string, index: 0 | 1) {
+  rideSwing(id: string, index: 0 | 1, accepted = false) {
     const swing = this.world?.swings.find(value => value.placement.id === id);
     if (!swing || this.swingOccupied(id, index) || this.blocked || this.place || this.seatedBench || this.ridingSwing || !this.movement?.grounded) return false;
     swing.seatPoint(index, this.temp);
     if (this.temp.distanceTo(this.player.position) > 2.9) return false;
+    if (!accepted && this.requestShared({ kind: "swing", id, index }, () => this.rideSwing(id, index, true))) return true;
     this.puppies?.cancelPet(); this.puppyTrickId = null;
     this.releaseMouseLook(); this.clearKeys();
     this.swingCamera = { yaw: this.yaw, pitch: this.pitch };
@@ -1373,7 +1465,7 @@ export class VillageEngine {
   brakeSwing() {
     if (this.ridingSwing && !this.blocked && !this.place) this.swingBrakeUntil = this.elapsed + .5;
   }
-  leaveSwing() {
+  leaveSwing(releaseShared = true) {
     const rider = this.ridingSwing, swing = this.world?.swings.find(value => value.placement.id === rider?.id);
     if (!rider || !swing || !this.movement) return false;
     const exits: { x: number; z: number }[] = [];
@@ -1384,6 +1476,7 @@ export class VillageEngine {
     exits.push({ x: this.movement.position.x, z: this.movement.position.z }, { x: .3, z: 20 });
     const exit = exits.find(point => this.movement!.clear(point.x, point.z));
     if (!exit) return false;
+    if (releaseShared && this.sharedMode && this.sharedConnected) this.requestShared({ kind: "leave" }, () => {});
     this.ridingSwing = null; this.releaseMouseLook(); this.clearKeys();
     this.player.rotation.set(0, swing.placement.yaw, 0);
     this.yaw = this.swingCamera.yaw; this.pitch = this.swingCamera.pitch;
@@ -1407,6 +1500,10 @@ export class VillageEngine {
     const stage=ACTIVITY_STAGES[place];
     this.cameraGoal.fromArray(stage.camera);
     this.lookGoal.fromArray(stage.look);
+    if (place === "focus") {
+      this.cameraGoal.set(110.3, 2.9, 3.45);
+      this.lookGoal.set(109.85, 1.2, -1.65);
+    }
     if (place === "mood") {
       if (!this.teaPanHeld) this.teaPan = this.reducedMotion ? 1 : T.MathUtils.smoothstep(this.elapsed - this.teaPanAt, 0, 4);
       this.cameraGoal.lerp(this.temp.set(11.6, 2.6, -8.3), 1 - this.teaPan);
@@ -1516,6 +1613,7 @@ export class VillageEngine {
     this.lastTime = now;
     this.elapsed += dt;
     if (!this.world) return;
+    if (!this.blocked) this.cottageCat?.update(dt, this.elapsed, this.reducedMotion);
     const movement = this.movement!;
     this.direction.set(0, 0, 0);
     if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing) {
@@ -1580,7 +1678,7 @@ export class VillageEngine {
       })).filter(p => p.distance < p.radius).sort((a, b) => a.distance - b.distance)[0]?.id ?? null;
       if (target !== this.nearGarden) { this.nearGarden = target; this.callbacks.nearGarden?.(target); }
       const puppy = this.puppies?.nearest(this.player.position) ?? null;
-      if (puppy?.id !== this.nearPuppy?.id) { this.nearPuppy = puppy; this.callbacks.nearPuppy?.(puppy); }
+      if (puppy?.id !== this.nearPuppy?.id || puppy?.owner !== this.nearPuppy?.owner) { this.nearPuppy = puppy; this.callbacks.nearPuppy?.(puppy); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
     this.companionHands.reset();
@@ -1598,12 +1696,18 @@ export class VillageEngine {
       this.spiritFins.forEach(fin => relaxBlobArm(fin, this.elapsed, moving, this.reducedMotion || this.blocked));
     }
     this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
+    if (this.sharedMode && this.place && this.activityPosition) this.player.position.fromArray(this.activityPosition);
+    if (this.sharedMode && this.place && this.activitySeat !== null) {
+      const benchId = { music: "bench-1", mood: "bench-4", birds: "bird-clearing-bench" }[this.place as "music" | "mood" | "birds"];
+      const bench = this.world.benches.find(bench => bench.id === benchId);
+      if (bench) { const point = this.seatPoint(bench, this.activitySeat); this.player.position.set(point.x, bench.seatHeight - .62, point.z); }
+    }
     const scatterAge = this.elapsed - this.birdFeedAt;
     if (this.character && scatterAge < 1.6 && !this.reducedMotion) {
       this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
       this.spiritFins.forEach((fin, i) => { fin.rotation.z = Math.sin(scatterAge * 5 + i) * .4; });
     }
-    if (movement.speed > .18 || !movement.grounded || this.blocked || this.place || this.ridingSwing) this.puppies?.cancelPet();
+    if (!this.sharedMode && (movement.speed > .18 || !movement.grounded || this.blocked || this.place || this.ridingSwing)) this.puppies?.cancelPet();
     const pettingDog = this.puppies?.pettingPuppy;
     if (pettingDog) {
       this.puppyPetTarget.copy(pettingDog.actor.position);
@@ -1664,9 +1768,11 @@ export class VillageEngine {
     const t = this.reducedMotion ? 0 : this.elapsed;
     this.updateLighting(dt);
     this.atmosphere.update(t, this.camera.position);
-    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place && !this.ridingSwing, this.camera.quaternion, this.player.rotation.y);
-    this.puppies?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place,
-      this.camera.quaternion, this.player.rotation.y);
+    if (!this.sharedMode || this.sharedActors) {
+      this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place && !this.ridingSwing, this.camera.quaternion, this.player.rotation.y);
+      this.puppies?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place,
+        this.camera.quaternion, this.player.rotation.y);
+    }
     if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),
       !this.place && !this.blocked && !this.seatedBench && !this.puppies?.pettingPuppy && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
     const contact = this.puppies?.petContact(this.player.rotation.y, this.puppyPetSide);
@@ -1684,6 +1790,20 @@ export class VillageEngine {
         const lowered = target.sub(offset);
         // Bring the whole blob beside the dog's cheek, keeping the original tiny arms.
         this.character.position.lerp(lowered, amount);
+      }
+    }
+    if (this.cottageCat?.petting && this.character && !this.blocked) {
+      this.player.updateWorldMatrix(true, true);
+      this.cottageCat.root.updateWorldMatrix(true, true);
+      const hand = this.spiritFins.find(fin => fin.name === "SpiritFinL");
+      if (hand?.parent) {
+        const age = this.cottageCat.petAge;
+        const amount = this.reducedMotion ? 1 : T.MathUtils.smoothstep(age, 0, .6) * (1 - T.MathUtils.smoothstep(age, 2.6, 3.2));
+        this.cottageCat.petTarget(this.catPetTarget).add(this.temp.set(.06, .08 + (this.reducedMotion ? 0 : Math.sin(age * 7) * .025), .03));
+        const target = this.player.worldToLocal(this.catPetTarget);
+        const offset = hand.position.clone().multiply(this.character.scale).applyQuaternion(this.character.quaternion);
+        this.character.position.lerp(target.sub(offset), amount);
+        hand.rotation.z += amount * .16;
       }
     }
     if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);

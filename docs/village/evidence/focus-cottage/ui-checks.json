@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "1280 × 720: compact timer fits",
+    "1280 × 720: napping cat stays clear of the timer and screen edges",
+    "1280 × 720: timer is translucent without overflow",
+    "1366 × 768: compact timer fits",
+    "1366 × 768: napping cat stays clear of the timer and screen edges",
+    "1366 × 768: timer is translucent without overflow",
+    "1024 × 640: compact timer fits",
+    "1024 × 640: napping cat stays clear of the timer and screen edges",
+    "1024 × 640: timer is translucent without overflow",
+    "Pet button has a square E keycap and 44 px target",
+    "Click starts petting and returns canvas focus",
+    "Active pet button is disabled",
+    "Actual E starts the same pet action",
+    "E produces immediate button press feedback",
+    "Reduced nap stays still",
+    "Exit removes the pet control and pauses the cat",
+    "No page errors or WebGL shader/sampler warnings"
+  ],
+  "errors": [],
+  "warnings": []
+}

@@ -26,6 +26,29 @@ const path = require('node:path');
       const flock=e.birds,life=e.life,cam=e.camera,far=new T.Vector3(0,0,30),near=new T.Vector3(-37,0,6);
       const tick=(seconds,caretaker=false,player=far,reduced=false,otherBlobNearby=false)=>{for(let i=0;i<Math.round(seconds*60);i++)flock.update(1/60,i/60,reduced,cam,player,caretaker,true,otherBlobNearby);};
       check(flock.birds.length===12 && flock.parts.length===4,'Twelve Blender doves use four instanced mesh draws');
+      check(flock.crumbs.count===96 && flock.thrownCrumbs.count===18,'A fuller 96-crumb serving accompanies the 18 thrown crumbs');
+      const routeSamples=[],flightPeaks=[];
+      for(let pattern=0;pattern<3;pattern++) {
+        flock.flightCount=pattern;
+        let peak=0,maxStep=0;
+        for(let i=0;i<12;i++) {
+          const start=new T.Vector3(),end=new T.Vector3(),previous=new T.Vector3(),point=new T.Vector3();
+          flock.flightPosition(i,0,start);flock.flightPosition(i,30,end);
+          check(start.distanceTo(flock.birds[i].landing)<1e-6 && end.distanceTo(flock.birds[i].landing)<1e-6,'Circuit '+pattern+' returns dove '+i+' to its saved landing spot');
+          previous.copy(start);
+          for(let sample=1;sample<=1800;sample++) {
+            flock.flightPosition(i,sample/60,point);
+            if(!point.toArray().every(Number.isFinite) || point.y<.12)throw Error('Invalid flight position');
+            peak=Math.max(peak,point.y);maxStep=Math.max(maxStep,point.distanceTo(previous));previous.copy(point);
+          }
+        }
+        check(maxStep<.3,'Circuit '+pattern+' has continuous motion at 60 FPS');
+        flightPeaks.push(peak);
+        const midpoint=new T.Vector3();flock.flightPosition(0,15,midpoint);routeSamples.push(midpoint.toArray());
+      }
+      check(Math.max(...flightPeaks)>39 && Math.max(...flightPeaks)<43,'Higher circuits rise above 39 m while remaining bounded');
+      check(routeSamples.every((point,index)=>routeSamples.every((other,j)=>index===j||new T.Vector3(...point).distanceTo(new T.Vector3(...other))>5)),'The three circuits have distinct sky paths');
+      flock.flightCount=0;
       check(life.residents.length===5 && life.residents[4].root.name==='Wren','Wren joins the four existing residents');
       check(life.caretakerPresent,'Wren starts at her clearing');
       check(e.movement.clear(-33.5,4),'Clearing arrival and exit are collision-free');
@@ -57,6 +80,7 @@ const path = require('node:path');
       tick(2);check(flock.phase==='ground'&&flock.status==='eating','Queued crumbs are eaten after the 30-second flight');
       check(!e.gardenAction({kind:'feedBirds'}),'Repeated input cannot restart eating');
       tick(4,false,near);check(flock.status==='happy'&&flock.hearts.visible,'Fed birds celebrate with hearts');
+      check(flock.crumbs.visible,'A few shrinking crumbs remain during the first happy coos');
       e.travel('birds');e.frame(performance.now());
       flock.update(0,5,false,cam,near,false,true);e.renderer.render(e.scene,cam);
       check(flock.bubble.textContent==='Coo coo~ (Thank you~)'&&!flock.bubble.hidden,'Exact thank-you speech appears over the flock');
@@ -94,7 +118,7 @@ const path = require('node:path');
       for(const p of PLACES){life.setActivity(p.id);life.update(.016,40,near,false,false,cam.quaternion);check(life.residents.every(r=>Number.isFinite(r.root.position.x)),'Five-resident staging is valid at '+p.id);}
       life.setCompanions([]);life.setActivity(null);const wren=life.residents[4];wren.returning=false;wren.movement.settle(-38,1.5);wren.root.position.set(-38,.1,1.5);
       e.travel('birds');e.frame(performance.now());flock.update(0,5,false,cam,near,false,true);e.renderer.render(e.scene,cam);
-      return { checks, statuses, fedEvents:feeds.length, parts:flock.parts.map(p=>p.mesh.name), errors:[] };
+      return { checks, statuses, flightPeaks, fedEvents:feeds.length, parts:flock.parts.map(p=>p.mesh.name), errors:[] };
     });
     await page.screenshot({ path:path.join(output,`clearing-${kind}.png`) });
     await page.evaluate(()=>{const e=engine;e.camera.position.set(-34.5,1.5,6.2);e.camera.lookAt(-37,.55,4);e.camera.updateMatrixWorld();captureBirds();});

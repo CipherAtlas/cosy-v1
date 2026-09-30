@@ -14,6 +14,7 @@ import { distanceToPath, insidePlantingClearance, projectWorldLayout, type Autho
 import { fenceGeometry } from "./fenceGeometry";
 import { setAuthoredWorld } from "./environment";
 import { VillageSwingSet } from "./swings";
+import { BIRD_FEEDING, fillBirdCrumbs } from "./birds";
 export { groundY, riverX } from "./environment";
 
 /** Optional authoring hook; the public village keeps its existing merged render path. */
@@ -654,9 +655,18 @@ export async function buildWorld(
   add(clearing, mat.path, BIRD_CLEARING.x, .1, BIRD_CLEARING.z).castShadow = false;
   capture?.("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
-  const rim = new T.TorusGeometry(.72, .07, 8, 40); rim.rotateX(-Math.PI / 2);
-  add(rim, mat.stone, BIRD_CLEARING.x, .17, BIRD_CLEARING.z);
-  add(new T.CylinderGeometry(.67,.67,.025,40), mat.wood, BIRD_CLEARING.x, .13, BIRD_CLEARING.z).castShadow = false;
+  const rim = new T.TorusGeometry(BIRD_FEEDING.bowlRadius, .065, 8, 48); rim.rotateX(-Math.PI / 2);
+  add(rim, mat.stone, BIRD_CLEARING.x, .2, BIRD_CLEARING.z);
+  const bowl = new T.LatheGeometry([
+    [.04, .015], [.82, .015], [.99, .045], [BIRD_FEEDING.bowlRadius, .09],
+    [1.01, .095], [.95, .06], [.8, .035], [.04, .035],
+  ].map(([r, y]) => new T.Vector2(r, y)), 48);
+  add(bowl, mat.wood, BIRD_CLEARING.x, .1, BIRD_CLEARING.z).castShadow = false;
+  if (capture) {
+    const serving = new T.InstancedMesh(new T.IcosahedronGeometry(.047, 0), new T.MeshStandardMaterial({ color: "#edc693", roughness: 1 }), BIRD_FEEDING.servingCrumbs);
+    fillBirdCrumbs(serving, new T.Object3D()); serving.receiveShadow = true;
+    group.add(serving);
+  }
   capture?.("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
   // A low bench faces the birds, leaving the eastern entrance completely open.

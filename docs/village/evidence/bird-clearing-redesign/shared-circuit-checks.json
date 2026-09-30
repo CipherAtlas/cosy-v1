@@ -1,0 +1,46 @@
+{
+  "checks": [
+    "Shared flock starts with the first circuit",
+    "Takeoff advances shared circuit 1",
+    "Mid-flight steps retain circuit 1",
+    "Takeoff advances shared circuit 2",
+    "Mid-flight steps retain circuit 2",
+    "Takeoff advances shared circuit 3",
+    "Mid-flight steps retain circuit 3",
+    "Saved and broadcast snapshots retain the circuit choice",
+    "An older snapshot advances safely from the original circuit",
+    "Two renderers agree on shared circuit 0",
+    "Two renderers agree on shared circuit 1",
+    "Two renderers agree on shared circuit 2",
+    "Two renderers agree on shared circuit 3",
+    "The fourth shared flight wraps to the first route",
+    "Shared flights use three distinct routes",
+    "Older shared snapshots render the original circuit",
+    "A shared meal shows the fuller serving and separate thrown crumbs",
+    "The full serving fills the bowl and spills around its rim"
+  ],
+  "sharedMidpoints": [
+    [
+      -28.760017452898264,
+      28.736222814793866,
+      -25.93751851198931
+    ],
+    [
+      -18.828040959710982,
+      39.34872582694225,
+      -19.769320704986022
+    ],
+    [
+      -44.6928744125386,
+      31.478152505896784,
+      -15.700341772005675
+    ],
+    [
+      -28.760017452898264,
+      28.736222814793866,
+      -25.93751851198931
+    ]
+  ],
+  "inside": 63,
+  "outside": 33
+}

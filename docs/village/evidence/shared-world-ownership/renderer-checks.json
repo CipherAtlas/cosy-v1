@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "Late pond arrivals share the same duck positions at 0 ms",
+    "Reduced motion preserves the shared duck path at 0 ms",
+    "Late pond arrivals share the same duck positions at 1500 ms",
+    "Reduced motion preserves the shared duck path at 1500 ms",
+    "Late pond arrivals share the same duck positions at 6000 ms",
+    "Reduced motion preserves the shared duck path at 6000 ms",
+    "Late pond arrivals share the same duck positions at 11500 ms",
+    "Reduced motion preserves the shared duck path at 11500 ms",
+    "Late pond arrivals share the same duck positions at 16000 ms",
+    "Reduced motion preserves the shared duck path at 16000 ms",
+    "Late pond arrivals share the same duck positions at 30000 ms",
+    "Reduced motion preserves the shared duck path at 30000 ms",
+    "Another visitor's tea does not overwrite the private focus timer",
+    "Observer input cannot move a held dog or take its walking pack",
+    "Shared petting animates the dog without taking over an observer's camera",
+    "Walking packs are derived from authoritative ownership",
+    "Local invitations cannot take or move another visitor's talking resident",
+    "Busy resident controls use shared ownership",
+    "Observers see the accepted companion tea gesture on the world clock",
+    "Observers see the accepted companion watering gesture",
+    "Shared companion task props clear when the accepted gesture ends"
+  ],
+  "errors": []
+}

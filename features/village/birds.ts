@@ -1,10 +1,26 @@
 import * as T from "three";
 import { BIRD_CLEARING } from "./environment";
+import type { SharedBirds } from "./sharedActors";
 
 export type BirdStatus = "flying" | "crumbs" | "waiting" | "sad" | "eating" | "happy";
 export const BIRD_THANKS = { en: "Coo coo~ (Thank you~)", ja: "クークー〜（ありがとう〜）" };
 const BIRD_SAD = { en: "Coo coo :(", ja: "クークー :(" };
 const SAD_AFTER = 6;
+export const BIRD_FEEDING = { bowlRadius: 1.05, servingCrumbs: 96, thrownCrumbs: 18 };
+
+/** The editor preview and the live serving share the same crumb distribution. */
+export function fillBirdCrumbs(mesh: T.InstancedMesh, dummy: T.Object3D, portion = 1, x = BIRD_CLEARING.x, z = BIRD_CLEARING.z) {
+  for (let i = 0; i < mesh.count; i++) {
+    const angle = i * 2.399;
+    const inBowl = i < mesh.count * .65;
+    const radius = inBowl ? .95 * Math.sqrt((i + .5) / (mesh.count * .65)) : 1.12 + (i % 11) * .038;
+    dummy.position.set(x + Math.cos(angle) * radius, inBowl ? .17 + i % 3 * .009 : .13, z + Math.sin(angle) * radius);
+    dummy.rotation.set(i * .7, i * 1.3, i * .4);
+    dummy.scale.set(.75 + i % 4 * .16, .5 + i % 3 * .17, .7 + i % 5 * .12).multiplyScalar(portion);
+    dummy.updateMatrix(); mesh.setMatrixAt(i, dummy.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+}
 
 // Landing positions from the saved “Current village copy”.
 export const BIRD_LANDING_SPOTS: [number, number][] = [
@@ -42,18 +58,26 @@ export class BirdFlock {
   private throwAge = -1;
   private dummy = new T.Object3D();
   private next = new T.Vector3();
-  // Lift along the open eastern approach, circle the pond above the canopies,
-  // then descend from the west without crossing the birdwatching bench.
-  private flightRoute = new T.CatmullRomCurve3([
-    [0, 0, 0], [6, 8, 1], [14, 16, -6], [14, 19, -24],
-    [3, 21, -31], [-6, 19, -23], [-8, 14, -10], [-5, 7, -1], [0, 0, 0],
-  ].map(([x, y, z]) => new T.Vector3(x, y, z)));
+  private flightCount = 0;
+  // Every circuit starts and ends at the same dry landing spots. The higher
+  // paths cross scenery only after climbing above it.
+  private flightRoutes = [
+    [[0, 0, 0], [6, 8, 1], [14, 20, -6], [14, 26, -24], [3, 29, -31], [-6, 24, -23], [-8, 16, -10], [-5, 7, -1], [0, 0, 0]],
+    [[0, 0, 0], [6, 9, 1], [15, 24, 7], [29, 36, -6], [16, 39, -26], [-5, 32, -23], [-13, 21, -9], [-5, 8, -1], [0, 0, 0]],
+    [[0, 0, 0], [6, 9, 1], [16, 25, -8], [7, 34, -25], [-8, 30, -15], [8, 23, -8], [16, 17, 2], [-5, 8, -1], [0, 0, 0]],
+  ].map(points => new T.CatmullRomCurve3(points.map(([x, y, z]) => new T.Vector3(x, y, z))));
   private bubble = document.createElement("div");
   private projected = new T.Vector3();
   private language: "en" | "ja" = "en";
   private announce = false;
   private width = 0;
   private height = 0;
+  private shared: SharedBirds | null = null;
+  private sharedClock = 0;
+  applyShared(state: SharedBirds, time: number) {
+    if (state.mealAt !== null && state.mealAt !== this.shared?.mealAt) this.fed(false);
+    this.shared = state; this.sharedClock = time - Date.now();
+  }
 
   constructor(source: T.Object3D, host: HTMLElement, private changed: (status: BirdStatus) => void,
     private fed: (byCaretaker: boolean) => void) {
@@ -79,9 +103,9 @@ export class BirdFlock {
     heart.bezierCurveTo(.1, .56, .45, .55, .5, .23); heart.bezierCurveTo(.55, -.05, .15, -.3, 0, -.48);
     this.hearts = new T.InstancedMesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#ff9aab", side: T.DoubleSide, depthWrite: false }), 12);
     this.hearts.name = "Happy dove hearts";
-    this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.038, 0), new T.MeshStandardMaterial({ color: "#edc693", roughness: 1 }), 36);
+    this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.047, 0), new T.MeshStandardMaterial({ color: "#edc693", roughness: 1 }), BIRD_FEEDING.servingCrumbs);
     this.crumbs.name = "Sourdough crumbs";
-    this.thrownCrumbs = new T.InstancedMesh(this.crumbs.geometry, this.crumbs.material, 18);
+    this.thrownCrumbs = new T.InstancedMesh(this.crumbs.geometry, this.crumbs.material, BIRD_FEEDING.thrownCrumbs);
     this.thrownCrumbs.name = "Scattered sourdough crumbs";
     for (const mesh of [this.hearts, this.crumbs, this.thrownCrumbs]) {
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); mesh.frustumCulled = false; mesh.visible = false; this.group.add(mesh);
@@ -110,36 +134,51 @@ export class BirdFlock {
       : this.queued ? "crumbs" : this.phase === "flight" ? "flying" : this.age >= SAD_AFTER ? "sad" : "waiting";
     if (this.status !== this.lastStatus) { this.lastStatus = this.status; this.changed(this.status); }
   }
-  private flightPosition(index: number, age: number, target: T.Vector3) {
+  private flightPosition(index: number, age: number, target: T.Vector3, reduced = false) {
     const bird = this.birds[index], t = T.MathUtils.clamp(age / 30, 0, 1);
-    this.flightRoute.getPointAt(t, target).add(bird.landing);
-    target.y += Math.sin(t * Math.PI) ** 2 * (index % 3) * .65;
+    const spread = Math.sin(t * Math.PI) ** 2, pattern = this.flightCount % this.flightRoutes.length;
+    this.flightRoutes[pattern].getPointAt(t, target).add(bird.landing);
+    const row = Math.floor(index / 2), side = index % 2 ? 1 : -1;
+    const lateral = pattern === 0 ? side * row * .65 : pattern === 1 ? (index % 4 - 1.5) * 1.4 : side * 2.2;
+    target.x += spread * (lateral + (reduced ? 0 : Math.sin(t * Math.PI * 4 + index * .7) * .45));
+    target.z += spread * (pattern === 0 ? -row * .5 : pattern === 1 ? -Math.floor(index / 4) * 1.5 : (row - 2.5) * .85);
+    target.y += spread * (index % 3) * .65;
     return target;
   }
   update(dt: number, time: number, reduced: boolean, camera: T.Camera, player: T.Vector3, caretaker: boolean, visible: boolean, otherBlobNearby = false) {
+    const nearby = Math.hypot(player.x - BIRD_CLEARING.x, player.z - BIRD_CLEARING.z) <= BIRD_CLEARING.feedingPerimeter;
+    if (this.shared) {
+      const now = Date.now() + this.sharedClock;
+      this.phase = this.shared.phase; this.age = Math.max(0, (now - this.shared.since) / 1000);
+      this.mealAge = this.shared.mealAt === null ? -1 : Math.max(0, (now - this.shared.mealAt) / 1000);
+      this.queued = this.shared.queued; this.served = this.shared.served;
+      this.throwAge = this.shared.throwAt === null ? -1 : Math.max(0, (now - this.shared.throwAt) / 1000);
+      this.throwOrigin.fromArray(this.shared.origin);
+      this.flightCount = this.shared.flightCount ?? 0;
+    } else {
     this.age += dt;
     if (this.throwAge >= 0) this.throwAge += dt;
     if (this.phase === "flight" && this.age >= 30) { this.phase = "ground"; this.age = 0; }
-    const nearby = Math.hypot(player.x - BIRD_CLEARING.x, player.z - BIRD_CLEARING.z) <= BIRD_CLEARING.feedingPerimeter;
     if (this.phase === "ground" && !this.served) {
       if (this.queued && this.age >= .4) this.startMeal(false);
       else if (caretaker && !nearby && !otherBlobNearby && this.age >= 2.5) this.startMeal(true);
     }
     if (this.mealAge >= 0) this.mealAge += dt;
     if (this.phase === "ground" && (this.served ? this.mealAge >= 10 : this.age >= 18)) {
-      this.phase = "flight"; this.age = 0; this.mealAge = -1; this.served = false;
+      this.phase = "flight"; this.age = 0; this.mealAge = -1; this.served = false; this.flightCount++;
+    }
     }
     this.publish();
     const sadGoal = this.status === "sad" ? 1 : 0;
     this.sadness = reduced ? sadGoal : T.MathUtils.lerp(this.sadness, sadGoal, 1 - Math.exp(-dt * 4));
     this.hearts.visible = visible && this.status === "happy";
-    this.crumbs.visible = visible && (this.queued || this.status === "eating") && (reduced || this.throwAge < 0 || this.throwAge >= 1.15);
+    this.crumbs.visible = visible && (this.queued || this.served && this.mealAge < 7) && (reduced || this.throwAge < 0 || this.throwAge >= 1.15);
     const joyAge = this.mealAge - 4;
     this.birds.forEach((bird, i) => {
       const flying = this.phase === "flight", happy = this.status === "happy";
       if (flying) {
-        this.flightPosition(i, this.age, bird.root.position);
-        this.flightPosition(i, this.age + .03, this.next).sub(bird.root.position);
+        this.flightPosition(i, this.age, bird.root.position, reduced);
+        this.flightPosition(i, this.age + .03, this.next, reduced).sub(bird.root.position);
         if (this.next.lengthSq() > .00001) bird.root.rotation.y = Math.atan2(this.next.x, this.next.z);
         bird.root.rotation.z = reduced ? 0 : -.09 * Math.sin(this.age / 30 * Math.PI * 2);
         bird.root.rotation.x = reduced ? 0 : -.06 * this.next.y;
@@ -168,18 +207,12 @@ export class BirdFlock {
       part.nodes.forEach((node, i) => part.mesh.setMatrixAt(i, node.matrixWorld)); part.mesh.instanceMatrix.needsUpdate = true;
     }
     this.hearts.instanceMatrix.needsUpdate = true;
-    if (this.crumbs.visible) for (let i = 0; i < 36; i++) {
-      const a = i * 2.399, r = .2 + (i % 7) * .19;
-      this.dummy.position.set(BIRD_CLEARING.x + Math.cos(a) * r, .18, BIRD_CLEARING.z + Math.sin(a) * r);
-      this.dummy.rotation.set(i, i, i); this.dummy.scale.setScalar(this.mealAge > 2 ? Math.max(0, (4 - this.mealAge) / 2) : 1);
-      this.dummy.updateMatrix(); this.crumbs.setMatrixAt(i, this.dummy.matrix);
-    }
-    this.crumbs.instanceMatrix.needsUpdate = true;
+    if (this.crumbs.visible) fillBirdCrumbs(this.crumbs, this.dummy, this.mealAge > 2 ? Math.max(0, (7 - this.mealAge) / 5) : 1);
     this.thrownCrumbs.visible = visible && this.throwAge >= 0 && this.throwAge < 3.5;
     if (this.thrownCrumbs.visible) {
       const progress = reduced ? 1 : T.MathUtils.clamp(this.throwAge / 1.15, 0, 1);
-      for (let i = 0; i < 18; i++) {
-        const angle = i * 2.399, radius = .18 + (i % 6) * .16;
+      for (let i = 0; i < this.thrownCrumbs.count; i++) {
+        const angle = i * 2.399, radius = .2 + (i % 6) * .17;
         const startX = this.throwOrigin.x + Math.cos(angle) * .12;
         const startZ = this.throwOrigin.z + Math.sin(angle) * .12;
         const endX = BIRD_CLEARING.x + Math.cos(angle) * radius;

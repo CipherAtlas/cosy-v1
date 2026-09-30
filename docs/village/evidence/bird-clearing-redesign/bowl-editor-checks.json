@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "Updated bowl has a rendered shelf preview",
+    "Existing asset ID remains placeable and selectable",
+    "Position, rotation and scale survive working-copy save/reload",
+    "Both protected presets remain byte-identical",
+    "No editor page errors"
+  ],
+  "savedLayout": "layout-6500a935-6487-465b-8a3a-20eacf0b9dbb",
+  "item": {
+    "id": "object-a2b93a0d-7c75-4ca2-9fe6-58d9b04ac1ea",
+    "asset": "bird-feeding-dish",
+    "name": "Sourdough feeding dish",
+    "position": [
+      -24,
+      0.4,
+      -31
+    ],
+    "rotation": [
+      0,
+      35,
+      0
+    ],
+    "scale": [
+      1.2,
+      1.2,
+      1.2
+    ],
+    "visible": true,
+    "locked": false
+  },
+  "errors": [],
+  "presetHashes": [
+    "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a"
+  ]
+}

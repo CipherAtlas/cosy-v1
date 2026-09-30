@@ -1038,6 +1038,33 @@ kbd {
   display: flex; flex-direction: column; gap: 12px; pointer-events: none;
 }
 #v-activity-panel[hidden] { display: none; }
+#v-activity-panel:has(.v-focus) { width: min(320px,calc(100vw - 40px)); right: 20px; }
+.village #v-activity-panel > .v-focus {
+  background: rgba(26, 54, 43, .78); color: #fff2d9; border: 1px solid #eee5c84d;
+  padding: 18px; backdrop-filter: blur(12px); box-shadow: 0 12px 34px #15271e26;
+}
+.village .v-focus h2 { color: #fff2d9; font-size: 21px; margin-bottom: 8px; }
+.village .v-focus .v-timer { color: #fff2d9; font-size: 56px; margin-top: 8px; }
+.village .v-focus .v-intention, .village .v-focus .v-session-options, .village .v-focus .v-text-button { color: #e0e6cf !important; }
+.village .v-focus .v-intention { font-size: 13px !important; margin: 4px 0 12px !important; }
+.village .v-focus .v-preset-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin: 0 0 14px; }
+.village .v-focus .v-chip { padding: 8px 5px; font-size: 11px; line-height: 1.3; }
+.village .v-focus .v-session-options { margin-top: 12px; }
+.village .v-focus .v-chip, .village .v-focus .v-button {
+  background: #d9e8cf14; color: #fff2d9; border-color: #eee5c858; min-height: 44px;
+}
+.village .v-focus .v-chip:hover, .village .v-focus .v-button:hover { background: #d9e8cf2e; }
+.village .v-focus .v-chip[aria-pressed="true"], .village .v-focus .v-primary { color: #fff2d9; background: #76977a47; border-color: #b6c6a5; box-shadow: none; }
+.v-cottage-cat {
+  position: absolute; z-index: 4; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px);
+  padding: 8px 10px 8px 17px; color: #fff2d9; background: #193b2ebd;
+  border: 1px solid #e0e9d35e; border-radius: 14px; backdrop-filter: blur(10px); font-size: 13px;
+}
+.v-cottage-cat .v-interact { display: flex; align-items: center; gap: 9px; min-height: 44px; margin: 0; padding: 7px 12px; border: 1px solid #e0e9d37a; border-radius: 8px; background: #c5d6af16; color: #fff2d9; white-space: nowrap; }
+.v-cottage-cat .v-interact:hover { background: #c5d6af32; }
+.v-cottage-cat kbd { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1px solid #e0e9d39c; border-radius: 3px; background: #d9e7c922; font: 600 13px/1 sans-serif; color: #fff2d9; }
+.v-cottage-cat button:disabled { opacity: .65; }
 .village #v-activity-panel > .v-activity {
   position: relative; inset: auto; transform: none; width: 100%; max-height: none;
   box-sizing: border-box; min-height: 0; flex: 0 1 auto; pointer-events: auto;

@@ -29,6 +29,14 @@ export class GardenScene {
   private action?: GardenAction;
   private actionAt = -100;
   private feedAt = -100;
+  private sharedClock: number | null = null;
+  private sharedEpoch = 0;
+  syncShared(time: number, epoch: number, feedAt: number | null) {
+    this.sharedClock = time - Date.now(); this.sharedEpoch = epoch;
+    const feedingAt = feedAt === null ? -100 : (feedAt - epoch) / 1000;
+    if (feedingAt !== this.feedAt) this.feedCelebrated = false;
+    this.feedAt = feedingAt;
+  }
   private feedCelebrated = true;
   private teaAt = -100;
   private splashAt = -100;
@@ -272,6 +280,7 @@ export class GardenScene {
   }
 
   update(dt: number, time: number, reduced: boolean, cameraRotation?: T.Quaternion) {
+    if (this.sharedClock !== null) time = (Date.now() + this.sharedClock - this.sharedEpoch) / 1000;
     this.time = time; this.wind.value = reduced ? 0 : time; this.breeze.value = reduced ? 0 : 1;
     const t = reduced ? 0 : time, feedAge = time - this.feedAt, feeding = feedAge < 11;
     this.hearts.visible = feedAge >= 7 && feedAge < 10.7;
@@ -285,7 +294,20 @@ export class GardenScene {
       const targetZ = feeding && !bird.swan ? -7.8 + Math.sin(i * 2.4) * 1.2 : POND.z + Math.sin(a) * (bird.swan ? 6 : 4.4);
       const dx = targetX - bird.root.position.x, dz = targetZ - bird.root.position.z;
       const blend = reduced ? 1 : 1 - Math.exp(-dt * .7);
-      bird.root.position.x += dx * blend; bird.root.position.z += dz * blend;
+      if (this.sharedClock !== null) {
+        // Derive the swimming path from world time so late arrivals see the same ducks.
+        const speed = bird.swan ? .07 : .105, radiusX = bird.swan ? 4.8 : 3.3, radiusZ = bird.swan ? 6 : 4.4;
+        const orbitX = POND.x + Math.cos(time * speed + bird.phase) * radiusX;
+        const orbitZ = POND.z + Math.sin(time * speed + bird.phase) * radiusZ;
+        const startX = POND.x + Math.cos(this.feedAt * speed + bird.phase) * radiusX;
+        const startZ = POND.z + Math.sin(this.feedAt * speed + bird.phase) * radiusZ;
+        const mealX = -25 + Math.cos(i * 2.4) * 1.4, mealZ = -7.8 + Math.sin(i * 2.4) * 1.2;
+        const arrival = 1 - Math.exp(-Math.max(0, feedAge) * .7);
+        const departure = 1 - Math.exp(-Math.max(0, feedAge - 11) * .7);
+        const fedX = T.MathUtils.lerp(startX, mealX, arrival), fedZ = T.MathUtils.lerp(startZ, mealZ, arrival);
+        bird.root.position.x = bird.swan || feedAge < 0 || feedAge > 24 ? orbitX : feedAge < 11 ? fedX : T.MathUtils.lerp(fedX, orbitX, departure);
+        bird.root.position.z = bird.swan || feedAge < 0 || feedAge > 24 ? orbitZ : feedAge < 11 ? fedZ : T.MathUtils.lerp(fedZ, orbitZ, departure);
+      } else { bird.root.position.x += dx * blend; bird.root.position.z += dz * blend; }
       bird.root.position.y = POND.y + .015 + Math.sin(t * 2 + bird.phase) * (reduced ? 0 : .022);
       const happyAge = feedAge - 7 - (i - 1) * .16;
       const happy = !bird.swan && happyAge >= 0 && happyAge < 3.1;

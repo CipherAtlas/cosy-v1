@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "cottage-cat has a rendered shelf preview",
+    "cottage-cat can be placed",
+    "cottage-cat supports position, facing and scale",
+    "cottage-couch has a rendered shelf preview",
+    "cottage-couch can be placed",
+    "cottage-couch supports position, facing and scale",
+    "cottage-reading-lamp has a rendered shelf preview",
+    "cottage-reading-lamp can be placed",
+    "cottage-reading-lamp supports position, facing and scale",
+    "cottage-fern has a rendered shelf preview",
+    "cottage-fern can be placed",
+    "cottage-fern supports position, facing and scale",
+    "cottage-botanical-print has a rendered shelf preview",
+    "cottage-botanical-print can be placed",
+    "cottage-botanical-print supports position, facing and scale",
+    "cottage-cat-cushion has a rendered shelf preview",
+    "cottage-cat-cushion can be placed",
+    "cottage-cat-cushion supports position, facing and scale",
+    "All six asset transforms survive a named file save",
+    "All six saved transforms survive reload",
+    "Playable layout and both protected presets are byte-identical",
+    "Editor has no page errors"
+  ],
+  "fileId": "layout-0230d6f6-d220-4090-81bf-b11e00f5744a",
+  "errors": []
+}

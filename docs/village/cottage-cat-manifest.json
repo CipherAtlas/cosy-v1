@@ -1,0 +1,24 @@
+{
+  "name": "Cream and caramel cottage cat",
+  "origin": "Original Blender sculpture",
+  "blender": "5.2.1 LTS",
+  "generator": "scripts/village/create_cottage_cat.py",
+  "source": "assets/village/cottage-cat.blend",
+  "runtime": "public/village/models/cottage-cat.glb",
+  "bytes": 487400,
+  "sha256": "94715996a07031e7dc75391c5182849283d9dd20c2d23c85c1e80d029125d197",
+  "triangles": 20776,
+  "meshes": 58,
+  "materials": 9,
+  "rig": "Named rigid part pivots; procedural runtime poses",
+  "behaviors": [
+    "nap",
+    "walk",
+    "stretch",
+    "jump up",
+    "ask for pets",
+    "pet",
+    "jump down"
+  ],
+  "thirdPartyAssets": false
+}

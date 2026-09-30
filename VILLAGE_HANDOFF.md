@@ -1,11 +1,29 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — integrated village release prepared
+
+The complete pending shared-world, four-dog, bird and private-cottage changes are approved for commit/push/deployment. Current source typecheck, two isolated static exports, Worker/client regressions, scene collision parity, 26 real three-client checks, 17 cottage UI checks and 45 editor checks passed. One concurrent petting-test timeout passed on an unchanged sequential rerun. The exported site excludes private tooling. [Release preparation and evidence](VILLAGE_BUILD.md#2026-10-01--integrated-village-release-preparation) supersede older unresolved full-typecheck/export notes below. The matching Worker must precede the published Pages client; live verification is pending, and existing visitors need to reload afterward.
+
 ## 2026-09-30 — five-minute IP kicks published
 
 The local console at `http://127.0.0.1:3052/` is restarted and has active Players online / Kick for 5 minutes controls; the 293-row private archive and background capture are preserved. Source `d433ad0`, Worker version `8693cad0-6aba-4320-9693-e59756ea6206` and successful [Pages run 36752254287](https://github.com/CipherAtlas/cosy-v1/actions/runs/36752254287) publish only the scoped kick/client/console changes on the previous public village. Pending shared-actor, dog, bird and cottage work remains local.
 
-Live production visitors confirmed the keyboard kick, same-IP disconnection, exact full-screen copy, stopped playback/removed canvas, focused heading and refused reload. After the actual five-minute cooldown, reloading admitted the same IP again with a connected, loaded village. No browser page errors were captured during the successful live flow. The live layout matches the previous release and all seven checked public admin/editor/save/player routes remain 404. Existing visitors must reload before they can be kicked and receive the new screen. See [the release ledger](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-kick-release-published) for complete evidence and remaining limits.
+Live production visitors confirmed the keyboard kick, same-IP disconnection, exact full-screen copy, stopped playback/removed canvas, focused heading and refused reload. After the actual five-minute cooldown, reloading admitted the same IP again with a connected, loaded village. No browser page errors were captured during the successful live flow. The live layout matches the previous release and all seven checked public admin/editor/save/player routes remain 404. Existing visitors must reload before they can be kicked and receive the new screen. The [admin kick instructions](tools/village-admin/README.md#kick-a-player-for-five-minutes) cover pointer/keyboard use, shared-IP cooldowns and unavailable/stale player rows. See [the release ledger](VILLAGE_BUILD.md#2026-09-30--five-minute-ip-kick-release-published) for complete evidence and remaining limits.
 
+
+## 2026-09-30 — focus cottage window wall and comfy chair (local)
+
+The cottage window is larger with a clean four-pane oak frame and no side curtains. Mixed glazed pottery/books on two small shelves warm the wall; the writing chair has a thick woven seat, padded back and soft armrests. The couch and visible cat nap spot retain their positions. Five new Furnishings assets and the updated existing window have editor previews, transforms and named save/reload support; the private room remains code-authored.
+
+Full typecheck, isolated static export, 81 seating checks, 17 actual UI/laptop checks and 40 isolated editor checks passed. [Build record, room view and limits](VILLAGE_BUILD.md#2026-09-30--focus-cottage-window-wall-and-comfy-chair-local). The source snapshot certifies this refresh, not the concurrent shared-world audit. Firefox/Safari, physical hardware, screen readers, long-session performance and live chat remain open. No Git write or deployment. Preview: `http://127.0.0.1:3085/`, Enter → Places → Focus cottage.
+
+## 2026-09-30 — focus cottage cat and furnishings (local)
+
+The window-wall and chair follow-up above supersedes this entry's curtain and shelf arrangement.
+
+The private cottage has a Blender-made cream/caramel cat who begins with a visible nap, wanders/stretches and hops onto the desk for E/button pets. The right-wall sage couch is retained; surfaces, reading lamp, textiles, fern, print and the window's continuous frame/panes/curtains are refreshed. The compact translucent timer leaves more scene space. Six new assets have local editor previews and transform/save/reload support; private room placement remains code-authored. Active/protected/user layouts are preserved.
+
+Full typecheck, isolated static export, 81 seating checks, 26 cat checks/6,000 samples, 17 actual UI/laptop checks and 22 isolated editor checks passed. [Build record, screenshots and limits](VILLAGE_BUILD.md#2026-09-30--focus-cottage-cat-and-furnishings-local). Firefox/Safari, hardware/performance, screen readers and live shared-chat overlays remain open. Preserve concurrent shared-world/admin changes; this work does not certify them. No Git write or deployment. Preview: `http://127.0.0.1:3085/`, Enter → Places → Focus cottage.
 
 ## 2026-09-30 — scoped IP kick release preparation
 
@@ -19,6 +37,19 @@ The local admin console lists connected players and offers Kick for 5 minutes. T
 Focused Worker/client tests, seven Python tests, chat regressions, 27 device-gate checks, 19 local Chrome checks, syntax checks, full typecheck and diff checks passed. The browser fixture used a real local Worker/proxy and actual village UI/shared client with scene/audio lifecycle substitutes; full WebGL/audio disposal, production headers, old live sessions and hibernation remain unverified. Wrangler reported a network-loss error when browser contexts closed. [Behavior, checks and limits](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-player-kicks-local). No Git write, static export or deployment occurred. Publication requires the matching Worker/client followed by restarting the local console; preserve concurrent village/admin/archive changes and keep private tooling excluded. See [the operator guide](tools/village-admin/README.md).
 
 
+
+## 2026-09-30 — shared-world ownership audit (local)
+
+The Worker now owns outdoor dog/resident patrols, engagement, petting, walking packs, conversations, bench/swing reservations, outdoor activity positions and flock/duck meal clocks. Busy actors cannot be taken by another visitor; full benches refuse further visitors. The focus cottage remains private and independently available, and external tea actions preserve its timer. Disconnect/recovery/reservation expiry release abandoned claims, including companion return positions across storage reconstruction. The standardized contract is in [AGENTS.md](AGENTS.md#shared-village-interaction-rules) and [README.md](README.md#shared-village); apply it to every future interaction. The [audit ledger](VILLAGE_BUILD.md#2026-09-30-shared-world-ownership-audit-local) records 26 real three-client checks, 66 Worker scenarios, 21 renderer checks, passed typecheck/export and remaining limits. Use `worker/world-physics.json` plus `scripts/village/tests/shared-physics.cjs` after any collision/layout update. Preserve concurrent artwork/admin edits. These ownership changes are local; matching Worker/client publication requires separate approval, with the Worker first and existing visitors reloading.
+
+## 2026-09-30 — larger bird bowl and varied sky circuits (local)
+
+The bird clearing has a wider carved bowl, a 96-crumb serving alongside the 18 thrown crumbs, and three alternating 30-second sky routes with changing formations and peaks up to 40.65 m. Existing landing positions and feeding timing are preserved. The shared bird snapshot retains the route counter across save/restore; older snapshots use the original route. The existing feeding-dish editor asset has the revised bowl/serving preview and keeps its saved ID. This change preserves presets and object placements. Local Chrome passed 688 bird checks and five focused editor checks; 18 deterministic shared-circuit checks and strict typechecking of the changed bird/world/simulation modules passed. The final full typecheck currently encounters a missing `floorHeight` import in the main thread's concurrent `life.ts` edits. [Behavior, screenshots and exact verification limits](VILLAGE_BUILD.md#2026-09-30-larger-bird-bowl-and-varied-sky-circuits-local). Final connected multiplayer integration and production export remain open. This side change does not certify the main multiplayer work and is not deployed.
+
+
+## 2026-09-30 — four dogs and longer neighbourhood patrols (local)
+
+The playable village has four widely spaced dogs with 31–55 m circuits: Mochi/Pip in Sunrise meadow, Kiko/Luma by the tea garden, Biscuit/Maple on the western pond approach and Cloud/Moss on the northern lane. All six breeds remain placeable in the local editor; protected presets and named copies are unchanged. Local Chrome passed 52 patrol checks, 360 puppy checks, 89 pack/hand-contact checks and 16 isolated editor checks; initial typecheck and diff checks passed. The final full typecheck currently hits a missing `floorHeight` import in the concurrent `life.ts` edits. [Behavior and verification](VILLAGE_BUILD.md#2026-09-30-four-dogs-and-longer-neighbourhood-patrols-local). No Git write or deployment occurred; concurrent multiplayer work remains separate.
 
 
 ## 2026-09-30 — button press feedback and matching swing controls
@@ -53,6 +84,10 @@ The pack camera keeps its target within 1.2 m of the player, caps automatic pull
 ## 2026-09-30 — laptop controls, swings and bridge release preparation
 
 The pending public-site release combines meadow swings/editor registration, bridge symmetry/corner collision, translucent dog controls and phone refusal. Fresh production export/typecheck and focused engine, controls, bridge, bench and editor checks passed; [the release preparation](VILLAGE_BUILD.md#2026-09-30-laptop-controls-swings-and-bridge-release-preparation) records exact coverage. Local chat admin files and archive-related shared-document changes stay uncommitted. No shared Worker changes or deployment are included. Publication/live verification are pending, and shared swing synchronization and physical-device acceptance remain open.
+
+## 2026-09-30 — seven-day local chat archive (local)
+
+The loopback chat admin server now polls the existing Worker admin API every five seconds while the Python process runs, including when its browser tab is closed. It saves each seen message once in a private SQLite database on this Mac, prunes entries older than seven rolling days, and presents a dated, searchable archive beside live moderation. Remove and Clear all still affect live chat; captured copies remain until expiry. The [operator guide](tools/village-admin/README.md) gives the path, startup command and capture limits. Earlier hours cannot be backfilled from the Worker; outages or messages that disappear between polls can leave gaps. Focused local storage/server tests and a browser check passed. No Worker or public client change was made, and this archive has not been deployed. See [the build entry](VILLAGE_BUILD.md#2026-09-30-local-seven-day-chat-archive).
 
 ## 2026-09-30 — meadow swings and translucent laptop controls (local)
 
