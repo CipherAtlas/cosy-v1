@@ -14,13 +14,14 @@ vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };
   module: moduleRef, crypto: webcrypto, TextEncoder, Uint8Array, URL, Request, Response, Date,
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
   freshGarden: () => ({ beds: [] }), readGarden: value => JSON.parse(value),
+  VillageSimulation: class {},
 });
 const { VillageWorld, workerDefault } = moduleRef.exports;
 
 const saved = { hour: nowHour, entries: [{ id: 'visitor', name: 'Cosy Otter', message: 'Hello' }] };
 const records = new Map([['chat', saved]]);
 const messages = [];
-const socket = { send: raw => messages.push(JSON.parse(raw)) };
+const socket = { send: raw => messages.push(JSON.parse(raw)), deserializeAttachment: () => null };
 const ctx = {
   storage: {
     kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) },
@@ -75,7 +76,7 @@ const request = (path, method = 'GET', token = secret, headers = {}) => new Requ
     exports: clientModule.exports,
     require: () => ({ readGarden: value => JSON.parse(value) }),
     process: { env: {} }, WebSocket: MockWebSocket,
-    window: { setInterval: () => 1, clearInterval: () => {}, clearTimeout: () => {} },
+    window: { setInterval: () => 1, setTimeout: () => 2, clearInterval: () => {}, clearTimeout: () => {} },
   });
   const snapshots = [];
   const moderated = [];

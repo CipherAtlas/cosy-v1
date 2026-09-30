@@ -29,25 +29,31 @@ const cases = [
 
 // Exercise the real entry function with controlled hook phases and a scene sentinel.
 for (const [name, userAgent, mobile, phone] of cases) {
-  let state = null, mounts = 0;
+  const states = [null, false];
+  let hookIndex = 0, mounts = 0, onKick;
   const effects = [];
   const context = {
     exports: {}, require, navigator: { userAgent, ...(mobile === undefined ? {} : { userAgentData: { mobile } }) },
     window: { innerWidth: 320 },
-    useState: () => [state, value => { state = value; }],
+    useState: () => { const index = hookIndex++; return [states[index], value => { states[index] = value; }]; },
+    useCallback: callback => callback,
     useEffect: effect => effects.push(effect),
-    VillageScene: () => { mounts++; return jsx('div', { children: 'scene sentinel' }); },
+    VillageScene: props => { mounts++; onKick = props.onKicked; return jsx('div', { children: 'scene sentinel' }); },
+    KickedScreen: () => jsx('div', { children: 'kick screen sentinel' }),
   };
   vm.runInNewContext(compiled, context, { filename: sourcePath });
-  const initial = renderToStaticMarkup(context.exports.Village());
+  const render = () => { hookIndex = 0; return renderToStaticMarkup(context.exports.Village()); };
+  const initial = render();
   check(initial.includes('Opening the village') && mounts === 0, `${name}: no scene mounts before device detection`);
   effects[0]();
-  const result = renderToStaticMarkup(context.exports.Village());
-  check(state === phone, `${name}: correct device decision`);
+  const result = render();
+  check(states[0] === phone, `${name}: correct device decision`);
   if (phone) {
     check(result.includes('Please open the village on a laptop or PC.') && mounts === 0, `${name}: guidance replaces the entire scene`);
   } else {
     check(result.includes('scene sentinel') && mounts === 1, `${name}: a 320 px desktop window still mounts the scene`);
+    onKick();
+    check(render().includes('kick screen sentinel') && mounts === 1, `${name}: a kick replaces the whole scene`);
   }
 }
 console.log(`${checks} device-gate checks passed`);

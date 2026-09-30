@@ -1,5 +1,19 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — scoped IP kick release preparation
+
+The approved release is prepared on published base `e173c03`, with kicking and the private console/archive preserved; pending shared-actor/world-asset work stays local. The isolated 22-page production export, sequential typecheck, focused kick/chat tests, 27 device-gate checks, seven Python tests, syntax checks and 19 actual exported-app browser checks passed. Layout bytes match the published base, and private admin/editor tools are excluded. The pre-existing reduced-motion hydration warning was reproduced on the old live site and remains outside this release. [Release preparation and limits](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-kick-release-preparation). Worker/client publication and restarting the local console are in progress under the user's approval.
+
+
+## 2026-09-30 — five-minute IP player kicks (local)
+
+The local admin console lists connected players and offers Kick for 5 minutes. The Worker disconnects every session using that IP, immediately releases shared ownership/seats and persists the cooldown across object reconstruction; reloads/new tabs stay blocked until exactly five minutes. The client stops reconnecting, unmounts the scene/audio and focuses the full-screen “You've been kicked from this village. Log back in later!” message with the existing sky-transition styling. IP fingerprints stay private. Existing sessions without a fingerprint need to reconnect; shared-IP users share the cooldown.
+
+Focused Worker/client tests, seven Python tests, chat regressions, 27 device-gate checks, 19 local Chrome checks, syntax checks, full typecheck and diff checks passed. The browser fixture used a real local Worker/proxy and actual village UI/shared client with scene/audio lifecycle substitutes; full WebGL/audio disposal, production headers, old live sessions and hibernation remain unverified. Wrangler reported a network-loss error when browser contexts closed. [Behavior, checks and limits](VILLAGE_BUILD.md#2026-09-30-five-minute-ip-player-kicks-local). No Git write, static export or deployment occurred. Publication requires the matching Worker/client followed by restarting the local console; preserve concurrent village/admin/archive changes and keep private tooling excluded. See [the operator guide](tools/village-admin/README.md).
+
+
+
+
 ## 2026-09-30 — button press feedback and matching swing controls
 
 Village controls, NPC actions and portalled menus now give brief pointer/keyboard press feedback; reduced motion uses a still highlight. Swing controls share the dog panel's forest-green/cream colors, bordered buttons and square keycaps. Local `AGENTS.md` makes the treatment a continuing requirement. [Commit `a5280c1`](https://github.com/CipherAtlas/cosy-v1/commit/a5280c1b17b36bc6c732a3e13cc6371f76011ead) is pushed to main and published through successful [Pages run 36745769419](https://github.com/CipherAtlas/cosy-v1/actions/runs/36745769419). The 25 focused Chrome checks passed both locally and live; the 23-check swing UI rerun, 24 device-gate fixtures, isolated typecheck/static export, diff checks and ten live HTTP checks passed. [Behavior and release evidence](VILLAGE_BUILD.md#2026-09-30-button-press-feedback-and-matching-swing-controls). Physical laptops, Safari and screen readers remain open. Concurrent local chat-admin/archive and shared-actor work remains outside this release; the evidence-only follow-up skips CI.

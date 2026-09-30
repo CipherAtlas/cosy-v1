@@ -353,10 +353,11 @@
   gap: 13px;
   padding: 28px;
 }
-.v-scenery-loading h2 {
+.v-scenery-loading :is(h1, h2) {
   margin: 5px 0 0;
   font: 400 clamp(30px, 5vw, 46px)/1.15 Georgia, serif;
 }
+.v-kicked-content { max-width: 680px; }
 .v-scenery-loading p {
   margin: 0;
   color: #e8d9bb;

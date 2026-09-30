@@ -18,13 +18,14 @@ vm.runInNewContext(`${source}\nmodule.exports = VillageWorld;`, {
   crypto: webcrypto,
   freshGarden: () => ({ beds: [] }),
   readGarden: value => JSON.parse(value),
+  VillageSimulation: class {},
 });
 const VillageWorld = workerModule.exports;
 
 function room(savedChat, connected = true) {
   const records = new Map(savedChat ? [['chat', savedChat]] : []);
   const messages = [];
-  const sockets = connected ? [{ send: raw => messages.push(JSON.parse(raw)) }] : [];
+  const sockets = connected ? [{ send: raw => messages.push(JSON.parse(raw)), deserializeAttachment: () => null }] : [];
   const storage = {
     kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) },
     setAlarm: time => { storage.alarmAt = time; },
@@ -76,7 +77,7 @@ function room(savedChat, connected = true) {
     require: () => ({ readGarden: value => JSON.parse(value) }),
     process: { env: {} },
     WebSocket: MockWebSocket,
-    window: { setInterval: () => 1, clearInterval: () => {}, clearTimeout: () => {} },
+    window: { setInterval: () => 1, setTimeout: () => 2, clearInterval: () => {}, clearTimeout: () => {} },
   });
   const snapshots = [];
   const joining = clientModule.exports.connectSharedWorld({

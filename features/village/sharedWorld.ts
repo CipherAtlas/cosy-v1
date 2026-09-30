@@ -24,6 +24,7 @@ type WorldMessage =
   | { type: "chat"; chatHour: number; entry: SharedChatEntry }
   | { type: "chat_sync"; chatHour: number; chat: SharedChatEntry[]; removedMessageIds: string[] }
   | { type: "hour"; chatHour: number }
+  | { type: "kicked"; until: number }
   | { type: "error"; message: string };
 
 export function connectSharedWorld(options: {
@@ -34,6 +35,7 @@ export function connectSharedWorld(options: {
   onChatCooldown: (until: number) => void;
   onAction: (event: { action: GardenAction; x: number; z: number; isSelf: boolean }) => void;
   onDisconnect: () => void;
+  onKicked?: () => void;
   onSwingTaken?: () => void;
   onPuppyTrick?: (trick: SharedPuppyTrick) => void;
 }): Promise<SharedWorldConnection> {
@@ -58,17 +60,17 @@ export function connectSharedWorld(options: {
       selfId, visitors: [...visitors.values()], garden, gardenChanged, chatHour, chat,
     });
     const connection: SharedWorldConnection = {
-      sendGarden: action => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "garden", action })); },
+      sendGarden: action => { if (!closed && socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "garden", action })); },
       sendPuppyTrick: trick => {
         window.clearTimeout(trickTimer);
-        if (socket?.readyState !== WebSocket.OPEN) return;
+        if (closed || socket?.readyState !== WebSocket.OPEN) return;
         const delay = Math.max(0, nextTrickAt - Date.now());
         if (delay) { trickTimer = window.setTimeout(() => connection.sendPuppyTrick(trick), delay); return; }
         nextTrickAt = Date.now() + 160;
         socket.send(JSON.stringify({ type: "puppy_trick", trick }));
       },
       sendChat: message => {
-        if (socket?.readyState !== WebSocket.OPEN || Date.now() < nextChatAt) return false;
+        if (closed || socket?.readyState !== WebSocket.OPEN || Date.now() < nextChatAt) return false;
         try { socket.send(JSON.stringify({ type: "chat", message })); }
         catch { return false; }
         nextChatAt = Date.now() + 3100; // The Worker accepts one message per visitor every 3 seconds.
@@ -83,6 +85,12 @@ export function connectSharedWorld(options: {
         socket?.close();
       },
     };
+    const kicked = () => {
+      if (closed) return;
+      connection.close();
+      options.onKicked?.();
+      if (!connectedOnce) reject(new Error("You've been kicked from this village. Log back in later!"));
+    };
     const open = () => {
       if (closed) return;
       const active = new WebSocket(endpoint);
@@ -92,7 +100,9 @@ export function connectSharedWorld(options: {
         let message: WorldMessage;
         try { message = JSON.parse(event.data) as WorldMessage; }
         catch { return; }
-        if (message.type === "welcome") {
+        if (message.type === "kicked") {
+          kicked();
+        } else if (message.type === "welcome") {
           joined = true;
           retryDelay = 1000;
           lastPose = null;
@@ -158,7 +168,9 @@ export function connectSharedWorld(options: {
           active.close();
         }
       };
-      active.onclose = () => {
+      active.onclose = event => {
+        if (socket !== active) return;
+        if (event.code === 4003) { kicked(); return; }
         window.clearInterval(interval);
         window.clearTimeout(trickTimer);
         if (closed) return;

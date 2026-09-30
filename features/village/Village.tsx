@@ -55,18 +55,35 @@ const PERSONAL_RADIO_ENABLED = false;
 
 export function Village() {
   const [isPhone, setIsPhone] = useState<boolean | null>(null);
+  const [kicked, setKicked] = useState(false);
+  const onKicked = useCallback(() => setKicked(true), []);
   useEffect(() => {
     const browser = navigator as Navigator & { userAgentData?: { mobile?: boolean } };
     setIsPhone(browser.userAgentData?.mobile === true || /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(browser.userAgent));
   }, []);
-  if (isPhone === false) return <VillageScene />;
+  if (isPhone === false) return kicked ? <KickedScreen /> : <VillageScene onKicked={onKicked} />;
   return <main className="v-device-gate" aria-busy={isPhone === null}>
     <h1>Hearthwillow</h1>
     <p role="status">{isPhone ? "Please open the village on a laptop or PC." : "Opening the village…"}</p>
   </main>;
 }
 
-function VillageScene() {
+function KickedScreen() {
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (document.pointerLockElement) document.exitPointerLock();
+    heading.current?.focus();
+  }, []);
+  return <main className="v-scenery-loading">
+    <div className="v-scenery-loading-content v-kicked-content">
+      <Leaf size={35} weight="light" aria-hidden="true" />
+      <h1 ref={heading} tabIndex={-1}>You've been kicked from this village.</h1>
+      <p>Log back in later!</p>
+    </div>
+  </main>;
+}
+
+function VillageScene({ onKicked }: { onKicked: () => void }) {
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
     audio = useRef<VillageAudio | null>(null);
@@ -375,6 +392,7 @@ function VillageScene() {
       },
       onChatModerated: removedMessageIds => engine.current?.removeChatBubbles(removedMessageIds),
       onChatCooldown: until => { if (!cancelled) setChatCooldownUntil(until); },
+      onKicked: () => { if (!cancelled) onKicked(); },
       onPuppyTrick: trick => { if (!cancelled) engine.current?.showPuppyTrick(trick); },
       onSwingTaken: () => {
         if (cancelled) return;
@@ -409,7 +427,7 @@ function VillageScene() {
       sharedTrialModeRef.current = false;
       sharedConnectedRef.current = false;
     };
-  }, [entered]);
+  }, [entered, onKicked]);
   useEffect(() => {
     if (!canvas.current) return;
     let cancelled = false;

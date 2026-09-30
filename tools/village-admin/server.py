@@ -1,14 +1,19 @@
-"""Loopback-only proxy for the live village chat moderation API."""
+"""Loopback-only proxy for the live village moderation API."""
 
 import argparse
 import getpass
 import json
 import re
 import secrets
+import sqlite3
+import threading
+import time
 from http.client import HTTPConnection, HTTPSConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse, urlsplit
+
+from archive import ARCHIVE_FILE, ChatArchive
 
 
 ROOT = Path(__file__).parent
@@ -17,12 +22,85 @@ TOKEN_FILE = Path.home() / ".config" / "cosy-village" / "chat-admin-token"
 MESSAGE_ID = re.compile(r"[0-9a-f-]{36}\Z")
 
 
+def worker_request(worker_url, token, method, path, extra_headers=None):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+        "Cache-Control": "no-store",
+    }
+    headers.update(extra_headers or {})
+    parsed = urlparse(worker_url)
+    connection_type = HTTPSConnection if parsed.scheme == "https" else HTTPConnection
+    connection = connection_type(parsed.hostname, parsed.port, timeout=8)
+    try:
+        connection.request(method, path, headers=headers)
+        response = connection.getresponse()
+        body = response.read(1_000_001)
+        if len(body) > 1_000_000:
+            return 502, {"error": "The server response was too large."}
+        if 200 <= response.status < 300:
+            return response.status, json.loads(body)
+        if response.status in (404, 426) and method == "GET" and path in ("/admin/chat", "/admin/players"):
+            return 404, {"error": "The admin API is not available on this Worker yet."}
+        if "/players/" in path:
+            return response.status, {"error": {
+                401: "The server rejected the admin secret.",
+                404: "That player is no longer connected. Refresh the players list.",
+                409: "That player needs to reconnect before an IP kick is available.",
+            }.get(response.status, "The server could not kick this player.")}
+        return response.status, {"error": {
+            401: "The server rejected the admin secret.",
+            404: "That message is no longer in the chat.",
+            409: "The chat hour changed. Refresh before clearing it.",
+        }.get(response.status, "The server could not complete this action.")}
+    except (OSError, TimeoutError, ValueError):
+        return 502, {"error": "Could not reach the village server."}
+    finally:
+        connection.close()
+
+
 class AdminServer(ThreadingHTTPServer):
-    def __init__(self, address, worker_url, token):
+    def __init__(self, address, worker_url, token, archive_path=ARCHIVE_FILE, poll_interval=5):
         super().__init__(address, AdminHandler)
         self.worker_url = worker_url.rstrip("/")
         self.token = token
         self.csrf_token = secrets.token_urlsafe(32)
+        self.archive = ChatArchive(archive_path)
+        self.poll_interval = poll_interval
+        self.last_capture_at = None
+        self.capture_error = None
+        self.archive_stop = threading.Event()
+        self.archive_thread = threading.Thread(target=self.archive_loop, name="chat-archive", daemon=True)
+
+    def record_chat(self, chat):
+        try:
+            self.archive.capture(chat)
+            self.last_capture_at = int(time.time())
+            self.capture_error = None
+        except (OSError, sqlite3.Error, ValueError):
+            self.capture_error = "The local archive could not save. Check disk access."
+
+    def archive_loop(self):
+        while not self.archive_stop.is_set():
+            status, chat = worker_request(self.worker_url, self.token, "GET", "/admin/chat")
+            if status == 200:
+                self.record_chat(chat)
+            else:
+                try:
+                    self.archive.prune()
+                    self.capture_error = chat.get("error", "Could not capture chat.")
+                except (OSError, sqlite3.Error):
+                    self.capture_error = "The local archive could not save. Check disk access."
+            self.archive_stop.wait(self.poll_interval)
+
+    def start_archiving(self):
+        self.archive_thread.start()
+
+    def server_close(self):
+        self.archive_stop.set()
+        if self.archive_thread.is_alive():
+            self.archive_thread.join(timeout=9)
+        super().server_close()
 
 
 class AdminHandler(BaseHTTPRequestHandler):
@@ -45,43 +123,36 @@ class AdminHandler(BaseHTTPRequestHandler):
         return self.headers.get("Host") == f"127.0.0.1:{self.server.server_port}"
 
     def upstream(self, method, path, extra_headers=None):
-        headers = {
-            "Authorization": f"Bearer {self.server.token}",
-            "Accept": "application/json",
-            "Cache-Control": "no-store",
-        }
-        headers.update(extra_headers or {})
-        parsed = urlparse(self.server.worker_url)
-        connection_type = HTTPSConnection if parsed.scheme == "https" else HTTPConnection
-        connection = connection_type(parsed.hostname, parsed.port, timeout=8)
-        try:
-            connection.request(method, path, headers=headers)
-            response = connection.getresponse()
-            body = response.read(1_000_001)
-            if len(body) > 1_000_000:
-                return 502, {"error": "The server response was too large."}
-            if 200 <= response.status < 300:
-                return response.status, json.loads(body)
-            if response.status == 404 and method == "GET" and path == "/admin/chat":
-                return 404, {"error": "The admin API is not available on this Worker yet."}
-            return response.status, {"error": {
-                401: "The server rejected the admin secret.",
-                404: "That message is no longer in the chat.",
-                409: "The chat hour changed. Refresh before clearing it.",
-            }.get(response.status, "The server could not complete this action.")}
-        except (OSError, TimeoutError, ValueError):
-            return 502, {"error": "Could not reach the village server."}
-        finally:
-            connection.close()
+        return worker_request(self.server.worker_url, self.server.token, method, path, extra_headers)
 
     def do_GET(self):
         if not self.allowed_host():
             return self.send_json(403, {"error": "Forbidden host."})
-        if self.path == "/api/session":
+        parsed = urlsplit(self.path)
+        if parsed.path == "/api/session":
             return self.send_json(200, {"csrfToken": self.server.csrf_token, "server": urlparse(self.server.worker_url).hostname})
-        if self.path == "/api/chat":
+        if parsed.path == "/api/chat":
             status, body = self.upstream("GET", "/admin/chat")
+            if status == 200:
+                self.server.record_chat(body)
             return self.send_json(status, body)
+        if parsed.path == "/api/players":
+            status, body = self.upstream("GET", "/admin/players")
+            return self.send_json(status, body)
+        if parsed.path == "/api/archive":
+            params = parse_qs(parsed.query, keep_blank_values=True)
+            try:
+                query = params.get("q", [""])[0]
+                day = params.get("day", [""])[0]
+                offset = int(params.get("offset", ["0"])[0])
+                archive = self.server.archive.list_messages(query, day, offset)
+            except ValueError:
+                return self.send_json(400, {"error": "Invalid archive filter."})
+            except (OSError, sqlite3.Error):
+                return self.send_json(503, {"error": "Could not read the local archive. Check disk access."})
+            archive["lastCaptureAt"] = self.server.last_capture_at
+            archive["captureError"] = self.server.capture_error
+            return self.send_json(200, archive)
         files = {"/": ("index.html", "text/html; charset=utf-8"),
                  "/admin.js": ("admin.js", "text/javascript; charset=utf-8"),
                  "/admin.css": ("admin.css", "text/css; charset=utf-8")}
@@ -108,10 +179,19 @@ class AdminHandler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError):
             return self.send_json(400, {"error": "Invalid JSON."})
         if self.path == "/api/delete" and isinstance(payload, dict) and isinstance(payload.get("messageId"), str) and MESSAGE_ID.fullmatch(payload["messageId"]):
+            previous_status, previous_chat = self.upstream("GET", "/admin/chat")
+            if previous_status == 200:
+                self.server.record_chat(previous_chat)
             status, body = self.upstream("DELETE", "/admin/chat/" + payload["messageId"])
             return self.send_json(status, body)
         if self.path == "/api/clear" and isinstance(payload, dict) and type(payload.get("chatHour")) is int:
+            previous_status, previous_chat = self.upstream("GET", "/admin/chat")
+            if previous_status == 200:
+                self.server.record_chat(previous_chat)
             status, body = self.upstream("DELETE", "/admin/chat", {"If-Match": f'"{payload["chatHour"]}"'})
+            return self.send_json(status, body)
+        if self.path == "/api/kick" and isinstance(payload, dict) and isinstance(payload.get("playerId"), str) and MESSAGE_ID.fullmatch(payload["playerId"]):
+            status, body = self.upstream("POST", "/admin/players/" + payload["playerId"] + "/kick")
             return self.send_json(status, body)
         return self.send_json(400, {"error": "Invalid action."})
 
@@ -141,6 +221,7 @@ def main():
     if len(token) < 32:
         parser.error("The admin secret must be at least 32 characters.")
     server = AdminServer(("127.0.0.1", args.port), args.worker_url, token)
+    server.start_archiving()
     print(f"Village chat admin: http://127.0.0.1:{server.server_port}/")
     try:
         server.serve_forever()

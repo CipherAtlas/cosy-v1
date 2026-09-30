@@ -2,6 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed } from "../features/village/garden.ts";
 
 const MAX_VISITORS = 64;
+const KICK_DURATION_MS = 5 * 60_000;
 const MAX_SWING_ANGLE = 78 * Math.PI / 180;
 const PUPPY_TRICK_SECONDS = { sit: 7, dance: 5.2, spin: 3.2, bow: 3.8, wave: 4.2, roll: 4.6 };
 const validObjectId = id => typeof id === "string" && /^[a-zA-Z0-9_-]{1,100}$/.test(id);
@@ -51,6 +52,13 @@ async function authorized(request, token) {
   return difference === 0;
 }
 
+async function ipFingerprint(request) {
+  const ip = request.headers.get("CF-Connecting-IPv6") || request.headers.get("CF-Connecting-IP");
+  if (!ip) return null;
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip.trim().toLowerCase()));
+  return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
 export class VillageWorld extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
@@ -60,12 +68,24 @@ export class VillageWorld extends DurableObject {
     this.chat = (savedChat?.entries ?? []).map(entry => entry.messageId ? entry : { ...entry, messageId: crypto.randomUUID() });
     this.puppyTricks = new Map((ctx.storage.kv.get("puppyTricks") || []).filter(trick =>
       Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000).map(trick => [trick.id, trick]));
+    this.ipKicks = new Map(ctx.storage.kv.get("ipKicks") || []);
+    this.pruneKicks();
     if (savedChat && this.chat.some((entry, index) => entry !== savedChat.entries[index])) {
       ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
     }
   }
 
-  sockets() { return this.ctx.getWebSockets(); }
+  sockets() { return this.ctx.getWebSockets().filter(socket => !socket.deserializeAttachment()?.kickedUntil); }
+
+  pruneKicks() {
+    let changed = false;
+    for (const [ip, until] of this.ipKicks) if (until <= Date.now()) { this.ipKicks.delete(ip); changed = true; }
+    if (changed) this.ctx.storage.kv.put("ipKicks", [...this.ipKicks]);
+  }
+
+  adminPlayers() {
+    return { players: this.visitors().map(({ id, name, color, ipHash }) => ({ id, name, color, canKick: !!ipHash })) };
+  }
 
   visitors() {
     return this.sockets().map(socket => socket.deserializeAttachment()).filter(Boolean);
@@ -86,10 +106,30 @@ export class VillageWorld extends DurableObject {
     void this.ctx.storage.setAlarm((hour + 1) * 3_600_000);
   }
 
-  async alarm() { this.rollHour(); }
+  async alarm() { this.pruneKicks(); this.rollHour(); }
 
   async fetch(request) {
     const url = new URL(request.url);
+    if (url.pathname === "/admin/players" && request.method === "GET") return Response.json(this.adminPlayers());
+    const kickMatch = /^\/admin\/players\/([0-9a-f-]{36})\/kick$/.exec(url.pathname);
+    if (kickMatch && request.method === "POST") {
+      const target = this.visitors().find(visitor => visitor.id === kickMatch[1]);
+      if (!target) return new Response("Player no longer connected", { status: 404 });
+      if (!target.ipHash) return new Response("Player must reconnect before an IP kick is available", { status: 409 });
+      this.pruneKicks();
+      const until = Date.now() + KICK_DURATION_MS;
+      this.ipKicks.set(target.ipHash, until);
+      this.ctx.storage.kv.put("ipKicks", [...this.ipKicks]);
+      const affected = this.sockets().filter(socket => socket.deserializeAttachment()?.ipHash === target.ipHash);
+      for (const socket of affected) {
+        const visitor = socket.deserializeAttachment();
+        socket.serializeAttachment({ ...visitor, kickedUntil: until });
+        this.broadcast({ type: "leave", id: visitor.id });
+        send(socket, { type: "kicked", until });
+        socket.close(4003, "Kicked for 5 minutes");
+      }
+      return Response.json({ ...this.adminPlayers(), until, kickedCount: affected.length });
+    }
     if (url.pathname === "/admin/chat") {
       this.rollHour();
       if (request.method === "GET") return Response.json({ chatHour: this.chatHour, entries: this.chat });
@@ -118,6 +158,17 @@ export class VillageWorld extends DurableObject {
       return Response.json({ chatHour: this.chatHour, entries: this.chat });
     }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") return new Response("WebSocket required", { status: 426 });
+    const ipHash = await ipFingerprint(request);
+    this.pruneKicks();
+    const kickedUntil = this.ipKicks.get(ipHash);
+    if (kickedUntil) {
+      // Complete the handshake so browsers can receive the kick screen instead of an opaque HTTP error.
+      const [client, server] = Object.values(new WebSocketPair());
+      server.accept();
+      send(server, { type: "kicked", until: kickedUntil });
+      server.close(4003, "Kicked for 5 minutes");
+      return new Response(null, { status: 101, webSocket: client });
+    }
     this.rollHour();
     if (this.sockets().length >= MAX_VISITORS) return new Response("Village full", { status: 503 });
     const used = new Set(this.visitors().map(visitor => visitor.name));
@@ -126,7 +177,7 @@ export class VillageWorld extends DurableObject {
     while (used.has(name)) name = names[Math.floor(Math.random() * names.length)];
     const slot = (this.ctx.storage.kv.get("nextSlot") || 0) + 1;
     this.ctx.storage.kv.put("nextSlot", slot);
-    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0, crumbPouch: false };
+    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, ipHash, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0, crumbPouch: false };
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment(visitor);
@@ -147,7 +198,7 @@ export class VillageWorld extends DurableObject {
     catch { return; }
     if (!message || typeof message !== "object") return;
     const visitor = socket.deserializeAttachment();
-    if (!visitor) return;
+    if (!visitor || visitor.kickedUntil) return;
     if (message.type === "move") {
       const now = Date.now();
       if (now - visitor.lastMove < 80 || ![message.x, message.z, message.heading].every(Number.isFinite)
@@ -210,8 +261,9 @@ export class VillageWorld extends DurableObject {
   }
 
   async webSocketClose(socket) {
-    socket.close(1000, "Visitor left");
     const visitor = socket.deserializeAttachment();
+    if (visitor?.kickedUntil) return;
+    socket.close(1000, "Visitor left");
     if (visitor) this.broadcast({ type: "leave", id: visitor.id }, socket);
   }
 }

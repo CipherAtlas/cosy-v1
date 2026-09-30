@@ -3,21 +3,57 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hearthwillow chat admin</title>
+  <title>Hearthwillow village admin</title>
   <link rel="stylesheet" href="/admin.css">
   <script src="/admin.js" defer></script>
 </head>
 <body>
-  <main>
-    <header>
-      <div><h1>Hearthwillow chat</h1><p id="connection">Connecting to the village…</p></div>
-      <button id="refresh" type="button">Refresh</button>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <h1>Hearthwillow village</h1>
+        <p id="connection">Connecting to the village…</p>
+      </div>
+      <p id="capture" class="capture" role="status">Starting local archive…</p>
     </header>
-    <section aria-label="Current chat">
-      <div class="section-heading"><h2>Current hour</h2><button id="clear" class="danger" type="button" disabled>Clear all messages</button></div>
-      <p id="status" role="status" aria-live="polite">Loading messages…</p>
-      <div id="messages" class="messages"></div>
-    </section>
+    <div class="workspace">
+      <div class="live-column">
+      <section class="panel players-panel" aria-labelledby="players-heading">
+        <div class="panel-heading">
+          <div><h2 id="players-heading">Players online</h2><p>Kicks last five minutes and apply to everyone using the same IP.</p></div>
+          <button id="players-refresh" type="button">Refresh</button>
+        </div>
+        <p id="players-status" class="section-status" role="status" aria-live="polite">Loading players…</p>
+        <div id="players" class="players-list"></div>
+      </section>
+      <section class="panel live-panel" aria-labelledby="live-heading">
+        <div class="panel-heading">
+          <div><h2 id="live-heading">Live chat</h2><p>Current UTC hour</p></div>
+          <button id="refresh" type="button">Refresh</button>
+        </div>
+        <p id="status" class="section-status" role="status" aria-live="polite">Loading messages…</p>
+        <div id="messages" class="live-messages"></div>
+        <div class="live-actions"><button id="clear" class="danger" type="button" disabled>Clear all messages</button></div>
+      </section>
+      </div>
+      <section class="panel archive-panel" aria-labelledby="archive-heading">
+        <div class="panel-heading archive-heading">
+          <div><h2 id="archive-heading">Seven-day archive</h2><p>Saved on this Mac while the local server runs</p></div>
+          <strong id="archive-count" class="archive-count">0 saved</strong>
+        </div>
+        <div class="archive-tools" role="search">
+          <label for="archive-search">Search messages or names</label>
+          <div class="filter-row">
+            <input id="archive-search" type="search" placeholder="Search the archive" autocomplete="off" maxlength="100">
+            <select id="archive-day" aria-label="Filter archive by day"><option value="">All days</option></select>
+          </div>
+        </div>
+        <p id="archive-status" class="section-status" role="status" aria-live="polite">Loading archive…</p>
+        <div id="archive-results" class="archive-results"></div>
+        <button id="archive-more" class="more-button" type="button" hidden>Show older messages</button>
+        <p class="retention-note">Times show when this Mac first saved a message. Cleared or removed live messages stay here for seven days. If the server is off at expiry, they are removed on its next start. Missed hours cannot be recovered.</p>
+      </section>
+    </div>
   </main>
 </body>
 </html>
