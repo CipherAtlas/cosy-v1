@@ -1,5 +1,9 @@
 # Village implementation evidence — updated 2026-09-30
 
+## Laptop controls, swings and bridge — 2026-09-30 published
+
+[Publication checks](laptop-controls-publication.json) record application commit `c095bed`, successful Pages run 36731658161 (attempt 2), 14 live Chrome checks, source-matching layout/model bytes and seven private-route 404 responses. The unchanged retry followed an existing Google font loader failure. [The release ledger](../../../VILLAGE_BUILD.md#2026-09-30-laptop-controls-swings-and-bridge-release-published) distinguishes fresh local checks, live browser checks and remaining physical-device/shared-swing limits. Local chat admin/archive files and related shared-document edits are excluded from the release.
+
 ## Symmetric bridge and corner collision
 
 [Bridge view](bridge-symmetric-local.png) shows matching approaches and mirrored parapets/posts/coping. [Editor preview](bridge-editor-preview-local.png) is the rendered asset-library image. [56 Chrome checks](bridge-corners-local.json) cover production-module full-world collision, actual W-key crossing, rendered symmetry and isolated editor preview/transform/save/reload. The deterministic bridge regression also covers diagonal repeated jumps at 30/60/120 fps, reverse escape and local separation from old/new posts and central rails. These are local source checks; see [the build entry](../../../VILLAGE_BUILD.md#2026-09-30-symmetric-bridge-and-corner-collision-local) for device/live limits.

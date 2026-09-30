@@ -1,5 +1,13 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-30 laptop controls, swings and bridge release (published)
+
+[Application commit `c095bed`](https://github.com/CipherAtlas/cosy-v1/commit/c095bed5adc3c14086822eea9a5275a7079c4a4b) publishes the meadow swings/editor registration, symmetric bridge/corner recovery, translucent dog controls and phone entry gate through successful [Pages run 36731658161](https://github.com/CipherAtlas/cosy-v1/actions/runs/36731658161), attempt 2. The first attempt failed inside the existing Google font loader; retrying the unchanged commit passed both build and deploy. No dependency, font, deployment configuration or shared Worker change was made.
+
+The [release preparation](#2026-09-30-laptop-controls-swings-and-bridge-release-preparation) records the fresh isolated build/typecheck and focused regressions. Fourteen live Chrome checks passed: desktop arrival/shared connection, Focus cottage entry/exit, Left swing/W pumping/Get off, compact 1024×640 controls, T/Dance/focus return, Wren F dialogue, simulated iPhone refusal with zero world-asset/WebSocket requests, narrow desktop entry and no captured page errors. Public root/activity routes return 200; live layout/spirit/puppy bytes match source; seven editor/admin/layout-save paths return 404. [Publication evidence](docs/village/evidence/laptop-controls-publication.json) contains the live checks and HTTP responses.
+
+All pending public-village changes and their local editor/evidence files were committed. Local chat admin files, their seven-day archive work and related shared-document sections remain uncommitted and are excluded from publication. The editor itself remains local-only. The older local entries describe pre-release checkpoints. Shared swing occupancy/motion/elevation, physical phone/laptop hardware, Safari, screen readers and target-device performance remain unverified; the live checks certify this browser session, not those acceptance gaps.
+
 ## 2026-09-30 laptop controls, swings and bridge release preparation
 
 The authorized release includes all pending public-village changes: meadow swings and local editor registration, symmetric bridge/corner recovery, compact translucent dog controls and the phone identity gate. Local chat admin files and their seven-day archive documentation are excluded from this commit; the shared Worker is unchanged and will not be redeployed.

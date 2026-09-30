@@ -1,0 +1,122 @@
+{
+  "applicationCommit": "c095bed5adc3c14086822eea9a5275a7079c4a4b",
+  "workflow": {
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36731658161",
+    "id": 36731658161,
+    "attempt": 2,
+    "conclusion": "success",
+    "unchangedRetryAfter": "Existing next/font Google loader error"
+  },
+  "site": "https://cosy.sabarg.com/",
+  "localVerification": {
+    "staticPages": 22,
+    "typecheck": true,
+    "deviceGateFixtures": 24,
+    "bridgeGroups": 11,
+    "movementCompositionContracts": 10,
+    "swingEngineScenarios": 31,
+    "fixedChainSamples": 1237,
+    "renderedSwingChecks": 23,
+    "fullWorldBridgeEditorChecks": 56,
+    "swingEditorChecks": 10,
+    "benchScenarios": 7,
+    "editorServerTests": 9,
+    "rootAssetReferences": 15,
+    "exportPrivatePaths": [],
+    "layoutBytesMatch": true
+  },
+  "liveBrowser": {
+    "url": "https://cosy.sabarg.com/",
+    "scope": "Live Chrome deployment smoke checks; simulated phone identity and desktop viewports",
+    "checks": [
+      "Live desktop arrival loads the new swing world",
+      "Existing shared village connects",
+      "Places enters Focus cottage",
+      "Activity exit returns to exploration",
+      "Live Left swing control seats the player",
+      "Live W shortcut pumps the swing",
+      "Live 1024x640 swing controls preserve the scene",
+      "Live Get off reaches clear ground",
+      "Live T opens the dog trick controls",
+      "Live Dance folds the list and restores game focus",
+      "Live F changes Wren dialogue",
+      "Live phone identity gate blocks scene assets and shared connection",
+      "A narrow desktop window still loads the village",
+      "Live desktop checks have no captured page errors"
+    ],
+    "errors": [],
+    "phoneWorldRequests": 0
+  },
+  "liveHttp": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/focus/",
+      "status": 200
+    },
+    {
+      "path": "/mood/",
+      "status": 200
+    },
+    {
+      "path": "/gratitude/",
+      "status": 200
+    },
+    {
+      "path": "/village/world-layout.json",
+      "status": 200,
+      "sourceByteMatch": true,
+      "sha256": "d9e934682fe6e139bb2d5b75f42a614f3934acbde11f37ff23b9e211106f6e32"
+    },
+    {
+      "path": "/village/models/spirit.glb",
+      "status": 200,
+      "sourceByteMatch": true,
+      "sha256": "f859fab5f915415bf84333317f60502980bb7bfc54b1b0af1612ea52f9a0d599"
+    },
+    {
+      "path": "/village/models/puppies.glb",
+      "status": 200,
+      "sourceByteMatch": true,
+      "sha256": "cd0cb7e9c4d64ecbe29c20c662a19e20a9343f4aa407a3beabaa704e71a47968"
+    },
+    {
+      "path": "/editor/",
+      "status": 404
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/server.py",
+      "status": 404
+    },
+    {
+      "path": "/api/layouts/",
+      "status": 404
+    },
+    {
+      "path": "/api/apply/",
+      "status": 404
+    }
+  ],
+  "exclusions": [
+    "Local chat admin/archive files and associated shared-document edits",
+    "Shared Worker deployment"
+  ],
+  "limits": [
+    "Shared swing occupancy, motion and rider elevation are not synchronized",
+    "Physical phone and laptop hardware, Safari, screen readers and target-device performance unverified"
+  ]
+}

@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — laptop controls, swings and bridge release (published)
+
+[Commit `c095bed`](https://github.com/CipherAtlas/cosy-v1/commit/c095bed5adc3c14086822eea9a5275a7079c4a4b) and successful [Pages run 36731658161](https://github.com/CipherAtlas/cosy-v1/actions/runs/36731658161), attempt 2, publish the pending swings/editor, bridge, dog-control and phone-gate changes. The unchanged retry passed after an existing Google font loader failure. Fresh source/build regressions and 14 live Chrome checks passed; live layout/model bytes match source and seven private-tooling paths return 404. [Release evidence and limits](VILLAGE_BUILD.md#2026-09-30-laptop-controls-swings-and-bridge-release-published). Local chat admin/archive files and their shared-doc changes remain uncommitted. No shared Worker deployment occurred. Swing synchronization and physical-device/performance acceptance remain open; local checkpoint entries below are historical.
+
 ## 2026-09-30 — laptop controls, swings and bridge release preparation
 
 The pending public-site release combines meadow swings/editor registration, bridge symmetry/corner collision, translucent dog controls and phone refusal. Fresh production export/typecheck and focused engine, controls, bridge, bench and editor checks passed; [the release preparation](VILLAGE_BUILD.md#2026-09-30-laptop-controls-swings-and-bridge-release-preparation) records exact coverage. Local chat admin files and archive-related shared-document changes stay uncommitted. No shared Worker changes or deployment are included. Publication/live verification are pending, and shared swing synchronization and physical-device acceptance remain open.
