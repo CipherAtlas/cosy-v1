@@ -1,5 +1,24 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — shared interaction release preparation
+
+The user authorized committing/pushing main and deployment with only necessary verification. The public release includes swing/trick/panel fixes plus the integrated shared-height and pack-camera corrections; local chat-admin/archive work stays uncommitted. Existing completed local checks are reused. Worker version `de2ce640-370e-4fd7-81f8-4163fd97055b` is deployed and production health passed; Pages publication and a brief live two-client smoke check remain pending. [Release preparation](VILLAGE_BUILD.md#2026-09-30-shared-interaction-release-preparation).
+
+## 2026-09-30 — shared swings, dog tricks and unified dog panel (local)
+
+Swing occupancy and pendulum motion now reach shared visitors; the remote spirit stays attached to the visible seat through its vertical arc. The Worker rejects conflicting seat claims, E selects a free nearby seat and occupied buttons are disabled. All six dog tricks broadcast position/facing and an authoritative start time; reconnecting/joining visitors resume active clips, including after Worker hibernation. Patrols, petting and walking invitations remain local.
+
+Dog name/status, Pet, Walk/Home, Tricks and response now share a compact 320 px translucent panel. Choosing or finishing a trick keeps its list open, and the selected dog waits while its trick list is open. T/Escape close the list and release the hold; walking away or leaving the context also releases it. Twenty-nine two-client local Chrome checks, five viewport checks, Worker/client validation, existing chat regressions, 31 swing scenarios/1,237 chain samples, 508 puppy checks, typecheck, isolated static export and diff checks passed. [Behavior, screenshots and limits](VILLAGE_BUILD.md#2026-09-30-shared-swings-dog-tricks-and-unified-dog-panel-local). The export excludes private tooling, and source/layout assets are preserved. Concurrent camera, shared-height and admin/archive work is retained. No Git write or deployment occurred; release the Worker before the matching client, then verify live public interactions. Earlier pill/collapse and unsynchronized-swing entries below are historical.
+
+
+## 2026-09-30 — shared jump height (local)
+
+Movement now includes actual Y and sends updates for jumps in place; the Worker retains/broadcasts it and includes it in welcome snapshots. Observers interpolate the height, while clients without Y retain ground/bench positioning. Typecheck, existing chat-hour/admin checks and 10 two-client local Chrome checks passed: three stationary jumps rose about 0.98 m on the observer and landed, with no captured page errors. [Behavior and limits](VILLAGE_BUILD.md#2026-09-30-shared-jump-height-local). No Git write or publication occurred; Worker and client release plus live verification remain pending. Concurrent dog/swing and local-admin work is preserved.
+
+## 2026-09-30 — player-focused dog-pack camera (local)
+
+The pack camera keeps its target within 1.2 m of the player, caps automatic pullback at 2.8 m and follows movement twice as quickly. Lower pack framing keeps the rear dogs' paws visible. Seventeen focused local Chrome checks passed for six-dog framing at 1280×720, 1366×768 and 1024×640, stragglers, sprint/turn/stop at 30/60/120 FPS, reduced motion and pack dismissal; typecheck and diff checks passed. [Evidence and limits](VILLAGE_BUILD.md#2026-09-30-player-focused-dog-pack-camera-local). This is local camera evidence only; concurrent shared-action/panel work, production export, live multiplayer and physical-device acceptance are not certified. No Git write or deployment occurred.
+
 ## 2026-09-30 — laptop controls, swings and bridge release (published)
 
 [Commit `c095bed`](https://github.com/CipherAtlas/cosy-v1/commit/c095bed5adc3c14086822eea9a5275a7079c4a4b) and successful [Pages run 36731658161](https://github.com/CipherAtlas/cosy-v1/actions/runs/36731658161), attempt 2, publish the pending swings/editor, bridge, dog-control and phone-gate changes. The unchanged retry passed after an existing Google font loader failure. Fresh source/build regressions and 14 live Chrome checks passed; live layout/model bytes match source and seven private-tooling paths return 404. [Release evidence and limits](VILLAGE_BUILD.md#2026-09-30-laptop-controls-swings-and-bridge-release-published). Local chat admin/archive files and their shared-doc changes remain uncommitted. No shared Worker deployment occurred. Swing synchronization and physical-device/performance acceptance remain open; local checkpoint entries below are historical.

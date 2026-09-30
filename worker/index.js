@@ -2,6 +2,9 @@ import { DurableObject } from "cloudflare:workers";
 import { freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed } from "../features/village/garden.ts";
 
 const MAX_VISITORS = 64;
+const MAX_SWING_ANGLE = 78 * Math.PI / 180;
+const PUPPY_TRICK_SECONDS = { sit: 7, dance: 5.2, spin: 3.2, bow: 3.8, wave: 4.2, roll: 4.6 };
+const validObjectId = id => typeof id === "string" && /^[a-zA-Z0-9_-]{1,100}$/.test(id);
 const adjectives = ["Relaxed", "Sleepy", "Cosy", "Sunny", "Gentle", "Snuggly", "Cheerful", "Drowsy", "Mellow", "Kind", "Rosy", "Dreamy", "Soft", "Warm", "Little", "Jolly", "Calm", "Cloudy", "Happy", "Fluffy"];
 const animals = ["Panda", "Bunny", "Otter", "Duckling", "Fox", "Kitten", "Hedgehog", "Fawn", "Penguin", "Puffin", "Koala", "Sparrow", "Seal", "Mouse", "Lamb", "Turtle", "Robin", "Swan", "Cub", "Wren"];
 
@@ -55,6 +58,8 @@ export class VillageWorld extends DurableObject {
     const savedChat = ctx.storage.kv.get("chat");
     this.chatHour = savedChat?.hour ?? -1;
     this.chat = (savedChat?.entries ?? []).map(entry => entry.messageId ? entry : { ...entry, messageId: crypto.randomUUID() });
+    this.puppyTricks = new Map((ctx.storage.kv.get("puppyTricks") || []).filter(trick =>
+      Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000).map(trick => [trick.id, trick]));
     if (savedChat && this.chat.some((entry, index) => entry !== savedChat.entries[index])) {
       ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
     }
@@ -127,8 +132,9 @@ export class VillageWorld extends DurableObject {
     server.serializeAttachment(visitor);
     send(server, {
       type: "welcome", selfId: visitor.id,
-      visitors: this.visitors().map(({ id, name, color, slot, x, z, heading }) => ({ id, name, color, slot, x, z, heading })),
+      visitors: this.visitors().map(({ id, name, color, slot, x, y, z, heading, swing }) => ({ id, name, color, slot, x, y, z, heading, swing: swing ?? null })),
       garden: this.garden, chatHour: this.chatHour, chat: this.chat,
+      puppyTricks: [...this.puppyTricks.values()].filter(trick => Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000),
     });
     this.broadcast({ type: "join", visitor: { id: visitor.id, name, color: visitor.color, slot, x: 0, z: 0, heading: 0 } }, server);
     return new Response(null, { status: 101, webSocket: client });
@@ -144,13 +150,39 @@ export class VillageWorld extends DurableObject {
     if (!visitor) return;
     if (message.type === "move") {
       const now = Date.now();
-      if (now - visitor.lastMove < 80 || ![message.x, message.z, message.heading].every(Number.isFinite)) return;
+      if (now - visitor.lastMove < 80 || ![message.x, message.z, message.heading].every(Number.isFinite)
+        || (message.y !== undefined && !Number.isFinite(message.y))) return;
       visitor.lastMove = now;
       visitor.x = Math.max(-160, Math.min(160, message.x));
+      visitor.y = message.y === undefined ? undefined : Math.max(-20, Math.min(40, message.y));
       visitor.z = Math.max(-160, Math.min(160, message.z));
       visitor.heading = Math.max(-Math.PI, Math.min(Math.PI, message.heading));
+      const ride = message.swing;
+      visitor.swing = ride && validObjectId(ride.id) && [0, 1].includes(ride.index)
+        && [ride.angle, ride.velocity].every(Number.isFinite)
+        ? { id: ride.id, index: ride.index, angle: Math.max(-MAX_SWING_ANGLE, Math.min(MAX_SWING_ANGLE, ride.angle)), velocity: Math.max(-4, Math.min(4, ride.velocity)) } : null;
+      if (visitor.swing && this.visitors().some(other => other.id !== visitor.id
+        && other.swing?.id === visitor.swing.id && other.swing.index === visitor.swing.index)) {
+        visitor.swing = null;
+        send(socket, { type: "swing_taken" });
+      }
       socket.serializeAttachment(visitor);
-      this.broadcast({ type: "move", id: visitor.id, x: visitor.x, z: visitor.z, heading: visitor.heading }, socket);
+      this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, swing: visitor.swing }, socket);
+    } else if (message.type === "puppy_trick") {
+      const trick = message.trick, now = Date.now();
+      if (!trick || !validObjectId(trick.id) || !Object.hasOwn(PUPPY_TRICK_SECONDS, trick.command)
+        || ![trick.x, trick.z, trick.heading].every(Number.isFinite) || now - (visitor.lastTrick || 0) < 150
+        || Math.hypot(trick.x - visitor.x, trick.z - visitor.z) > 3) return;
+      const accepted = { id: trick.id, command: trick.command,
+        x: Math.max(-160, Math.min(160, trick.x)), z: Math.max(-160, Math.min(160, trick.z)),
+        heading: Math.max(-Math.PI, Math.min(Math.PI, trick.heading)), startedAt: now };
+      visitor.lastTrick = now;
+      socket.serializeAttachment(visitor);
+      for (const [id, previous] of this.puppyTricks) if (now - previous.startedAt >= PUPPY_TRICK_SECONDS[previous.command] * 1000) this.puppyTricks.delete(id);
+      if (!this.puppyTricks.has(accepted.id) && this.puppyTricks.size >= 128) return;
+      this.puppyTricks.set(accepted.id, accepted);
+      this.ctx.storage.kv.put("puppyTricks", [...this.puppyTricks.values()]);
+      this.broadcast({ type: "puppy_trick", actor: visitor.id, trick: accepted });
     } else if (message.type === "garden" && validAction(message.action, this.garden.beds.length)) {
       const action = message.action;
       if ((action.kind === "feed" || action.kind === "feedBirds") && !visitor.crumbPouch) return;
@@ -178,6 +210,7 @@ export class VillageWorld extends DurableObject {
   }
 
   async webSocketClose(socket) {
+    socket.close(1000, "Visitor left");
     const visitor = socket.deserializeAttachment();
     if (visitor) this.broadcast({ type: "leave", id: visitor.id }, socket);
   }

@@ -1,17 +1,24 @@
 import { readGarden, type GardenAction, type GardenState } from "./garden";
+import type { PuppyCommand } from "./puppies";
+import type { SwingSeat } from "./swings";
 
-export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; z: number; heading: number };
+export type SharedSwingRide = SwingSeat & { angle: number; velocity: number };
+export type SharedPuppyTrick = { id: string; command: PuppyCommand; x: number; z: number; heading: number; startedAt: number };
+export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null };
 export type SharedChatEntry = { id?: string; messageId?: string; name: string; message: string; sentAt?: number };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
   sendChat: (message: string) => boolean;
+  sendPuppyTrick: (trick: SharedPuppyTrick) => void;
   close: () => void;
 };
 
 type WorldMessage =
-  | { type: "welcome"; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[] }
+  | { type: "welcome"; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[]; puppyTricks?: SharedPuppyTrick[] }
   | { type: "join"; visitor: SharedVisitor }
-  | { type: "move"; id: string; x: number; z: number; heading: number }
+  | { type: "move"; id: string; x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null }
+  | { type: "swing_taken" }
+  | { type: "puppy_trick"; actor: string; trick: SharedPuppyTrick }
   | { type: "leave"; id: string }
   | { type: "garden"; garden: GardenState; event: { action: GardenAction; actor: string; x: number; z: number } }
   | { type: "chat"; chatHour: number; entry: SharedChatEntry }
@@ -20,13 +27,15 @@ type WorldMessage =
   | { type: "error"; message: string };
 
 export function connectSharedWorld(options: {
-  getPose: () => { x: number; z: number; heading: number } | null;
+  getPose: () => { x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null } | null;
   onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
   onChat: (entry: SharedChatEntry) => void;
   onChatModerated?: (removedMessageIds: string[]) => void;
   onChatCooldown: (until: number) => void;
   onAction: (event: { action: GardenAction; x: number; z: number; isSelf: boolean }) => void;
   onDisconnect: () => void;
+  onSwingTaken?: () => void;
+  onPuppyTrick?: (trick: SharedPuppyTrick) => void;
 }): Promise<SharedWorldConnection> {
   const endpoint = process.env.NEXT_PUBLIC_SHARED_WORLD_URL || "ws://127.0.0.1:2567";
   return new Promise((resolve, reject) => {
@@ -41,13 +50,23 @@ export function connectSharedWorld(options: {
     let socket: WebSocket | null = null;
     let connectedOnce = false;
     let closed = false;
-    let lastPose: { x: number; z: number; heading: number } | null = null;
+    let lastPose: ReturnType<typeof options.getPose> = null;
     let nextChatAt = 0;
+    let nextTrickAt = 0;
+    let trickTimer = 0;
     const publish = (gardenChanged = false) => options.onState({
       selfId, visitors: [...visitors.values()], garden, gardenChanged, chatHour, chat,
     });
     const connection: SharedWorldConnection = {
       sendGarden: action => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "garden", action })); },
+      sendPuppyTrick: trick => {
+        window.clearTimeout(trickTimer);
+        if (socket?.readyState !== WebSocket.OPEN) return;
+        const delay = Math.max(0, nextTrickAt - Date.now());
+        if (delay) { trickTimer = window.setTimeout(() => connection.sendPuppyTrick(trick), delay); return; }
+        nextTrickAt = Date.now() + 160;
+        socket.send(JSON.stringify({ type: "puppy_trick", trick }));
+      },
       sendChat: message => {
         if (socket?.readyState !== WebSocket.OPEN || Date.now() < nextChatAt) return false;
         try { socket.send(JSON.stringify({ type: "chat", message })); }
@@ -60,6 +79,7 @@ export function connectSharedWorld(options: {
         closed = true;
         window.clearInterval(interval);
         window.clearTimeout(retry);
+        window.clearTimeout(trickTimer);
         socket?.close();
       },
     };
@@ -77,6 +97,7 @@ export function connectSharedWorld(options: {
           retryDelay = 1000;
           lastPose = null;
           nextChatAt = 0;
+          nextTrickAt = 0;
           options.onChatCooldown(0);
           selfId = message.selfId;
           visitors.clear();
@@ -85,12 +106,15 @@ export function connectSharedWorld(options: {
           chatHour = message.chatHour;
           chat = message.chat;
           publish(true);
+          for (const trick of message.puppyTricks ?? []) options.onPuppyTrick?.(trick);
           window.clearInterval(interval);
           interval = window.setInterval(() => {
             const pose = options.getPose();
             if (pose && active.readyState === WebSocket.OPEN && (!lastPose
               || Math.hypot(pose.x - lastPose.x, pose.z - lastPose.z) > 0.01
-              || Math.abs(pose.heading - lastPose.heading) > 0.01)) {
+              || pose.y !== lastPose.y
+              || Math.abs(pose.heading - lastPose.heading) > 0.01
+              || JSON.stringify(pose.swing ?? null) !== JSON.stringify(lastPose.swing ?? null))) {
               lastPose = pose;
               active.send(JSON.stringify({ type: "move", ...pose }));
             }
@@ -101,7 +125,12 @@ export function connectSharedWorld(options: {
           publish();
         } else if (message.type === "move") {
           const visitor = visitors.get(message.id);
-          if (visitor) { Object.assign(visitor, { x: message.x, z: message.z, heading: message.heading }); publish(); }
+          if (visitor) { Object.assign(visitor, { x: message.x, y: message.y, z: message.z, heading: message.heading, swing: message.swing ?? null }); publish(); }
+        } else if (message.type === "swing_taken") {
+          options.onSwingTaken?.();
+        } else if (message.type === "puppy_trick") {
+          if (message.actor === selfId) nextTrickAt = Date.now() + 160;
+          options.onPuppyTrick?.(message.trick);
         } else if (message.type === "leave") {
           visitors.delete(message.id);
           publish();
@@ -131,6 +160,7 @@ export function connectSharedWorld(options: {
       };
       active.onclose = () => {
         window.clearInterval(interval);
+        window.clearTimeout(trickTimer);
         if (closed) return;
         if (!connectedOnce) { reject(new Error("Could not join the shared village.")); return; }
         if (joined) options.onDisconnect();

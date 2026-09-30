@@ -45,6 +45,7 @@ import type { BirdStatus } from "./birds";
 import { VILLAGERS } from "./villagers";
 import { GARDEN_KEY, CROP_NAMES, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
 import type { SharedChatEntry, SharedWorldConnection, SharedVisitor } from "./sharedWorld";
+import type { SwingSeat } from "./swings";
 
 type RadioPreferences = { mode: "radio" | "village"; station: RadioStationId; track: RadioTrack | null; favorites: RadioTrack[]; queue: RadioTrack[]; paused: boolean };
 const INITIAL_RADIO: RadioPreferences = { mode: "radio", station: "lofi", track: null, favorites: [], queue: [], paused: false };
@@ -148,6 +149,7 @@ function VillageScene() {
   const [nearPuppy, setNearPuppy] = useState<NearbyPuppy | null>(null);
   const [followingPuppies, setFollowingPuppies] = useState<NearbyPuppy[]>([]);
   const [tricksPuppyId, setTricksPuppyId] = useState<string | null>(null);
+  const [occupiedSwings, setOccupiedSwings] = useState<SwingSeat[]>([]);
   const puppyTricksToggle = useRef<HTMLButtonElement>(null);
   const [performanceReport, setPerformanceReport] = useState("");
   const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
@@ -318,7 +320,7 @@ function VillageScene() {
       ? new URLSearchParams(location.search).get("sharedTrial") !== "1"
       : !process.env.NEXT_PUBLIC_SHARED_WORLD_URL)) return;
     let cancelled = false;
-    let peopleKey = "", chatKey = "";
+    let peopleKey = "", chatKey = "", swingsKey = "";
     sharedTrialModeRef.current = true;
     setSharedTrialEnabled(true);
     void import("./sharedWorld").then(({ connectSharedWorld }) => connectSharedWorld({
@@ -343,6 +345,9 @@ function VillageScene() {
         const visitors = snapshot.visitors.filter(visitor => visitor.id !== snapshot.selfId);
         sharedVisitorsRef.current = visitors;
         engine.current?.setRemoteVisitors(visitors);
+        const swings = visitors.flatMap(visitor => visitor.swing ? [{ id: visitor.swing.id, index: visitor.swing.index }] : []);
+        const nextSwingsKey = JSON.stringify(swings);
+        if (nextSwingsKey !== swingsKey) { swingsKey = nextSwingsKey; setOccupiedSwings(swings); }
         const nextPeopleKey = snapshot.visitors.map(visitor => `${visitor.id}:${visitor.name}:${visitor.color}`).sort().join("|");
         if (nextPeopleKey !== peopleKey) {
           peopleKey = nextPeopleKey;
@@ -365,6 +370,12 @@ function VillageScene() {
       },
       onChatModerated: removedMessageIds => engine.current?.removeChatBubbles(removedMessageIds),
       onChatCooldown: until => { if (!cancelled) setChatCooldownUntil(until); },
+      onPuppyTrick: trick => { if (!cancelled) engine.current?.showPuppyTrick(trick); },
+      onSwingTaken: () => {
+        if (cancelled) return;
+        engine.current?.leaveSwing();
+        setNotice(preferences.current.language === "ja" ? "そのブランコには、ほかの人が座っています。" : "Someone is already on that swing. Try the other seat.");
+      },
       onDisconnect: () => {
         if (cancelled) return;
         sharedConnectedRef.current = false;
@@ -375,6 +386,7 @@ function VillageScene() {
         sharedPeopleRef.current = [];
         engine.current?.setRemoteVisitors([]);
         setSharedPeople([]);
+        setOccupiedSwings([]);
         setSharedStatus("Disconnected");
       },
     })).then(connection => {
@@ -430,8 +442,8 @@ function VillageScene() {
             ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}がなでてもらいに近づいてきます。`
             : `${puppy.name} comes closer for a gentle pet.`),
           puppyCommanded: (puppy, command) => {
-            setTricksPuppyId(null);
-            if (document.activeElement?.closest(".v-puppy-actions")) canvas.current?.querySelector("canvas")?.focus();
+            const trick = engine.current?.getPuppyTrick(puppy.id, command);
+            if (trick) sharedTrialRef.current?.sendPuppyTrick(trick);
             const action = {
               sit: ["sits down for a little rest.", "はちょこんと座りました。"],
               dance: ["dances with happy little hops!", "は楽しそうに踊っています！"],
@@ -737,6 +749,10 @@ function VillageScene() {
     setTricksPuppyId(null);
   }, [nearPuppy?.id, showPuppyActions]);
   useEffect(() => {
+    engine.current?.setPuppyInteraction(puppyTricksOpen ? nearPuppy?.id ?? null : null);
+    return () => engine.current?.setPuppyInteraction(null);
+  }, [puppyTricksOpen, nearPuppy?.id, ready]);
+  useEffect(() => {
     if (!showPuppyActions || !nearPuppy) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
@@ -967,7 +983,7 @@ function VillageScene() {
         </div>
       )}
       {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}${showPuppyActions ? " has-puppy-actions" : ""}${showSwingActions ? " has-swing-actions" : ""}${ridingSwing ? " is-swinging" : ""}`}>
-        {notice && <div className="v-notice" role="status">{notice}</div>}
+        {notice && !showPuppyActions && <div className="v-notice" role="status">{notice}</div>}
         {showSwingActions && <section className="v-swing-controls" aria-label={t("Swing controls", "ブランコの操作")}>
           <h2>{t("Meadow swings", "草原のブランコ")}</h2>
           {ridingSwing ? <>
@@ -1000,6 +1016,7 @@ function VillageScene() {
             </div>
           </> : nearSwing && <div className="v-swing-pump">
             {([0, 1] as const).map(index => <button key={index} className="v-interact" aria-keyshortcuts={nearSwing.index === index ? "E" : undefined}
+              disabled={occupiedSwings.some(seat => seat.id === nearSwing.id && seat.index === index)}
               onClick={() => { engine.current?.rideSwing(nearSwing.id, index); canvas.current?.querySelector("canvas")?.focus(); }}>
               {nearSwing.index === index && <kbd aria-hidden="true">E</kbd>}{t(index === 0 ? "Left swing" : "Right swing", index === 0 ? "左のブランコ" : "右のブランコ")}
             </button>)}
@@ -1044,7 +1061,9 @@ function VillageScene() {
             else if (command) engine.current?.commandPuppy(nearPuppy.id, command);
           }}>
           <div className="v-puppy-heading">
-            <h2><PawPrint size={18} aria-hidden="true" />{t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name)}</h2>
+            <PawPrint size={22} aria-hidden="true" />
+            <div><h2>{t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name)}</h2>
+              <p>{t(puppyIsFollowing ? "Walking with you" : PUPPY_INFO[nearPuppy.breed].breed, puppyIsFollowing ? "一緒にお散歩中" : "小さなお友だち")}</p></div>
           </div>
           <div className="v-puppy-main-actions">
             <button className="v-interact" aria-keyshortcuts="E" aria-label={t(`Pet ${nearPuppy.name}`, `${nearPuppy.name}をなでる`)}
@@ -1058,6 +1077,7 @@ function VillageScene() {
             <button ref={puppyTricksToggle} className="v-interact v-puppy-tricks-toggle" aria-keyshortcuts="T" aria-expanded={puppyTricksOpen} aria-controls="v-puppy-tricks"
               onClick={() => setTricksPuppyId(puppyTricksOpen ? null : nearPuppy.id)}>
               <kbd aria-hidden="true">T</kbd>{t("Tricks", "芸")}
+              <CaretDown size={12} aria-hidden="true" />
             </button>
           </div>
           <div id="v-puppy-tricks" className="v-puppy-trick-list" hidden={!puppyTricksOpen}>
@@ -1070,6 +1090,7 @@ function VillageScene() {
           {showPackHome && <button className="v-interact v-puppy-home" aria-keyshortcuts="H" onClick={() => engine.current?.sendPuppyHome()}>
             <kbd aria-hidden="true">H</kbd>{t(followingPuppies.length === 1 ? `Send ${followingPuppies[0].name} home` : `Send all ${followingPuppies.length} dogs home`, "犬たちを元の場所に戻す")}
           </button>}
+          {notice && <div className="v-puppy-response" role="status">{notice}</div>}
         </section>}
         {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />

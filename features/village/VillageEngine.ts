@@ -22,9 +22,9 @@ import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphics
 import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
-import type { SharedChatEntry, SharedVisitor } from "./sharedWorld";
+import type { SharedChatEntry, SharedVisitor, SharedSwingRide, SharedPuppyTrick } from "./sharedWorld";
 import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal } from "./focusCottageProps";
-import type { SwingSeat } from "./swings";
+import { SWING_MAX_ANGLE, type SwingSeat } from "./swings";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -53,7 +53,8 @@ export class VillageEngine {
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
   private character?: T.Object3D;
-  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement }>();
+  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number }>();
+  private pendingPuppyTricks = new Map<string, SharedPuppyTrick>();
   private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
@@ -539,6 +540,8 @@ export class VillageEngine {
     this.scene.add(this.birds.group);
     this.puppies = new PuppyPack(puppyKit.scene, puppyKit.animations, world.authored.puppies, world.colliders, world.authored,
       (breed, position, kind) => this.callbacks.puppySound?.(breed, position, kind));
+    for (const trick of this.pendingPuppyTricks.values()) this.puppies.sharedTrick(trick);
+    this.pendingPuppyTricks.clear();
     this.scene.add(this.puppies.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
       companion: id => this.callbacks.companion?.(id), crumbs: id => this.callbacks.crumbs?.(id), visitTea: () => this.callbacks.visitTea?.(),
@@ -930,7 +933,26 @@ export class VillageEngine {
     }
   }
   setGarden(state: GardenState) { this.gardenState = state; this.garden?.sync(state); this.dialogue?.setMintAvailable(state.mint > 0); }
-  getPlayerPose() { return { x: this.player.position.x, z: this.player.position.z, heading: this.player.rotation.y }; }
+  getPlayerPose() {
+    const swing = this.world?.swings.find(value => value.placement.id === this.ridingSwing?.id);
+    const pendulum = swing && this.ridingSwing ? swing.pendulums[this.ridingSwing.index] : null;
+    return { x: this.player.position.x, y: this.player.position.y, z: this.player.position.z, heading: this.player.rotation.y,
+      swing: pendulum && this.ridingSwing ? { ...this.ridingSwing, angle: pendulum.angle,
+        velocity: this.blocked || this.place ? 0 : pendulum.velocity } : null };
+  }
+  getPuppyTrick(id: string, command: PuppyCommand): SharedPuppyTrick | null {
+    const puppy = this.puppies?.puppies.find(value => value.info.id === id);
+    return puppy ? { id, command, x: puppy.actor.position.x, z: puppy.actor.position.z,
+      heading: puppy.heading, startedAt: Date.now() } : null;
+  }
+  showPuppyTrick(trick: SharedPuppyTrick) {
+    if (this.puppies) this.puppies.sharedTrick(trick);
+    else this.pendingPuppyTricks.set(trick.id, trick);
+  }
+  setPuppyInteraction(id: string | null) { this.puppies?.setInteraction(id); }
+  swingOccupied(id: string, index: 0 | 1) {
+    return [...this.remoteVisitors.values()].some(remote => remote.swing?.id === id && remote.swing.index === index);
+  }
   showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) {
     const id = entry.id ?? (entry.name === selfName ? selfId : [...this.remoteVisitors].find(([, remote]) => remote.name === entry.name)?.[0]);
     if (!id || (id !== selfId && !this.remoteVisitors.has(id))) return;
@@ -1082,9 +1104,13 @@ export class VillageEngine {
       remote.group.removeFromParent(); this.remoteVisitors.delete(id);
     }
     for (const visitor of visitors) {
+      const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
+      const height = visitor.y !== undefined && Number.isFinite(visitor.y) ? visitor.y
+        : seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z);
       let remote = this.remoteVisitors.get(visitor.id);
       if (!remote) {
         const group = new T.Group(), spirit = cloneSkeleton(this.character);
+        spirit.position.set(0, .62, 0); spirit.rotation.set(0, 0, 0);
         this.tintSpirit(spirit, visitor.color, true);
         this.glowSpirit(spirit, this.weatherBlend.night);
         const label = document.createElement("div");
@@ -1093,20 +1119,23 @@ export class VillageEngine {
         label.style.setProperty("--visitor-color", visitor.color);
         this.host.append(label);
         group.add(spirit);
-        const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
-        group.position.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
+        group.position.set(visitor.x, height, visitor.z);
         group.rotation.y = visitor.heading;
         this.scene.add(group);
-        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label };
+        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: this.elapsed };
         this.remoteVisitors.set(visitor.id, remote);
       }
       if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
       remote.name = visitor.name;
       remote.slot = visitor.slot;
       remote.label.style.setProperty("--visitor-color", visitor.color);
-      const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
-      remote.target.set(visitor.x, seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z), visitor.z);
+      remote.target.set(visitor.x, height, visitor.z);
       remote.heading = visitor.heading;
+      const ride = visitor.swing;
+      const swing = ride && [0, 1].includes(ride.index) && [ride.angle, ride.velocity].every(Number.isFinite)
+        && this.world?.swings.find(value => value.placement.id === ride.id);
+      if (JSON.stringify(remote.swing) !== JSON.stringify(swing ? ride : null)) remote.swingReceivedAt = this.elapsed;
+      remote.swing = swing && ride ? { ...ride } : null;
       remote.group.visible = this.place !== "focus";
     }
     this.resolveSeatCollision();
@@ -1321,7 +1350,7 @@ export class VillageEngine {
   toggleRun() { this.running = !this.running; this.reportMovement(true); }
   rideSwing(id: string, index: 0 | 1) {
     const swing = this.world?.swings.find(value => value.placement.id === id);
-    if (!swing || this.blocked || this.place || this.seatedBench || this.ridingSwing || !this.movement?.grounded) return false;
+    if (!swing || this.swingOccupied(id, index) || this.blocked || this.place || this.seatedBench || this.ridingSwing || !this.movement?.grounded) return false;
     swing.seatPoint(index, this.temp);
     if (this.temp.distanceTo(this.player.position) > 2.9) return false;
     this.puppies?.cancelPet(); this.puppyTrickId = null;
@@ -1430,6 +1459,7 @@ export class VillageEngine {
     const followers = this.puppies?.followers ?? [];
     const dogs = this.seatedBench ? 0 : followers.length;
     const packBack = Math.max(0, Math.min(1.8, (dogs - 1) * .3));
+    this.lookGoal.y -= packBack * .4;
     if (dogs && this.puppies) {
       let minX = this.player.position.x, maxX = minX, minZ = this.player.position.z, maxZ = minZ;
       for (const puppy of this.puppies.puppies) {
@@ -1437,10 +1467,14 @@ export class VillageEngine {
         minX = Math.min(minX, puppy.actor.position.x); maxX = Math.max(maxX, puppy.actor.position.x);
         minZ = Math.min(minZ, puppy.actor.position.z); maxZ = Math.max(maxZ, puppy.actor.position.z);
       }
-      this.lookGoal.x = (minX + maxX) * .5;
-      this.lookGoal.z = (minZ + maxZ) * .5;
+      const offsetX = (minX + maxX) * .5 - this.player.position.x;
+      const offsetZ = (minZ + maxZ) * .5 - this.player.position.z;
+      // Keep the player as the anchor when a dog falls behind or rounds a corner.
+      const weight = Math.min(1, 1.2 / Math.max(.001, Math.hypot(offsetX, offsetZ)));
+      this.lookGoal.x += offsetX * weight;
+      this.lookGoal.z += offsetZ * weight;
     }
-    const distance = this.seatedBench ? 3 : this.distance + (dogs ? Math.min(4.6, 1 + dogs * .6) : 0);
+    const distance = this.seatedBench ? 3 : this.distance + (dogs ? Math.min(2.8, 1.6 + (dogs - 1) * .24) : 0);
     this.cameraGoal.copy(this.player.position).add(this.temp.set(
       this.lookGoal.x - this.player.position.x + Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
       1.35 + Math.sin(this.pitch) * distance + packBack * .4,
@@ -1515,7 +1549,8 @@ export class VillageEngine {
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 14));
     }
     if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing) {
-      const swing = this.world.swings.map(value => value.nearest(this.player.position)).find(value => value !== null) ?? null;
+      const swing = this.world.swings.map(value => value.nearest(this.player.position,
+        index => this.swingOccupied(value.placement.id, index))).find(value => value !== null) ?? null;
       if (swing?.id !== this.nearSwing?.id || swing?.index !== this.nearSwing?.index) { this.nearSwing = swing; this.callbacks.nearSwing?.(swing); }
       let near: PlaceId | null = null,
         dist = 4;
@@ -1619,7 +1654,9 @@ export class VillageEngine {
         p.needsUpdate = true;
       }
     }
-    const blend = this.reducedMotion ? 1 : 1 - Math.exp(-dt * 7);
+    const cameraResponse = !this.place && !this.seatedBench && !this.ridingSwing
+      && (this.puppies?.followers.length ?? 0) > 1 && movement.speed > .12 ? 14 : 7;
+    const blend = this.reducedMotion ? 1 : 1 - Math.exp(-dt * cameraResponse);
     this.camera.position.lerp(this.cameraGoal, blend);
     if (!this.place) this.camera.position.y = Math.max(this.camera.position.y, floorHeight(this.camera.position.x, this.camera.position.z) + .3);
     this.currentLook.lerp(this.lookGoal, blend);
@@ -1720,7 +1757,15 @@ export class VillageEngine {
     this.birds?.update(dt, this.elapsed, this.reducedMotion, this.camera, this.player.position,
       this.life?.caretakerPresent ?? false, this.place !== "focus" && !this.blocked, otherBlobNearby);
     for (const remote of this.remoteVisitors.values()) {
-      remote.group.position.lerp(remote.target, 1 - Math.exp(-dt * 12));
+      const ride = remote.swing, swing = ride && this.world.swings.find(value => value.placement.id === ride.id);
+      if (ride && swing) {
+        // Predict only a short gap between packets, then hold if the rider stops sending.
+        const age = Math.min(.24, Math.max(0, this.elapsed - remote.swingReceivedAt));
+        const angle = T.MathUtils.clamp(ride.angle + ride.velocity * age, -SWING_MAX_ANGLE, SWING_MAX_ANGLE);
+        swing.showSharedMotion(ride.index, angle, ride.velocity, dt);
+        swing.seatPoint(ride.index, remote.group.position); remote.group.position.y -= .62;
+        remote.heading = swing.placement.yaw;
+      } else remote.group.position.lerp(remote.target, 1 - Math.exp(-dt * 12));
       const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
       remote.group.traverse(node => {

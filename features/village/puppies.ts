@@ -5,6 +5,7 @@ import { floorHeight, type Collider } from "./environment";
 import { VillageMovement } from "./movement";
 import { VillageNavigation } from "./navigation";
 import type { AuthoredWorld, PuppyBreed, PuppyPlacement } from "./worldLayout";
+import type { SharedPuppyTrick } from "./sharedWorld";
 
 export const PUPPY_INFO: Record<PuppyBreed, { model: string; name: string; breed: string; japanese: string }> = {
   corgi: { model: "Mochi", name: "Mochi", breed: "corgi", japanese: "モチ" },
@@ -33,6 +34,7 @@ type Puppy = {
   nextFollowPath: number; followGoal: [number, number] | null; stuckAge: number;
   command: PuppyCommand | null; commandAge: number; animation: PuppyAnimation;
   petTarget: [number, number] | null; petApproachAge: number;
+  sharedStartedAt: number | null;
 };
 
 const PATROLS: Record<PuppyBreed, [number, number][]> = {
@@ -66,6 +68,7 @@ export class PuppyPack {
   private openAge = 0;
   private followHeading = 0;
   private previousPlayer = new T.Vector3();
+  private interactionId: string | null = null;
 
   constructor(source: T.Object3D, clips: T.AnimationClip[], placements: PuppyPlacement[], colliders: Collider[], authored: AuthoredWorld,
     private onSound: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void) {
@@ -108,7 +111,7 @@ export class PuppyPack {
         waypoint: route.length > 1 ? 1 : 0, path: [], pause: 2 + index * 1.5,
         petAge: 100, petting: false, heading: placement.yaw, hearts, heightOffset,
         nextFollowPath: 0, followGoal: null, stuckAge: 0,
-        command: null, commandAge: 0, petTarget: null, petApproachAge: 0,
+        command: null, commandAge: 0, petTarget: null, petApproachAge: 0, sharedStartedAt: null,
         animation: new PuppyAnimation(model, clips, PUPPY_INFO[placement.breed].model, index * 1.9) });
     }
   }
@@ -163,10 +166,16 @@ export class PuppyPack {
 
   nearest(player: T.Vector3): NearbyPuppy | null {
     if (this.pettingPuppy) return null;
+    const held = this.puppies.find(puppy => puppy.info.id === this.interactionId);
+    if (held && Math.hypot(player.x - held.actor.position.x, player.z - held.actor.position.z) < 2.65
+      && held.movement.canWalkTo(player.x, player.z)) return held.info;
+    this.interactionId = null;
     const closest = this.puppies.filter(p => !p.petting && !p.petTarget).map(p => ({ p, distance: Math.hypot(player.x - p.actor.position.x, player.z - p.actor.position.z) }))
       .filter(value => value.distance < 2.35 && value.p.movement.canWalkTo(player.x, player.z)).sort((a, b) => a.distance - b.distance)[0];
     return closest?.p.info ?? null;
   }
+
+  setInteraction(id: string | null) { this.interactionId = id; }
 
   pet(id: string, player: T.Vector3): boolean {
     const puppy = this.puppies.find(p => p.info.id === id);
@@ -240,6 +249,7 @@ export class PuppyPack {
     const puppy = this.puppies.find(value => value.info.id === id);
     if (!puppy || this.nearest(player)?.id !== id || puppy.petting) return null;
     puppy.command = action;
+    puppy.sharedStartedAt = null;
     puppy.commandAge = 0;
     puppy.animation.start(action);
     puppy.pause = 1.1;
@@ -252,6 +262,21 @@ export class PuppyPack {
       this.onSound(puppy.info.breed, [puppy.actor.position.x, puppy.actor.position.y + .6, puppy.actor.position.z], "happy");
     }
     return puppy.info;
+  }
+
+  sharedTrick(trick: SharedPuppyTrick) {
+    const puppy = this.puppies.find(value => value.info.id === trick.id);
+    const age = Math.max(0, (Date.now() - trick.startedAt) / 1000);
+    if (!puppy || !PUPPY_TRICKS.some(value => value.command === trick.command)
+      || ![trick.x, trick.z, trick.heading, trick.startedAt].every(Number.isFinite)
+      || age >= puppy.animation.duration(trick.command) || !puppy.movement.clear(trick.x, trick.z)) return false;
+    puppy.petting = false; puppy.petTarget = null; puppy.path = []; puppy.stuckAge = 0;
+    puppy.movement.settle(trick.x, trick.z);
+    puppy.actor.position.set(trick.x, puppy.movement.position.y + puppy.heightOffset, trick.z);
+    puppy.actor.rotation.y = puppy.heading = trick.heading;
+    puppy.command = trick.command; puppy.commandAge = age; puppy.sharedStartedAt = trick.startedAt;
+    puppy.animation.start(trick.command, age);
+    return true;
   }
 
   update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, active: boolean,
@@ -295,8 +320,8 @@ export class PuppyPack {
       const { actor, movement } = puppy;
       if (active && puppy.petting) puppy.petAge += delta;
       if (puppy.petting && puppy.petAge >= 3) { puppy.petting = false; puppy.petTarget = null; }
-      if (active && puppy.command) {
-        puppy.commandAge += delta;
+      if (puppy.command && (active || puppy.sharedStartedAt !== null)) {
+        puppy.commandAge = puppy.sharedStartedAt === null ? puppy.commandAge + delta : Math.max(0, (Date.now() - puppy.sharedStartedAt) / 1000);
         if (puppy.commandAge >= puppy.animation.duration(puppy.command)) puppy.command = null;
       }
       let walking = false;
@@ -319,7 +344,8 @@ export class PuppyPack {
           if (next) this.walkToward(puppy, delta, next, 1.15, player); else movement.pause();
         }
         if (puppy.petApproachAge > 5 || Math.hypot(player.x - puppy.petTarget[0], player.z - puppy.petTarget[1]) > 1.6) this.cancelPet();
-      } else if (slot >= 0) {
+      } else if (puppy.info.id === this.interactionId) movement.pause();
+      else if (slot >= 0) {
         const baseTarget = this.trailingPoint(FOLLOW_DISTANCE + (this.singleFile ? slot * 1.15 : Math.floor(slot / 2) * 1.35));
         const side = this.singleFile ? 0 : (slot % 2 ? 1 : -1) * FOLLOW_SIDE;
         const target: [number, number] = [baseTarget[0] + Math.cos(this.followHeading) * side, baseTarget[1] - Math.sin(this.followHeading) * side];
@@ -374,7 +400,9 @@ export class PuppyPack {
       const desiredHeading = puppy.petting ? Math.atan2(player.x - actor.position.x, player.z - actor.position.z) : puppy.heading;
       const turn = T.MathUtils.euclideanModulo(desiredHeading - actor.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       if (active) actor.rotation.y += turn * (1 - Math.exp(-delta * 6));
-      puppy.animation.update(delta, movement.speed, puppy.command, puppy.petting, reduced, active);
+      if (puppy.sharedStartedAt !== null && puppy.command) puppy.animation.actions[puppy.command].time = puppy.commandAge;
+      puppy.animation.update(puppy.sharedStartedAt !== null && puppy.command ? 0 : delta,
+        movement.speed, puppy.command, puppy.petting, reduced, active, delta);
       puppy.hearts.forEach((heart, i) => {
         const age = puppy.petAge - .35 - i * .28;
         heart.visible = active && puppy.petting && !reduced && age > 0 && age < 1.45;

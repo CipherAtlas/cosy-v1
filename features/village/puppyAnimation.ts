@@ -32,15 +32,16 @@ export class PuppyAnimation {
     this.mixer.update(0);
   }
 
-  start(command: PuppyCommand | "pet") {
+  start(command: PuppyCommand | "pet", age = 0) {
     this.performance = command;
     this.actions[command].reset().setEffectiveWeight(this.weights[command]).play();
+    this.actions[command].time = age;
   }
 
   duration(command: PuppyCommand) { return this.actions[command].getClip().duration; }
 
   update(delta: number, speed: number, command: PuppyCommand | null, petting: boolean,
-    reduced: boolean, active: boolean) {
+    reduced: boolean, active: boolean, blendDelta = delta) {
     if (!active) return;
     const performance = command ?? (petting ? "pet" : null);
     if (performance && performance !== this.performance) this.start(performance);
@@ -55,7 +56,7 @@ export class PuppyAnimation {
       : { idle: 1 - moving, walk: moving * (1 - run), run: moving * run };
     // All outgoing actions keep their present weights: rapid commands cannot snap
     // back to the beginning of a previous crossfade.
-    const blend = 1 - Math.exp(-delta * 10);
+    const blend = 1 - Math.exp(-blendDelta * 10);
     for (const [key, action] of Object.entries(this.actions)) {
       this.weights[key] = T.MathUtils.lerp(this.weights[key], targets[key] ?? 0, blend);
       if (this.weights[key] < .0001) this.weights[key] = 0;

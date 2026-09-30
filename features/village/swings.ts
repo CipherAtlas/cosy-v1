@@ -110,9 +110,18 @@ export class VillageSwingSet {
   seatPoint(index: 0 | 1, target: T.Vector3) {
     return this.pivots[index].localToWorld(target.set(0, -SWING_LENGTH, 0));
   }
-  nearest(position: T.Vector3): SwingSeat | null {
+  showSharedMotion(index: 0 | 1, angle: number, velocity: number, dt: number) {
+    const pendulum = this.pendulums[index];
+    pendulum.angle = T.MathUtils.lerp(pendulum.angle, angle, 1 - Math.exp(-dt * 18));
+    pendulum.velocity = velocity;
+    this.pivots[index].rotation.x = -pendulum.angle;
+    this.seatCarriers[index].rotation.x = pendulum.angle;
+    this.root.updateMatrixWorld(true);
+  }
+  nearest(position: T.Vector3, occupied?: (index: 0 | 1) => boolean): SwingSeat | null {
     let distance = 2.5, nearest: SwingSeat | null = null;
     for (const index of [0, 1] as const) {
+      if (occupied?.(index)) continue;
       this.seatPoint(index, this.point);
       const d = Math.hypot(this.point.x - position.x, this.point.z - position.z);
       if (d < distance && Math.abs(this.point.y - position.y) < 1.65) { distance = d; nearest = { id: this.placement.id, index }; }

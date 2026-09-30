@@ -1,0 +1,121 @@
+{
+  "straggler": {
+    "bias": 1.1999999999999993,
+    "distance": 8.265057253545033
+  },
+  "visibility": [
+    {
+      "width": 1280,
+      "height": 720,
+      "inFrame": true,
+      "maxY": 0.9508249848294089
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "inFrame": true,
+      "maxY": 0.9508249848294089
+    },
+    {
+      "width": 1024,
+      "height": 640,
+      "inFrame": true,
+      "maxY": 0.9508249848294089
+    }
+  ],
+  "runs": [
+    {
+      "fps": 30,
+      "maxLag": 2.5282378894272033,
+      "sustainedMaxLag": 0.3664470191926325,
+      "maxBias": 1.2000000000000017,
+      "playerOffscreen": 0,
+      "stopLag": 0.008609650902050986
+    },
+    {
+      "fps": 60,
+      "maxLag": 3.1836635648529104,
+      "sustainedMaxLag": 0.4306789471876943,
+      "maxBias": 1.2000000000000017,
+      "playerOffscreen": 0,
+      "stopLag": 0.008919203106867564
+    },
+    {
+      "fps": 120,
+      "maxLag": 3.5714940439415828,
+      "sustainedMaxLag": 0.413045416220349,
+      "maxBias": 1.200000000000002,
+      "playerOffscreen": 0,
+      "stopLag": 0.012921604357670102
+    }
+  ],
+  "reducedLag": 0,
+  "soloBias": 0,
+  "checks": [
+    "A straggler keeps the camera target close to the player",
+    "A six-dog pack does not pull the camera far behind the player",
+    "1280 by 720: all six dog heads and paws remain in frame",
+    "1366 by 768: all six dog heads and paws remain in frame",
+    "1024 by 640: all six dog heads and paws remain in frame",
+    "30 fps: sprinting and turning keep camera lag below 0.6 m after the turn transition",
+    "30 fps: stopping settles the camera within half a second",
+    "30 fps: the moving player stays in view",
+    "60 fps: sprinting and turning keep camera lag below 0.6 m after the turn transition",
+    "60 fps: stopping settles the camera within half a second",
+    "60 fps: the moving player stays in view",
+    "120 fps: sprinting and turning keep camera lag below 0.6 m after the turn transition",
+    "120 fps: stopping settles the camera within half a second",
+    "120 fps: the moving player stays in view",
+    "Reduced motion retains immediate camera following",
+    "Sending the dogs home restores the solo camera target",
+    "No browser page errors"
+  ],
+  "errors": [],
+  "baseline": {
+    "straggler": {
+      "bias": 4.25,
+      "distance": 12.958350519432187
+    },
+    "visibility": [
+      {
+        "width": 1366,
+        "height": 768,
+        "inFrame": true,
+        "maxY": 0.5603677330191634
+      },
+      {
+        "width": 1024,
+        "height": 640,
+        "inFrame": true,
+        "maxY": 0.5603677330191634
+      }
+    ],
+    "runs": [
+      {
+        "fps": 30,
+        "maxLag": 4.168641023608798,
+        "maxBias": 4.613908238571311,
+        "playerOffscreen": 0,
+        "stopLag": 0.2519211979583583
+      },
+      {
+        "fps": 60,
+        "maxLag": 4.657837049216899,
+        "maxBias": 4.763620749438155,
+        "playerOffscreen": 0,
+        "stopLag": 0.23970544314766729
+      },
+      {
+        "fps": 120,
+        "maxLag": 4.929223943236669,
+        "maxBias": 4.7488222887346385,
+        "playerOffscreen": 0,
+        "stopLag": 0.24091776694412587
+      }
+    ],
+    "reducedLag": 0,
+    "soloBias": 0,
+    "errors": []
+  },
+  "scope": "Local camera only; no publication or live multiplayer verification."
+}

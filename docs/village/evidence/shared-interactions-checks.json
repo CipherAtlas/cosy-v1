@@ -1,0 +1,96 @@
+{
+  "checks": [
+    "Both visitors join the same local Worker",
+    "Observer sees the visitor attached to the moving seat in all samples",
+    "Remote rider follows the vertical arc",
+    "Occupied seat is visibly disabled for another visitor",
+    "Getting off releases the shared seat",
+    "Clicking Dance keeps the trick menu open",
+    "Shared dog dances at the requesting visitor\u2019s dog position",
+    "Focused keyboard trick keeps the menu open",
+    "Reconnect resumes the active trick at its current clip time",
+    "Spin animates on the other client and keeps the menu open",
+    "Bow animates on the other client and keeps the menu open",
+    "Wave animates on the other client and keeps the menu open",
+    "Roll over animates on the other client and keeps the menu open",
+    "Dog stays beside the open controls after its trick finishes",
+    "Completed tricks keep the list open",
+    "1280\u00d7720 panel fits the desktop window",
+    "1280\u00d7720 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1366\u00d7768 panel fits the desktop window",
+    "1366\u00d7768 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1440\u00d7900 panel fits the desktop window",
+    "1440\u00d7900 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1024\u00d7640 panel fits the desktop window",
+    "1024\u00d7640 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "844\u00d7390 panel fits the desktop window",
+    "844\u00d7390 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "Escape closes the list explicitly",
+    "Closing Tricks releases patrol and follow movement",
+    "Leaving the interaction releases the dog",
+    "Both clients have no captured page errors"
+  ],
+  "swingSamples": [
+    {
+      "gap": 0,
+      "angle": 0.1494038490484315,
+      "height": 2.607360026730488
+    },
+    {
+      "gap": 0,
+      "angle": 0.22080891553828744,
+      "height": 2.642179408064547
+    },
+    {
+      "gap": 0,
+      "angle": 0.2993206865862224,
+      "height": 2.695665898265093
+    },
+    {
+      "gap": 0,
+      "angle": 0.3842318552150995,
+      "height": 2.7710593960232397
+    },
+    {
+      "gap": 0,
+      "angle": 0.4672730076335738,
+      "height": 2.8619190290397145
+    },
+    {
+      "gap": 0,
+      "angle": 0.5624977678126237,
+      "height": 2.9861359223997916
+    },
+    {
+      "gap": 0,
+      "angle": 0.6316224729079201,
+      "height": 3.089101979456655
+    },
+    {
+      "gap": 0,
+      "angle": 0.7002832120795462,
+      "height": 3.201490778086641
+    },
+    {
+      "gap": 0,
+      "angle": 0.7546288454769007,
+      "height": 3.2972455213391925
+    },
+    {
+      "gap": 0,
+      "angle": 0.7964151941569141,
+      "height": 3.3747634047730566
+    },
+    {
+      "gap": 0,
+      "angle": 0.8203740123177478,
+      "height": 3.420677589617129
+    },
+    {
+      "gap": 0,
+      "angle": 0.8284795552394437,
+      "height": 3.4364470468490333
+    }
+  ],
+  "errors": []
+}
