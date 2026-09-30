@@ -1,0 +1,131 @@
+{
+  "applicationCommit": "a5280c1b17b36bc6c732a3e13cc6371f76011ead",
+  "workflow": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36745769419",
+  "conclusion": "success",
+  "httpChecks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/mood/",
+      "status": 200
+    },
+    {
+      "path": "/gratitude/",
+      "status": 200
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/",
+      "status": 404
+    },
+    {
+      "path": "/api/layouts",
+      "status": 404
+    },
+    {
+      "path": "/api/apply",
+      "status": 404
+    },
+    {
+      "path": "/village-editor/",
+      "status": 404
+    }
+  ],
+  "layoutMatchesRelease": true,
+  "scope": "Live Chrome on https://cosy.sabarg.com; physical hardware and Safari not verified",
+  "browser": {
+    "checks": [
+      "Arrival button gives pointer press feedback",
+      "Header controls give pointer feedback",
+      "Portalled menu keyboard activation animates once",
+      "Direct T shortcut animates Tricks",
+      "Dog trick shortcut animates its matching control",
+      "Feedback keeps the trick list open",
+      "Swing panel, buttons and keycaps exactly share the dog color/border/spacing treatment",
+      "W shortcut animates Forward",
+      "Press animation starts without delaying pumping",
+      "Button visibly dips in scale during its press",
+      "Button returns to its resting scale",
+      "Down-arrow shortcut animates Back",
+      "Space with Forward focused animates Brake",
+      "Focused Space still brakes",
+      "1280x720 swing panel fits with 44 px buttons and square keycaps",
+      "1366x768 swing panel fits with 44 px buttons and square keycaps",
+      "1024x640 swing panel fits with 44 px buttons and square keycaps",
+      "844x390 swing panel fits with 44 px buttons and square keycaps",
+      "Reduced motion uses a still highlight",
+      "Disabled controls never animate",
+      "NPC F shortcut gives the real Chat button press feedback",
+      "NPC pointer activation gives press feedback",
+      "Activity buttons give press feedback",
+      "Typing in an editable activity field produces no shortcut feedback",
+      "Browser captured no application errors"
+    ],
+    "errors": [],
+    "dogStyle": {
+      "panel": {
+        "backgroundColor": "rgba(23, 57, 43, 0.72)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.35)",
+        "borderRadius": "16px",
+        "padding": "12px",
+        "backdropFilter": "blur(10px)"
+      },
+      "button": {
+        "backgroundColor": "rgba(255, 242, 208, 0.06)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.3)",
+        "borderRadius": "8px",
+        "padding": "6px 7px",
+        "backdropFilter": "none"
+      },
+      "kbd": {
+        "backgroundColor": "rgba(255, 242, 208, 0.1)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.5)",
+        "borderRadius": "4px",
+        "padding": "0px",
+        "backdropFilter": "none"
+      }
+    },
+    "swingStyle": {
+      "panel": {
+        "backgroundColor": "rgba(23, 57, 43, 0.72)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.35)",
+        "borderRadius": "16px",
+        "padding": "12px",
+        "backdropFilter": "blur(10px)"
+      },
+      "button": {
+        "backgroundColor": "rgba(255, 242, 208, 0.06)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.3)",
+        "borderRadius": "8px",
+        "padding": "6px 7px",
+        "backdropFilter": "none"
+      },
+      "kbd": {
+        "backgroundColor": "rgba(255, 242, 208, 0.1)",
+        "color": "rgb(255, 248, 232)",
+        "borderTopColor": "rgba(255, 242, 208, 0.5)",
+        "borderRadius": "4px",
+        "padding": "0px",
+        "backdropFilter": "none"
+      }
+    }
+  }
+}
