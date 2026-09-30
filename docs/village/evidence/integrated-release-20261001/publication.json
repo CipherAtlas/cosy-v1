@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-01",
+  "sourceCommit": "9e76eaf918f978036a8861a5aad4d7f3d2d25eef",
+  "workerVersion": "7888d371-63a9-4487-a142-d780a37f0e3c",
+  "previousWorkerVersion": "8693cad0-6aba-4320-9693-e59756ea6206",
+  "pagesRun": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36762483970",
+  "pagesConclusion": "success",
+  "buildJob": "success",
+  "deployJob": "success",
+  "liveSite": "https://cosy.sabarg.com/",
+  "workerHealth": {
+    "ok": true
+  },
+  "liveBrowserChecks": 20,
+  "liveHttpChecks": 12,
+  "existingVisitors": "reload to receive matching client",
+  "limits": [
+    "Safari and physical hardware unverified",
+    "64-client runtime load unverified",
+    "Long-session performance and listening unverified"
+  ]
+}

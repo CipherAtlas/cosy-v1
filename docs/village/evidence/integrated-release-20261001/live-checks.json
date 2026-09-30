@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-01",
+  "sourceCommit": "9e76eaf918f978036a8861a5aad4d7f3d2d25eef",
+  "workerVersion": "7888d371-63a9-4487-a142-d780a37f0e3c",
+  "checks": [
+    "Two actual production browser clients share visitor presence",
+    "Production Worker and renderer both contain the four-dog layout",
+    "Production Worker and renderer both contain the four-dog layout",
+    "Other visitors see disabled actions for an owned dog",
+    "Production Worker rejects a competing dog action",
+    "The held dog remains stationary in the shared world",
+    "An accepted trick is broadcast to the observing production client",
+    "The actual trick list remains open after the shared action",
+    "Closing the live interaction releases dog ownership",
+    "Actual NPC chat keyboard control publishes its shared owner",
+    "Private focus hides other visitors while both cottages remain available",
+    "Private focus hides other visitors while both cottages remain available",
+    "The new cottage cat loads in the visible nap spot",
+    "Live cottage controls fit 1280×720",
+    "Live cottage controls fit 1024×640",
+    "Actual cottage pet button acts only in the visitor’s private room",
+    "Live cottage exit restores the outdoor scene",
+    "The other visitor stays in their private cottage after the first leaves",
+    "Live phone identity is refused before world assets, canvas or shared connection",
+    "No captured production browser page errors"
+  ],
+  "errors": [],
+  "scope": "Two actual production Chrome clients; controlled actor claims were released; no messages or garden crops changed"
+}

@@ -1,5 +1,7 @@
 # Cosy Layout Studio
 
+The [2026-10-01 village release](../../VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published) publishes the four-dog layout, revised bird bowl and cottage assets. This editor and its server/save APIs remain local-only; its source is committed alongside the game. Forty cottage-asset and five bowl-editor checks passed with temporary saves and unchanged protected presets.
+
 A private map editor using the village’s actual Three.js artwork. It runs outside Next.js, binds to your computer’s loopback address, and is excluded from the public static export. It uses the project’s existing TypeScript and Three.js installation plus Python 3; no new dependencies are required. Paths, oak fence lines, meadow grass, trees, walkable areas, oak meadow benches, crumb pouches, existing cottage/spire positions and resident routes feed the playable scene through `public/village/world-layout.json`.
 
 ```bash

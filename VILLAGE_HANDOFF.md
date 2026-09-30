@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-01 — integrated village release prepared
+## 2026-10-01 — integrated village release published
 
-The complete pending shared-world, four-dog, bird and private-cottage changes are approved for commit/push/deployment. Current source typecheck, two isolated static exports, Worker/client regressions, scene collision parity, 26 real three-client checks, 17 cottage UI checks and 45 editor checks passed. One concurrent petting-test timeout passed on an unchanged sequential rerun. The exported site excludes private tooling. [Release preparation and evidence](VILLAGE_BUILD.md#2026-10-01--integrated-village-release-preparation) supersede older unresolved full-typecheck/export notes below. The matching Worker must precede the published Pages client; live verification is pending, and existing visitors need to reload afterward.
+The complete shared-world, four-dog, bird and private-cottage changes are pushed in source commit `9e76eaf` and published by successful [Pages run 36762483970](https://github.com/CipherAtlas/cosy-v1/actions/runs/36762483970). Matching Worker version `7888d371-63a9-4487-a142-d780a37f0e3c` deployed before the Pages client reached visitors; its preceding version is `8693cad0-6aba-4320-9693-e59756ea6206`. Twenty actual production two-client Chrome checks, twelve HTTP/asset checks and Worker health passed. The layout and cat GLB match committed bytes, and private-tooling paths remain 404. [Release, local checks and remaining limits](VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published) supersede older pending-publication and unresolved full-typecheck/export notes below. Existing visitors must reload. Preserve private focus and Worker-owned outdoor interactions; Safari, physical hardware, screen readers, 64-client runtime load and long sessions remain open.
 
 ## 2026-09-30 — five-minute IP kicks published
 
