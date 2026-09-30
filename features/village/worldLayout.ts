@@ -15,6 +15,7 @@ export type AuthoredWorld = {
   walkable: { id: string; x: number; z: number; radiusX: number; radiusZ: number; yaw: number }[];
   trees: { id: string; x: number; z: number; y: number; rotation: [number, number, number]; scale: [number, number, number] }[];
   benches: { id: string; x: number; y: number; z: number; yaw: number; scale: [number, number, number] }[];
+  swings: AuthoredWorld["benches"];
   crumbPouches: { id: string; x: number; y: number; z: number; rotation: [number, number, number]; scale: [number, number, number] }[];
   puppies: PuppyPlacement[];
   routes: Partial<Record<ResidentId, ResidentRoute>>;
@@ -31,7 +32,7 @@ export function projectWorldLayout(source: unknown): AuthoredWorld {
   const layout = source as WorldLayout;
   if (!layout || layout.version !== 1 || layout.base !== "cosy-village-2026-09-27" || !Array.isArray(layout.objects))
     throw Error("The playable world layout has an unsupported format.");
-  const result: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], crumbPouches: [], puppies: [], routes: {} };
+  const result: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], swings: [], crumbPouches: [], puppies: [], routes: {} };
   for (const item of layout.objects) {
     if (!item?.visible || !Array.isArray(item.position) || !Array.isArray(item.rotation) || !Array.isArray(item.scale)) continue;
     const [x, y, z] = item.position;
@@ -64,6 +65,11 @@ export function projectWorldLayout(source: unknown): AuthoredWorld {
     if (item.asset === "walkable-region") result.walkable.push({ id: item.id, x, z, radiusX: 12 * item.scale[0], radiusZ: 12 * item.scale[2], yaw: item.rotation[1] * Math.PI / 180 });
     if (/^tree-\d+$/.test(item.asset)) result.trees.push({ id: item.id, x, y, z, rotation: item.rotation.map(value => value * Math.PI / 180) as [number, number, number], scale: item.scale });
     if (item.asset === "oak-bench") result.benches.push({ id: item.id, x, y, z, yaw: item.rotation[1] * Math.PI / 180, scale: item.scale });
+    if (item.asset === "meadow-swings") {
+      if (item.scale.some(value => value <= 0 || Math.abs(value - item.scale[0]) > .001) || Math.abs(item.rotation[0]) > .001 || Math.abs(item.rotation[2]) > .001)
+        throw Error("Swing sets need upright rotation and uniform scale for their pendulum physics.");
+      result.swings.push({ id: item.id, x, y, z, yaw: item.rotation[1] * Math.PI / 180, scale: item.scale });
+    }
     if (item.asset === "bird-crumb-pouch") result.crumbPouches.push({ id: item.id, x, y, z,
       rotation: item.rotation.map(value => value * Math.PI / 180) as [number, number, number], scale: item.scale });
     if (item.asset.startsWith("puppy-")) {

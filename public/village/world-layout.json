@@ -6021,9 +6021,9 @@
       "locked": false
     },
     {
-      "id": "sunrise-meadow-bench",
-      "asset": "oak-bench",
-      "name": "Sunrise meadow bench",
+      "id": "sunrise-meadow-swings",
+      "asset": "meadow-swings",
+      "name": "Sunrise meadow swings",
       "position": [
         59,
         2.397839,

@@ -39,11 +39,17 @@ export type Collider = {
 export const riverX = (z: number) => -11 + Math.sin(z * 0.052) * 3;
 export const roadX = (z: number) => Math.sin(z * 0.048) * 2;
 export const HEARTH = { x: -5.8, z: -19, radius: 1, pavingRadius: 3.6, pavingHeight: .14 };
-export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3, northEastOpening: 1.8 };
+export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3, approachOpening: 1.8, collisionMargin: .08 };
+// Continuous footprints include the coping, end posts and a little body clearance.
+export const BRIDGE_BARRIERS: Collider[] = [-1, 1].map(side => ({
+  x: BRIDGE.x, z: BRIDGE.z + side * (BRIDGE.width / 2 + .22),
+  w: BRIDGE.length - BRIDGE.approachOpening * 2 + .16 + BRIDGE.collisionMargin * 2,
+  d: .64 + BRIDGE.collisionMargin * 2,
+}));
 export const POND = { x: -27, z: -14, rx: 9, rz: 12, y: -.3 };
 export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
 export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5, feedingPerimeter: 7 };
-let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], crumbPouches: [], puppies: [], routes: {} };
+let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], swings: [], crumbPouches: [], puppies: [], routes: {} };
 export function setAuthoredWorld(world: AuthoredWorld) { authoredWorld = world; }
 export function inWalkableWorld(x: number, z: number) {
   if (Math.abs(x) <= 40 && z >= -48 && z <= 42) return true;

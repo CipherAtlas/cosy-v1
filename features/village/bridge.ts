@@ -7,15 +7,15 @@ export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, c
   const masonry = stone.clone(); masonry.name = "Bridge limestone"; masonry.color.set("#c2c4b4");
   const { x: center, z, length, width } = BRIDGE;
   const start = center - length / 2, divisions = 64;
-  function archStrip(low: number, high: number, depth: number, offsetZ: number, spanLength = length) {
+  function archStrip(low: number, high: number, depth: number, offsetZ: number, spanLength = length, spanStart = start) {
     const shape = new T.Shape();
     for (let i = 0; i <= divisions; i++) {
-      const x = start + i * spanLength / divisions;
+      const x = spanStart + i * spanLength / divisions;
       if (i === 0) shape.moveTo(x, bridgeHeight(x) + high);
       else shape.lineTo(x, bridgeHeight(x) + high);
     }
     for (let i = divisions; i >= 0; i--) {
-      const x = start + i * spanLength / divisions; shape.lineTo(x, bridgeHeight(x) + low);
+      const x = spanStart + i * spanLength / divisions; shape.lineTo(x, bridgeHeight(x) + low);
     }
     shape.closePath();
     const geometry = new T.ExtrudeGeometry(shape, { depth, bevelEnabled: false, steps: 1 });
@@ -49,25 +49,21 @@ export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, c
   };
   for (const side of [-1, 1]) {
     const wallZ = z + side * (width / 2 + .22);
-    const wallLength = side === 1 ? length - BRIDGE.northEastOpening : length;
-    archStrip(0, .72, .44, wallZ - .22, wallLength).name = "Stone parapet";
+    const wallLength = length - BRIDGE.approachOpening * 2;
+    const wallStart = start + BRIDGE.approachOpening;
+    archStrip(0, .72, .44, wallZ - .22, wallLength, wallStart).name = "Stone parapet";
     for (let i = 0; i < 26; i++) {
-      const x = start + (i + .5) * wallLength / 26;
+      const x = wallStart + (i + .5) * wallLength / 26;
       const cap = block(x, bridgeHeight(x) + .81, wallZ, wallLength / 26 - .014, .18, .54);
       cap.rotation.z = Math.atan2(bridgeHeight(x + .01) - bridgeHeight(x - .01), .02);
     }
     for (let i = 0; i < 24; i++) {
-      const x = start + (i + .5) * wallLength / 24;
-      colliders.push({ x, z: wallZ, w: wallLength / 24, d: .44, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91 });
+      const x = wallStart + (i + .5) * wallLength / 24;
+      colliders.push({ x, z: wallZ, w: wallLength / 24, d: .54, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91 });
     }
-    // Leave a bank-side opening beside the eastern approach, instead of enclosing a dead end.
+    // Matching openings on both banks keep every approach clear of projecting end stones.
     for (const end of [-1, 1]) {
-      const bankOpening = side === 1 && end === 1;
-      if (!bankOpening) {
-        const x = center + end * (length / 2 - .45);
-        block(x, -.24, wallZ, 1.35, .7, .72);
-      }
-      const postX = bankOpening ? start + wallLength - .17 : center + end * (length / 2 - .17);
+      const postX = center + end * (wallLength / 2 - .17);
       const postFloor = bridgeHeight(postX);
       block(postX, postFloor + .47, wallZ, .5, .94, .64);
       colliders.push({ x: postX, z: wallZ, w: .5, d: .64, bottom: postFloor, top: postFloor + .94 });

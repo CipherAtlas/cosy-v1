@@ -24,6 +24,7 @@ import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
 import type { SharedChatEntry, SharedVisitor } from "./sharedWorld";
 import { makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal } from "./focusCottageProps";
+import type { SwingSeat } from "./swings";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -102,6 +103,11 @@ export class VillageEngine {
   private nearBench: VillageBench | null = null;
   private seatedBench: VillageBench | null = null;
   private seatedIndex: 0 | 1 | null = null;
+  private nearSwing: SwingSeat | null = null;
+  private ridingSwing: SwingSeat | null = null;
+  private swingCamera = { yaw: 0, pitch: .15 };
+  private swingPulse = { direction: 0, until: 0 };
+  private swingBrakeUntil = 0;
   private quality: Quality = "low";
   private graphicsTier: GraphicsTier = "battery";
   private detailedRenderScale = 1;
@@ -146,6 +152,7 @@ export class VillageEngine {
   private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
+      if (this.ridingSwing && !this.blocked) this.leaveSwing();
       if (this.seatedBench && !this.blocked) this.stand();
       this.releaseMouseLook();
       this.clearKeys();
@@ -159,13 +166,21 @@ export class VillageEngine {
       (e.target instanceof HTMLElement && e.target.isContentEditable)
     )
       return;
+    if (this.ridingSwing) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const key = e.key.toLowerCase();
+      if (["w", "s", "arrowup", "arrowdown", " "].includes(key)) { e.preventDefault(); this.keys.add(key); }
+      if (key === "e" && !e.repeat) { e.preventDefault(); this.leaveSwing(); }
+      if (key === "r" && !e.repeat) { e.preventDefault(); this.resetPosition(); }
+      return;
+    }
     if (this.seatedBench?.birdClearing && e.key.toLowerCase() === "f" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
       this.callbacks.scatterBirds?.(true);
       return;
     }
     if (e.target instanceof HTMLButtonElement &&
-      (!e.target.closest(".v-puppy-actions, .v-puppy-home") || e.key === " " || e.key === "Enter")) return;
+      (!e.target.closest(".v-puppy-actions, .v-puppy-home, .v-swing-controls") || e.key === " " || e.key === "Enter")) return;
     if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)
     )
@@ -186,6 +201,7 @@ export class VillageEngine {
       if (command) this.commandPuppy(this.nearPuppy.id, command);
     }
     if (e.key.toLowerCase() === "e" && !e.repeat && !this.place) {
+      if (this.nearSwing) { this.rideSwing(this.nearSwing.id, this.nearSwing.index); return; }
       if (this.dialogue?.visitTea()) return;
       if (this.seatedBench) this.stand();
       else if (this.nearBench) this.sit(this.nearBench.id);
@@ -198,6 +214,8 @@ export class VillageEngine {
   private onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.key.toLowerCase());
   private clearKeys = () => {
     this.keys.clear();
+    this.swingPulse.direction = 0;
+    this.swingBrakeUntil = 0;
     if (this.pointer && this.renderer.domElement.hasPointerCapture(this.pointer.id))
       this.renderer.domElement.releasePointerCapture(this.pointer.id);
     this.pointer = undefined;
@@ -348,6 +366,8 @@ export class VillageEngine {
       near: (id: PlaceId | null) => void;
       nearBench?: (id: string | null) => void;
       seat?: (id: string | null) => void;
+      nearSwing?: (seat: SwingSeat | null) => void;
+      ridingSwing?: (seat: SwingSeat | null) => void;
       scatterBirds?: (fromBench?: boolean) => void;
       interact: (id: PlaceId) => void;
       error: (message: string) => void;
@@ -1149,6 +1169,7 @@ export class VillageEngine {
   }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
   setPlace(id: PlaceId | null) {
+    if (id && this.ridingSwing) this.leaveSwing();
     if (id !== "mood") this.dialogue?.clearTeaSpeech();
     if (id && this.seatedBench) {
       this.seatedBench = null;
@@ -1224,6 +1245,7 @@ export class VillageEngine {
   }
   resetPosition() {
     if (this.blocked || this.place || !this.movement) return false;
+    if (this.ridingSwing) this.leaveSwing();
     const nearby = this.movement.recoverySpot();
     const { x, z } = nearby ?? { x: .3, z: 20 };
     if (!this.movement.clear(x, z)) {
@@ -1240,6 +1262,8 @@ export class VillageEngine {
     this.player.rotation.y = this.walkingHeading;
     this.near = null;
     this.nearBench = null;
+    this.nearSwing = null;
+    this.callbacks.nearSwing?.(null);
     this.nearGarden = null;
     this.nearPuppy = null;
     this.callbacks.near(null);
@@ -1256,7 +1280,7 @@ export class VillageEngine {
   }
   sit(id: string, selectedSide?: 0 | 1) {
     const bench = this.world?.benches.find(value => value.id === id);
-    if (!bench || this.blocked || this.place || this.seatedBench || this.nearBench?.id !== id) return;
+    if (!bench || this.blocked || this.place || this.seatedBench || this.ridingSwing || this.nearBench?.id !== id) return;
     const occupied = this.seatOccupants(bench);
     const preferred = selectedSide !== undefined ? [selectedSide, selectedSide === 0 ? 1 : 0] as const
       : this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
@@ -1291,10 +1315,65 @@ export class VillageEngine {
     if (down && (this.blocked || this.place || this.seatedBench)) return;
     if (down) {
       this.keys.add(key);
-      if (key === " " && !this.seatedBench) this.movement?.jump();
+      if (key === " " && !this.seatedBench && !this.ridingSwing) this.movement?.jump();
     } else this.keys.delete(key);
   }
   toggleRun() { this.running = !this.running; this.reportMovement(true); }
+  rideSwing(id: string, index: 0 | 1) {
+    const swing = this.world?.swings.find(value => value.placement.id === id);
+    if (!swing || this.blocked || this.place || this.seatedBench || this.ridingSwing || !this.movement?.grounded) return false;
+    swing.seatPoint(index, this.temp);
+    if (this.temp.distanceTo(this.player.position) > 2.9) return false;
+    this.puppies?.cancelPet(); this.puppyTrickId = null;
+    this.releaseMouseLook(); this.clearKeys();
+    this.swingCamera = { yaw: this.yaw, pitch: this.pitch };
+    this.ridingSwing = { id, index }; this.nearSwing = null;
+    this.yaw = swing.placement.yaw + 1.1; this.pitch = .45;
+    this.dialogue?.setEnabled(false);
+    this.callbacks.nearSwing?.(null); this.callbacks.ridingSwing?.(this.ridingSwing);
+    return true;
+  }
+  swingKey(key: "w" | "s" | " ", down: boolean) {
+    if (down && (!this.ridingSwing || this.blocked || this.place)) return;
+    this.walkKey(key, down);
+  }
+  pushSwing(direction: -1 | 1) {
+    if (!this.ridingSwing || this.blocked || this.place) return;
+    this.swingPulse = { direction, until: this.elapsed + .3 };
+  }
+  brakeSwing() {
+    if (this.ridingSwing && !this.blocked && !this.place) this.swingBrakeUntil = this.elapsed + .5;
+  }
+  leaveSwing() {
+    const rider = this.ridingSwing, swing = this.world?.swings.find(value => value.placement.id === rider?.id);
+    if (!rider || !swing || !this.movement) return false;
+    const exits: { x: number; z: number }[] = [];
+    for (const distance of [3.3, -3.3, 4, -4]) {
+      swing.root.localToWorld(this.temp.set(rider.index === 0 ? -.98 : .98, 0, distance));
+      exits.push({ x: this.temp.x, z: this.temp.z });
+    }
+    exits.push({ x: this.movement.position.x, z: this.movement.position.z }, { x: .3, z: 20 });
+    const exit = exits.find(point => this.movement!.clear(point.x, point.z));
+    if (!exit) return false;
+    this.ridingSwing = null; this.releaseMouseLook(); this.clearKeys();
+    this.player.rotation.set(0, swing.placement.yaw, 0);
+    this.yaw = this.swingCamera.yaw; this.pitch = this.swingCamera.pitch;
+    this.movement.settle(exit.x, exit.z);
+    this.player.position.copy(this.movement.position);
+    this.dialogue?.setEnabled(!this.blocked && !this.place);
+    this.callbacks.ridingSwing?.(null);
+    this.updateWalkingCamera();
+    return true;
+  }
+  private updateSwingCamera() {
+    const swing = this.world?.swings.find(value => value.placement.id === this.ridingSwing?.id);
+    if (!swing) return;
+    swing.root.localToWorld(this.lookGoal.set(0, this.compactView ? 2 : 1.6, 0));
+    const distance = (this.compactView ? 10.5 : 7.3) * swing.placement.scale[0];
+    this.cameraGoal.copy(this.lookGoal).add(this.temp.set(Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
+      Math.sin(this.pitch) * distance + .7, Math.cos(this.yaw) * Math.cos(this.pitch) * distance));
+    this.cameraGoal.y = Math.max(this.cameraGoal.y, floorHeight(this.cameraGoal.x, this.cameraGoal.z) + .4);
+  }
   private updateActivityCamera(place: PlaceId) {
     const stage=ACTIVITY_STAGES[place];
     this.cameraGoal.fromArray(stage.camera);
@@ -1405,7 +1484,7 @@ export class VillageEngine {
     if (!this.world) return;
     const movement = this.movement!;
     this.direction.set(0, 0, 0);
-    if (!this.blocked && !this.place && !this.seatedBench) {
+    if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing) {
       const forward = Number(this.keys.has("w") || this.keys.has("arrowup")) - Number(this.keys.has("s") || this.keys.has("arrowdown"));
       const side = Number(this.keys.has("d") || this.keys.has("arrowright")) - Number(this.keys.has("a") || this.keys.has("arrowleft"));
       this.direction.set(side * Math.cos(this.yaw) - forward * Math.sin(this.yaw), 0,
@@ -1413,8 +1492,17 @@ export class VillageEngine {
       if (this.direction.lengthSq() > 0) this.direction.normalize();
     }
     movement.update(dt, { x: this.direction.x, z: this.direction.z, run: this.running,
-      sprint: this.keys.has("shift"), blocked: this.blocked || this.place !== null || !!this.seatedBench });
+      sprint: this.keys.has("shift"), blocked: this.blocked || this.place !== null || !!this.seatedBench || !!this.ridingSwing });
+    const swingInput = Number(this.keys.has("w") || this.keys.has("arrowup")) - Number(this.keys.has("s") || this.keys.has("arrowdown"));
+    const swingDirection = swingInput || (this.elapsed < this.swingPulse.until ? this.swingPulse.direction : 0);
+    this.world.swings.forEach(swing => swing.update(dt, this.ridingSwing, swingDirection, this.keys.has(" ") || this.elapsed < this.swingBrakeUntil, this.blocked || !!this.place));
     this.player.position.set(movement.position.x, movement.position.y, movement.position.z);
+    if (this.ridingSwing) {
+      const swing = this.world.swings.find(value => value.placement.id === this.ridingSwing!.id)!;
+      swing.seatPoint(this.ridingSwing.index, this.player.position);
+      this.player.position.y -= .62;
+      this.player.rotation.set(0, swing.placement.yaw, 0);
+    }
     if (this.seatedBench) {
       const seat = this.seatPoint(this.seatedBench, this.seatedIndex ?? 0);
       this.player.position.set(seat.x, this.seatedBench.seatHeight - .62, seat.z);
@@ -1426,7 +1514,9 @@ export class VillageEngine {
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 14));
     }
-    if (!this.blocked && !this.place && !this.seatedBench) {
+    if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing) {
+      const swing = this.world.swings.map(value => value.nearest(this.player.position)).find(value => value !== null) ?? null;
+      if (swing?.id !== this.nearSwing?.id || swing?.index !== this.nearSwing?.index) { this.nearSwing = swing; this.callbacks.nearSwing?.(swing); }
       let near: PlaceId | null = null,
         dist = 4;
       PLACES.forEach((p) => {
@@ -1460,15 +1550,16 @@ export class VillageEngine {
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
     this.companionHands.reset();
     if (this.character) {
-      const bob = this.reducedMotion || this.blocked || this.seatedBench ? 0 : Math.sin(this.elapsed*2.8)*.065;
+      const bob = this.reducedMotion || this.blocked || this.seatedBench || this.ridingSwing ? 0 : Math.sin(this.elapsed*2.8)*.065;
       this.character.position.x = 0;
       this.character.position.y = .62 + bob;
       this.character.position.z = 0;
       this.character.rotation.y = 0;
-      this.character.rotation.x = T.MathUtils.lerp(this.character.rotation.x, this.seatedBench ? -.08 : this.reducedMotion ? 0 : movement.speed*.022, 1-Math.exp(-dt*8));
-      this.character.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*1.7)*.035;
+      this.character.rotation.x = T.MathUtils.lerp(this.character.rotation.x, this.reducedMotion ? 0 : this.ridingSwing ? -.1 + swingDirection * .1 : this.seatedBench ? -.08 : movement.speed*.022, 1-Math.exp(-dt*8));
+      this.character.rotation.z = this.reducedMotion || this.blocked || this.ridingSwing ? 0 : Math.sin(this.elapsed*1.7)*.035;
       const squash = this.reducedMotion ? 0 : movement.landing>0 ? -.1 : movement.takeoff>0 ? .09 : 0;
-      this.character.scale.set(this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4),this.spiritScale*(this.seatedBench ? .86 : 1+squash),this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4));
+      const sitting = this.seatedBench || this.ridingSwing;
+      this.character.scale.set(this.spiritScale*(sitting ? 1.05 : 1-squash*.4),this.spiritScale*(sitting ? .86 : 1+squash),this.spiritScale*(sitting ? 1.05 : 1-squash*.4));
       this.spiritFins.forEach(fin => relaxBlobArm(fin, this.elapsed, moving, this.reducedMotion || this.blocked));
     }
     this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
@@ -1477,7 +1568,7 @@ export class VillageEngine {
       this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
       this.spiritFins.forEach((fin, i) => { fin.rotation.z = Math.sin(scatterAge * 5 + i) * .4; });
     }
-    if (movement.speed > .18 || !movement.grounded || this.blocked || this.place) this.puppies?.cancelPet();
+    if (movement.speed > .18 || !movement.grounded || this.blocked || this.place || this.ridingSwing) this.puppies?.cancelPet();
     const pettingDog = this.puppies?.pettingPuppy;
     if (pettingDog) {
       this.puppyPetTarget.copy(pettingDog.actor.position);
@@ -1487,6 +1578,8 @@ export class VillageEngine {
     }
     if (this.place) {
       this.updateActivityCamera(this.place);
+    } else if (this.ridingSwing) {
+      this.updateSwingCamera();
     } else {
       this.updateWalkingCamera();
       const performingPuppy = this.puppies?.puppies.find(puppy => puppy.info.id === this.puppyTrickId && puppy.command);
@@ -1534,7 +1627,7 @@ export class VillageEngine {
     const t = this.reducedMotion ? 0 : this.elapsed;
     this.updateLighting(dt);
     this.atmosphere.update(t, this.camera.position);
-    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place, this.camera.quaternion, this.player.rotation.y);
+    this.life?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place && !this.ridingSwing, this.camera.quaternion, this.player.rotation.y);
     this.puppies?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place,
       this.camera.quaternion, this.player.rotation.y);
     if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),

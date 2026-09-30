@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Swing has a rendered Furnishings library preview",
+    "Swing supports position, upright rotation and scale",
+    "Named save keeps the swing transform",
+    "Reload restores the swing transform",
+    "Apply writes the swing transform into the isolated playable layout",
+    "Runtime projection uses the saved swing placement",
+    "Apply rejects a nonphysical swing scale or tilt",
+    "Apply rejects a nonphysical swing scale or tilt",
+    "Protected preset remains byte-identical",
+    "Editor has no page errors"
+  ],
+  "errors": []
+}

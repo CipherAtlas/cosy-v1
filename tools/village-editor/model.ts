@@ -11,6 +11,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RESIDENT_IDS, type ResidentRoute, type ResidentId } from "../../features/village/worldLayout";
 import { fenceGeometry } from "../../features/village/fenceGeometry";
 import { PUPPY_INFO } from "../../features/village/puppies";
+import { VillageSwingSet } from "../../features/village/swings";
 
 export type LayoutItem = {
   id: string; asset: string; name: string; position: [number, number, number];
@@ -136,11 +137,13 @@ export class LayoutScene {
           for (const object of objects) root.attach(object);
         }
         const locked = category === "Landscape" && !id.startsWith("island") || ["wayfinding", "ivy"].includes(id);
-        const shelf = !["terrain", "shore", "river", "river-stones", "meadow-grass", "wildflowers", "forest", "ivy", "wayfinding"].includes(id) && !this.world.authored.benches.some(bench => bench.id === id) && !this.world.authored.fences.some(fence => fence.id === id) && !id.startsWith("mountain") && (!id.startsWith("bench-") || id === "bench-1") && (!id.startsWith("fence-") || id === "fence--1-180") && (!id.startsWith("lamp-") || id === "lamp-20" || id === "lamp-moon-bridge") && (!id.startsWith("edge-lantern-") || id === "edge-lantern-garden-1") && (!id.startsWith("path-") || id === "path-2" || name === "Bird clearing approach");
+        const shelf = !["terrain", "shore", "river", "river-stones", "meadow-grass", "wildflowers", "forest", "ivy", "wayfinding"].includes(id) && !this.world.authored.benches.some(bench => bench.id === id) && !this.world.authored.swings.some(swing => swing.id === id) && !this.world.authored.fences.some(fence => fence.id === id) && !id.startsWith("mountain") && (!id.startsWith("bench-") || id === "bench-1") && (!id.startsWith("fence-") || id === "fence--1-180") && (!id.startsWith("lamp-") || id === "lamp-20" || id === "lamp-moon-bridge") && (!id.startsWith("edge-lantern-") || id === "edge-lantern-garden-1") && (!id.startsWith("path-") || id === "path-2" || name === "Bird clearing approach");
         register(id, name, category, root, shelf, locked);
       }
     }
     this.assets.set("oak-bench", { id: "oak-bench", name: "Oak meadow bench", category: "Furnishings", template: this.assets.get("bench-1")!.template.clone(true), shelf: true, solid: true });
+    this.assets.set("meadow-swings", { id: "meadow-swings", name: "Meadow swing set · two seats", category: "Furnishings",
+      template: new VillageSwingSet({ id: "meadow-swings", x: 0, y: 0, z: 0, yaw: 0, scale: [1, 1, 1] }).root, shelf: true, solid: true });
     const kit = await new GLTFLoader().loadAsync("/village/models/garden-pond.glb");
     const garden = new GardenScene(kit.scene, [], () => {}, this.world.gardenSurfaces);
     // Preserve the authored garden as one assembly; planting state remains outside layout files.

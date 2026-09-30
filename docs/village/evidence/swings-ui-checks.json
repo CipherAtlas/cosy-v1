@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "Left swing click seats the player",
+    "Forward desktop target fits",
+    "Forward keycap is visible",
+    "Back desktop target fits",
+    "Back keycap is visible",
+    "Brake desktop target fits",
+    "Brake keycap is visible",
+    "Get off desktop target fits",
+    "Get off keycap is visible",
+    "Focused W control pumps the physical seat",
+    "S switches to backward pumping",
+    "Space brakes while a pump button has focus",
+    "Holding the on-screen Forward button pumps",
+    "Pointer capture releases pumping outside the button",
+    "Get off restores clear ground and canvas focus",
+    "Right swing click selects the second independent seat",
+    "1280 by 720 laptop viewport keeps the compact panel in a clear corner",
+    "1366 by 768 laptop viewport keeps the compact panel in a clear corner",
+    "Smaller laptop keeps most of the world view clear",
+    "Riding panel uses less than 10 percent of the smaller laptop and stays off the main scene",
+    "Panel and buttons have translucent backgrounds",
+    "Focused E shortcut gets off the swing",
+    "Rendered export has no captured page errors"
+  ],
+  "errors": []
+}

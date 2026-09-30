@@ -3,8 +3,8 @@ const path = require('node:path');
 const T = require('three');
 const build = process.argv[2];
 const { buildBridge } = require(path.join(build, 'bridge.js'));
-const { BRIDGE, bridgeHeight, onBridge } = require(path.join(build, 'environment.js'));
-const { VillageMovement } = require(path.join(build, 'movement.js'));
+const { BRIDGE, bridgeHeight, onBridge, riverX } = require(path.join(build, 'environment.js'));
+const { VillageMovement, MOVEMENT } = require(path.join(build, 'movement.js'));
 const colliders = [];
 const bridge = buildBridge(new T.MeshStandardMaterial(), new T.MeshStandardMaterial(), colliders);
 bridge.updateMatrixWorld(true);
@@ -70,3 +70,80 @@ const landing = approach.recoverySpot();
 assert(landing && landing.x > approach.position.x, 'The east-bank recovery must move away from the end stone');
 assert(approach.clear(landing.x, landing.z) && !onBridge(landing.x, landing.z));
 console.log('PASS pictured bridge-end gap is walkable in both directions and still has recovery');
+for (const end of [-1, 1]) for (const side of [-1, 1]) {
+ const x = BRIDGE.x + end * (BRIDGE.length / 2 - .17);
+ const z = BRIDGE.z + side * (BRIDGE.width / 2 + .37);
+ const m = new VillageMovement(colliders, () => {});
+ m.settle(x, z); m.position.y = bridgeHeight(x) + .94;
+ for (let i = 0; i < 120; i++) m.update(1 / 60, { x: end, z: 0, run: false, sprint: false, blocked: false });
+ assert(end * (m.position.x - x) > 1, 'A spirit at an old bridge end post must be able to move onto its bank');
+ assert(m.clear(m.position.x, m.position.z, m.position.y), 'Escaping an old post must leave the spirit clear');
+}
+console.log('PASS all four old bridge-end post traps allow escape');
+for (const xOffset of [-5.5, -4.7, -4, 0, 4, 4.7, 5.5]) {
+ for (const zOffset of [0, 1.35, 1.64, 1.66, 1.87, 2.05]) {
+  const heights = [];
+  for (const end of [-1, 1]) for (const side of [-1, 1]) {
+   ray.set(new T.Vector3(BRIDGE.x + end * xOffset, 4, BRIDGE.z + side * zOffset), new T.Vector3(0, -1, 0));
+   heights.push(ray.intersectObject(bridge, true)[0]?.point.y ?? -10);
+  }
+  assert(Math.max(...heights) - Math.min(...heights) < .003, 'Masonry must be symmetric across both bridge axes');
+ }
+}
+console.log('PASS rendered deck, coping and posts are symmetric across both axes');
+for (const end of [-1, 1]) for (const side of [-1, 1]) {
+ const x = BRIDGE.x + end * (BRIDGE.length / 2 - .8);
+ const m = new VillageMovement(approachColliders, () => {});
+ for (const direction of [-1, 1]) {
+  m.settle(x, BRIDGE.z + side * (direction === -1 ? 3 : .5));
+  const targetZ = BRIDGE.z + side * (direction === -1 ? .5 : 3);
+  assert(m.canWalkTo(x, targetZ), 'Every bank opening must allow direct entry and exit');
+  for (let i = 0; i < 100; i++) m.update(1 / 60, { x: 0, z: side * direction, run: false, sprint: false, blocked: false });
+  assert(side * direction * (m.position.z - targetZ) >= 0, 'Walking must pass through each bank opening');
+ }
+}
+console.log('PASS all four bank-side openings allow entry and exit');
+for (const fps of [30, 60, 120]) for (const end of [-1, 1]) for (const side of [-1, 1]) {
+ const postX = BRIDGE.x + end * (BRIDGE.length / 2 - BRIDGE.approachOpening - .17);
+ const wallZ = BRIDGE.z + side * (BRIDGE.width / 2 + .22);
+ for (const y of [0, bridgeHeight(postX) + .94]) {
+  const m = new VillageMovement(colliders, () => {});
+  m.settle(postX, wallZ + side * .15); m.position.y = y;
+  m.update(1 / fps, { x: end, z: 0, run: false, sprint: false, blocked: false });
+  assert(m.clear(m.position.x, m.position.z, m.position.y), 'An overlapping or post-top spirit must be nudged clear in one frame');
+  assert(Math.hypot(m.position.x - postX, m.position.z - wallZ - side * .15) < 1, 'The correction must stay local to the post');
+  assert(Math.abs(m.position.x - riverX(m.position.z)) >= 3.6 || onBridge(m.position.x, m.position.z), 'Correction must never land in water');
+  for (let i = 0; i < fps * 2; i++) m.update(1 / fps, { x: end, z: 0, run: false, sprint: false, blocked: false });
+  assert(end * (m.position.x - postX) > 1, 'The corrected spirit must keep moving normally');
+ }
+ // Approach the protruding post diagonally, jumping repeatedly, then reverse away.
+ const m = new VillageMovement(colliders, () => {});
+ m.settle(BRIDGE.x + end * (BRIDGE.length / 2 + .7), BRIDGE.z + side * 3);
+ for (let i = 0; i < fps * 2; i++) {
+  if (i % fps === 0) m.jump();
+  m.update(1 / fps, { x: -end / Math.SQRT2, z: -side / Math.SQRT2, run: false, sprint: true, blocked: false });
+  assert(m.clear(m.position.x, m.position.z, m.position.y), 'Diagonal jumping must never embed the spirit in stone');
+ }
+ const before = { ...m.position };
+ for (let i = 0; i < fps; i++) m.update(1 / fps, { x: end, z: 0, run: false, sprint: false, blocked: false });
+ assert(end * (m.position.x - before.x) > 1, 'Reversing away from a corner must not stick');
+}
+console.log('PASS post overlap, post-top recovery and diagonal jumping stay safe at 30/60/120 fps');
+for (const side of [-1, 1]) {
+ const m = new VillageMovement(colliders, () => {});
+ const z = BRIDGE.z + side * (BRIDGE.width / 2 + .22);
+ m.settle(BRIDGE.x, z);
+ m.update(1 / 60, { x: 0, z: 0, run: false, sprint: false, blocked: false });
+ assert(m.clear(m.position.x, m.position.z, m.position.y), 'A mid-rail overlap must resolve onto the deck');
+ assert(onBridge(m.position.x, m.position.z), 'Mid-rail correction must stay out of the river');
+ assert(Math.hypot(m.position.x - BRIDGE.x, m.position.z - z) < 1, 'Correction must never teleport across the bridge');
+}
+console.log('PASS central rail overlap resolves locally onto the deck, away from water');
+for (const side of [-1, 1]) {
+ const m = new VillageMovement(colliders, () => {});
+ m.settle(BRIDGE.x - 3, BRIDGE.z + side * (BRIDGE.width / 2 - MOVEMENT.radius - .35));
+ for (let i = 0; i < 90; i++) m.update(1 / 60, { x: 1 / Math.SQRT2, z: side / Math.SQRT2, run: true, sprint: false, blocked: false });
+ assert(m.position.x > BRIDGE.x, 'Movement into a rail must still slide along the crossing');
+ assert(m.clear(m.position.x, m.position.z, m.position.y));
+}
+console.log('PASS rail contact preserves sliding along the crossing');

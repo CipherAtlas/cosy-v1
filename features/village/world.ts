@@ -13,6 +13,7 @@ import { withBasePath } from "../../lib/basePath";
 import { distanceToPath, insidePlantingClearance, projectWorldLayout, type AuthoredWorld } from "./worldLayout";
 import { fenceGeometry } from "./fenceGeometry";
 import { setAuthoredWorld } from "./environment";
+import { VillageSwingSet } from "./swings";
 export { groundY, riverX } from "./environment";
 
 /** Optional authoring hook; the public village keeps its existing merged render path. */
@@ -32,6 +33,7 @@ export type World = {
   setLanguage: (language: "en" | "ja") => void;
   colliders: Collider[];
   benches: VillageBench[];
+  swings: VillageSwingSet[];
   flames: T.Mesh[];
   lanterns: T.Mesh[];
   water: T.Mesh;
@@ -66,6 +68,7 @@ export async function buildWorld(
     flames: T.Mesh[] = [],
     lanterns: T.Mesh[] = [];
   const wind = { time: { value: 0 }, strength: { value: 0.3 } };
+  const swings: VillageSwingSet[] = [];
   const vegetation: T.InstancedMesh[] = [];
   const lampLights: T.PointLight[] = [];
   const lanternHalos: T.Sprite[] = [];
@@ -76,6 +79,10 @@ export async function buildWorld(
   // The editor captures uncut source instances so moving or undoing a clearing can restore them.
   const erasedPlanting = (x: number, z: number) => !capture && insidePlantingClearance(x, z, authored.clearings);
   const clearPlanting = (x: number, z: number) =>
+    authored.swings.some(swing => {
+      const dx = x - swing.x, dz = z - swing.z, c = Math.cos(swing.yaw), s = Math.sin(swing.yaw);
+      return Math.abs(dx * c - dz * s) < 3.1 * swing.scale[0] && Math.abs(dx * s + dz * c) < 3.3 * swing.scale[0];
+    }) ||
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
     || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9
     || pondDistance(x, z) < 1.12
@@ -726,6 +733,11 @@ export async function buildWorld(
   // Apply the new colliders after seeded planting so unrelated scenery stays in place.
   colliders.pop();
   for (const placed of authored.benches) bench(placed.x, placed.z, placed.yaw, placed.scale[0], placed.id, placed.y, placed.scale[1], placed.scale[2]);
+  for (const placed of authored.swings) {
+    const swing = new VillageSwingSet(placed); swings.push(swing); group.add(swing.root);
+    colliders.push(...swing.colliders());
+    capture?.(placed.id, "Meadow swing set", "Furnishings", [swing.root], [placed.x, placed.y, placed.z]);
+  }
   layoutStart = group.children.length;
   // Hearth with glowing embers and gently animated flame geometry.
   for (let i = 0; i < 16; i++) {
@@ -905,6 +917,7 @@ export async function buildWorld(
   group.updateMatrixWorld(true);
   const batches = new Map<T.Material, T.BufferGeometry[]>();
   const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh, shoreMesh]);
+  swings.forEach(swing => swing.dynamicMeshes.forEach(mesh => keep.add(mesh)));
   const remove: T.Object3D[] = [];
   group.traverse((o) => {
     if (o instanceof T.Mesh && !keep.has(o)) {
@@ -1502,6 +1515,7 @@ export async function buildWorld(
     },
     colliders,
     benches,
+    swings,
     flames,
     lanterns,
     water,

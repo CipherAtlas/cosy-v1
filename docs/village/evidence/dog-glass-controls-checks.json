@@ -1,0 +1,152 @@
+{
+  "viewports": [
+    {
+      "screen": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "allTargets": true,
+        "clearOfHints": true,
+        "dock": {
+          "bottom": 698,
+          "height": 178.5,
+          "left": 960,
+          "right": 1260,
+          "top": 519.5,
+          "width": 300,
+          "x": 960,
+          "y": 519.5
+        },
+        "inBounds": true,
+        "noOverflow": true,
+        "squareKeycaps": true
+      }
+    },
+    {
+      "screen": {
+        "width": 1366,
+        "height": 768
+      },
+      "metrics": {
+        "allTargets": true,
+        "clearOfHints": true,
+        "dock": {
+          "bottom": 746,
+          "height": 178.5,
+          "left": 1046,
+          "right": 1346,
+          "top": 567.5,
+          "width": 300,
+          "x": 1046,
+          "y": 567.5
+        },
+        "inBounds": true,
+        "noOverflow": true,
+        "squareKeycaps": true
+      }
+    },
+    {
+      "screen": {
+        "width": 1440,
+        "height": 900
+      },
+      "metrics": {
+        "allTargets": true,
+        "clearOfHints": true,
+        "dock": {
+          "bottom": 878,
+          "height": 178.5,
+          "left": 1120,
+          "right": 1420,
+          "top": 699.5,
+          "width": 300,
+          "x": 1120,
+          "y": 699.5
+        },
+        "inBounds": true,
+        "noOverflow": true,
+        "squareKeycaps": true
+      }
+    },
+    {
+      "screen": {
+        "width": 1024,
+        "height": 640
+      },
+      "metrics": {
+        "allTargets": true,
+        "clearOfHints": true,
+        "dock": {
+          "bottom": 564,
+          "height": 178.5,
+          "left": 704,
+          "right": 1004,
+          "top": 385.5,
+          "width": 300,
+          "x": 704,
+          "y": 385.5
+        },
+        "inBounds": true,
+        "noOverflow": true,
+        "squareKeycaps": true
+      }
+    }
+  ],
+  "keyboard": [
+    {
+      "key": "z",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi sits down for a little rest."
+    },
+    {
+      "key": "x",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi dances with happy little hops!"
+    },
+    {
+      "key": "v",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi twirls around twice!"
+    },
+    {
+      "key": "q",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi does a playful bow."
+    },
+    {
+      "key": "j",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi sits and waves a little paw!"
+    },
+    {
+      "key": "k",
+      "expanded": "false",
+      "focused": "CANVAS",
+      "notice": "Mochi tucks up and rolls over!"
+    }
+  ],
+  "shortWindow": {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "scrollHeight": 219,
+    "visibleHeight": 160,
+    "keyboardReached": "K Roll over"
+  },
+  "autoCollapse": {
+    "focus": "CANVAS",
+    "expanded": false,
+    "collapsedDock": {
+      "width": 300,
+      "height": 79.5
+    }
+  },
+  "browserErrors": []
+}

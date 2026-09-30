@@ -1,4 +1,4 @@
-import { BRIDGE, floorHeight, inWalkableWorld, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
+import { BRIDGE_BARRIERS, floorHeight, inWalkableWorld, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
 import type { Collider, MovementStatus, WorldContact } from "./environment";
 
 const STEP = 1 / 120;
@@ -49,21 +49,44 @@ export class VillageMovement {
     return true;
   }
   clear(x: number, z: number, y = floorHeight(x, z)) {
-    const r = MOVEMENT.radius;
     if (!inWalkableWorld(x, z)) return false;
     if (Math.abs(x - riverX(z)) < 3.6 && !onBridge(x, z)) return false;
     if (pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
-    // Keep the rails solid in the air while leaving the visible east-bank opening walkable.
-    const railDistance = Math.abs(z - BRIDGE.z);
-    if (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 &&
-      railDistance > BRIDGE.width / 2 - r && railDistance < BRIDGE.width / 2 + .4 &&
-      (z < BRIDGE.z || x < BRIDGE.x + BRIDGE.length / 2 - BRIDGE.northEastOpening)) return false;
+    // Rails stay solid during jumps; one rounded footprint also covers every stone seam.
+    if (BRIDGE_BARRIERS.some(c => this.overlaps(c, x, z))) return false;
     return !this.colliders.some(c => {
       if (y >= (c.top ?? 8) || y + MOVEMENT.height <= (c.bottom ?? -1)) return false;
-      const dx = Math.max(Math.abs(x - c.x) - c.w / 2, 0);
-      const dz = Math.max(Math.abs(z - c.z) - c.d / 2, 0);
-      return dx * dx + dz * dz < r * r;
+      return this.overlaps(c, x, z);
     });
+  }
+  private overlaps(c: Collider, x: number, z: number) {
+    const dx = Math.max(Math.abs(x - c.x) - c.w / 2, 0);
+    const dz = Math.max(Math.abs(z - c.z) - c.d / 2, 0);
+    return dx * dx + dz * dz < MOVEMENT.radius ** 2;
+  }
+  private resolveBridgeOverlap() {
+    const { x, z } = this.position;
+    const barrier = BRIDGE_BARRIERS.find(c => this.overlaps(c, x, z));
+    if (!barrier) return;
+    const radius = MOVEMENT.radius + .001;
+    const minX = barrier.x - barrier.w / 2, maxX = barrier.x + barrier.w / 2;
+    const minZ = barrier.z - barrier.d / 2, maxZ = barrier.z + barrier.d / 2;
+    const dx = x - Math.max(minX, Math.min(maxX, x));
+    const dz = z - Math.max(minZ, Math.min(maxZ, z));
+    const distance = Math.hypot(dx, dz);
+    const candidates = [
+      { x: minX - radius, z }, { x: maxX + radius, z },
+      { x, z: minZ - radius }, { x, z: maxZ + radius },
+    ];
+    if (distance > 0) candidates.push({ x: x + dx * (radius / distance - 1), z: z + dz * (radius / distance - 1) });
+    // A stale or edge-landing position must be able to leave. Choose the nearest
+    // clear bank/deck surface, never the water on the other side of a parapet.
+    const target = candidates.filter(p => Math.hypot(p.x - x, p.z - z) <= 1 && this.clear(p.x, p.z))
+      .sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z))[0];
+    if (!target) return;
+    this.position = { x: target.x, y: floorHeight(target.x, target.z), z: target.z };
+    this.velocity = { x: 0, y: 0, z: 0 };
+    this.grounded = true;
   }
   recoverySpot() {
     const origin = this.position;
@@ -99,6 +122,7 @@ export class VillageMovement {
   }
   private step(input: { x: number; z: number; run: boolean; sprint: boolean }) {
     const dt = STEP;
+    this.resolveBridgeOverlap();
     this.jumpBuffer = Math.max(0, this.jumpBuffer - dt);
     this.landing = Math.max(0, this.landing - dt);
     this.takeoff = Math.max(0, this.takeoff - dt);

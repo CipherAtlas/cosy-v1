@@ -2,6 +2,14 @@
 
 Updated: 2026-09-30. Required direction for open gaps `VIS-01`, `VIS-02`, `LIGHT-01`, `PLACE-01`, and asset-related `PERF-01`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md). Everything described as a target below is future work unless explicitly listed as current.
 
+## Meadow swing set — 2026-09-30 local
+
+`features/village/swings.ts` generates an original pair of swings from the user's two-seat A-frame reference: sage tubular supports, a warm timber crossbeam, muted green rounded seats, copper attachments, stone feet and alternating merged chain links. Each chain is one draw mesh; the hanging assemblies stay outside the world's static merge. The local editor renders the same source as **Meadow swing set · two seats** in Furnishings, with placeable instances and saved position/facing/uniform scale. The active Sunrise meadow bench alone is replaced; historical presets and named copies retain compatible bench assets. No downloaded models, image generation, new dependencies or paid assets were used. [Local high arc and editor/controls checks](../../VILLAGE_BUILD.md#2026-09-30-meadow-swings-and-13-inch-scene-space-local) record the current visual evidence and limits.
+
+## Symmetric bridge — 2026-09-30 local
+
+The current local stone arch has matching 1.8 m bank-side openings at all four corners, mirrored parapets/end posts/coping and no projecting approach abutments. Its 12 m × 3.3 m deck retains the movement height profile. The local editor captures this mesh under the existing `bridge` ID in Bridges and renders a fresh library preview; saved transforms remain compatible. [Local scene and editor evidence](../../VILLAGE_BUILD.md#2026-09-30-symmetric-bridge-and-corner-collision-local) includes symmetry raycasts and working-copy transform save/reload. Older bridge captures below predate this change.
+
 ## Village puppies and blob hands — 2026-09-30 local
 
 Mochi the corgi, Kiko the Shiba Inu, Biscuit the beagle, Cloud the Samoyed, Fern the Border Collie and Atlas the German Shepherd use original Blender 5.2.1 LTS sculpts with painted vertex colors. Cloud has a fuller ruff, Fern has a black/white coat, blaze, white socks and tipped ears, and Atlas has a dark saddle/mask, tall ears and a bushy tail. [Generator](../../scripts/village/create_puppies.py), editable `assets/village/puppies.blend`, runtime `public/village/models/puppies.glb`, [manifest](puppies-manifest.json) and [lineup](evidence/puppies-blender.png) retain the source trail. Each dog has a 26-bone skin with baked leg IK, expressive eyes/jaw, two-part ears and a three-part tail. Ten named authored clips per dog cover idle, walk, run, pet, sit, dance, spin, bow, wave and roll. The complete six-dog GLB is 6,496,952 bytes and 122,860 triangles, with three shared materials and no textures. Runtime movement drives gait cadence and blends interruptions. All six breeds have local editor previews and reusable placements.

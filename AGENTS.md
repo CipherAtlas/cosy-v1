@@ -1,3 +1,11 @@
+# Laptop and desktop experience
+
+The village is for laptops and desktop PCs. Do not optimize the village game or its controls for phones. Prioritize available world-view space, keyboard access and compatibility with 13-inch laptop screens.
+
+Strongly optimize the village scene and interface for 13-inch laptop screens. Keep the world and the current interaction clearly visible; use compact, contextual controls placed away from the main action. Buttons and control panels must have translucent or partially transparent backgrounds with readable text, visible boundaries and clear keyboard focus. Avoid large opaque overlays, unnecessary panels and controls that cover the player, interaction target or too much of the scene. Verify layouts at representative 13-inch laptop viewport sizes and in smaller desktop windows.
+
+On phones, refuse to open the village and show a simple message asking the visitor to use a laptop or PC. Check device identity before mounting the village scene, loading world assets, initializing game audio or connecting to the shared village. Do not use viewport width alone to block entry: narrow windows on laptops and PCs must still work.
+
 # Village assets and the local layout editor
 
 Whenever creating or adding new village assets, objects, buildings, props, vegetation, scenery, or other world elements, **also add them to the local layout editor in the same change**. Editor support is a required part of completing the asset or object work.

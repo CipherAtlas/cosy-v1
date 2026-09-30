@@ -1,0 +1,83 @@
+{
+  "checks": [
+    "Timed pumping reaches a high bounded arc at 30 FPS",
+    "Timed pumping reaches a high bounded arc at 60 FPS",
+    "Timed pumping reaches a high bounded arc at 120 FPS",
+    "High arcs agree across frame rates",
+    "An empty swing loses energy naturally",
+    "Holding the brake dissipates energy",
+    "Scaled chain length changes the physical period",
+    "Swing set replaces the far eastern meadow bench",
+    "Old meadow bench and seating target are removed",
+    "Both hanging assemblies survive runtime static batching",
+    "Seat 1 has a clear ground approach",
+    "Seat 1 has a proximity prompt",
+    "E mounts seat 1",
+    "Seat 1 rider reaches more than 72 degrees",
+    "Other seat moves independently",
+    "Space brakes seat 1",
+    "Seat 1 exits safely with E / Escape",
+    "Seat 2 has a clear ground approach",
+    "Seat 2 has a proximity prompt",
+    "E mounts seat 2",
+    "Seat 2 rider reaches more than 72 degrees",
+    "Other seat moves independently",
+    "Space brakes seat 2",
+    "Seat 2 exits safely with E / Escape",
+    "Seat 1 has a clear ground approach",
+    "Blur clears held pumping",
+    "Menus block pumping input",
+    "Typing does not pump the swing",
+    "Activity travel releases the swing",
+    "Seat 1 has a clear ground approach",
+    "Recovery releases the swing onto clear ground"
+  ],
+  "chainSteps": 1237,
+  "runs": [
+    {
+      "fps": 30,
+      "peak": 1.3610740020159005,
+      "angle": 0.3515307240814419,
+      "velocity": 2.3263012573093036
+    },
+    {
+      "fps": 60,
+      "peak": 1.3610811466245376,
+      "angle": 0.40741803696272516,
+      "velocity": 2.2931247500405214
+    },
+    {
+      "fps": 120,
+      "peak": 1.3610827317293308,
+      "angle": 0.4282729126366608,
+      "velocity": 2.2794222941081315
+    }
+  ],
+  "highPose": {
+    "angle": -1.253405396215358,
+    "y": 4.400803490104003
+  },
+  "mounts": [
+    {
+      "id": "sunrise-meadow-swings",
+      "index": 0
+    },
+    null,
+    {
+      "id": "sunrise-meadow-swings",
+      "index": 1
+    },
+    null,
+    {
+      "id": "sunrise-meadow-swings",
+      "index": 0
+    },
+    null,
+    {
+      "id": "sunrise-meadow-swings",
+      "index": 0
+    },
+    null
+  ],
+  "errors": []
+}

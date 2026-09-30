@@ -1,5 +1,9 @@
 # Village implementation evidence — updated 2026-09-30
 
+## Symmetric bridge and corner collision
+
+[Bridge view](bridge-symmetric-local.png) shows matching approaches and mirrored parapets/posts/coping. [Editor preview](bridge-editor-preview-local.png) is the rendered asset-library image. [56 Chrome checks](bridge-corners-local.json) cover production-module full-world collision, actual W-key crossing, rendered symmetry and isolated editor preview/transform/save/reload. The deterministic bridge regression also covers diagonal repeated jumps at 30/60/120 fps, reverse escape and local separation from old/new posts and central rails. These are local source checks; see [the build entry](../../../VILLAGE_BUILD.md#2026-09-30-symmetric-bridge-and-corner-collision-local) for device/live limits.
+
 ## Small blob arms and collecting dogs
 
 [Current movie](puppy-small-arms-motion.webm), [desktop pet](puppy-small-arms-petting.png), [390×844 portrait pet](puppy-small-arms-petting-phone.png) and [phone controls](puppy-small-arms-controls-phone.png) show the original small fins, whole-blob lowering and individual dog invitations. The pet stills use the production-module renderer without React overlays; controls use the exported app. [Engine](puppy-small-arms-engine-checks.json), [pack/contact](puppy-small-arms-pack-checks.json), [companions](puppy-small-arms-companion-checks.json), [isolated editor](puppy-small-arms-editor-checks.json) and [exported UI](puppy-small-arms-ui-checks.json) contain 707 local Chrome checks. These supersede the long-arm/summon-all preview; older files remain historical. See [the build entry](../../../VILLAGE_BUILD.md#2026-09-30-small-blob-arms-and-collecting-dogs-local) for exact scope, verification and untested device/live behavior. No deployment occurred.
@@ -148,3 +152,7 @@ Captured locally before publication; now included in application commit `738e408
 - [Overhead NPC circuits](roaming-circuits.webm): roughly 20 seconds, three seconds of actual controller simulation per recorded second, covering one simulated minute. Residents follow their real circuits from their starting points; this is an accelerated renderer capture without audio or user input. Use the four-minute simulation results for repeated-completion evidence.
 
 Reproduce the geometry/simulation assertions using the local QA harness's **Check roaming and street clearance** button. These checks establish route completion and furniture placement, not new FPS, Windows, physical-phone or long-session acceptance.
+
+## Meadow swings and laptop controls — 2026-09-30 local
+
+`swings-engine-checks.json` records 31 pendulum/engine scenarios and 1,237 chain-length samples; `swings-ui-checks.json` records 23 rendered controls/viewport checks; `swings-editor-checks.json` records 10 isolated shelf/transform/save/reload/Apply checks. `swings-high.png` shows the bounded high arc, and `swings-laptop.png` shows the translucent lower-right controls. These are local Chrome and desktop-viewport checks, not physical laptop or live multiplayer evidence. See [behavior and remaining limits](../../../VILLAGE_BUILD.md#2026-09-30-meadow-swings-and-13-inch-scene-space-local).

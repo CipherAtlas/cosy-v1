@@ -972,18 +972,59 @@ kbd {
   width: max-content; max-width: min(420px,calc(100vw - 40px)); pointer-events: none;
 }
 .v-world-feedback:empty { display: none; }
-.v-world-feedback .v-interact { pointer-events: auto; max-width: 100%; white-space: normal; }
-.v-world-feedback .v-puppy-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; max-width: 100%; }
-.v-world-feedback .v-puppy-tricks { pointer-events: auto; color: #2a4d47; }
-.v-world-feedback .v-puppy-tricks summary {
-  display: flex; align-items: center; justify-content: center; min-height: 44px;
-  box-sizing: border-box; padding: 8px 15px; border: 1px solid #9baf9e; border-radius: 12px;
-  background: #fff7e5f2; box-shadow: 0 7px 24px #122c3329; cursor: pointer;
+.v-swing-controls {
+  width: 320px; max-width: 100%; box-sizing: border-box; padding: 10px;
+  color: #233f33; background: #f5f4d5a1; border: 1px solid #eef6d88c;
+  border-radius: 12px; box-shadow: 0 5px 20px #122c331a; backdrop-filter: blur(5px); pointer-events: auto;
 }
-.v-world-feedback .v-puppy-tricks summary:hover { background: #fffdf4; }
-.v-world-feedback .v-puppy-trick-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
-.v-world-feedback .v-puppy-trick-list .v-interact { min-height: 44px; padding: 7px 10px; gap: 7px; }
+.v-swing-controls h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.v-swing-controls p { margin: 6px 0 8px; font-size: 12px; line-height: 1.4; color: #304d3d; }
+.v-swing-pump, .v-swing-secondary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.v-world-feedback .v-swing-controls .v-interact { min-height: 44px; padding: 6px 10px; font-size: 13px; border-radius: 7px; background: #fffcec36; border-color: #314d3e66; box-shadow: none; backdrop-filter: none; touch-action: none; user-select: none; }
+.v-world-feedback .v-swing-controls .v-interact:hover { background: #fffcec70; }
+.v-world-feedback .v-swing-controls .v-interact:active { background: #d1dfc480; }
+.v-swing-controls kbd { flex: 0 0 26px; width: 26px; min-width: 26px; height: 26px; border-radius: 4px; box-sizing: border-box; }
+.v-world-feedback.has-swing-actions { left: auto; right: 24px; bottom: 26px; transform: none; align-items: stretch; }
+.v-world-feedback .v-interact { pointer-events: auto; max-width: 100%; white-space: normal; }
+.v-world-feedback.has-puppy-actions {
+  left: auto; right: max(20px,env(safe-area-inset-right)); bottom: max(22px,env(safe-area-inset-bottom));
+  transform: none; align-items: flex-end; gap: 8px; max-width: min(300px,calc(100vw - 40px));
+}
+.v-world-feedback .v-puppy-actions {
+  width: 300px; max-width: 100%; box-sizing: border-box;
+  display: flex; flex-direction: column; flex: 0 0 auto; gap: 6px; pointer-events: none;
+  color: #fff8e8;
+}
+.v-puppy-heading { display: flex; align-items: center; justify-content: flex-end; }
+.v-puppy-heading h2 {
+  display: flex; align-items: center; gap: 6px; margin: 0; padding: 4px 10px;
+  font-size: 13px; font-weight: 600; border-radius: 999px; background: #17392bb3;
+  border: 1px solid #fff2d04d; backdrop-filter: blur(6px);
+}
+.v-puppy-main-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.v-world-feedback .v-puppy-actions .v-interact {
+  min-height: 44px; padding: 6px 9px; gap: 6px; border-radius: 999px;
+  font-size: 13px; text-align: left; color: #fff8e8; background: #17392bb3; border-color: #fff2d066;
+  box-shadow: 0 2px 8px #0f241f1a; backdrop-filter: blur(6px);
+}
+.v-world-feedback .v-puppy-actions .v-interact:hover { background: #17392bd9; border-color: #fff2d099; }
+.v-world-feedback .v-puppy-actions .v-interact:focus-visible { outline: 2px solid #fff2d0; outline-offset: 2px; }
+.v-world-feedback .v-puppy-actions .v-interact kbd {
+  flex: 0 0 24px; width: 24px; min-width: 24px; height: 24px; box-sizing: border-box;
+  font: 600 12px ui-monospace, monospace; border-radius: 4px;
+  background: #fff2d01a; border-color: #fff2d080; color: #fff8e8;
+}
+.v-world-feedback .v-puppy-tricks-toggle[aria-expanded="true"] { background: #355b40cc; border-color: #fff2d099; }
+.v-world-feedback .v-puppy-trick-list {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); gap: 5px;
+}
+.v-world-feedback .v-puppy-trick-list[hidden] { display: none; }
 .v-world-feedback .v-puppy-home { align-self: center; padding: 7px 12px; font-size: 13px; }
+.v-world-feedback .v-puppy-actions .v-puppy-home { width: 100%; }
+.v-world-feedback.has-puppy-actions .v-notice {
+  padding: 7px 11px; border-radius: 14px; font-size: 12px; line-height: 1.4;
+  color: #fff8e8; background: #17392bb3; border: 1px solid #fff2d04d; backdrop-filter: blur(6px);
+}
 .v-world-feedback .v-notice, #v-activity-panel .v-notice {
   position: static; transform: none; width: auto; max-width: 100%; margin: 0;
   box-sizing: border-box; flex: 0 0 auto; pointer-events: none;
@@ -998,12 +1039,17 @@ kbd {
   position: relative; inset: auto; transform: none; width: 100%; max-height: none;
   box-sizing: border-box; min-height: 0; flex: 0 1 auto; pointer-events: auto;
 }
+@media (min-width: 701px) and (max-width: 1050px) {
+  .v-world-feedback.has-puppy-actions { bottom: 76px; }
+}
 @media (max-width: 700px) {
+  .v-world-feedback.is-walking.has-swing-actions { left: max(14px,env(safe-area-inset-left)); right: max(14px,env(safe-area-inset-right)); align-items: center; }
+  .v-world-feedback.is-walking.is-swinging { bottom: max(18px,env(safe-area-inset-bottom)); }
   .v-world-feedback { left: 14px; right: 14px; bottom: 76px; transform: none; width: auto; max-width: none; }
   .v-world-feedback.is-walking { left: 168px; right: 20px; bottom: max(145px,calc(env(safe-area-inset-bottom) + 120px)); align-items: stretch; }
-  .v-world-feedback .v-puppy-actions { flex-direction: column; align-items: stretch; }
-  .v-world-feedback .v-puppy-tricks summary { width: 100%; }
-  .v-world-feedback .v-puppy-trick-list .v-interact { padding: 7px; gap: 6px; }
+  .v-world-feedback.is-walking.has-puppy-actions {
+    left: auto; right: 14px; bottom: 76px; width: min(300px,calc(100vw - 28px)); max-width: none; align-items: flex-end;
+  }
   #v-activity-panel { left: 12px; right: 12px; bottom: 70px; width: auto; max-height: 49dvh; }
 }
 @media (max-height: 600px) {
@@ -1404,3 +1450,10 @@ kbd {
 .v-bird-feed-button { min-height: 44px; }
 .v-bird-feed-button kbd { flex-basis: 29px; width: 29px; height: 29px; }
 .v-bird-activity [role="status"] { min-height: 3em; }
+.v-device-gate {
+  min-height: 100dvh; box-sizing: border-box; padding: 32px;
+  display: grid; align-content: center; justify-items: center; gap: 16px;
+  background: #e9eadb; color: #2a4d47; text-align: center;
+}
+.v-device-gate h1 { margin: 0; font-family: var(--font-raleway),sans-serif; font-size: 36px; font-weight: 500; }
+.v-device-gate p { max-width: 28em; margin: 0; font-size: 17px; line-height: 1.6; }
