@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — button press feedback and matching swing controls
+
+Village controls, NPC actions and portalled menus now give brief pointer/keyboard press feedback; reduced motion uses a still highlight. Swing controls share the dog panel's forest-green/cream colors, bordered buttons and square keycaps. Local `AGENTS.md` makes the treatment a continuing requirement. Twenty-five focused Chrome checks, the 23-check swing UI rerun, 24 device-gate fixtures, isolated typecheck/static export and diff checks passed. Publication and live checks are pending. [Behavior and release evidence](VILLAGE_BUILD.md#2026-09-30-button-press-feedback-and-matching-swing-controls). Concurrent local chat-admin/archive and shared-actor work remains outside this release.
+
 ## 2026-09-30 — shared interaction release (published)
 
 [Commit `9515cd7`](https://github.com/CipherAtlas/cosy-v1/commit/9515cd77f653c1e6deed9ba8e37e035ba0b1da65) is pushed to main and published through successful [Pages run 36741743392](https://github.com/CipherAtlas/cosy-v1/actions/runs/36741743392). Worker version `de2ce640-370e-4fd7-81f8-4163fd97055b` deployed first; health passed. Nine brief live checks with two Chrome clients verified the rider/seat attachment, seat release, remote Dance playback, persistent menu and waiting dog, Escape close, no page errors and private-tooling exclusion. Previously completed local checks were reused. [Release evidence and remaining limits](VILLAGE_BUILD.md#2026-09-30-shared-interaction-release-published).

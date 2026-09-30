@@ -46,6 +46,7 @@ import { VILLAGERS } from "./villagers";
 import { GARDEN_KEY, CROP_NAMES, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
 import type { SharedChatEntry, SharedWorldConnection, SharedVisitor } from "./sharedWorld";
 import type { SwingSeat } from "./swings";
+import { installButtonFeedback } from "./buttonFeedback";
 
 type RadioPreferences = { mode: "radio" | "village"; station: RadioStationId; track: RadioTrack | null; favorites: RadioTrack[]; queue: RadioTrack[]; paused: boolean };
 const INITIAL_RADIO: RadioPreferences = { mode: "radio", station: "lofi", track: null, favorites: [], queue: [], paused: false };
@@ -69,6 +70,10 @@ function VillageScene() {
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
     audio = useRef<VillageAudio | null>(null);
+  useEffect(() => {
+    const root = canvas.current?.parentElement;
+    if (root) return installButtonFeedback(root);
+  }, []);
   const [progress, setProgress] = useState(0),
     [ready, setReady] = useState(false),
     [entered, setEntered] = useState(false),
@@ -990,7 +995,7 @@ function VillageScene() {
             <p>{t("Alternate with the arc to swing higher.", "揺れに合わせて前へ・後ろへ。もっと高く！")}</p>
             <div className="v-swing-pump">
               {([['w', 'W', 'Forward', '前へ'], ['s', 'S', 'Back', '後ろへ']] as const).map(([key, shortcut, english, japanese]) =>
-                <button key={key} className="v-interact" aria-keyshortcuts={shortcut}
+                <button key={key} className="v-interact" aria-keyshortcuts={key === "w" ? "W ArrowUp" : "S ArrowDown"}
                   onPointerDown={event => { event.currentTarget.setPointerCapture(event.pointerId); engine.current?.swingKey(key, true); }}
                   onPointerUp={() => engine.current?.swingKey(key, false)}
                   onPointerCancel={() => engine.current?.swingKey(key, false)}
@@ -1010,7 +1015,7 @@ function VillageScene() {
                 onClick={event => { if (event.detail === 0) engine.current?.brakeSwing(); }}>
                 <kbd aria-hidden="true">␣</kbd>{t("Brake", "ブレーキ")}
               </button>
-              <button className="v-interact" aria-keyshortcuts="E" onClick={() => { engine.current?.leaveSwing(); canvas.current?.querySelector("canvas")?.focus(); }}>
+              <button className="v-interact" aria-keyshortcuts="E Escape" onClick={() => { engine.current?.leaveSwing(); canvas.current?.querySelector("canvas")?.focus(); }}>
                 <kbd aria-hidden="true">E</kbd>{t("Get off", "降りる")}
               </button>
             </div>
@@ -1074,7 +1079,7 @@ function VillageScene() {
               onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}>
               <kbd aria-hidden="true">P</kbd>{t(puppyIsFollowing ? "Home" : "Walk", puppyIsFollowing ? "おうちへ" : "お散歩")}
             </button>
-            <button ref={puppyTricksToggle} className="v-interact v-puppy-tricks-toggle" aria-keyshortcuts="T" aria-expanded={puppyTricksOpen} aria-controls="v-puppy-tricks"
+            <button ref={puppyTricksToggle} className="v-interact v-puppy-tricks-toggle" aria-keyshortcuts={puppyTricksOpen ? "T Escape" : "T"} aria-expanded={puppyTricksOpen} aria-controls="v-puppy-tricks"
               onClick={() => setTricksPuppyId(puppyTricksOpen ? null : nearPuppy.id)}>
               <kbd aria-hidden="true">T</kbd>{t("Tricks", "芸")}
               <CaretDown size={12} aria-hidden="true" />

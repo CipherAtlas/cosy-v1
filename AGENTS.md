@@ -20,6 +20,10 @@ Whenever creating or adding new village assets, objects, buildings, props, veget
 
 NPC conversation actions and nearby animal interaction buttons must show their real keyboard shortcuts in clear, square `kbd` keycaps inside the clickable button. Keep the keycaps visible on desktop and touch layouts, preserve a distinct button boundary and at least a 44 px touch target, and keep click/tap and keyboard actions equivalent. Do not show a keycap for an action without that shortcut.
 
+# Button press feedback
+
+Every village button, including NPC conversation/actions, animal interactions, swing controls, activities and menus, must give immediate, subtle visual press feedback for pointer and keyboard activation, including its real shortcuts. Use a brief press-and-release animation without moving surrounding layout or delaying the action. Respect reduced motion with a still highlight instead of movement, and never animate disabled controls. Keep translucent forest-green interaction panels, cream text, bordered buttons and square keycaps consistent; the meadow swing controls use the same treatment as the nearby dog panel.
+
 # Documentation after code changes
 
 After every code change, update the relevant existing documentation in the same change. For village work, record the behavior, checks actually run, and remaining limits in `VILLAGE_BUILD.md`; keep `VILLAGE_HANDOFF.md`, `README.md`, and affected village or layout-editor guides aligned with current behavior. For other features, update their corresponding docs. Distinguish local verification from live or deployed results.
