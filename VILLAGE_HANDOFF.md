@@ -1,8 +1,10 @@
 # Cosy Village — canonical handoff
 
-## 2026-09-30 — shared interaction release preparation
+## 2026-09-30 — shared interaction release (published)
 
-The user authorized committing/pushing main and deployment with only necessary verification. The public release includes swing/trick/panel fixes plus the integrated shared-height and pack-camera corrections; local chat-admin/archive work stays uncommitted. Existing completed local checks are reused. Worker version `de2ce640-370e-4fd7-81f8-4163fd97055b` is deployed and production health passed; Pages publication and a brief live two-client smoke check remain pending. [Release preparation](VILLAGE_BUILD.md#2026-09-30-shared-interaction-release-preparation).
+[Commit `9515cd7`](https://github.com/CipherAtlas/cosy-v1/commit/9515cd77f653c1e6deed9ba8e37e035ba0b1da65) is pushed to main and published through successful [Pages run 36741743392](https://github.com/CipherAtlas/cosy-v1/actions/runs/36741743392). Worker version `de2ce640-370e-4fd7-81f8-4163fd97055b` deployed first; health passed. Nine brief live checks with two Chrome clients verified the rider/seat attachment, seat release, remote Dance playback, persistent menu and waiting dog, Escape close, no page errors and private-tooling exclusion. Previously completed local checks were reused. [Release evidence and remaining limits](VILLAGE_BUILD.md#2026-09-30-shared-interaction-release-published).
+
+The release also contains the integrated shared jump-height and player-focused pack-camera fixes. Their focused local evidence, plus the other tricks and reconnect/hibernation checks, was not repeated live. Physical hardware, Safari, screen readers, adverse latency and performance acceptance remain open. Local chat-admin/archive work stays uncommitted. The evidence-only follow-up skips CI to avoid rebuilding unchanged application code; dated local checkpoints below are historical.
 
 ## 2026-09-30 — shared swings, dog tricks and unified dog panel (local)
 

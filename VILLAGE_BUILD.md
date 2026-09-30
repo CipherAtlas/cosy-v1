@@ -1,10 +1,12 @@
 # Cosy Village — implementation and evidence ledger
 
-## 2026-09-30 shared interaction release preparation
+## 2026-09-30 shared interaction release (published)
 
-The authorized public release includes synchronized swing riders/occupancy, shared dog tricks, the persistent unified dog panel, shared jump height and the integrated player-focused pack camera. Local chat-admin/archive files and their documentation remain outside this release. Previously completed local typecheck, isolated static export and focused checks are reused; `git diff --check` passed during the release audit. No dependency, deployment configuration, layout or editor change is included.
+[Application commit `9515cd7`](https://github.com/CipherAtlas/cosy-v1/commit/9515cd77f653c1e6deed9ba8e37e035ba0b1da65) publishes synchronized swing riders/occupancy, all six shared dog tricks, the persistent unified dog panel, shared jump height and the integrated player-focused pack camera. Both build and deploy succeeded in [Pages run 36741743392](https://github.com/CipherAtlas/cosy-v1/actions/runs/36741743392). The shared Worker deployed first with version `de2ce640-370e-4fd7-81f8-4163fd97055b`; production `/health` returned `{"ok":true}`. Existing completed local checks below were reused, with a final diff audit; no further local suite or build was repeated. No dependency, deployment configuration, layout or editor change is included.
 
-The shared Worker deployed successfully before the client, with version `de2ce640-370e-4fd7-81f8-4163fd97055b`; its production `/health` returned `{"ok":true}`. GitHub Pages publication and a brief live two-client smoke check are pending.
+Nine brief live Chrome checks passed with two clients on `https://cosy.sabarg.com/`: both joined the production shared world, the rider stayed attached to the moving seat (offset below 0.001 m), getting off released it, Dance animated on the observer, the menu stayed open after choosing and finishing the trick, the dog stayed in place, and Escape closed/released the interaction. No page errors were captured. The public root returned 200; `/editor/`, `/admin/` and `/api/layouts` returned 404. [Publication evidence](docs/village/evidence/shared-interactions-publication.json).
+
+The remaining live tricks, reconnect/hibernation, jump height and camera scenarios rely on the focused local evidence below; this release smoke did not repeat them. Physical laptop hardware, Safari, screen readers, adverse network latency and target-device performance remain unverified. Local chat-admin/archive files and their shared-document sections stay uncommitted. The earlier local entries are historical checkpoints. Release evidence is committed separately with CI skipped because it changes documentation only; the published application remains the successful application commit above.
 
 ## 2026-09-30 shared swings, dog tricks and unified dog panel (local)
 

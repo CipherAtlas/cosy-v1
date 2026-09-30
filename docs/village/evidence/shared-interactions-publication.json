@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-09-30T16:08:44.290Z",
+  "site": "https://cosy.sabarg.com/",
+  "workerVersion": "de2ce640-370e-4fd7-81f8-4163fd97055b",
+  "applicationCommit": "9515cd77f653c1e6deed9ba8e37e035ba0b1da65",
+  "checks": [
+    "Two live browser clients joined the production shared world",
+    "Live observer sees the rider attached to the moving swing seat",
+    "Getting off releases the live shared seat",
+    "Dance plays visibly on the other production client",
+    "The live Tricks menu stays open after choosing a trick",
+    "The dog waits beside the persistent live panel after its trick finishes",
+    "Escape closes the live list and releases the dog",
+    "No captured live browser page errors",
+    "The live site is available and private tooling routes remain excluded"
+  ],
+  "riderSeatGap": 0,
+  "http": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/editor/",
+      "status": 404
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/api/layouts",
+      "status": 404
+    }
+  ],
+  "errors": [],
+  "pagesRun": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36741743392"
+}
