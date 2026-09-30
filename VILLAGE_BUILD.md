@@ -1,5 +1,11 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-30 small arms and individual dog invitations release (published)
+
+The restored small-fin spirit, lowered whole-body petting, individually collected dog pack and matching editor/artwork/documentation shipped in [commit `4ec043e`](https://github.com/CipherAtlas/cosy-v1/commit/4ec043e0f924de1f3625c9560869c7fb04685c50) through successful [Pages run 36717133961](https://github.com/CipherAtlas/cosy-v1/actions/runs/36717133961). Both build and deploy jobs completed. Fresh production-configured static export (22 pages), sequential typecheck, 107 pack/hand-contact checks, 46 companion checks, manifest/export byte checks and diff checks passed. The playable layout, named copies and protected presets are unchanged. No Worker, dependency or deployment configuration change was included.
+
+Live HTTP checks returned 200 for the root, v3 spirit, puppy kit and world layout, with all three asset/layout downloads byte-identical to committed source. `/editor/`, `/admin/`, `/api/layouts`, `/api/apply` and `/tools/village-editor/` returned 404. The in-app browser entered and connected to the shared village, showed P/H and no L summon entry in Controls, opened Bird clearing and returned to exploration. F advanced Wren's dialogue and made her crumb gift available. No browser errors were captured. Live dog petting/collection, seated bird feeding, physical touch, Safari, screen readers, large editor-scaled dogs, multi-visitor behavior and target-device performance remain unverified. The local checkpoint below records earlier implementation evidence and its pre-release status.
+
 ## 2026-09-30 small blob arms and collecting dogs (local)
 
 The long articulated-arm pass has been replaced with the original small Blender fins. `scripts/village/create_spirit.py`, `assets/village/spirit.blend`, `public/village/models/spirit.glb` and `docs/village/spirit-manifest.json` now contain the v3 spirit: 437,768 bytes / 22,464 triangles, with two original 0.27 m-wide movable fins and no shoulder/elbow/wrist limb geometry. The runtime and local editor load the same version for player, residents and shared visitors. Existing asset IDs, the six dog models, playable layout and protected presets are preserved.

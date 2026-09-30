@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-09-30 — small arms and individual dog invitations release (published)
+
+[Commit `4ec043e`](https://github.com/CipherAtlas/cosy-v1/commit/4ec043e0f924de1f3625c9560869c7fb04685c50) and successful [Pages run 36717133961](https://github.com/CipherAtlas/cosy-v1/actions/runs/36717133961) publish the restored tiny fins, lowered petting and nearby-only dog invitations. Fresh build/typecheck, 107 pack/contact and 46 companion checks, unchanged layout/presets and private-tooling exclusion passed. Live assets match source bytes; arrival/shared connection, Controls without L, Bird clearing exit and Wren F dialogue passed without captured browser errors. [Release evidence and remaining limits](VILLAGE_BUILD.md#2026-09-30-small-arms-and-individual-dog-invitations-release-published). Live dog petting/collection, seated feeding and device/performance acceptance remain open. The local checkpoint below describes the preceding implementation; its no-deployment statement is historical.
+
 ## 2026-09-30 — small blob arms and collecting dogs (local)
 
 The rejected long arms have been removed in Blender and runtime code. The original small movable fins are back for player, residents, shared visitors and the local editor (v3 GLB: 437,768 bytes / 22,464 triangles). Petting lowers the whole blob beside the animated cheek, eases in/out over 0.65 seconds and gently rotates the tiny hand at its original scale. Clear-side stance checks, waiting walkers, cancellation, reduced motion and resident hand-holding remain verified. The pet camera shows both faces on desktop and portrait.
