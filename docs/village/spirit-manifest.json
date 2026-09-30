@@ -1,26 +1,23 @@
 {
-  "id": "cosy-spirit-v2",
+  "id": "cosy-spirit-v3",
   "status": "original stylized player and residents",
   "runtimeFile": "public/village/models/spirit.glb",
   "sourceFile": "assets/village/spirit.blend",
   "creatorOrTool": "Original scripted modeling, Blender 5.2.1 LTS",
   "license": "Original project artwork; no third-party character assets",
-  "sha256": "961cb091020d64852645cdbd744e401256392ec1189b5e74daa79b21dee9d4ba",
-  "bytes": 524132,
+  "sha256": "f859fab5f915415bf84333317f60502980bb7bfc54b1b0af1612ea52f9a0d599",
+  "bytes": 437768,
   "units": "metres",
   "upAxis": "+Y",
   "forwardAxis": "+Z",
-  "triangles": 26784,
+  "triangles": 22464,
   "materials": 3,
   "textures": 0,
-  "animation": "Runtime shoulder and elbow IK with rounded hands, contact-aware petting and companion hand-holding, hover and jump squash. Ground traversal is unchanged.",
+  "animation": "Tiny movable fins, lowered whole-body petting, companion hand-holding, hover and jump squash. Ground traversal is unchanged.",
   "arms": {
-    "upperLength": 0.36,
-    "forearmLength": 0.38,
-    "joints": [
-      "shoulder",
-      "elbow",
-      "wrist"
-    ]
+    "style": "original tiny fins",
+    "width": 0.27,
+    "height": 0.16,
+    "depth": 0.25
   }
 }

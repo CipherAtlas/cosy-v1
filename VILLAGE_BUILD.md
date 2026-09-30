@@ -1,5 +1,29 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-09-30 small blob arms and collecting dogs (local)
+
+The long articulated-arm pass has been replaced with the original small Blender fins. `scripts/village/create_spirit.py`, `assets/village/spirit.blend`, `public/village/models/spirit.glb` and `docs/village/spirit-manifest.json` now contain the v3 spirit: 437,768 bytes / 22,464 triangles, with two original 0.27 m-wide movable fins and no shoulder/elbow/wrist limb geometry. The runtime and local editor load the same version for player, residents and shared visitors. Existing asset IDs, the six dog models, playable layout and protected presets are preserved.
+
+Petting moves the whole blob beside the animated cheek and lowers its hover, keeping the little hand at its original scale. Entry and release ease over 0.65 seconds; the hand rotates gently during the stroke. The six default-size dogs lowered the body from its normal 0.62 m hover to about 0.26–0.44 m, with a clear return to the normal position. Stance checks choose an unobstructed side or reject the interaction if both approaches are blocked. The dog still approaches and faces the visitor before its response starts; other walkers wait, and walking/jumping/activities cancel the pet. Reduced motion holds still poses. A front diagonal camera keeps the blob and dog faces visible. Local desktop/portrait captures and the Samoyed/Collie/Shepherd movie were visually inspected.
+
+Approach a dog and choose **P / Walk with** to add that dog to the existing walkers. Additional dogs must be approached and invited individually. The **Walk with all dogs** button, **L** shortcut, Controls-guide entry, engine action, bulk invitation API and unused style are removed. **H** still sends the collected pack home; P can release one nearby walker. Paired/single-file navigation, spacing, turns and waiting remain intact. The walking camera centers the actual nearby collected dogs and player so curved collection routes stay framed on portrait screens.
+
+Verified locally with **707 Chrome checks**:
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Breeds, patrols, tricks, invitation/home, reduced motion, camera and recorded audio | 508 passed | [Engine checks](docs/village/evidence/puppy-small-arms-engine-checks.json) |
+| Tiny-fin geometry/scale, six lowered pets and release, blocked stances, nearby-only collection, inactive L, bridge/passage routes, separation and pack framing | 107 passed | [Pack checks](docs/village/evidence/puppy-small-arms-pack-checks.json) |
+| Small-fin resident hand-holding, turns, jumping, activities and routes | 46 passed | [Companion checks](docs/village/evidence/puppy-small-arms-companion-checks.json) |
+| Six shelf previews, transform save/reload, isolated Apply and preserved preset | 16 passed | [Editor checks](docs/village/evidence/puppy-small-arms-editor-checks.json) |
+| Exported desktop/phone keycaps and targets, individual P click/keyboard, inactive L, H and landscape scrolling | 30 passed | [UI checks](docs/village/evidence/puppy-small-arms-ui-checks.json) |
+
+`npm run typecheck`, the root static export from an isolated copy and `git diff --check` passed. The final runtime/editor source matches that build copy; the spirit manifest hash/size and exported GLB/layout bytes match. Export inspection found no editor/admin route, editor code or layout save/Apply API. Editor tests used temporary layouts/playable files; the repository's playable layout, named working copies and presets were not changed. Existing unrelated workspace-root, Browserslist and RoomScene image warnings remain.
+
+Fresh release preparation also passed the production-configured root static export (22 pages), sequential `npm run typecheck`, 107 pack/hand-contact checks, 46 companion checks and `git diff --check`. Both GLBs match their manifests and exported bytes; the exported layout matches the unchanged playable source. Protected presets and named layouts are unchanged, and export inspection found no editor/admin route, code or layout save/Apply API.
+
+[Current motion preview](docs/village/evidence/puppy-small-arms-motion.webm), [desktop pet](docs/village/evidence/puppy-small-arms-petting.png), [portrait pet](docs/village/evidence/puppy-small-arms-petting-phone.png), [phone controls](docs/village/evidence/puppy-small-arms-controls-phone.png). These supersede the earlier long-arm preview. Physical touch, Safari, screen readers, large editor-scaled dogs, live shared sessions and target-device performance remain unverified. **No Git write or deployment occurred.** The preceding published release still has the earlier arms and summon-all behavior until a separately authorized release.
+
 ## 2026-09-30 dog pack and seated bird feeding release (published)
 
 Reviewed the complete pending change set for release: the six-dog skeletal rework, pack walking and tricks, articulated blob hands, seated bird feeding and sad bird poses, shared-chat composer styling, matching local-editor assets, source artwork, manifests and evidence. No Worker, dependency or deployment configuration changes are included.

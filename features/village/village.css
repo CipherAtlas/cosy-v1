@@ -984,7 +984,6 @@ kbd {
 .v-world-feedback .v-puppy-trick-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
 .v-world-feedback .v-puppy-trick-list .v-interact { min-height: 44px; padding: 7px 10px; gap: 7px; }
 .v-world-feedback .v-puppy-home { align-self: center; padding: 7px 12px; font-size: 13px; }
-.v-world-feedback .v-puppy-walk-all { border-color: #557b67; background: #e6efde; }
 .v-world-feedback .v-notice, #v-activity-panel .v-notice {
   position: static; transform: none; width: auto; max-width: 100%; margin: 0;
   box-sizing: border-box; flex: 0 0 auto; pointer-events: none;

@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "corgi is in the shelf with a rendered preview",
+    "shiba is in the shelf with a rendered preview",
+    "beagle is in the shelf with a rendered preview",
+    "samoyed is in the shelf with a rendered preview",
+    "collie is in the shelf with a rendered preview",
+    "shepherd is in the shelf with a rendered preview",
+    "Six pups are in the playable working copy",
+    "Mochi supports saved placement, facing and uniform scale",
+    "An additional beagle can be placed from the library",
+    "An additional collie can be placed from the library",
+    "An additional shepherd can be placed from the library",
+    "Puppy transform survives a named file save",
+    "Puppy transform survives editor reload",
+    "Apply carries puppy placement into the isolated playable layout",
+    "Protected preset is byte-identical",
+    "Editor has no page errors"
+  ],
+  "fileId": "layout-a64d656f-14eb-4b41-9cd0-a0bec50a443a",
+  "errors": []
+}

@@ -406,7 +406,7 @@ export function Village() {
             setNotice(preferences.current.language === "ja"
               ? puppies.length ? `${puppies.length}匹の犬がいっしょにお散歩します。` : "犬たちはいつもの場所に戻ります。"
               : puppies.length === 1 ? `${puppies[0].name} walks with you.`
-                : puppies.length ? `${puppies.length} dogs are gathering for your walk.` : "The dogs head back to their usual spots.");
+                : puppies.length ? `${puppies.length} dogs are walking with you.` : "The dogs head back to their usual spots.");
           },
           puppySound: (breed, position, kind) => audio.current?.puppyEffect(breed, position, kind),
           puppyPetted: puppy => setNotice(preferences.current.language === "ja"
@@ -968,15 +968,6 @@ export function Village() {
             }}>
             <kbd aria-hidden="true">P</kbd>{t(followingPuppies.some(puppy => puppy.id === nearPuppy.id) ? `Let ${nearPuppy.name} go home` : `Walk with ${nearPuppy.name}`, followingPuppies.some(puppy => puppy.id === nearPuppy.id) ? `${nearPuppy.name}を元の場所に戻す` : `${nearPuppy.name}と歩く`)}
           </button>
-          {followingPuppies.length < (engine.current?.puppyCount ?? 0) && <button className="v-interact v-puppy-walk-all" aria-keyshortcuts="L"
-            onClick={() => engine.current?.walkAllPuppies()}
-            onKeyDown={event => {
-              if (event.key.toLowerCase() === "l" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
-                event.preventDefault(); event.stopPropagation(); engine.current?.walkAllPuppies();
-              }
-            }}>
-            <kbd aria-hidden="true">L</kbd>{t("Walk with all dogs", "みんなでお散歩")}<PawPrint size={17} />
-          </button>}
           <details className="v-puppy-tricks" key={nearPuppy.id}>
             <summary>{t("Tricks", "芸を見せて")}</summary>
             <div className="v-puppy-trick-list">
@@ -1097,7 +1088,6 @@ export function Village() {
                     ["Space", t("Jump", "ジャンプ")],
                     ["E", t("Pet a puppy, tend plants, sit, enter an activity, or share harvest over tea with Luma", "子犬をなでる・植物のお世話・座る・近くの場所に入る・ルマと収穫をお茶で分かち合う")],
                     ["P", t("Invite a nearby puppy to walk with you", "近くの子犬と一緒に歩く")],
-                    ["L", t("Call all dogs for a walk together", "みんなでお散歩")],
                     ["H", t("Send all walking dogs home", "犬たちを元の場所に戻す")],
                     ["Z / X / V / Q", t("Ask a nearby puppy to sit, dance, spin or bow", "近くの子犬におすわり・ダンス・まわって・おじぎをお願いする")],
                     ["Enter", t("Message the village", "村のチャットに入力")],

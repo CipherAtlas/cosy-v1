@@ -138,12 +138,6 @@ export class PuppyPack {
     return puppy.info;
   }
 
-  inviteAll(player: T.Vector3, heading: number): NearbyPuppy[] {
-    this.beginWalk(player, heading);
-    for (const puppy of this.puppies) this.join(puppy);
-    return this.followers;
-  }
-
   dismiss(id?: string): NearbyPuppy[] {
     const leaving = this.puppies.filter(puppy => this.followingIds.includes(puppy.info.id) && (!id || puppy.info.id === id));
     this.followingIds = this.followingIds.filter(value => !leaving.some(puppy => puppy.info.id === value));
@@ -196,11 +190,14 @@ export class PuppyPack {
 
   get pettingPuppy() { return this.puppies.find(puppy => puppy.petting || puppy.petTarget) ?? null; }
 
-  petContact(): T.Vector3 | null {
+  petContact(heading = 0, side = -1): T.Vector3 | null {
     const puppy = this.pettingPuppy;
     if (!puppy?.petting) return null;
     puppy.actor.updateWorldMatrix(true, true);
-    return puppy.head.getWorldPosition(new T.Vector3()).add(new T.Vector3(0, .29 * puppy.actor.scale.y, 0));
+    // Put the tiny paddle just outside the near cheek; the blob moves to meet it.
+    const size = puppy.actor.scale.y;
+    return puppy.head.getWorldPosition(new T.Vector3()).add(new T.Vector3(
+      Math.cos(heading) * side * .38 * size, -.07 * size, -Math.sin(heading) * side * .38 * size));
   }
 
   private walkToward(puppy: Puppy, delta: number, target: [number, number], speed: number, player: T.Vector3) {

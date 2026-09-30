@@ -2,7 +2,6 @@
 Metres, Blender -Y forward / Z up. GLB +Z forward / Y up. Runtime handles hovering.
 """
 import bpy, math, json, hashlib
-from mathutils import Vector
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -39,23 +38,8 @@ def oval(name,pos,scale,mat):
  bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
  return finish(ob,mat)
 for side in [-1,1]:
- # Rounded mittens on a shoulder, elbow and wrist hierarchy, shared by every blob.
- suffix='L' if side<0 else 'R'
- shoulder=bpy.data.objects.new('SpiritFin'+suffix,None);bpy.context.collection.objects.link(shoulder)
- shoulder.location=(side*.31,.035,.43)
- upper=oval('SpiritUpperArm'+suffix,(0,0,.18),(.065,.065,.21),cloud);upper.parent=shoulder
- elbow=bpy.data.objects.new('SpiritElbow'+suffix,None);bpy.context.collection.objects.link(elbow);elbow.parent=shoulder;elbow.location=(0,0,.36)
- lower=oval('SpiritForearm'+suffix,(0,0,.19),(.06,.06,.22),cloud);lower.parent=elbow
- wrist=bpy.data.objects.new('SpiritWrist'+suffix,None);bpy.context.collection.objects.link(wrist);wrist.parent=elbow;wrist.location=(0,0,.38)
- hand=oval('SpiritHand'+suffix,(0,-.012,.035),(.088,.066,.105),cloud);hand.parent=wrist
- thumb=oval('SpiritThumb'+suffix,(side*.064,-.018,.024),(.045,.055,.055),cloud);thumb.parent=wrist
- goal=Vector((side*.13,-.12,-.32));distance=goal.length;direction=goal.normalized()
- along=(.36**2-.38**2+distance**2)/(2*distance)
- bend=Vector((side*.35,-1,-.35));bend=(bend-direction*bend.dot(direction)).normalized()
- upper_direction=direction*along+bend*math.sqrt(.36**2-along**2)
- shoulder.rotation_mode='QUATERNION';shoulder.rotation_quaternion=Vector((0,0,1)).rotation_difference(upper_direction.normalized())
- lower_direction=shoulder.rotation_quaternion.inverted()@(goal-upper_direction)
- elbow.rotation_mode='QUATERNION';elbow.rotation_quaternion=Vector((0,0,1)).rotation_difference(lower_direction.normalized())
+ fin=oval('SpiritFinL' if side<0 else 'SpiritFinR',(side*.426,.015,.405),(.135,.125,.08),cloud)
+ fin.rotation_euler.y=side*-.28
  oval('Kind eye', (side*.128,-.318,.546),(.031,.014,.046),ink)
  oval('Soft rosy cheek',(side*.227,-.279,.435),(.065,.009,.027),blush)
 # Smile follows the curved surface, so it remains attached in side views.
@@ -67,7 +51,7 @@ for i in range(25):
  spline.points[i].co=(x,y,z,1)
 smile=bpy.data.objects.new('Gentle smile',curve);bpy.context.collection.objects.link(smile);smile.data.materials.append(ink)
 bpy.context.view_layer.objects.active=smile;smile.select_set(True);bpy.ops.object.convert(target='MESH');smile=bpy.context.object;meshes.append(smile)
-# Join facial pieces per material; preserve the articulated arms.
+# Join facial pieces per material; preserve the tiny movable fins.
 for mat in [ink,blush]:
  bpy.ops.object.select_all(action='DESELECT');parts=[o for o in bpy.context.scene.objects if o.type=='MESH' and o.data.materials and o.data.materials[0]==mat]
  for o in parts:o.select_set(True)
@@ -77,5 +61,5 @@ bpy.context.preferences.filepaths.save_version=0
 source=ROOT/'assets/village/spirit.blend';output=ROOT/'public/village/models/spirit.glb'
 bpy.ops.wm.save_as_mainfile(filepath=str(source))
 bpy.ops.export_scene.gltf(filepath=str(output),export_format='GLB',export_yup=True,export_animations=False)
-manifest={'id':'cosy-spirit-v2','status':'original stylized player and residents','runtimeFile':str(output.relative_to(ROOT)),'sourceFile':str(source.relative_to(ROOT)),'creatorOrTool':'Original scripted modeling, Blender '+bpy.app.version_string,'license':'Original project artwork; no third-party character assets','sha256':hashlib.sha256(output.read_bytes()).hexdigest(),'bytes':output.stat().st_size,'units':'metres','upAxis':'+Y','forwardAxis':'+Z','triangles':sum(len(p.vertices)-2 for o in bpy.context.scene.objects if o.type=='MESH' for p in o.data.polygons),'materials':3,'textures':0,'animation':'Runtime shoulder and elbow IK with rounded hands, contact-aware petting and companion hand-holding, hover and jump squash. Ground traversal is unchanged.','arms':{'upperLength':.36,'forearmLength':.38,'joints':['shoulder','elbow','wrist']}}
+manifest={'id':'cosy-spirit-v3','status':'original stylized player and residents','runtimeFile':str(output.relative_to(ROOT)),'sourceFile':str(source.relative_to(ROOT)),'creatorOrTool':'Original scripted modeling, Blender '+bpy.app.version_string,'license':'Original project artwork; no third-party character assets','sha256':hashlib.sha256(output.read_bytes()).hexdigest(),'bytes':output.stat().st_size,'units':'metres','upAxis':'+Y','forwardAxis':'+Z','triangles':sum(len(p.vertices)-2 for o in bpy.context.scene.objects if o.type=='MESH' for p in o.data.polygons),'materials':3,'textures':0,'animation':'Tiny movable fins, lowered whole-body petting, companion hand-holding, hover and jump squash. Ground traversal is unchanged.','arms':{'style':'original tiny fins','width':.27,'height':.16,'depth':.25}}
 (ROOT/'docs/village/spirit-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');print(json.dumps(manifest))

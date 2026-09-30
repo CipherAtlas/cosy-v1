@@ -11,7 +11,7 @@ import { BirdFlock, type BirdStatus } from "./birds";
 import { PuppyPack, puppyCommandForKey, type NearbyPuppy, type PuppyCommand } from "./puppies";
 import type { PuppyBreed } from "./worldLayout";
 import { VillageLife } from "./life";
-import { CompanionHands, poseBlobArm, relaxBlobArm } from "./companionWalk";
+import { CompanionHands, relaxBlobArm } from "./companionWalk";
 import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
@@ -36,6 +36,7 @@ export class VillageEngine {
   private puppies?: PuppyPack;
   private nearPuppy: NearbyPuppy | null = null;
   private puppyPetTarget = new T.Vector3();
+  private puppyPetSide = -1;
   private puppyTrickId: string | null = null;
   private birdFeedAt = -100;
   private dialogue?: VillagerDialogue;
@@ -178,8 +179,6 @@ export class VillageEngine {
     if (e.key.toLowerCase() === "b" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.bread();
     if (e.key.toLowerCase() === "p" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && this.nearPuppy)
       this.togglePuppyFollow(this.nearPuppy.id);
-    if (e.key.toLowerCase() === "l" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey)
-      this.walkAllPuppies();
     if (e.key.toLowerCase() === "h" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey)
       this.sendPuppyHome();
     if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && this.nearPuppy) {
@@ -447,7 +446,7 @@ export class VillageEngine {
     const [world, gltf, gardenKit, dove, puppyKit] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
-        withBasePath("/village/models/spirit.glb?v=2"),
+        withBasePath("/village/models/spirit.glb?v=3"),
       ),
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
@@ -1115,6 +1114,14 @@ export class VillageEngine {
   petPuppy(id: string) {
     if (this.blocked || this.place || this.seatedBench || !this.movement?.grounded || this.movement.speed > .18 || !this.puppies?.pet(id, this.player.position)) return false;
     const puppy = this.puppies.puppies.find(value => value.info.id === id)!;
+    const bearing = Math.atan2(puppy.actor.position.x - this.player.position.x, puppy.actor.position.z - this.player.position.z) + Math.PI;
+    const beside = .38 * puppy.actor.scale.y + .426 * this.spiritScale;
+    const ahead = -(1.14 - .43 * puppy.actor.scale.y);
+    const side = [-1, 1].find(value => this.movement!.canWalkTo(
+      this.player.position.x + Math.sin(bearing) * ahead + Math.cos(bearing) * value * beside,
+      this.player.position.z + Math.cos(bearing) * ahead - Math.sin(bearing) * value * beside));
+    if (side === undefined) { this.puppies.cancelPet(); return false; }
+    this.puppyPetSide = side;
     this.puppyPetTarget.copy(puppy.actor.position);
     this.callbacks.puppyPetted?.(puppy.info);
     return true;
@@ -1134,13 +1141,6 @@ export class VillageEngine {
     } else if (!this.puppies.invite(id, this.player.position, this.player.rotation.y)) return false;
     this.callbacks.puppyFollowing?.(this.puppies.followers);
     return true;
-  }
-  get puppyCount() { return this.puppies?.puppies.length ?? 0; }
-  walkAllPuppies() {
-    if (this.blocked || this.place || this.seatedBench || !this.puppies || !this.nearPuppy) return false;
-    const puppies = this.puppies.inviteAll(this.player.position, this.player.rotation.y);
-    this.callbacks.puppyFollowing?.(puppies);
-    return puppies.length > 0;
   }
   sendPuppyHome() {
     if (this.blocked || this.place || !this.puppies?.dismiss().length) return false;
@@ -1348,10 +1348,19 @@ export class VillageEngine {
   private updateWalkingCamera() {
     this.lookGoal.copy(this.player.position).add(this.temp.set(0, 1.35, 0));
     this.lookGoal.y += Math.max(0, -Math.sin(this.pitch)) * 2.4;
-    const dogs = this.seatedBench ? 0 : this.puppies?.followers.length ?? 0;
+    const followers = this.puppies?.followers ?? [];
+    const dogs = this.seatedBench ? 0 : followers.length;
     const packBack = Math.max(0, Math.min(1.8, (dogs - 1) * .3));
-    this.lookGoal.x -= Math.sin(this.player.rotation.y) * packBack;
-    this.lookGoal.z -= Math.cos(this.player.rotation.y) * packBack;
+    if (dogs && this.puppies) {
+      let minX = this.player.position.x, maxX = minX, minZ = this.player.position.z, maxZ = minZ;
+      for (const puppy of this.puppies.puppies) {
+        if (!followers.some(value => value.id === puppy.info.id) || puppy.actor.position.distanceTo(this.player.position) > 9) continue;
+        minX = Math.min(minX, puppy.actor.position.x); maxX = Math.max(maxX, puppy.actor.position.x);
+        minZ = Math.min(minZ, puppy.actor.position.z); maxZ = Math.max(maxZ, puppy.actor.position.z);
+      }
+      this.lookGoal.x = (minX + maxX) * .5;
+      this.lookGoal.z = (minZ + maxZ) * .5;
+    }
     const distance = this.seatedBench ? 3 : this.distance + (dogs ? Math.min(4.6, 1 + dogs * .6) : 0);
     this.cameraGoal.copy(this.player.position).add(this.temp.set(
       this.lookGoal.x - this.player.position.x + Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
@@ -1449,10 +1458,13 @@ export class VillageEngine {
       if (puppy?.id !== this.nearPuppy?.id) { this.nearPuppy = puppy; this.callbacks.nearPuppy?.(puppy); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
+    this.companionHands.reset();
     if (this.character) {
       const bob = this.reducedMotion || this.blocked || this.seatedBench ? 0 : Math.sin(this.elapsed*2.8)*.065;
+      this.character.position.x = 0;
       this.character.position.y = .62 + bob;
       this.character.position.z = 0;
+      this.character.rotation.y = 0;
       this.character.rotation.x = T.MathUtils.lerp(this.character.rotation.x, this.seatedBench ? -.08 : this.reducedMotion ? 0 : movement.speed*.022, 1-Math.exp(-dt*8));
       this.character.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*1.7)*.035;
       const squash = this.reducedMotion ? 0 : movement.landing>0 ? -.1 : movement.takeoff>0 ? .09 : 0;
@@ -1469,15 +1481,9 @@ export class VillageEngine {
     const pettingDog = this.puppies?.pettingPuppy;
     if (pettingDog) {
       this.puppyPetTarget.copy(pettingDog.actor.position);
-      const angle = Math.atan2(pettingDog.actor.position.x - this.player.position.x, pettingDog.actor.position.z - this.player.position.z);
+      const angle = Math.atan2(pettingDog.actor.position.x - this.player.position.x, pettingDog.actor.position.z - this.player.position.z) + Math.PI;
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 8));
-      if (this.character && pettingDog.petting) {
-        const petAge = pettingDog.petAge;
-        const reach = this.reducedMotion ? 1 : T.MathUtils.smoothstep(petAge, 0, .4) * (1 - T.MathUtils.smoothstep(petAge, 2.55, 3));
-        this.character.rotation.x = reach * .09;
-        this.character.position.z = reach * .15;
-      }
     }
     if (this.place) {
       this.updateActivityCamera(this.place);
@@ -1493,16 +1499,17 @@ export class VillageEngine {
         const sideX = -directionZ, sideZ = directionX;
         const middleX = this.player.position.x + dx * .5, middleZ = this.player.position.z + dz * .5;
         // Show the petting hand on the near side and keep tricks clear of the controls.
-        const side = -1;
+        const side = watchingPet ? this.puppyPetSide : -1;
         const portrait = this.camera.aspect < .85;
         const distance = watchingTrick ? (portrait ? 8.5 : 3.8) : (portrait ? 4.8 : 3.15);
         const offset = distance * Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect * .5;
-        const frameX = watchingTrick ? target.x - directionX * offset : middleX;
-        const frameZ = watchingTrick ? target.z - directionZ * offset : middleZ;
-        const back = watchingTrick ? 0 : -.25;
+        const frameX = watchingTrick ? target.x - directionX * offset : middleX + Math.cos(this.player.rotation.y) * this.puppyPetSide * .3;
+        const frameZ = watchingTrick ? target.z - directionZ * offset : middleZ - Math.sin(this.player.rotation.y) * this.puppyPetSide * .3;
+        const back = watchingTrick ? 0 : distance * .94;
+        const lateral = watchingTrick ? distance : distance * .35;
         this.lookGoal.set(frameX, this.player.position.y + .86, frameZ);
-        this.cameraGoal.set(frameX + sideX * side * distance - directionX * back,
-          this.player.position.y + 2.2, frameZ + sideZ * side * distance - directionZ * back);
+        this.cameraGoal.set(frameX + sideX * side * lateral - directionX * back,
+          this.player.position.y + 2.2, frameZ + sideZ * side * lateral - directionZ * back);
       }
     }
     if (this.rain) {
@@ -1532,13 +1539,22 @@ export class VillageEngine {
       this.camera.quaternion, this.player.rotation.y);
     if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),
       !this.place && !this.blocked && !this.seatedBench && !this.puppies?.pettingPuppy && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
-    const contact = this.puppies?.petContact();
+    const contact = this.puppies?.petContact(this.player.rotation.y, this.puppyPetSide);
     const dog = this.puppies?.pettingPuppy;
     if (contact && dog?.petting && this.character) {
-      const arm = this.spiritFins.find(fin => fin.name === "SpiritFinR");
-      const amount = this.reducedMotion ? 1 : T.MathUtils.smoothstep(dog.petAge, 0, .4) * (1 - T.MathUtils.smoothstep(dog.petAge, 2.55, 3));
-      contact.y += this.reducedMotion ? 0 : Math.sin(dog.petAge * 9) * .018 * amount;
-      if (arm) poseBlobArm(arm, contact, amount);
+      const hand = this.spiritFins.find(fin => fin.name === (this.puppyPetSide < 0 ? "SpiritFinR" : "SpiritFinL"));
+      if (hand) {
+        const amount = this.reducedMotion ? 1 : T.MathUtils.smoothstep(dog.petAge, 0, .65) * (1 - T.MathUtils.smoothstep(dog.petAge, 2.35, 3));
+        const stroke = this.reducedMotion ? 0 : Math.sin(dog.petAge * 7) * .025;
+        this.character.rotation.set(amount * .14, 0, 0);
+        hand.rotation.z = -this.puppyPetSide * amount * (.12 + stroke * 3);
+        this.player.updateWorldMatrix(true, false);
+        const target = this.player.worldToLocal(contact);
+        const offset = hand.position.clone().multiply(this.character.scale).applyQuaternion(this.character.quaternion);
+        const lowered = target.sub(offset);
+        // Bring the whole blob beside the dog's cheek, keeping the original tiny arms.
+        this.character.position.lerp(lowered, amount);
+      }
     }
     if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);
     this.world.wind.time.value = t;

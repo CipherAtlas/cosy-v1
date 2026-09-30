@@ -1,4 +1,8 @@
-# Village implementation evidence — updated 2026-09-29
+# Village implementation evidence — updated 2026-09-30
+
+## Small blob arms and collecting dogs
+
+[Current movie](puppy-small-arms-motion.webm), [desktop pet](puppy-small-arms-petting.png), [390×844 portrait pet](puppy-small-arms-petting-phone.png) and [phone controls](puppy-small-arms-controls-phone.png) show the original small fins, whole-blob lowering and individual dog invitations. The pet stills use the production-module renderer without React overlays; controls use the exported app. [Engine](puppy-small-arms-engine-checks.json), [pack/contact](puppy-small-arms-pack-checks.json), [companions](puppy-small-arms-companion-checks.json), [isolated editor](puppy-small-arms-editor-checks.json) and [exported UI](puppy-small-arms-ui-checks.json) contain 707 local Chrome checks. These supersede the long-arm/summon-all preview; older files remain historical. See [the build entry](../../../VILLAGE_BUILD.md#2026-09-30-small-blob-arms-and-collecting-dogs-local) for exact scope, verification and untested device/live behavior. No deployment occurred.
 
 ## Luma mint interaction cue
 

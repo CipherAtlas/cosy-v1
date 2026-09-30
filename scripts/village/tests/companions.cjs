@@ -63,13 +63,13 @@ const path = require('node:path');
       e.movement.settle(1, 27); e.player.rotation.y = Math.PI; e.setCompanions(['pip']);
       const pip = e.life.residents[0]; pip.movement.settle(2.05, 27); pip.root.rotation.y = Math.PI;
       tick(2);
-      check(e.companionHands.holdingCount === 2, 'Player and Pip hold their articulated hands while standing together');
+      check(e.companionHands.holdingCount === 2, 'Player and Pip hold their tiny hands while standing together');
       e.keys.add('w'); tick(2); e.keys.clear();
       check(e.companionHands.holdingCount === 2, 'Player and Pip keep holding hands while walking, including during dialogue');
       const gap = () => {
         e.player.updateWorldMatrix(true, true); pip.root.updateWorldMatrix(true, true);
         const a = e.spiritFins.find(f => f.name === 'SpiritFinL'), b = pip.fins.find(f => f.name === 'SpiritFinR');
-        return a.getObjectByName('SpiritWristL').getWorldPosition(new T.Vector3()).distanceTo(b.getObjectByName('SpiritWristR').getWorldPosition(new T.Vector3()));
+        return a.localToWorld(new T.Vector3(-.135, 0, 0)).distanceTo(b.localToWorld(new T.Vector3(.135, 0, 0)));
       };
       check(gap() < .035, 'The two hand tips visibly meet while walking');
       e.camera.position.set(-.7, 1.8, e.player.position.z - 4.2);

@@ -155,7 +155,7 @@ export class LayoutScene {
     }
     const [doveKit, spiritKit, puppyKit] = await Promise.all([
       new GLTFLoader().loadAsync("/village/models/dove.glb?v=1"),
-      new GLTFLoader().loadAsync("/village/models/spirit.glb?v=2"),
+      new GLTFLoader().loadAsync("/village/models/spirit.glb?v=3"),
       new GLTFLoader().loadAsync("/village/models/puppies.glb?v=4"),
     ]);
     for (const [breed, info] of Object.entries(PUPPY_INFO)) {
