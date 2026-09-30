@@ -35,7 +35,7 @@ import { isRadioStationId, isRadioTrack, RADIO_PAGE_SIZE, RADIO_STATIONS, search
 import type { RadioTrack } from "./soundtrack";
 import { HarvestInventory } from "./GardenActivities";
 import { VillageAudio } from "./audio";
-import { PUPPY_INFO, type NearbyPuppy } from "./puppies";
+import { PUPPY_INFO, PUPPY_TRICKS, puppyCommandForKey, type NearbyPuppy } from "./puppies";
 import { useSession } from "./useSession";
 import type { ActivityMoment, MovementStatus } from "./environment";
 import type { VillageEngine } from "./VillageEngine";
@@ -131,7 +131,7 @@ export function Village() {
   const [gardenStorageError, setGardenStorageError] = useState(false);
   const [nearGarden, setNearGarden] = useState<string | null>(null);
   const [nearPuppy, setNearPuppy] = useState<NearbyPuppy | null>(null);
-  const [followingPuppy, setFollowingPuppy] = useState<NearbyPuppy | null>(null);
+  const [followingPuppies, setFollowingPuppies] = useState<NearbyPuppy[]>([]);
   const [performanceReport, setPerformanceReport] = useState("");
   const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
   const enterRef = useRef(false);
@@ -210,6 +210,11 @@ export function Village() {
     };
     setNotice(messages[action.kind][preferences.current.language === "ja" ? 1 : 0]);
   }, []);
+  const scatterBenchCrumbs = useCallback(() => {
+    if (!engine.current?.sittingAtBirdBench) return;
+    if (!crumbsReadyRef.current) onGardenAction({ kind: "birdCrumbs" });
+    onGardenAction({ kind: "feedBirds" });
+  }, [onGardenAction]);
   const interactGarden = useCallback((id: string) => {
     const action = nearbyGardenAction(id, gardenRef.current);
     if (!action) return;
@@ -378,7 +383,7 @@ export function Village() {
     import("./VillageEngine")
       .then(async ({ VillageEngine }) => {
         if (cancelled) return;
-        setFollowingPuppy(null);
+        setFollowingPuppies([]);
         local = new VillageEngine(canvas.current!, {
           progress: setProgress,
           movement: setMovement,
@@ -396,18 +401,30 @@ export function Village() {
           nearGarden: setNearGarden,
           gardenInteract: interactGarden,
           nearPuppy: setNearPuppy,
-          puppyFollowing: puppy => {
-            setFollowingPuppy(puppy);
+          puppyFollowing: puppies => {
+            setFollowingPuppies(puppies);
             setNotice(preferences.current.language === "ja"
-              ? puppy
-                ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}が後ろをついてきます。`
-                : "子犬はいつもの場所に戻ります。"
-              : puppy ? `${puppy.name} trots along behind you.` : "Your puppy heads back to their usual spot.");
+              ? puppies.length ? `${puppies.length}匹の犬がいっしょにお散歩します。` : "犬たちはいつもの場所に戻ります。"
+              : puppies.length === 1 ? `${puppies[0].name} walks with you.`
+                : puppies.length ? `${puppies.length} dogs are gathering for your walk.` : "The dogs head back to their usual spots.");
           },
           puppySound: (breed, position, kind) => audio.current?.puppyEffect(breed, position, kind),
           puppyPetted: puppy => setNotice(preferences.current.language === "ja"
-            ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}はしっぽを振って喜んでいます。`
-            : `${puppy.name} wags happily and leans into your hand.`),
+            ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}がなでてもらいに近づいてきます。`
+            : `${puppy.name} comes closer for a gentle pet.`),
+          puppyCommanded: (puppy, command) => {
+            const action = {
+              sit: ["sits down for a little rest.", "はちょこんと座りました。"],
+              dance: ["dances with happy little hops!", "は楽しそうに踊っています！"],
+              spin: ["twirls around twice!", "はくるくる回っています！"],
+              bow: ["does a playful bow.", "は遊ぼうのポーズをしています。"],
+              wave: ["sits and waves a little paw!", "は座っておててを振っています！"],
+              roll: ["tucks up and rolls over!", "はごろんと転がっています！"],
+            }[command];
+            setNotice(preferences.current.language === "ja"
+              ? `${puppy.name === PUPPY_INFO[puppy.breed].name ? PUPPY_INFO[puppy.breed].japanese : puppy.name}${action[1]}`
+              : `${puppy.name} ${action[0]}`);
+          },
           contact: event => audio.current?.contact(event),
           environment: frame => audio.current?.setEnvironment(frame),
           ready: () => {
@@ -416,7 +433,7 @@ export function Village() {
           near: setNear,
           nearBench: setNearBench,
           seat: setSeatedBench,
-          scatterBirds: () => onGardenAction({ kind: "feedBirds" }),
+          scatterBirds: fromBench => fromBench ? scatterBenchCrumbs() : onGardenAction({ kind: "feedBirds" }),
           interact: openPlace,
           error: (msg) => {
             setError(msg);
@@ -455,7 +472,7 @@ export function Village() {
     };
     // Settings are applied independently, without remounting the world.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineAttempt, openPlace]);
+  }, [engineAttempt, openPlace, scatterBenchCrumbs]);
   useEffect(() => {
     engine.current?.setBlocked(!entered || panel !== null || sceneryLoading !== null);
     enterRef.current = entered;
@@ -906,16 +923,35 @@ export function Village() {
         {showWorldInteraction && seatedBench && <button className="v-interact" onClick={() => engine.current?.stand()}><kbd>E</kbd>{t("Stand up", "立ち上がる")}</button>}
         {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
         {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
-        {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact" disabled={birdMealBusy} onClick={() => onGardenAction({ kind: "feedBirds" })}>{!nearBench && !seatedBench && <kbd>E</kbd>}{garden.crumbPouch ? t("Scatter sourdough crumbs", "サワードウのパンくずを撒く") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")}<Bird size={17} /></button>}
-        {showWorldInteraction && followingPuppy && <button className="v-interact v-puppy-home" aria-keyshortcuts="H" onClick={() => engine.current?.sendPuppyHome()}
+        {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact v-bird-feed-button" disabled={birdMealBusy}
+          aria-keyshortcuts={seatedBench === "bird-clearing-bench" ? "F" : !nearBench && !seatedBench ? "E" : undefined}
+          onClick={() => seatedBench === "bird-clearing-bench" ? scatterBenchCrumbs() : onGardenAction({ kind: "feedBirds" })}
+          onKeyDown={event => {
+            const shortcut = seatedBench === "bird-clearing-bench" ? "f" : !nearBench && !seatedBench ? "e" : null;
+            if (shortcut && event.key.toLowerCase() === shortcut && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+              event.preventDefault(); event.stopPropagation();
+              if (shortcut === "f") scatterBenchCrumbs(); else onGardenAction({ kind: "feedBirds" });
+            }
+          }}>
+          {seatedBench === "bird-clearing-bench" ? <kbd aria-hidden="true">F</kbd> : !nearBench && !seatedBench && <kbd aria-hidden="true">E</kbd>}
+          {seatedBench === "bird-clearing-bench" || garden.crumbPouch ? t("Scatter sourdough crumbs", "サワードウのパンくずを撒く") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")}<Bird size={17} />
+        </button>}
+        {showWorldInteraction && followingPuppies.length > 0 && <button className="v-interact v-puppy-home" aria-keyshortcuts="H" onClick={() => engine.current?.sendPuppyHome()}
           onKeyDown={event => {
             if (event.key.toLowerCase() === "h" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
               event.preventDefault(); event.stopPropagation(); engine.current?.sendPuppyHome();
             }
           }}>
-          <kbd aria-hidden="true">H</kbd>{t(`Send ${followingPuppy.name} home`, `${followingPuppy.name === PUPPY_INFO[followingPuppy.breed].name ? PUPPY_INFO[followingPuppy.breed].japanese : followingPuppy.name}を元の場所に戻す`)}
+          <kbd aria-hidden="true">H</kbd>{t(followingPuppies.length === 1 ? `Send ${followingPuppies[0].name} home` : `Send all ${followingPuppies.length} dogs home`, "犬たちを元の場所に戻す")}
         </button>}
-        {showWorldInteraction && nearPuppy && !nearBench && !seatedBench && !nearbyAction && !nearBirds && <div className="v-puppy-actions">
+        {showWorldInteraction && nearPuppy && !nearBench && !seatedBench && !nearbyAction && !nearBirds && <div className="v-puppy-actions"
+          onKeyDown={event => {
+            if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
+            const command = puppyCommandForKey(event.key);
+            if (command) {
+              event.preventDefault(); event.stopPropagation(); engine.current?.commandPuppy(nearPuppy.id, command);
+            }
+          }}>
           <button className="v-interact" aria-keyshortcuts="E" onClick={() => engine.current?.petPuppy(nearPuppy.id)}
             onKeyDown={event => {
               if (event.key.toLowerCase() === "e" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
@@ -924,14 +960,33 @@ export function Village() {
             }}>
             <kbd aria-hidden="true">E</kbd>{t(`Pet ${nearPuppy.name}`, `${nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name}をなでる`)}<PawPrint size={17} />
           </button>
-          {followingPuppy?.id !== nearPuppy.id && <button className="v-interact" aria-keyshortcuts="P" onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}
+          <button className="v-interact" aria-keyshortcuts="P" onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}
             onKeyDown={event => {
               if (event.key.toLowerCase() === "p" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
                 event.preventDefault(); event.stopPropagation(); engine.current?.togglePuppyFollow(nearPuppy.id);
               }
             }}>
-            <kbd aria-hidden="true">P</kbd>{t(`Walk with ${nearPuppy.name}`, `${nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name}と歩く`)}
+            <kbd aria-hidden="true">P</kbd>{t(followingPuppies.some(puppy => puppy.id === nearPuppy.id) ? `Let ${nearPuppy.name} go home` : `Walk with ${nearPuppy.name}`, followingPuppies.some(puppy => puppy.id === nearPuppy.id) ? `${nearPuppy.name}を元の場所に戻す` : `${nearPuppy.name}と歩く`)}
+          </button>
+          {followingPuppies.length < (engine.current?.puppyCount ?? 0) && <button className="v-interact v-puppy-walk-all" aria-keyshortcuts="L"
+            onClick={() => engine.current?.walkAllPuppies()}
+            onKeyDown={event => {
+              if (event.key.toLowerCase() === "l" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+                event.preventDefault(); event.stopPropagation(); engine.current?.walkAllPuppies();
+              }
+            }}>
+            <kbd aria-hidden="true">L</kbd>{t("Walk with all dogs", "みんなでお散歩")}<PawPrint size={17} />
           </button>}
+          <details className="v-puppy-tricks" key={nearPuppy.id}>
+            <summary>{t("Tricks", "芸を見せて")}</summary>
+            <div className="v-puppy-trick-list">
+              {PUPPY_TRICKS.map(({ command, key, english, japanese }) =>
+                <button key={command} className="v-interact" aria-keyshortcuts={key}
+                  onClick={() => engine.current?.commandPuppy(nearPuppy.id, command)}>
+                  <kbd aria-hidden="true">{key}</kbd>{t(english, japanese)}
+                </button>)}
+            </div>
+          </details>
         </div>}
         {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
@@ -965,8 +1020,9 @@ export function Village() {
             else setNotice(t("Chat isn't ready yet. Your message is still here.", "チャットの準備ができていません。メッセージは入力欄に残っています。"));
           }}>
             <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => { event.stopPropagation(); if (event.key === "Enter" && Date.now() < chatCooldownUntil) event.preventDefault(); }} maxLength={180} placeholder='Press "Enter" to type!' disabled={sharedStatus !== "Connected"} />
-            <button type="submit" disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
-              {chatCooldownSeconds > 0 ? `Send in ${chatCooldownSeconds}s` : "Send"}
+            <button type="submit" aria-label={chatCooldownSeconds > 0 ? `Send in ${chatCooldownSeconds} seconds` : "Send message"} disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
+              <ArrowUp size={20} weight="bold" aria-hidden="true" />
+              {chatCooldownSeconds > 0 && <span className="v-shared-send-count" aria-hidden="true">{chatCooldownSeconds}</span>}
             </button>
           </form>
         </section>}
@@ -1032,6 +1088,7 @@ export function Village() {
                     ["Esc", t("Release the mouse / close", "マウスを解除 / 閉じる")],
                     [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
                     [t("Click or tap a bench side", "ベンチの左右をクリック・タップ"), t("Sit on that side", "選んだ側に座る")],
+                    ["F", t("Scatter crumbs from the birdwatching bench", "野鳥観察のベンチでパンくずを撒く")],
                     [t("Drag while settled", "ひと休み中にドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
                     ["G", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
@@ -1040,7 +1097,9 @@ export function Village() {
                     ["Space", t("Jump", "ジャンプ")],
                     ["E", t("Pet a puppy, tend plants, sit, enter an activity, or share harvest over tea with Luma", "子犬をなでる・植物のお世話・座る・近くの場所に入る・ルマと収穫をお茶で分かち合う")],
                     ["P", t("Invite a nearby puppy to walk with you", "近くの子犬と一緒に歩く")],
-                    ["H", t("Send your puppy home", "子犬を元の場所に戻す")],
+                    ["L", t("Call all dogs for a walk together", "みんなでお散歩")],
+                    ["H", t("Send all walking dogs home", "犬たちを元の場所に戻す")],
+                    ["Z / X / V / Q", t("Ask a nearby puppy to sit, dance, spin or bow", "近くの子犬におすわり・ダンス・まわって・おじぎをお願いする")],
                     ["Enter", t("Message the village", "村のチャットに入力")],
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],

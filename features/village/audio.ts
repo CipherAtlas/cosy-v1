@@ -389,7 +389,7 @@ export class VillageAudio {
     if (this.track(source, [gain, pan], c.currentTime + buffer.duration / .96, true)) source.start();
   }
   puppyEffect(breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") {
-    const c = this.context, buffer = this.puppySounds.get(breed);
+    const c = this.context, buffer = this.puppySounds.get(breed === "collie" ? "shiba" : breed === "shepherd" ? "beagle" : breed);
     if (!this.enabled || !c || !buffer || c.state !== "running" || document.hidden || this.mix.master === 0 || this.mix.effects === 0) return;
     const listener = this.environment.listener;
     if (Math.hypot(position[0] - listener[0], position[1] - listener[1], position[2] - listener[2]) > 22) return;

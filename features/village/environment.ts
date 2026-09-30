@@ -42,8 +42,8 @@ export const HEARTH = { x: -5.8, z: -19, radius: 1, pavingRadius: 3.6, pavingHei
 export const BRIDGE = { x: riverX(3), z: 3, length: 12, width: 3.3, northEastOpening: 1.8 };
 export const POND = { x: -27, z: -14, rx: 9, rz: 12, y: -.3 };
 export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
-export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5 };
-let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], puppies: [], routes: {} };
+export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5, feedingPerimeter: 7 };
+let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], crumbPouches: [], puppies: [], routes: {} };
 export function setAuthoredWorld(world: AuthoredWorld) { authoredWorld = world; }
 export function inWalkableWorld(x: number, z: number) {
   if (Math.abs(x) <= 40 && z >= -48 && z <= 42) return true;

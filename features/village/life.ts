@@ -6,7 +6,7 @@ import { VillageNavigation } from "./navigation";
 import { ACTIVITY_STAGES } from "./activityScene";
 import type { PlaceId } from "./places";
 import { CROP_MODELS, type Crop, type GardenAction } from "./garden";
-import { CompanionWalk } from "./companionWalk";
+import { CompanionWalk, relaxBlobArm } from "./companionWalk";
 import { RESIDENT_IDS, type AuthoredWorld } from "./worldLayout";
 
 const COMPANION_STAGES: Record<PlaceId, [number, number, number][]> = {
@@ -119,6 +119,10 @@ export class VillageLife {
     const wren = this.residents[4];
     return !wren.following && !wren.returning && Math.hypot(wren.root.position.x - BIRD_CLEARING.x, wren.root.position.z - BIRD_CLEARING.z) < 4.5;
   }
+  get otherBlobAtBirdClearing() {
+    return this.residents.some((resident, index) => index !== 4 && resident.root.visible &&
+      Math.hypot(resident.root.position.x - BIRD_CLEARING.x, resident.root.position.z - BIRD_CLEARING.z) <= BIRD_CLEARING.feedingPerimeter);
+  }
   feedBirds() { this.birdFeedAt = this.lastTime; }
 
   setCompanions(ids: string[]) {
@@ -176,7 +180,7 @@ export class VillageLife {
       }
       if (tending && !reduced) r.spirit.rotation.x = .09 + Math.sin(time * 3 + index) * .035;
       r.spirit.rotation.z = !reduced && this.activity === "music" ? Math.sin(time * 1.8 + index) * .055 : 0;
-      r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(time * 2 + index + i * Math.PI) * .1; });
+      r.fins.forEach(fin => relaxBlobArm(fin, time + index, false, reduced));
       return;
     }
     r.cup.visible = false;
@@ -212,7 +216,7 @@ export class VillageLife {
     r.spirit.position.y = .55 + (reduced ? 0 : Math.sin(time * 2.5 + r.phase) * .065);
     r.spirit.rotation.x = reduced ? 0 : r.movement.speed * .025;
     r.spirit.rotation.z = reduced ? 0 : Math.sin(time * 1.6 + r.phase) * .035;
-    r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(time * (r.walking ? 7 : 3) + r.phase + i * Math.PI) * .18; });
+    r.fins.forEach(fin => relaxBlobArm(fin, time + r.phase, r.walking, reduced));
     if (r.returning && Math.hypot(target[0] - r.root.position.x, target[1] - r.root.position.z) < .4) { r.returning = false; r.pause = 2; }
   }
   update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, canApproach = true, cameraRotation?: T.Quaternion, playerHeading?: number) {
@@ -293,7 +297,7 @@ export class VillageLife {
       r.spirit.position.y = .55 + (reduced ? 0 : Math.sin(elapsed * 2.5 + r.phase) * .065);
       r.spirit.rotation.x = reduced ? 0 : r.movement.speed * .035;
       r.spirit.rotation.z = reduced ? 0 : Math.sin(elapsed * 1.6 + r.phase) * .035;
-      r.fins.forEach((fin, i) => { fin.rotation.z = reduced ? 0 : Math.sin(elapsed * (walking ? 7 : 3) + r.phase + i * Math.PI) * .18; });
+      r.fins.forEach(fin => relaxBlobArm(fin, elapsed + r.phase, walking, reduced));
 
     }
     const age = elapsed - this.giftAt, thanking = this.activity === "mood" && age < 4.8;

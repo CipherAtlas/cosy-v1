@@ -75,7 +75,7 @@ def digest(data):
 
 
 def playable_asset(item):
-    return item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line', 'grass-tuft', 'grass-patch', 'grass-wide', 'planting-clearance', 'walkable-region', 'oak-bench', 'puppy-corgi', 'puppy-shiba', 'puppy-beagle', 'puppy-samoyed', 'cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') or bool(re.fullmatch(r'tree-\d+', item['asset']))
+    return item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line', 'grass-tuft', 'grass-patch', 'grass-wide', 'planting-clearance', 'walkable-region', 'oak-bench', 'bird-crumb-pouch', 'puppy-corgi', 'puppy-shiba', 'puppy-beagle', 'puppy-samoyed', 'puppy-collie', 'puppy-shepherd', 'cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') or bool(re.fullmatch(r'tree-\d+', item['asset']))
 
 
 def check_playable_changes(previous, next_doc):
@@ -87,14 +87,14 @@ def check_playable_changes(previous, next_doc):
             raise ValueError('Playable cottages and the village spire cannot be removed or replaced.')
         if (old and not playable_asset(old)) or (new and not playable_asset(new)):
             if old is None or new is None or any(old.get(key) != new.get(key) for key in ('asset', 'position', 'rotation', 'scale', 'visible', 'path')):
-                raise ValueError('This layout changes an object the playable map does not yet control. Apply paths, grass, erased planting, trees, walkable areas, oak meadow benches, puppies, and resident routes; keep other object placements in a saved working copy.')
+                raise ValueError('This layout changes an object the playable map does not yet control. Apply paths, grass, erased planting, trees, walkable areas, oak meadow benches, crumb pouches, puppies, and resident routes; keep other object placements in a saved working copy.')
     for item in next_doc['objects']:
         if not playable_asset(item): continue
         if item['asset'] in ('cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') and (not item['visible'] or item['scale'] != [1, 1, 1]):
             raise ValueError('Playable cottages and the village spire support position and facing; keep them visible at 1× scale.')
         if item['asset'] in ('cottage-1', 'cottage-2', 'cottage-3', 'cottage-4', 'cottage-7', 'cottage-8', 'cottage-9', 'tower') and item['id'] != item['asset']:
             raise ValueError('Only the existing cottages and village spire can be repositioned in the playable layout.')
-        if not re.fullmatch(r'tree-\d+', item['asset']) and (abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
+        if item['asset'] != 'bird-crumb-pouch' and not re.fullmatch(r'tree-\d+', item['asset']) and (abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
             raise ValueError('Playable world objects use upright rotation. Set X and Z rotation to 0 before applying.')
         if item['asset'] in ('custom-path', 'path-straight', 'path-curved', 'fence-line') and (abs(item['scale'][0] - item['scale'][2]) > .001 or abs(item['scale'][1] - 1) > .001):
             raise ValueError('Playable paths use even horizontal scaling and 1× vertical scale. Use the path length and width controls to shape them.')

@@ -8,10 +8,10 @@ import { buildWorld, type VillageBench, type World } from "./world";
 import { VillageMovement } from "./movement";
 import { createAtmosphere } from "./atmosphere";
 import { BirdFlock, type BirdStatus } from "./birds";
-import { PuppyPack, type NearbyPuppy } from "./puppies";
+import { PuppyPack, puppyCommandForKey, type NearbyPuppy, type PuppyCommand } from "./puppies";
 import type { PuppyBreed } from "./worldLayout";
 import { VillageLife } from "./life";
-import { CompanionHands } from "./companionWalk";
+import { CompanionHands, poseBlobArm, relaxBlobArm } from "./companionWalk";
 import { VillagerDialogue } from "./dialogue";
 import { VillageActivities, ACTIVITY_STAGES } from "./activityScene";
 import { GardenScene } from "./gardenScene";
@@ -35,8 +35,8 @@ export class VillageEngine {
   private birds?: BirdFlock;
   private puppies?: PuppyPack;
   private nearPuppy: NearbyPuppy | null = null;
-  private puppyPetAt = -100;
   private puppyPetTarget = new T.Vector3();
+  private puppyTrickId: string | null = null;
   private birdFeedAt = -100;
   private dialogue?: VillagerDialogue;
   private activities?: VillageActivities;
@@ -155,10 +155,16 @@ export class VillageEngine {
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement ||
       e.target instanceof HTMLSelectElement ||
-      e.target instanceof HTMLButtonElement ||
       (e.target instanceof HTMLElement && e.target.isContentEditable)
     )
       return;
+    if (this.seatedBench?.birdClearing && e.key.toLowerCase() === "f" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      this.callbacks.scatterBirds?.(true);
+      return;
+    }
+    if (e.target instanceof HTMLButtonElement &&
+      (!e.target.closest(".v-puppy-actions, .v-puppy-home") || e.key === " " || e.key === "Enter")) return;
     if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)
     )
@@ -172,8 +178,14 @@ export class VillageEngine {
     if (e.key.toLowerCase() === "b" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) this.dialogue?.bread();
     if (e.key.toLowerCase() === "p" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && this.nearPuppy)
       this.togglePuppyFollow(this.nearPuppy.id);
+    if (e.key.toLowerCase() === "l" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey)
+      this.walkAllPuppies();
     if (e.key.toLowerCase() === "h" && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey)
       this.sendPuppyHome();
+    if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && this.nearPuppy) {
+      const command = puppyCommandForKey(e.key);
+      if (command) this.commandPuppy(this.nearPuppy.id, command);
+    }
     if (e.key.toLowerCase() === "e" && !e.repeat && !this.place) {
       if (this.dialogue?.visitTea()) return;
       if (this.seatedBench) this.stand();
@@ -337,7 +349,7 @@ export class VillageEngine {
       near: (id: PlaceId | null) => void;
       nearBench?: (id: string | null) => void;
       seat?: (id: string | null) => void;
-      scatterBirds?: () => void;
+      scatterBirds?: (fromBench?: boolean) => void;
       interact: (id: PlaceId) => void;
       error: (message: string) => void;
       stats: (fps: number, draws: number, triangles: number) => void;
@@ -354,8 +366,9 @@ export class VillageEngine {
       nearGarden?: (id: string | null) => void;
       gardenInteract?: (id: string) => void;
       nearPuppy?: (puppy: NearbyPuppy | null) => void;
-      puppyFollowing?: (puppy: NearbyPuppy | null) => void;
+      puppyFollowing?: (puppies: NearbyPuppy[]) => void;
       puppyPetted?: (puppy: NearbyPuppy) => void;
+      puppyCommanded?: (puppy: NearbyPuppy, command: PuppyCommand) => void;
       puppySound?: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void;
     },
   ) {
@@ -434,11 +447,11 @@ export class VillageEngine {
     const [world, gltf, gardenKit, dove, puppyKit] = await Promise.all([
       buildWorld(this.callbacks.progress, this.renderer),
       new GLTFLoader().loadAsync(
-        withBasePath("/village/models/spirit.glb?v=1"),
+        withBasePath("/village/models/spirit.glb?v=2"),
       ),
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
-      new GLTFLoader().loadAsync(withBasePath("/village/models/puppies.glb?v=1")),
+      new GLTFLoader().loadAsync(withBasePath("/village/models/puppies.glb?v=4")),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -473,7 +486,7 @@ export class VillageEngine {
     this.scene.add(this.atmosphere.sky);
 
     const root = gltf.scene;
-    const b = new T.Box3().setFromObject(root),
+    const b = new T.Box3().setFromObject(root.getObjectByName("SpiritBody") ?? root),
       height = b.getSize(new T.Vector3()).y;
     this.spiritScale = .95 / height;
     root.scale.setScalar(this.spiritScale);
@@ -505,7 +518,7 @@ export class VillageEngine {
       this.callbacks.gardenSound?.("crumbs", [BIRD_CLEARING.x, .4, BIRD_CLEARING.z]);
     });
     this.scene.add(this.birds.group);
-    this.puppies = new PuppyPack(puppyKit.scene, world.authored.puppies, world.colliders, world.authored,
+    this.puppies = new PuppyPack(puppyKit.scene, puppyKit.animations, world.authored.puppies, world.colliders, world.authored,
       (breed, position, kind) => this.callbacks.puppySound?.(breed, position, kind));
     this.scene.add(this.puppies.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
@@ -1080,7 +1093,7 @@ export class VillageEngine {
     this.resolveSeatCollision();
   }
   gardenAction(action: GardenAction, source?: { x: number; z: number }, animateSelf = true) {
-    if ((action.kind === "feed" || action.kind === "feedBirds") && !this.gardenState.crumbPouch) return false;
+    if ((action.kind === "feed" || action.kind === "feedBirds") && !source && !this.gardenState.crumbPouch) return false;
     if (action.kind === "feedBirds") {
       const origin = source ? new T.Vector3(source.x, floorHeight(source.x, source.z), source.z) : this.player.position;
       const accepted = this.birds?.feed(origin) ?? false;
@@ -1098,25 +1111,40 @@ export class VillageEngine {
   setCompanions(ids: string[]) {
     this.companions = ids; this.life?.setCompanions(ids); this.life?.setActivity(this.place);
   }
+  get sittingAtBirdBench() { return !this.blocked && !this.place && this.seatedBench?.birdClearing === true; }
   petPuppy(id: string) {
-    if (this.blocked || this.place || this.seatedBench || !this.puppies?.pet(id, this.player.position)) return false;
+    if (this.blocked || this.place || this.seatedBench || !this.movement?.grounded || this.movement.speed > .18 || !this.puppies?.pet(id, this.player.position)) return false;
     const puppy = this.puppies.puppies.find(value => value.info.id === id)!;
-    this.puppyPetAt = this.elapsed;
     this.puppyPetTarget.copy(puppy.actor.position);
     this.callbacks.puppyPetted?.(puppy.info);
     return true;
   }
-  togglePuppyFollow(id: string) {
-    if (this.blocked || this.place || this.seatedBench || !this.puppies) return false;
-    if (this.puppies.follower?.id === id) return this.sendPuppyHome();
-    const puppy = this.puppies.invite(id, this.player.position, this.player.rotation.y);
+  commandPuppy(id: string, command: PuppyCommand) {
+    if (this.blocked || this.place || this.seatedBench) return false;
+    const puppy = this.puppies?.command(id, command, this.player.position);
     if (!puppy) return false;
-    this.callbacks.puppyFollowing?.(puppy);
+    this.puppyTrickId = id;
+    this.callbacks.puppyCommanded?.(puppy, command);
     return true;
   }
+  togglePuppyFollow(id: string) {
+    if (this.blocked || this.place || this.seatedBench || !this.puppies) return false;
+    if (this.puppies.followers.some(puppy => puppy.id === id)) {
+      this.puppies.dismiss(id);
+    } else if (!this.puppies.invite(id, this.player.position, this.player.rotation.y)) return false;
+    this.callbacks.puppyFollowing?.(this.puppies.followers);
+    return true;
+  }
+  get puppyCount() { return this.puppies?.puppies.length ?? 0; }
+  walkAllPuppies() {
+    if (this.blocked || this.place || this.seatedBench || !this.puppies || !this.nearPuppy) return false;
+    const puppies = this.puppies.inviteAll(this.player.position, this.player.rotation.y);
+    this.callbacks.puppyFollowing?.(puppies);
+    return puppies.length > 0;
+  }
   sendPuppyHome() {
-    if (this.blocked || this.place || !this.puppies?.dismiss()) return false;
-    this.callbacks.puppyFollowing?.(null);
+    if (this.blocked || this.place || !this.puppies?.dismiss().length) return false;
+    this.callbacks.puppyFollowing?.([]);
     return true;
   }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
@@ -1320,11 +1348,15 @@ export class VillageEngine {
   private updateWalkingCamera() {
     this.lookGoal.copy(this.player.position).add(this.temp.set(0, 1.35, 0));
     this.lookGoal.y += Math.max(0, -Math.sin(this.pitch)) * 2.4;
-    const distance = this.seatedBench ? 3 : this.distance + (this.puppies?.follower ? 1.3 : 0);
+    const dogs = this.seatedBench ? 0 : this.puppies?.followers.length ?? 0;
+    const packBack = Math.max(0, Math.min(1.8, (dogs - 1) * .3));
+    this.lookGoal.x -= Math.sin(this.player.rotation.y) * packBack;
+    this.lookGoal.z -= Math.cos(this.player.rotation.y) * packBack;
+    const distance = this.seatedBench ? 3 : this.distance + (dogs ? Math.min(4.6, 1 + dogs * .6) : 0);
     this.cameraGoal.copy(this.player.position).add(this.temp.set(
-      Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
-      1.35 + Math.sin(this.pitch) * distance,
-      Math.cos(this.yaw) * Math.cos(this.pitch) * distance,
+      this.lookGoal.x - this.player.position.x + Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
+      1.35 + Math.sin(this.pitch) * distance + packBack * .4,
+      this.lookGoal.z - this.player.position.z + Math.cos(this.yaw) * Math.cos(this.pitch) * distance,
     ));
     this.cameraRay.origin.copy(this.lookGoal);
     this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
@@ -1417,7 +1449,6 @@ export class VillageEngine {
       if (puppy?.id !== this.nearPuppy?.id) { this.nearPuppy = puppy; this.callbacks.nearPuppy?.(puppy); }
     }
     if (now - this.statusTime > 100) { this.reportMovement(); this.statusTime = now; }
-    this.companionHands.reset();
     if (this.character) {
       const bob = this.reducedMotion || this.blocked || this.seatedBench ? 0 : Math.sin(this.elapsed*2.8)*.065;
       this.character.position.y = .62 + bob;
@@ -1426,7 +1457,7 @@ export class VillageEngine {
       this.character.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*1.7)*.035;
       const squash = this.reducedMotion ? 0 : movement.landing>0 ? -.1 : movement.takeoff>0 ? .09 : 0;
       this.character.scale.set(this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4),this.spiritScale*(this.seatedBench ? .86 : 1+squash),this.spiritScale*(this.seatedBench ? 1.05 : 1-squash*.4));
-      this.spiritFins.forEach((fin,i) => { fin.rotation.z = this.reducedMotion || this.blocked ? 0 : Math.sin(this.elapsed*(moving?8:3)+i*Math.PI)*.18; });
+      this.spiritFins.forEach(fin => relaxBlobArm(fin, this.elapsed, moving, this.reducedMotion || this.blocked));
     }
     this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
     const scatterAge = this.elapsed - this.birdFeedAt;
@@ -1434,33 +1465,44 @@ export class VillageEngine {
       this.character.rotation.x = Math.sin(scatterAge / 1.6 * Math.PI) * .16;
       this.spiritFins.forEach((fin, i) => { fin.rotation.z = Math.sin(scatterAge * 5 + i) * .4; });
     }
-    const petAge = this.elapsed - this.puppyPetAt;
-    if (this.character && petAge < 2.2 && movement.speed < .12) {
-      const dx = this.puppyPetTarget.x - this.player.position.x, dz = this.puppyPetTarget.z - this.player.position.z;
-      const angle = Math.atan2(dx, dz);
+    if (movement.speed > .18 || !movement.grounded || this.blocked || this.place) this.puppies?.cancelPet();
+    const pettingDog = this.puppies?.pettingPuppy;
+    if (pettingDog) {
+      this.puppyPetTarget.copy(pettingDog.actor.position);
+      const angle = Math.atan2(pettingDog.actor.position.x - this.player.position.x, pettingDog.actor.position.z - this.player.position.z);
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 8));
-      if (!this.reducedMotion) {
-        const reach = Math.sin(Math.min(1, petAge / 2.2) * Math.PI);
-        this.character.rotation.x = reach * .24;
+      if (this.character && pettingDog.petting) {
+        const petAge = pettingDog.petAge;
+        const reach = this.reducedMotion ? 1 : T.MathUtils.smoothstep(petAge, 0, .4) * (1 - T.MathUtils.smoothstep(petAge, 2.55, 3));
+        this.character.rotation.x = reach * .09;
         this.character.position.z = reach * .15;
-        this.spiritFins.forEach((fin, i) => { fin.rotation.z = (i % 2 ? -1 : 1) * reach * .42; });
       }
     }
     if (this.place) {
       this.updateActivityCamera(this.place);
     } else {
       this.updateWalkingCamera();
-      if (petAge < 2.2 && movement.speed < .12) {
-        const dx = this.puppyPetTarget.x - this.player.position.x, dz = this.puppyPetTarget.z - this.player.position.z;
+      const performingPuppy = this.puppies?.puppies.find(puppy => puppy.info.id === this.puppyTrickId && puppy.command);
+      const watchingTrick = !!performingPuppy && !this.blocked && !this.reducedMotion && !this.seatedBench;
+      const watchingPet = !!pettingDog?.petting && !this.blocked && !this.reducedMotion && !this.seatedBench;
+      if ((watchingPet || watchingTrick) && movement.speed < .12) {
+        const target = watchingTrick ? performingPuppy!.actor.position : this.puppyPetTarget;
+        const dx = target.x - this.player.position.x, dz = target.z - this.player.position.z;
         const length = Math.hypot(dx, dz) || 1, directionX = dx / length, directionZ = dz / length;
         const sideX = -directionZ, sideZ = directionX;
         const middleX = this.player.position.x + dx * .5, middleZ = this.player.position.z + dz * .5;
-        const side = (this.camera.position.x - middleX) * sideX + (this.camera.position.z - middleZ) * sideZ >= 0 ? 1 : -1;
-        this.lookGoal.set(middleX, this.player.position.y + .86, middleZ);
-        const distance = this.camera.aspect < .85 ? 4.8 : 3.15;
-        this.cameraGoal.set(middleX + sideX * side * distance - directionX * .65,
-          this.player.position.y + 2.2, middleZ + sideZ * side * distance - directionZ * .65);
+        // Show the petting hand on the near side and keep tricks clear of the controls.
+        const side = -1;
+        const portrait = this.camera.aspect < .85;
+        const distance = watchingTrick ? (portrait ? 8.5 : 3.8) : (portrait ? 4.8 : 3.15);
+        const offset = distance * Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect * .5;
+        const frameX = watchingTrick ? target.x - directionX * offset : middleX;
+        const frameZ = watchingTrick ? target.z - directionZ * offset : middleZ;
+        const back = watchingTrick ? 0 : -.25;
+        this.lookGoal.set(frameX, this.player.position.y + .86, frameZ);
+        this.cameraGoal.set(frameX + sideX * side * distance - directionX * back,
+          this.player.position.y + 2.2, frameZ + sideZ * side * distance - directionZ * back);
       }
     }
     if (this.rain) {
@@ -1489,7 +1531,15 @@ export class VillageEngine {
     this.puppies?.update(dt, this.elapsed, this.player.position, this.reducedMotion, !this.blocked && !this.place,
       this.camera.quaternion, this.player.rotation.y);
     if (this.life) this.companionHands.update(dt, this.player, this.spiritFins, this.life.residents.filter(r => r.following),
-      !this.place && !this.blocked && !this.seatedBench && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
+      !this.place && !this.blocked && !this.seatedBench && !this.puppies?.pettingPuppy && movement.grounded && scatterAge >= 1.6 && !this.life.companionWalk.singleFile);
+    const contact = this.puppies?.petContact();
+    const dog = this.puppies?.pettingPuppy;
+    if (contact && dog?.petting && this.character) {
+      const arm = this.spiritFins.find(fin => fin.name === "SpiritFinR");
+      const amount = this.reducedMotion ? 1 : T.MathUtils.smoothstep(dog.petAge, 0, .4) * (1 - T.MathUtils.smoothstep(dog.petAge, 2.55, 3));
+      contact.y += this.reducedMotion ? 0 : Math.sin(dog.petAge * 9) * .018 * amount;
+      if (arm) poseBlobArm(arm, contact, amount);
+    }
     if (this.place !== "focus") this.garden?.update(dt, this.elapsed, this.reducedMotion, this.camera.quaternion);
     this.world.wind.time.value = t;
     this.world.wind.strength.value = this.reducedMotion ? 0 : windAt(t, this.weather);
@@ -1552,11 +1602,21 @@ export class VillageEngine {
       this.sun.target.updateMatrixWorld();
       this.renderer.shadowMap.needsUpdate = true; this.shadowTime = now;
     }
-    this.birds?.update(dt, this.elapsed, this.reducedMotion, this.camera, this.player.position, this.life?.caretakerPresent ?? false, this.place !== "focus" && !this.blocked);
+    let otherBlobNearby = this.life?.otherBlobAtBirdClearing ?? false;
+    for (const remote of this.remoteVisitors.values()) {
+      if (Math.hypot(remote.target.x - BIRD_CLEARING.x, remote.target.z - BIRD_CLEARING.z) <= BIRD_CLEARING.feedingPerimeter) {
+        otherBlobNearby = true; break;
+      }
+    }
+    this.birds?.update(dt, this.elapsed, this.reducedMotion, this.camera, this.player.position,
+      this.life?.caretakerPresent ?? false, this.place !== "focus" && !this.blocked, otherBlobNearby);
     for (const remote of this.remoteVisitors.values()) {
       remote.group.position.lerp(remote.target, 1 - Math.exp(-dt * 12));
       const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
+      remote.group.traverse(node => {
+        if (node.name.startsWith("SpiritFin")) relaxBlobArm(node, this.elapsed + remote.slot, remote.group.position.distanceTo(remote.target) > .05, this.reducedMotion);
+      });
     }
     this.updateSpiritLights();
     const renderStart = performance.now();
@@ -1641,6 +1701,7 @@ export class VillageEngine {
     this.dialogue?.dispose();
     this.life?.dispose();
     this.birds?.dispose();
+    this.puppies?.dispose();
     this.garden?.dispose();
     this.world?.group.removeFromParent();
     this.world?.dispose();

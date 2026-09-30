@@ -1,8 +1,10 @@
 import * as T from "three";
 import { BIRD_CLEARING } from "./environment";
 
-export type BirdStatus = "flying" | "crumbs" | "waiting" | "eating" | "happy";
+export type BirdStatus = "flying" | "crumbs" | "waiting" | "sad" | "eating" | "happy";
 export const BIRD_THANKS = { en: "Coo coo~ (Thank you~)", ja: "クークー〜（ありがとう〜）" };
+const BIRD_SAD = { en: "Coo coo :(", ja: "クークー :(" };
+const SAD_AFTER = 6;
 
 // Landing positions from the saved “Current village copy”.
 export const BIRD_LANDING_SPOTS: [number, number][] = [
@@ -30,6 +32,7 @@ export class BirdFlock {
   private mealAge = -1;
   private queued = false;
   private served = false;
+  private sadness = 0;
   private lastStatus?: BirdStatus;
   private parts: { mesh: T.InstancedMesh; nodes: T.Object3D[] }[] = [];
   private hearts: T.InstancedMesh;
@@ -104,7 +107,7 @@ export class BirdFlock {
   }
   private publish() {
     this.status = this.mealAge >= 4 ? "happy" : this.mealAge >= 0 ? "eating"
-      : this.queued ? "crumbs" : this.phase === "flight" ? "flying" : "waiting";
+      : this.queued ? "crumbs" : this.phase === "flight" ? "flying" : this.age >= SAD_AFTER ? "sad" : "waiting";
     if (this.status !== this.lastStatus) { this.lastStatus = this.status; this.changed(this.status); }
   }
   private flightPosition(index: number, age: number, target: T.Vector3) {
@@ -113,20 +116,22 @@ export class BirdFlock {
     target.y += Math.sin(t * Math.PI) ** 2 * (index % 3) * .65;
     return target;
   }
-  update(dt: number, time: number, reduced: boolean, camera: T.Camera, player: T.Vector3, caretaker: boolean, visible: boolean) {
+  update(dt: number, time: number, reduced: boolean, camera: T.Camera, player: T.Vector3, caretaker: boolean, visible: boolean, otherBlobNearby = false) {
     this.age += dt;
     if (this.throwAge >= 0) this.throwAge += dt;
     if (this.phase === "flight" && this.age >= 30) { this.phase = "ground"; this.age = 0; }
-    const nearby = Math.hypot(player.x - BIRD_CLEARING.x, player.z - BIRD_CLEARING.z) < 7;
+    const nearby = Math.hypot(player.x - BIRD_CLEARING.x, player.z - BIRD_CLEARING.z) <= BIRD_CLEARING.feedingPerimeter;
     if (this.phase === "ground" && !this.served) {
       if (this.queued && this.age >= .4) this.startMeal(false);
-      else if (caretaker && this.age >= (nearby ? 12 : 2.5)) this.startMeal(true);
+      else if (caretaker && !nearby && !otherBlobNearby && this.age >= 2.5) this.startMeal(true);
     }
     if (this.mealAge >= 0) this.mealAge += dt;
     if (this.phase === "ground" && (this.served ? this.mealAge >= 10 : this.age >= 18)) {
       this.phase = "flight"; this.age = 0; this.mealAge = -1; this.served = false;
     }
     this.publish();
+    const sadGoal = this.status === "sad" ? 1 : 0;
+    this.sadness = reduced ? sadGoal : T.MathUtils.lerp(this.sadness, sadGoal, 1 - Math.exp(-dt * 4));
     this.hearts.visible = visible && this.status === "happy";
     this.crumbs.visible = visible && (this.queued || this.status === "eating") && (reduced || this.throwAge < 0 || this.throwAge >= 1.15);
     const joyAge = this.mealAge - 4;
@@ -141,15 +146,18 @@ export class BirdFlock {
       } else {
         bird.root.position.copy(bird.landing);
         bird.root.rotation.set(0, Math.atan2(BIRD_CLEARING.x - bird.landing.x, BIRD_CLEARING.z - bird.landing.z), 0);
+        bird.root.rotation.x = this.sadness * .1;
         if (!reduced) {
-          bird.root.position.y += happy ? Math.abs(Math.sin(joyAge * 5 + i)) * .1 : Math.sin(time * 2 + i) * .009;
+          bird.root.position.y += happy ? Math.abs(Math.sin(joyAge * 5 + i)) * .1 : Math.sin(time * 2 + i) * .009 - this.sadness * .025;
           bird.root.rotation.z = happy ? Math.sin(joyAge * 6 + i) * .07 : 0;
         }
       }
-      bird.head.rotation.x = !reduced && this.status === "eating" ? .27 + Math.sin(time * 6 + i) * .24 : 0;
+      bird.head.rotation.x = this.sadness * (.4 + (reduced ? 0 : Math.sin(time * 1.8 + i) * .035))
+        + (!reduced && this.status === "eating" ? .27 + Math.sin(time * 6 + i) * .24 : 0);
+      bird.head.rotation.z = reduced ? 0 : this.sadness * Math.sin(time * 1.2 + i) * .06;
       bird.wings.forEach((wing, side) => {
         const flap = reduced ? 0 : Math.sin(time * (flying ? 10 : 13) + i) * (flying ? .65 : .3);
-        wing.rotation.z = (side ? -1 : 1) * (flying ? flap : happy ? .65 + flap : 1.12);
+        wing.rotation.z = (side ? -1 : 1) * (flying ? flap : happy ? .65 + flap : 1.12 + this.sadness * .27);
       });
       bird.root.updateMatrixWorld(true);
       this.dummy.position.copy(bird.root.position).y += .95 + (reduced ? 0 : Math.max(0, joyAge) * .07);
@@ -188,11 +196,12 @@ export class BirdFlock {
       this.thrownCrumbs.instanceMatrix.needsUpdate = true;
     }
     this.projected.set(BIRD_CLEARING.x, 1.8, BIRD_CLEARING.z).project(camera);
-    const show = visible && this.status === "happy" && nearby && this.projected.z > -1 && this.projected.z < 1
+    const show = visible && (this.status === "happy" || this.status === "sad") && nearby && this.projected.z > -1 && this.projected.z < 1
       && Math.abs(this.projected.x) < .9 && Math.abs(this.projected.y) < .9;
     this.bubble.hidden = !show;
     if (show) {
-      if (!this.announce || this.bubble.textContent !== BIRD_THANKS[this.language]) this.bubble.textContent = BIRD_THANKS[this.language];
+      const speech = this.status === "sad" ? BIRD_SAD[this.language] : BIRD_THANKS[this.language];
+      if (!this.announce || this.bubble.textContent !== speech) this.bubble.textContent = speech;
       this.bubble.style.left = `${T.MathUtils.clamp((this.projected.x * .5 + .5) * this.width, 135, Math.max(135, this.width - 135))}px`;
       this.bubble.style.top = `${T.MathUtils.clamp((-this.projected.y * .5 + .5) * this.height - 32, this.width < 600 ? 205 : 150, this.height * (this.width < 600 ? .54 : .85))}px`;
     }

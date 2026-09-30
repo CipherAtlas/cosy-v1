@@ -662,6 +662,47 @@ export async function buildWorld(
   benches.push({ id: "bird-clearing-bench", x: birdBenchX, z: birdBenchZ, facing: Math.PI, seatHeight: .47, birdClearing: true,
     hitBox: new T.Box3(new T.Vector3(-1.25, 0, -.4), new T.Vector3(1.25, 1.12, .4)) });
   capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [birdBenchX, 0, birdBenchZ]);
+  const pouchCloth = new T.MeshStandardMaterial({ color: "#c9a679", roughness: 1, bumpMap: plasterMap, bumpScale: .018 });
+  const pouchCord = new T.MeshStandardMaterial({ color: "#805a3c", roughness: 1 });
+  const bread = new T.MeshStandardMaterial({ color: "#e8c694", roughness: 1 });
+  function makeCrumbPouch() {
+    const pouch = new T.Group(); pouch.name = "Sourdough crumb pouch";
+    const fabric = new T.LatheGeometry([
+      [.025, .015], [.14, .025], [.21, .09], [.22, .2], [.18, .29], [.1, .34], [.095, .4], [.11, .42],
+    ].map(([r, y]) => new T.Vector2(r, y)), 24);
+    const vertices = fabric.attributes.position;
+    for (let i = 0; i < vertices.count; i++) {
+      const x = vertices.getX(i), z = vertices.getZ(i), y = vertices.getY(i);
+      const fold = 1 + Math.sin(Math.atan2(x, z) * 10 + y * 9) * (y > .3 ? .12 : .035);
+      vertices.setXYZ(i, x * fold, y, z * fold * .8);
+    }
+    fabric.computeVertexNormals();
+    const body = new T.Mesh(fabric, pouchCloth); body.castShadow = body.receiveShadow = true; pouch.add(body);
+    const cord = new T.Mesh(new T.TorusGeometry(.102, .009, 4, 24), pouchCord);
+    cord.rotation.x = Math.PI / 2; cord.scale.y = .8; cord.position.y = .355; pouch.add(cord);
+    for (const side of [-1, 1]) {
+      const loop = new T.CatmullRomCurve3([
+        [0, .355, .09], [side * .075, .395, .11], [side * .09, .355, .11], [0, .355, .09], [side * .025, .255, .14],
+      ].map(([x, y, z]) => new T.Vector3(x, y, z)));
+      pouch.add(new T.Mesh(new T.TubeGeometry(loop, 20, .008, 4, false), pouchCord));
+    }
+    const filling = new T.Mesh(new T.CylinderGeometry(.087, .087, .018, 16), bread);
+    filling.position.y = .395; filling.scale.z = .8; pouch.add(filling);
+    for (let i = 0; i < 9; i++) {
+      const crumb = new T.Mesh(new T.IcosahedronGeometry(.018, 0), bread);
+      const angle = i * 2.4, r = .02 + i % 3 * .023;
+      crumb.position.set(Math.cos(angle) * r, .415 + i % 2 * .008, Math.sin(angle) * r * .8);
+      crumb.rotation.set(i, i * .4, 0); pouch.add(crumb);
+    }
+    return pouch;
+  }
+  if (capture) {
+    const pouch = makeCrumbPouch(); pouch.position.set(birdBenchX + 1.55, .1, birdBenchZ - .75); group.add(pouch);
+    capture("bird-crumb-pouch", "Sourdough crumb pouch", "Furnishings", [pouch], [pouch.position.x, pouch.position.y, pouch.position.z]);
+  } else for (const placed of authored.crumbPouches) {
+    const pouch = makeCrumbPouch(); pouch.position.set(placed.x, placed.y, placed.z);
+    pouch.rotation.set(...placed.rotation); pouch.scale.fromArray(placed.scale); group.add(pouch);
+  }
   layoutStart = group.children.length;
   const leaf = new T.MeshStandardMaterial({color:'#6d9959',roughness:1});
   const petal = new T.MeshStandardMaterial({color:'#fff9e9',roughness:.85});

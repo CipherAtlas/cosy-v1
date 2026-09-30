@@ -1,17 +1,26 @@
 {
-  "id": "cosy-spirit-v1",
-  "status": "original stylized player",
+  "id": "cosy-spirit-v2",
+  "status": "original stylized player and residents",
   "runtimeFile": "public/village/models/spirit.glb",
   "sourceFile": "assets/village/spirit.blend",
   "creatorOrTool": "Original scripted modeling, Blender 5.2.1 LTS",
   "license": "Original project artwork; no third-party character assets",
-  "sha256": "d089abfbdaf6a36a0bad15eb1911e37332b847ffe28e93b5a09bb48db7cfbc66",
-  "bytes": 437768,
+  "sha256": "961cb091020d64852645cdbd744e401256392ec1189b5e74daa79b21dee9d4ba",
+  "bytes": 524132,
   "units": "metres",
   "upAxis": "+Y",
   "forwardAxis": "+Z",
-  "triangles": 22464,
+  "triangles": 26784,
   "materials": 3,
   "textures": 0,
-  "animation": "Runtime hover, lean, fin flutter and jump squash; collision follows existing ground traversal. No free vertical flight."
+  "animation": "Runtime shoulder and elbow IK with rounded hands, contact-aware petting and companion hand-holding, hover and jump squash. Ground traversal is unchanged.",
+  "arms": {
+    "upperLength": 0.36,
+    "forearmLength": 0.38,
+    "joints": [
+      "shoulder",
+      "elbow",
+      "wrist"
+    ]
+  }
 }

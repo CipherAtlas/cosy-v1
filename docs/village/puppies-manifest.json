@@ -1,18 +1,38 @@
 {
-  "id": "puppies-v1",
+  "id": "puppies-v4",
   "breeds": [
     "corgi",
     "shiba",
     "beagle",
-    "samoyed"
+    "samoyed",
+    "collie",
+    "shepherd"
   ],
   "source": "assets/village/puppies.blend",
   "runtime": "public/village/models/puppies.glb",
   "creator": "Original project artwork, Blender 5.2.1 LTS",
   "license": "Original project artwork; no third-party character assets or textures.",
-  "bytes": 1956804,
-  "sha256": "35e3da3b7d713c0eb8deb0a594cf014ea319e16af79ca6ebc2acd1c0ce9c93ab",
-  "triangles": 58516,
+  "bytes": 6496952,
+  "sha256": "cd0cb7e9c4d64ecbe29c20c662a19e20a9343f4aa407a3beabaa704e71a47968",
+  "triangles": 122860,
   "textures": 0,
-  "animatedPartsPerDog": 9
+  "bonesPerDog": 26,
+  "materials": 3,
+  "clipsPerDog": {
+    "idle": 4,
+    "walk": 1,
+    "run": 0.6,
+    "pet": 3,
+    "sit": 7,
+    "dance": 5.2,
+    "spin": 3.2,
+    "bow": 3.8,
+    "wave": 4.2,
+    "roll": 4.6
+  },
+  "rig": "Skinned continuous sculpts, baked two-link leg IK, jaw, eyes, two-part ears and three-part tail",
+  "locomotion": {
+    "walkMetersPerCycle": 0.46,
+    "runMetersPerCycle": 0.76
+  }
 }

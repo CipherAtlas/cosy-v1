@@ -63,13 +63,13 @@ const path = require('node:path');
       e.movement.settle(1, 27); e.player.rotation.y = Math.PI; e.setCompanions(['pip']);
       const pip = e.life.residents[0]; pip.movement.settle(2.05, 27); pip.root.rotation.y = Math.PI;
       tick(2);
-      check(e.companionHands.posed.length === 2, 'Player and Pip hold their existing hands while standing together');
+      check(e.companionHands.holdingCount === 2, 'Player and Pip hold their articulated hands while standing together');
       e.keys.add('w'); tick(2); e.keys.clear();
-      check(e.companionHands.posed.length === 2, 'Player and Pip keep holding hands while walking, including during dialogue');
+      check(e.companionHands.holdingCount === 2, 'Player and Pip keep holding hands while walking, including during dialogue');
       const gap = () => {
         e.player.updateWorldMatrix(true, true); pip.root.updateWorldMatrix(true, true);
         const a = e.spiritFins.find(f => f.name === 'SpiritFinL'), b = pip.fins.find(f => f.name === 'SpiritFinR');
-        return a.localToWorld(new T.Vector3(-.135, 0, 0)).distanceTo(b.localToWorld(new T.Vector3(.135, 0, 0)));
+        return a.getObjectByName('SpiritWristL').getWorldPosition(new T.Vector3()).distanceTo(b.getObjectByName('SpiritWristR').getWorldPosition(new T.Vector3()));
       };
       check(gap() < .035, 'The two hand tips visibly meet while walking');
       e.camera.position.set(-.7, 1.8, e.player.position.z - 4.2);
@@ -77,37 +77,37 @@ const path = require('node:path');
       window.captureCompanions = () => e.renderer.render(e.scene, e.camera);
       metrics.push({ handGap: gap() });
       e.keys.add('d'); tick(2); e.keys.clear(); tick(1);
-      check(e.companionHands.posed.length === 2 && gap() < .035, 'A quarter turn reforms the hand-hold in the new walking direction');
+      check(e.companionHands.holdingCount === 2 && gap() < .035, 'A quarter turn reforms the hand-hold in the new walking direction');
       let turnClearance = Infinity;
       e.keys.add('a');
       for (let i = 0; i < 120; i++) { tick(1 / 60); turnClearance = Math.min(turnClearance, Math.hypot(pip.root.position.x - e.player.position.x, pip.root.position.z - e.player.position.z)); }
       e.keys.clear(); tick(1); metrics.push({ turnClearance });
       check(turnClearance > .7, 'Turning back preserves space between the two bodies');
-      check(e.companionHands.posed.length === 2 && gap() < .035, 'Turning back reforms the hand-hold');
+      check(e.companionHands.holdingCount === 2 && gap() < .035, 'Turning back reforms the hand-hold');
       e.player.rotation.y = Math.PI; tick(2);
       e.reducedMotion = true; tick(1);
-      check(e.companionHands.posed.length === 2 && gap() < .035, 'Reduced motion retains the resting hand-hold');
+      check(e.companionHands.holdingCount === 2 && gap() < .035, 'Reduced motion retains the resting hand-hold');
       e.reducedMotion = false; e.movement.jump(); tick(.1);
-      check(!e.companionHands.posed.length, 'Jumping releases the hand-hold'); tick(2);
+      check(!e.companionHands.holdingCount, 'Jumping releases the hand-hold'); tick(2);
       e.setCompanions(['pip', 'maple']); const maple = e.life.residents[1];
       maple.movement.settle(e.player.position.x - 1.05, e.player.position.z); maple.root.rotation.y = Math.PI;
       tick(2);
-      check(e.companionHands.posed.length === 4, 'Two companions can hold the left and right hand');
+      check(e.companionHands.holdingCount === 4, 'Two companions can hold the left and right hand');
       e.setPlace('mood'); tick(.1);
-      check(!e.companionHands.posed.length, 'Entering an activity restores normal hands and poses');
+      check(!e.companionHands.holdingCount, 'Entering an activity restores normal hands and poses');
       e.setPlace(null); e.setCompanions([]); tick(.1);
-      check(!e.companionHands.posed.length && e.spiritFins.every(f => f.scale.x === 1), 'Dismissal restores the original fin scale');
+      check(!e.companionHands.holdingCount && e.spiritFins.every(f => f.scale.x === 1), 'Dismissal restores the unstretched arms');
       const { PLACES } = await import('/modules/features/village/places.js');
       e.setCompanions(['pip', 'maple', 'moss', 'luma', 'wren']);
       for (const place of PLACES) {
         e.travel(place.id); tick(.1);
-        check(!e.companionHands.posed.length && e.life.residents.every(r => r.root.visible && r.root.position.distanceTo(e.player.position) < 7), `All companions release hands and join ${place.id}`);
+        check(!e.companionHands.holdingCount && e.life.residents.every(r => r.root.visible && r.root.position.distanceTo(e.player.position) < 7), `All companions release hands and join ${place.id}`);
       }
       e.setPlace(null);
       e.setCompanions(['pip']); e.movement.settle(-18.5, -5.5); pip.movement.settle(-18.5, -6.55);
       e.player.rotation.y = pip.root.rotation.y = -Math.PI / 2; e.yaw = Math.PI / 2; tick(1);
       e.keys.add('w'); tick(1.2); e.keys.clear();
-      check(e.life.companionWalk.singleFile && !e.companionHands.posed.length && pip.root.position.x > e.player.position.x + .5,
+      check(e.life.companionWalk.singleFile && !e.companionHands.holdingCount && pip.root.position.x > e.player.position.x + .5,
         'The actual pond dock releases hands and puts Pip behind the player');
       e.yaw = 0;
 

@@ -81,18 +81,43 @@ export class CompanionWalk {
   }
 }
 
-/** Pose the existing soft fins so their tips meet; no extra world geometry. */
-export class CompanionHands {
-  private posed: { fin: T.Object3D; position: T.Vector3; scale: T.Vector3; rotation: T.Quaternion }[] = [];
-  private reach = [0, 0];
-  private xAxis = new T.Vector3(1, 0, 0);
+/** Two-link arms keep their length while the shoulder, elbow and wrist rotate. */
+export function poseBlobArm(shoulder: T.Object3D, target: T.Vector3, amount = 1) {
+  const suffix = shoulder.name.slice(-1);
+  const elbow = shoulder.getObjectByName(`SpiritElbow${suffix}`);
+  const wrist = shoulder.getObjectByName(`SpiritWrist${suffix}`);
+  if (!elbow || !wrist || !shoulder.parent) return;
+  shoulder.parent.updateWorldMatrix(true, false);
+  const goal = shoulder.parent.worldToLocal(target.clone()).sub(shoulder.position);
+  const distance = T.MathUtils.clamp(goal.length(), .08, .735);
+  const direction = goal.normalize();
+  const along = (.36 ** 2 - .38 ** 2 + distance ** 2) / (2 * distance);
+  const bend = new T.Vector3(suffix === "L" ? -.35 : .35, -.35, 1);
+  bend.addScaledVector(direction, -bend.dot(direction)).normalize();
+  const upper = direction.clone().multiplyScalar(along).addScaledVector(bend, Math.sqrt(Math.max(0, .36 ** 2 - along ** 2)));
+  const upperRotation = new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), upper.clone().normalize());
+  const lower = direction.multiplyScalar(distance).sub(upper).applyQuaternion(upperRotation.clone().invert());
+  shoulder.quaternion.slerp(upperRotation, amount);
+  elbow.quaternion.slerp(new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), lower.normalize()), amount);
+  wrist.quaternion.slerp(new T.Quaternion(), amount);
+  shoulder.updateWorldMatrix(false, true);
+}
 
-  reset() {
-    for (const p of this.posed) { p.fin.position.copy(p.position); p.fin.scale.copy(p.scale); p.fin.quaternion.copy(p.rotation); }
-    this.posed = [];
-  }
+export function relaxBlobArm(shoulder: T.Object3D, time: number, moving: boolean, reduced: boolean) {
+  if (!shoulder.parent) return;
+  const side = shoulder.name.endsWith("L") ? -1 : 1;
+  const swing = reduced ? 0 : Math.sin(time * (moving ? 7 : 2.2) + (side < 0 ? Math.PI : 0)) * (moving ? .055 : .012);
+  shoulder.parent.updateWorldMatrix(true, false);
+  const rest = shoulder.position.clone().add(new T.Vector3(side * .13, -.32, .12 + swing));
+  poseBlobArm(shoulder, shoulder.parent.localToWorld(rest));
+}
+
+export class CompanionHands {
+  private reach = [0, 0];
+  holdingCount = 0;
 
   update(delta: number, player: T.Object3D, fins: T.Object3D[], companions: { root: T.Object3D; fins: T.Object3D[] }[], allowed: boolean) {
+    this.holdingCount = 0;
     player.updateWorldMatrix(true, true);
     for (let slot = 0; slot < 2; slot++) {
       const resident = companions[slot], side = slot === 0 ? -1 : 1;
@@ -105,19 +130,10 @@ export class CompanionHands {
       if (!ready) continue;
       resident.root.updateWorldMatrix(true, true);
       const hand = a.getWorldPosition(new T.Vector3()).add(b.getWorldPosition(new T.Vector3())).multiplyScalar(.5);
-      hand.y += .025;
-      for (const [fin, sign] of [[a, side], [b, -side]] as const) {
-        const saved = { fin, position: fin.position.clone(), scale: fin.scale.clone(), rotation: fin.quaternion.clone() };
-        const end = fin.parent!.worldToLocal(hand.clone());
-        const shoulder = fin.position.clone(); shoulder.x -= sign * .1;
-        const arm = end.clone().sub(shoulder), length = arm.length();
-        if (length > .39) continue;
-        const amount = this.reach[slot];
-        this.posed.push(saved);
-        fin.position.lerpVectors(saved.position, shoulder.add(end).multiplyScalar(.5), amount);
-        fin.scale.x *= T.MathUtils.lerp(1, length / .27, amount);
-        fin.quaternion.slerp(new T.Quaternion().setFromUnitVectors(this.xAxis, arm.normalize().multiplyScalar(sign)), amount);
-      }
+      hand.y -= .09;
+      poseBlobArm(a, hand, this.reach[slot]);
+      poseBlobArm(b, hand, this.reach[slot]);
+      this.holdingCount += 2;
     }
   }
 }

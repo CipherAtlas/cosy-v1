@@ -1,0 +1,143 @@
+{
+  "checks": [
+    "All requested breeds are present in the playable village",
+    "Blender blob has independent shoulder, elbow, wrist and hand geometry",
+    "Residents share both movable hands",
+    "Mochi accepts a nearby pet",
+    "Mochi approaches before starting the contact clip",
+    "Mochi stays in contact with the moving hand (gap 0.020 m)",
+    "Mochi releases the interaction after the stroke",
+    "Mochi petting rotates joints without stretching the arm",
+    "Kiko accepts a nearby pet",
+    "Kiko approaches before starting the contact clip",
+    "Kiko stays in contact with the moving hand (gap 0.038 m)",
+    "Kiko releases the interaction after the stroke",
+    "Kiko petting rotates joints without stretching the arm",
+    "Biscuit accepts a nearby pet",
+    "Biscuit approaches before starting the contact clip",
+    "Biscuit stays in contact with the moving hand (gap 0.039 m)",
+    "Biscuit releases the interaction after the stroke",
+    "Biscuit petting rotates joints without stretching the arm",
+    "Cloud accepts a nearby pet",
+    "Cloud approaches before starting the contact clip",
+    "Cloud stays in contact with the moving hand (gap 0.022 m)",
+    "Cloud releases the interaction after the stroke",
+    "Cloud petting rotates joints without stretching the arm",
+    "Fern accepts a nearby pet",
+    "Fern approaches before starting the contact clip",
+    "Fern stays in contact with the moving hand (gap 0.021 m)",
+    "Fern releases the interaction after the stroke",
+    "Fern petting rotates joints without stretching the arm",
+    "Atlas accepts a nearby pet",
+    "Atlas approaches before starting the contact clip",
+    "Atlas stays in contact with the moving hand (gap 0.039 m)",
+    "Atlas releases the interaction after the stroke",
+    "Atlas petting rotates joints without stretching the arm",
+    "Petting can be requested again after completion",
+    "Walking away cancels the pet and frees the arms",
+    "Reduced motion accepts petting",
+    "Reduced motion holds a still dog and hand pose",
+    "Walk all invites every dog from its authored home",
+    "All six gather from their homes (1.6, 1.6, 2.9, 1.2, 4.2, 4.2)",
+    "A dog can be petted during the six-dog walk",
+    "The other five dogs wait during the pet instead of crowding the hand",
+    "Sending the petted dog home releases the hand and keeps the other five",
+    "Cross-village walking route exists",
+    "All six follow across the bridge to the west garden (1.8, 2.9, 4.0, 7.3, 5.0, 6.1)",
+    "Pack stays on clear ground with separated bodies (0.680 m)",
+    "Activities pause the entire pack",
+    "One dog can leave while the remaining five keep their invitations",
+    "Send home releases the whole remaining pack",
+    "Walking keys work immediately with a dog-action button focused",
+    "Space retains native dog-button activation without also jumping",
+    "Six dogs narrow into single file and regroup at 30 fps (1.7, 1.8, 3.1, 3.1, 4.5, 4.5)",
+    "Passage walls and dog separation hold at 30 fps (0.893 m)",
+    "Six dogs narrow into single file and regroup at 60 fps (1.7, 1.9, 3.1, 3.2, 4.5, 4.5)",
+    "Passage walls and dog separation hold at 60 fps (0.897 m)",
+    "Six dogs narrow into single file and regroup at 120 fps (1.7, 1.9, 3.1, 3.2, 4.5, 4.5)",
+    "Passage walls and dog separation hold at 120 fps (0.896 m)",
+    "Petting and nearby actions reject a dog across a fence",
+    "Desktop walking camera includes the heads and paws of all six dogs",
+    "Portrait walking camera includes the heads and paws of all six dogs"
+  ],
+  "metrics": [
+    {
+      "breed": "corgi",
+      "petHandGap": 0.02010130767008312,
+      "contactFrames": 103
+    },
+    {
+      "breed": "shiba",
+      "petHandGap": 0.037505273035334775,
+      "contactFrames": 102
+    },
+    {
+      "breed": "beagle",
+      "petHandGap": 0.03933798309612079,
+      "contactFrames": 102
+    },
+    {
+      "breed": "samoyed",
+      "petHandGap": 0.02248770798641881,
+      "contactFrames": 102
+    },
+    {
+      "breed": "collie",
+      "petHandGap": 0.021144478247789162,
+      "contactFrames": 102
+    },
+    {
+      "breed": "shepherd",
+      "petHandGap": 0.039118759465424285,
+      "contactFrames": 102
+    },
+    {
+      "gatherDistances": [
+        1.7530806686450484,
+        2.895752712619548,
+        3.9524635917086526,
+        7.273397971574997,
+        5.048438656625598,
+        6.135435027288907
+      ],
+      "separation": 0.6800105638691835
+    },
+    {
+      "fps": 30,
+      "gaps": [
+        1.6942757764638523,
+        1.8438196737411983,
+        3.106522024489045,
+        3.13589547981524,
+        4.474376127951618,
+        4.461384424012593
+      ],
+      "minGap": 0.8925000726339882
+    },
+    {
+      "fps": 60,
+      "gaps": [
+        1.705124799205644,
+        1.8519913609128231,
+        3.12307346456361,
+        3.153408898113181,
+        4.467917722344346,
+        4.4730845942577195
+      ],
+      "minGap": 0.8967027752301568
+    },
+    {
+      "fps": 120,
+      "gaps": [
+        1.7037601740761346,
+        1.8600626297241492,
+        3.1210192833117,
+        3.1530202486584216,
+        4.475223868763331,
+        4.4888159930350815
+      ],
+      "minGap": 0.8964485039920154
+    }
+  ],
+  "errors": []
+}

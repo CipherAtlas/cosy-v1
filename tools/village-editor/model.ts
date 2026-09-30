@@ -1,4 +1,5 @@
 import * as T from "three";
+import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { buildWorld, type WorldLayoutCapture, type World } from "../../features/village/world";
 import { BIRD_CLEARING } from "../../features/village/environment";
@@ -154,13 +155,13 @@ export class LayoutScene {
     }
     const [doveKit, spiritKit, puppyKit] = await Promise.all([
       new GLTFLoader().loadAsync("/village/models/dove.glb?v=1"),
-      new GLTFLoader().loadAsync("/village/models/spirit.glb?v=1"),
-      new GLTFLoader().loadAsync("/village/models/puppies.glb?v=1"),
+      new GLTFLoader().loadAsync("/village/models/spirit.glb?v=2"),
+      new GLTFLoader().loadAsync("/village/models/puppies.glb?v=4"),
     ]);
     for (const [breed, info] of Object.entries(PUPPY_INFO)) {
       const model = puppyKit.scene.getObjectByName(info.model);
       if (!model) throw Error(`Missing ${info.model} puppy model.`);
-      const template = model.clone(true);
+      const template = cloneSkeleton(model);
       template.traverse(node => { if (node instanceof T.Mesh) node.castShadow = node.receiveShadow = true; });
       this.assets.set(`puppy-${breed}`, { id: `puppy-${breed}`, name: `${info.name} · ${info.breed}`, category: "Puppies", template, shelf: true });
     }
@@ -170,7 +171,7 @@ export class LayoutScene {
     dove.traverse(node => { if (node instanceof T.Mesh) node.castShadow = node.receiveShadow = true; });
     this.assets.set("white-dove", { id: "white-dove", name: "White dove", category: "Nature", template: dove, shelf: true });
     const spirit = spiritKit.scene;
-    spirit.scale.setScalar(.95 / new T.Box3().setFromObject(spirit).getSize(new T.Vector3()).y);
+    spirit.scale.setScalar(.95 / new T.Box3().setFromObject(spirit.getObjectByName("SpiritBody") ?? spirit).getSize(new T.Vector3()).y);
     // Reuse her runtime appearance so the editor cannot drift from the village's caretaker.
     const residents = new VillageLife(spirit, []);
     residents.residents.forEach((resident, index) => { this.defaultRoutes[RESIDENT_IDS[index]] = { points: structuredClone(resident.route) }; });
@@ -292,7 +293,7 @@ export class LayoutScene {
         root.removeFromParent(); this.releasePath(root); this.roots.delete(item.id); root = undefined;
       }
       if (!root) {
-        root = item.asset === "fence-line" && item.path ? this.makeFence(item.path) : item.path ? this.makePath(item.path, item.asset === "path-straight") : this.assets.get(item.asset)!.template.clone(true);
+        root = item.asset === "fence-line" && item.path ? this.makeFence(item.path) : item.path ? this.makePath(item.path, item.asset === "path-straight") : cloneSkeleton(this.assets.get(item.asset)!.template);
         root.userData = { layoutId: item.id, asset: item.asset, path: structuredClone(item.path) };
         this.roots.set(item.id, root); this.group.add(root);
       }

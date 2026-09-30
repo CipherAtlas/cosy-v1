@@ -620,6 +620,28 @@
       "locked": false
     },
     {
+      "id": "bird-crumb-pouch",
+      "asset": "bird-crumb-pouch",
+      "name": "Sourdough crumb pouch",
+      "position": [
+        -35.45,
+        0.1,
+        5.75
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
       "id": "bench-1",
       "asset": "bench-1",
       "name": "Oak bench 1",
@@ -7794,6 +7816,26 @@
       "name": "Cloud",
       "position": [-1, 0, -29],
       "rotation": [0, 25, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "puppy-fern",
+      "asset": "puppy-collie",
+      "name": "Fern",
+      "position": [5.4, 0, 17],
+      "rotation": [0, 210, 0],
+      "scale": [1, 1, 1],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "puppy-atlas",
+      "asset": "puppy-shepherd",
+      "name": "Atlas",
+      "position": [6.6, 0, 19.2],
+      "rotation": [0, 220, 0],
       "scale": [1, 1, 1],
       "visible": true,
       "locked": false

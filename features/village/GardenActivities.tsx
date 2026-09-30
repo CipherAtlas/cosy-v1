@@ -91,6 +91,7 @@ export function BirdActivity(p: GardenControls) {
     flying: t("The flock is making a little round of the village. They'll land after about 30 seconds in the sky.", "鳥たちは村をひと回り。約30秒飛んだら降りてきます。"),
     crumbs: t("Your crumbs are waiting. Here they come, after one little lap.", "パンくずを撒きました。ひと回りしたら降りてきます。"),
     waiting: t("Twelve little beaks, ready for a picnic.", "十二の小さなくちばし。ピクニックの準備ができました。"),
+    sad: t("Coo coo :(", "クークー :("),
     eating: t("A little peck, a happy flutter…", "ついばんで、うれしく羽ばたいて…"),
     happy: t("Coo coo~ (Thank you~)", "クークー〜（ありがとう〜）"),
   };

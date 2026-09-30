@@ -1,4 +1,6 @@
 import * as T from "three";
+import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
+import { PuppyAnimation } from "./puppyAnimation";
 import { floorHeight, type Collider } from "./environment";
 import { VillageMovement } from "./movement";
 import { VillageNavigation } from "./navigation";
@@ -9,14 +11,28 @@ export const PUPPY_INFO: Record<PuppyBreed, { model: string; name: string; breed
   shiba: { model: "Kiko", name: "Kiko", breed: "Shiba Inu", japanese: "キコ" },
   beagle: { model: "Biscuit", name: "Biscuit", breed: "beagle", japanese: "ビスケット" },
   samoyed: { model: "Cloud", name: "Cloud", breed: "Samoyed", japanese: "クラウド" },
+  collie: { model: "Fern", name: "Fern", breed: "Border Collie", japanese: "ファーン" },
+  shepherd: { model: "Atlas", name: "Atlas", breed: "German Shepherd", japanese: "アトラス" },
 };
 export type NearbyPuppy = { id: string; name: string; breed: PuppyBreed };
+export type PuppyCommand = "sit" | "dance" | "spin" | "bow" | "wave" | "roll";
+export const PUPPY_TRICKS: { command: PuppyCommand; key: string; english: string; japanese: string }[] = [
+  { command: "sit", key: "Z", english: "Sit", japanese: "おすわり" },
+  { command: "dance", key: "X", english: "Dance", japanese: "ダンス" },
+  { command: "spin", key: "V", english: "Spin", japanese: "まわって" },
+  { command: "bow", key: "Q", english: "Bow", japanese: "おじぎ" },
+  { command: "wave", key: "J", english: "Wave", japanese: "おてて" },
+  { command: "roll", key: "K", english: "Roll over", japanese: "ごろん" },
+];
+export const puppyCommandForKey = (key: string) => PUPPY_TRICKS.find(trick => trick.key.toLowerCase() === key.toLowerCase())?.command;
 type Puppy = {
-  info: NearbyPuppy; actor: T.Group; model: T.Object3D; head: T.Object3D; ears: T.Object3D[];
+  info: NearbyPuppy; actor: T.Group; model: T.Object3D; body: T.Object3D; head: T.Object3D; ears: T.Object3D[];
   legs: T.Object3D[]; tail: T.Object3D; movement: VillageMovement; route: [number, number][];
   waypoint: number; path: [number, number][]; pause: number; petAge: number; petting: boolean;
-  heading: number; phase: number; hearts: T.Mesh[]; heightOffset: number;
-  nextFollowPath: number; followGoal: [number, number] | null; lostAge: number; stuckAge: number;
+  heading: number; hearts: T.Mesh[]; heightOffset: number;
+  nextFollowPath: number; followGoal: [number, number] | null; stuckAge: number;
+  command: PuppyCommand | null; commandAge: number; animation: PuppyAnimation;
+  petTarget: [number, number] | null; petApproachAge: number;
 };
 
 const PATROLS: Record<PuppyBreed, [number, number][]> = {
@@ -24,9 +40,11 @@ const PATROLS: Record<PuppyBreed, [number, number][]> = {
   shiba: [[0, 0], [1.3, -2], [2.5, -3.5], [.2, -3.8]],
   beagle: [[0, 0], [-1.3, .8], [-2, 2.3], [-.4, 3.1]],
   samoyed: [[0, 0], [1, -2], [1.4, -4.5], [-.8, -3.7]],
+  collie: [[0, 0], [1, 1.2], [-1, 2.4], [-1.8, .4]],
+  shepherd: [[0, 0], [-1.3, .8], [-1.8, 2.4], [.3, 2.7]],
 };
-const FOLLOW_DISTANCE = 1.2;
-const FOLLOW_SIDE = .65;
+const FOLLOW_DISTANCE = 1.55;
+const FOLLOW_SIDE = .8;
 
 function heartGeometry() {
   const shape = new T.Shape();
@@ -40,19 +58,29 @@ export class PuppyPack {
   readonly group = new T.Group();
   readonly puppies: Puppy[] = [];
   private navigation: VillageNavigation;
+  private probe: VillageMovement;
   private nextBark = 5;
-  private followingId: string | null = null;
+  private followingIds: string[] = [];
   private playerTrail: [number, number][] = [];
+  singleFile = false;
+  private openAge = 0;
+  private followHeading = 0;
+  private previousPlayer = new T.Vector3();
 
-  constructor(source: T.Object3D, placements: PuppyPlacement[], colliders: Collider[], authored: AuthoredWorld,
+  constructor(source: T.Object3D, clips: T.AnimationClip[], placements: PuppyPlacement[], colliders: Collider[], authored: AuthoredWorld,
     private onSound: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void) {
     this.navigation = new VillageNavigation(colliders, authored);
+    this.probe = new VillageMovement(colliders, () => {});
     for (const [index, placement] of placements.entries()) {
       const prototype = source.getObjectByName(PUPPY_INFO[placement.breed].model);
       if (!prototype) continue;
-      const model = prototype.clone(true), actor = new T.Group();
+      const model = cloneSkeleton(prototype), actor = new T.Group();
       model.position.set(0, 0, 0); model.rotation.set(0, 0, 0);
-      model.traverse(node => { if (node instanceof T.Mesh) { node.castShadow = true; node.receiveShadow = true; } });
+      model.traverse(node => {
+        if (node instanceof T.Mesh) { node.castShadow = true; node.receiveShadow = true; }
+        // The bind-pose bounds cannot contain a standing dance or a lifted paw.
+        if (node instanceof T.SkinnedMesh) node.frustumCulled = false;
+      });
       const movement = new VillageMovement(colliders, () => {});
       movement.settle(placement.x, placement.z);
       const heightOffset = placement.y - floorHeight(placement.x, placement.z);
@@ -72,46 +100,63 @@ export class PuppyPack {
       });
       const name = placement.name || PUPPY_INFO[placement.breed].name;
       this.puppies.push({ info: { id: placement.id, name, breed: placement.breed }, actor, model,
+        body: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Body")!,
         head: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Head")!,
         ears: ["EarLeft", "EarRight"].map(part => model.getObjectByName(PUPPY_INFO[placement.breed].model + part)!),
         legs: ["FrontLeft", "FrontRight", "BackLeft", "BackRight"].map(part => model.getObjectByName(PUPPY_INFO[placement.breed].model + "Leg" + part)!),
         tail: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Tail")!, movement, route,
         waypoint: route.length > 1 ? 1 : 0, path: [], pause: 2 + index * 1.5,
-        petAge: 100, petting: false, heading: placement.yaw, phase: index * 1.9, hearts, heightOffset,
-        nextFollowPath: 0, followGoal: null, lostAge: 0, stuckAge: 0 });
+        petAge: 100, petting: false, heading: placement.yaw, hearts, heightOffset,
+        nextFollowPath: 0, followGoal: null, stuckAge: 0,
+        command: null, commandAge: 0, petTarget: null, petApproachAge: 0,
+        animation: new PuppyAnimation(model, clips, PUPPY_INFO[placement.breed].model, index * 1.9) });
     }
   }
 
-  get follower(): NearbyPuppy | null {
-    return this.puppies.find(puppy => puppy.info.id === this.followingId)?.info ?? null;
+  get followers(): NearbyPuppy[] {
+    return this.followingIds.map(id => this.puppies.find(puppy => puppy.info.id === id)!.info);
+  }
+
+  private beginWalk(player: T.Vector3, heading: number) {
+    if (this.followingIds.length) return;
+    this.followHeading = heading;
+    this.previousPlayer.copy(player);
+    this.playerTrail = [[player.x - Math.sin(heading) * 10, player.z - Math.cos(heading) * 10], [player.x, player.z]];
+  }
+
+  private join(puppy: Puppy) {
+    if (!this.followingIds.includes(puppy.info.id)) this.followingIds.push(puppy.info.id);
+    puppy.path = []; puppy.followGoal = null; puppy.nextFollowPath = 0; puppy.stuckAge = 0;
+    puppy.pause = 0; puppy.command = null;
   }
 
   invite(id: string, player: T.Vector3, heading: number): NearbyPuppy | null {
     const puppy = this.puppies.find(value => value.info.id === id);
     if (!puppy || this.nearest(player)?.id !== id || puppy.petting) return null;
-    this.dismiss();
-    this.followingId = id;
-    this.playerTrail = [
-      [player.x - Math.sin(heading) * FOLLOW_DISTANCE, player.z - Math.cos(heading) * FOLLOW_DISTANCE],
-      [player.x, player.z],
-    ];
-    puppy.path = []; puppy.followGoal = null; puppy.nextFollowPath = 0; puppy.lostAge = puppy.stuckAge = 0;
-    puppy.pause = 0;
+    this.beginWalk(player, heading);
+    this.join(puppy);
     return puppy.info;
   }
 
-  dismiss(): NearbyPuppy | null {
-    const puppy = this.puppies.find(value => value.info.id === this.followingId);
-    if (!puppy) return null;
-    this.followingId = null;
-    this.playerTrail = [];
-    puppy.path = []; puppy.followGoal = null; puppy.nextFollowPath = 0; puppy.lostAge = puppy.stuckAge = 0;
-    puppy.waypoint = 0; puppy.pause = 0;
-    return puppy.info;
+  inviteAll(player: T.Vector3, heading: number): NearbyPuppy[] {
+    this.beginWalk(player, heading);
+    for (const puppy of this.puppies) this.join(puppy);
+    return this.followers;
   }
 
-  private trailingPoint(): [number, number] {
-    let remaining = FOLLOW_DISTANCE;
+  dismiss(id?: string): NearbyPuppy[] {
+    const leaving = this.puppies.filter(puppy => this.followingIds.includes(puppy.info.id) && (!id || puppy.info.id === id));
+    this.followingIds = this.followingIds.filter(value => !leaving.some(puppy => puppy.info.id === value));
+    if (!this.followingIds.length) this.playerTrail = [];
+    for (const puppy of leaving) {
+      puppy.path = []; puppy.followGoal = null; puppy.nextFollowPath = 0; puppy.stuckAge = 0;
+      puppy.waypoint = 0; puppy.pause = 0; puppy.command = null;
+      puppy.petting = false; puppy.petTarget = null; puppy.petAge = 100;
+    }
+    return leaving.map(puppy => puppy.info);
+  }
+
+  private trailingPoint(remaining: number): [number, number] {
     for (let index = this.playerTrail.length - 1; index > 0; index--) {
       const end = this.playerTrail[index], start = this.playerTrail[index - 1];
       const length = Math.hypot(end[0] - start[0], end[1] - start[1]);
@@ -123,34 +168,123 @@ export class PuppyPack {
   }
 
   nearest(player: T.Vector3): NearbyPuppy | null {
-    const closest = this.puppies.filter(p => !p.petting).map(p => ({ p, distance: Math.hypot(player.x - p.actor.position.x, player.z - p.actor.position.z) }))
-      .filter(value => value.distance < 2.35).sort((a, b) => a.distance - b.distance)[0];
+    if (this.pettingPuppy) return null;
+    const closest = this.puppies.filter(p => !p.petting && !p.petTarget).map(p => ({ p, distance: Math.hypot(player.x - p.actor.position.x, player.z - p.actor.position.z) }))
+      .filter(value => value.distance < 2.35 && value.p.movement.canWalkTo(player.x, player.z)).sort((a, b) => a.distance - b.distance)[0];
     return closest?.p.info ?? null;
   }
 
   pet(id: string, player: T.Vector3): boolean {
     const puppy = this.puppies.find(p => p.info.id === id);
-    if (!puppy || this.nearest(player)?.id !== id || puppy.petting) return false;
-    puppy.petting = true; puppy.petAge = 0; puppy.pause = 4.2; puppy.path = []; puppy.stuckAge = 0;
+    if (!puppy || this.nearest(player)?.id !== id || this.puppies.some(p => p.petting || p.petTarget)) return false;
+    const dx = puppy.actor.position.x - player.x, dz = puppy.actor.position.z - player.z;
+    const length = Math.hypot(dx, dz) || 1;
+    const target: [number, number] = [player.x + dx / length * 1.14, player.z + dz / length * 1.14];
+    if (!puppy.movement.clear(...target)) return false;
+    puppy.petTarget = target; puppy.petApproachAge = 0; puppy.petAge = 100;
+    puppy.pause = 4.2; puppy.path = this.navigation.path([puppy.movement.position.x, puppy.movement.position.z], target); puppy.stuckAge = 0;
+    puppy.command = null;
     puppy.movement.pause();
-    this.onSound(puppy.info.breed, [puppy.actor.position.x, puppy.actor.position.y + .6, puppy.actor.position.z], "happy");
     return true;
+  }
+
+  cancelPet() {
+    for (const puppy of this.puppies) if (puppy.petting || puppy.petTarget) {
+      puppy.petting = false; puppy.petTarget = null; puppy.path = []; puppy.petAge = 100;
+    }
+  }
+
+  get pettingPuppy() { return this.puppies.find(puppy => puppy.petting || puppy.petTarget) ?? null; }
+
+  petContact(): T.Vector3 | null {
+    const puppy = this.pettingPuppy;
+    if (!puppy?.petting) return null;
+    puppy.actor.updateWorldMatrix(true, true);
+    return puppy.head.getWorldPosition(new T.Vector3()).add(new T.Vector3(0, .29 * puppy.actor.scale.y, 0));
+  }
+
+  private walkToward(puppy: Puppy, delta: number, target: [number, number], speed: number, player: T.Vector3) {
+    const position = puppy.movement.position;
+    let dx = target[0] - position.x, dz = target[1] - position.z;
+    const gap = Math.hypot(dx, dz);
+    if (gap < .04) { puppy.movement.pause(); return; }
+    dx /= gap; dz /= gap;
+    // Yield to nearby dogs and the player; fixed slots prevent crowding at a stop.
+    for (const other of this.puppies) {
+      if (other === puppy) continue;
+      const ox = position.x - other.movement.position.x, oz = position.z - other.movement.position.z;
+      const distance = Math.hypot(ox, oz);
+      if (distance > .001 && distance < .98) {
+        const push = (.98 - distance) * 3;
+        dx += ox / distance * push; dz += oz / distance * push;
+      }
+    }
+    const px = position.x - player.x, pz = position.z - player.z, distance = Math.hypot(px, pz);
+    if (distance < 1 && distance > .001) {
+      dx += px / distance * (1 - distance) * 4;
+      dz += pz / distance * (1 - distance) * 4;
+    }
+    const length = Math.hypot(dx, dz) || 1;
+    puppy.heading = Math.atan2(dx, dz);
+    const turn = T.MathUtils.euclideanModulo(puppy.heading - puppy.actor.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+    const throttle = Math.min(speed, gap * 3) * Math.max(.18, Math.cos(turn));
+    const oldX = position.x, oldZ = position.z;
+    puppy.movement.update(delta, { x: dx / length * throttle / 2.6, z: dz / length * throttle / 2.6,
+      run: false, sprint: false, blocked: false });
+    // Reject penetrations instead of shoving a neighbour through a wall or water.
+    if (this.puppies.some(other => other !== puppy &&
+      Math.hypot(position.x - other.movement.position.x, position.z - other.movement.position.z) < .68 &&
+      Math.hypot(oldX - other.movement.position.x, oldZ - other.movement.position.z) >= .68)) {
+      puppy.movement.settle(oldX, oldZ);
+    }
+  }
+
+  command(id: string, action: PuppyCommand, player: T.Vector3): NearbyPuppy | null {
+    const puppy = this.puppies.find(value => value.info.id === id);
+    if (!puppy || this.nearest(player)?.id !== id || puppy.petting) return null;
+    puppy.command = action;
+    puppy.commandAge = 0;
+    puppy.animation.start(action);
+    puppy.pause = 1.1;
+    puppy.path = [];
+    puppy.stuckAge = 0;
+    puppy.heading = Math.atan2(player.x - puppy.actor.position.x, player.z - puppy.actor.position.z);
+    puppy.movement.pause();
+    if (action === "dance" || action === "spin") {
+      puppy.petAge = 0;
+      this.onSound(puppy.info.breed, [puppy.actor.position.x, puppy.actor.position.y + .6, puppy.actor.position.z], "happy");
+    }
+    return puppy.info;
   }
 
   update(delta: number, elapsed: number, player: T.Vector3, reduced: boolean, active: boolean,
     cameraRotation?: T.Quaternion, playerHeading = 0) {
-    if (active && this.followingId) {
+    if (active && this.followingIds.length) {
       const last = this.playerTrail.at(-1)!;
       const travel = Math.hypot(player.x - last[0], player.z - last[1]);
-      if (travel > 5) {
-        this.playerTrail = [
-          [player.x - Math.sin(playerHeading) * FOLLOW_DISTANCE, player.z - Math.cos(playerHeading) * FOLLOW_DISTANCE],
-          [player.x, player.z],
-        ];
-      } else if (travel > .25) {
-        this.playerTrail.push([player.x, player.z]);
-        if (this.playerTrail.length > 120) this.playerTrail.shift();
+      const dx = player.x - this.previousPlayer.x, dz = player.z - this.previousPlayer.z;
+      if (Math.hypot(dx, dz) > .01 && travel < 5) {
+        const heading = Math.atan2(dx, dz);
+        const turn = T.MathUtils.euclideanModulo(heading - this.followHeading + Math.PI, Math.PI * 2) - Math.PI;
+        this.followHeading += turn * (1 - Math.exp(-delta * 8));
       }
+      this.previousPlayer.copy(player);
+      if (travel > 5) {
+        this.followHeading = playerHeading;
+        this.playerTrail = [[player.x - Math.sin(playerHeading) * 10, player.z - Math.cos(playerHeading) * 10], [player.x, player.z]];
+      } else if (travel > .12) {
+        this.playerTrail.push([player.x, player.z]);
+        if (this.playerTrail.length > 180) this.playerTrail.shift();
+      }
+      let open = true;
+      for (let row = 0; row < Math.ceil(this.followingIds.length / 2); row++) {
+        const point = this.trailingPoint(FOLLOW_DISTANCE + row * 1.35);
+        this.probe.settle(...point);
+        for (const side of [-1, 1]) if (!this.probe.canWalkTo(point[0] + Math.cos(this.followHeading) * FOLLOW_SIDE * side,
+          point[1] - Math.sin(this.followHeading) * FOLLOW_SIDE * side)) open = false;
+      }
+      if (!open) { this.singleFile = true; this.openAge = 0; }
+      else if (this.singleFile) { this.openAge += delta; if (this.openAge > .8) this.singleFile = false; }
     }
     if (active && elapsed >= this.nextBark) {
       this.nextBark = elapsed + 18 + Math.random() * 20;
@@ -161,59 +295,57 @@ export class PuppyPack {
       }
     }
     for (const puppy of this.puppies) {
-      const { actor, model, movement } = puppy;
-      puppy.petAge += delta;
-      if (puppy.petting && puppy.petAge > 2.9) puppy.petting = false;
+      const { actor, movement } = puppy;
+      if (active && puppy.petting) puppy.petAge += delta;
+      if (puppy.petting && puppy.petAge >= 3) { puppy.petting = false; puppy.petTarget = null; }
+      if (active && puppy.command) {
+        puppy.commandAge += delta;
+        if (puppy.commandAge >= puppy.animation.duration(puppy.command)) puppy.command = null;
+      }
       let walking = false;
-      if (active && puppy.petting && puppy.petAge < .85) {
-        const dx = player.x - movement.position.x, dz = player.z - movement.position.z, distance = Math.hypot(dx, dz);
-        const approach = Math.max(0, distance - 1.25);
-        if (approach > .08 && movement.canWalkTo(player.x - dx / distance * 1.25, player.z - dz / distance * 1.25)) {
-          movement.update(delta, { x: dx / distance * .55, z: dz / distance * .55, run: false, sprint: false, blocked: false });
-          walking = movement.speed > .08;
-        } else movement.pause();
-      } else if (active && !puppy.petting && puppy.info.id === this.followingId) {
-        const baseTarget = this.trailingPoint();
-        let target = baseTarget;
-        const last = this.playerTrail.at(-1)!, previous = this.playerTrail.at(-2)!;
-        const forwardX = last[0] - previous[0], forwardZ = last[1] - previous[1];
-        const forwardLength = Math.hypot(forwardX, forwardZ) || 1;
-        const sideTarget: [number, number] = [target[0] - forwardZ / forwardLength * FOLLOW_SIDE,
-          target[1] + forwardX / forwardLength * FOLLOW_SIDE];
-        if (movement.clear(...sideTarget)) target = sideTarget;
-        const distance = Math.hypot(player.x - movement.position.x, player.z - movement.position.z);
-        puppy.lostAge = distance > 18 ? puppy.lostAge + delta : 0;
-        if (puppy.lostAge > 4 && movement.clear(...target)) {
-          movement.settle(...target);
-          puppy.path = []; puppy.followGoal = null; puppy.lostAge = 0;
-        }
-        const gap = Math.hypot(target[0] - movement.position.x, target[1] - movement.position.z);
-        if (gap > .45) {
-          if (elapsed >= puppy.nextFollowPath && (!puppy.followGoal ||
-            Math.hypot(target[0] - puppy.followGoal[0], target[1] - puppy.followGoal[1]) > .6 || !puppy.path.length)) {
-            puppy.path = this.navigation.path([movement.position.x, movement.position.z], target);
-            if (!puppy.path.length && target !== baseTarget) {
-              target = baseTarget;
-              puppy.path = this.navigation.path([movement.position.x, movement.position.z], target);
-            }
-            puppy.followGoal = target;
-            puppy.nextFollowPath = elapsed + (distance > 8 ? 1.2 : .55);
+      const slot = this.followingIds.indexOf(puppy.info.id);
+      if (!active || puppy.command || puppy.petting) movement.pause();
+      else if (puppy.petTarget) {
+        puppy.petApproachAge += delta;
+        const gap = Math.hypot(puppy.petTarget[0] - movement.position.x, puppy.petTarget[1] - movement.position.z);
+        const facing = Math.atan2(player.x - movement.position.x, player.z - movement.position.z);
+        const turn = T.MathUtils.euclideanModulo(facing - actor.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+        if (gap < .12) {
+          movement.pause(); puppy.heading = facing;
+          if (Math.abs(turn) < .15) {
+            puppy.petting = true; puppy.petAge = 0; puppy.animation.start("pet");
+            this.onSound(puppy.info.breed, [actor.position.x, actor.position.y + .6, actor.position.z], "happy");
           }
-          while (puppy.path.length && Math.hypot(puppy.path[0][0] - movement.position.x,
-            puppy.path[0][1] - movement.position.z) < .35) puppy.path.shift();
+        } else {
+          while (puppy.path.length > 1 && Math.hypot(puppy.path[0][0] - movement.position.x, puppy.path[0][1] - movement.position.z) < .18) puppy.path.shift();
           const next = puppy.path[0];
-          if (next) {
-            const dx = next[0] - movement.position.x, dz = next[1] - movement.position.z;
-            const length = Math.hypot(dx, dz);
-            movement.update(delta, { x: dx / length, z: dz / length,
-              run: distance > 1.8, sprint: distance > 4.5, blocked: false });
-            walking = movement.speed > .08;
-            puppy.heading = Math.atan2(dx, dz);
-          } else movement.pause();
-          puppy.stuckAge = walking ? 0 : puppy.stuckAge + delta;
-          if (puppy.stuckAge > .8) {
-            puppy.path = []; puppy.nextFollowPath = elapsed; puppy.stuckAge = 0;
+          if (next) this.walkToward(puppy, delta, next, 1.15, player); else movement.pause();
+        }
+        if (puppy.petApproachAge > 5 || Math.hypot(player.x - puppy.petTarget[0], player.z - puppy.petTarget[1]) > 1.6) this.cancelPet();
+      } else if (slot >= 0) {
+        const baseTarget = this.trailingPoint(FOLLOW_DISTANCE + (this.singleFile ? slot * 1.15 : Math.floor(slot / 2) * 1.35));
+        const side = this.singleFile ? 0 : (slot % 2 ? 1 : -1) * FOLLOW_SIDE;
+        const target: [number, number] = [baseTarget[0] + Math.cos(this.followHeading) * side, baseTarget[1] - Math.sin(this.followHeading) * side];
+        const distance = Math.hypot(player.x - movement.position.x, player.z - movement.position.z);
+        const gap = Math.hypot(target[0] - movement.position.x, target[1] - movement.position.z);
+        const waitingForPet = !!this.pettingPuppy && distance < 5;
+        if (gap > .18 && !waitingForPet) {
+          const direct = gap < 3 && movement.canWalkTo(...target);
+          if (direct) { puppy.path = [target]; puppy.followGoal = target; }
+          else if (elapsed >= puppy.nextFollowPath && (!puppy.followGoal ||
+            Math.hypot(target[0] - puppy.followGoal[0], target[1] - puppy.followGoal[1]) > .35 || !puppy.path.length)) {
+            puppy.path = this.navigation.path([movement.position.x, movement.position.z], target);
+            puppy.followGoal = target;
+            puppy.nextFollowPath = elapsed + .55 + slot * .045;
           }
+          while (puppy.path.length > 1 && Math.hypot(puppy.path[0][0] - movement.position.x,
+            puppy.path[0][1] - movement.position.z) < .23) puppy.path.shift();
+          const next = puppy.path[0];
+          if (next) this.walkToward(puppy, delta, next, distance > 5 ? 5.8 : distance > 2.5 ? 4.3 : 2.6, player);
+          else movement.pause();
+          walking = movement.speed > .08;
+          puppy.stuckAge = walking ? 0 : puppy.stuckAge + delta;
+          if (puppy.stuckAge > .8) { puppy.path = []; puppy.nextFollowPath = elapsed; puppy.stuckAge = 0; }
         } else {
           movement.pause(); puppy.stuckAge = 0;
           puppy.heading = Math.atan2(player.x - movement.position.x, player.z - movement.position.z);
@@ -227,10 +359,8 @@ export class PuppyPack {
           if (next && Math.hypot(next[0] - movement.position.x, next[1] - movement.position.z) < .25) puppy.path.shift();
           const waypoint = puppy.path[0];
           if (waypoint) {
-            const dx = waypoint[0] - movement.position.x, dz = waypoint[1] - movement.position.z, length = Math.hypot(dx, dz);
-            movement.update(delta, { x: dx / length * .48, z: dz / length * .48, run: false, sprint: false, blocked: false });
+            this.walkToward(puppy, delta, waypoint, 1.25, player);
             walking = movement.speed > .08;
-            puppy.heading = Math.atan2(dx, dz);
           } else movement.pause();
           puppy.stuckAge = walking ? 0 : puppy.stuckAge + delta;
           if (puppy.stuckAge > .8) {
@@ -246,20 +376,11 @@ export class PuppyPack {
       actor.position.set(movement.position.x, movement.position.y + puppy.heightOffset, movement.position.z);
       const desiredHeading = puppy.petting ? Math.atan2(player.x - actor.position.x, player.z - actor.position.z) : puppy.heading;
       const turn = T.MathUtils.euclideanModulo(desiredHeading - actor.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
-      actor.rotation.y += turn * (1 - Math.exp(-delta * 6));
-      const happy = puppy.petting || puppy.petAge < 4.2 || puppy.info.id === this.followingId;
-      const hop = reduced ? 0 : puppy.petting ? Math.max(0, Math.sin(puppy.petAge * 11)) * .085 : walking ? Math.abs(Math.sin(elapsed * 8 + puppy.phase)) * .035 : 0;
-      model.position.y = hop;
-      model.rotation.x = reduced ? 0 : puppy.petting ? Math.sin(Math.min(1, puppy.petAge / 2.9) * Math.PI) * .09 : 0;
-      model.rotation.z = reduced ? 0 : happy ? Math.sin(elapsed * 10 + puppy.phase) * .07 : walking ? Math.sin(elapsed * 7 + puppy.phase) * .025 : 0;
-      puppy.head.rotation.z = reduced ? 0 : puppy.petting ? Math.sin(puppy.petAge * 4) * .18 : Math.sin(elapsed * 1.7 + puppy.phase) * .035;
-      puppy.head.rotation.x = reduced ? 0 : puppy.petting ? .10 + Math.sin(puppy.petAge * 7) * .08 : 0;
-      puppy.tail.rotation.y = reduced ? 0 : Math.sin(elapsed * (happy ? 14 : walking ? 8 : 3) + puppy.phase) * (happy ? .68 : .28);
-      puppy.ears.forEach((ear, i) => { ear.rotation.z = reduced ? 0 : Math.sin(elapsed * (happy ? 11 : 4) + i * Math.PI + puppy.phase) * (happy ? .13 : .04); });
-      puppy.legs.forEach((leg, i) => { leg.rotation.x = reduced ? 0 : walking ? Math.sin(elapsed * 9 + (i === 0 || i === 3 ? 0 : Math.PI)) * .27 : puppy.petting && i < 2 ? Math.sin(puppy.petAge * 8 + i) * .14 : 0; });
+      if (active) actor.rotation.y += turn * (1 - Math.exp(-delta * 6));
+      puppy.animation.update(delta, movement.speed, puppy.command, puppy.petting, reduced, active);
       puppy.hearts.forEach((heart, i) => {
         const age = puppy.petAge - .35 - i * .28;
-        heart.visible = !reduced && age > 0 && age < 1.45;
+        heart.visible = active && puppy.petting && !reduced && age > 0 && age < 1.45;
         if (!heart.visible) return;
         heart.position.set((i ? .25 : -.23) + Math.sin(age * 4 + i) * .05, .95 + age * .28, .65);
         if (cameraRotation) heart.quaternion.copy(cameraRotation);
@@ -267,4 +388,6 @@ export class PuppyPack {
       });
     }
   }
+
+  dispose() { this.puppies.forEach(puppy => puppy.animation.dispose()); }
 }

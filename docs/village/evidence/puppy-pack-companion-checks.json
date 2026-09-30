@@ -1,0 +1,98 @@
+{
+  "checks": [
+    "Luma alone occupies the hand-holding slot at 30 fps",
+    "Companion moves behind through the narrow passage at 30 fps",
+    "Companion never crosses passage walls at 30 fps",
+    "Companion rejoins beside the moving player at 30 fps (error 0.12946479090076213, position 21.049408023834,0,13.450392938741029)",
+    "Luma alone occupies the hand-holding slot at 60 fps",
+    "Companion moves behind through the narrow passage at 60 fps",
+    "Companion never crosses passage walls at 60 fps",
+    "Companion rejoins beside the moving player at 60 fps (error 0.11877806974992783, position 21.049772722731017,0,13.474937223083275)",
+    "Luma alone occupies the hand-holding slot at 120 fps",
+    "Companion moves behind through the narrow passage at 120 fps",
+    "Companion never crosses passage walls at 120 fps",
+    "Companion rejoins beside the moving player at 120 fps (error 0.17502260661243857, position 21.04998542311696,0,13.4871050017928)",
+    "A stationary player inside a narrow passage keeps single file",
+    "Waiting in the open allows the companion to return",
+    "Player and Pip hold their articulated hands while standing together",
+    "Player and Pip keep holding hands while walking, including during dialogue",
+    "The two hand tips visibly meet while walking",
+    "A quarter turn reforms the hand-hold in the new walking direction",
+    "Turning back preserves space between the two bodies",
+    "Turning back reforms the hand-hold",
+    "Reduced motion retains the resting hand-hold",
+    "Jumping releases the hand-hold",
+    "Two companions can hold the left and right hand",
+    "Entering an activity restores normal hands and poses",
+    "Dismissal restores the unstretched arms",
+    "All companions release hands and join focus",
+    "All companions release hands and join music",
+    "All companions release hands and join breathe",
+    "All companions release hands and join mood",
+    "All companions release hands and join gratitude",
+    "All companions release hands and join compliment",
+    "All companions release hands and join garden",
+    "All companions release hands and join birds",
+    "The actual pond dock releases hands and puts Pip behind the player",
+    "Five companions arrive across the village at 30 fps",
+    "Five companions follow over the bridge and around cottages at 30 fps",
+    "All companions respect world and water bounds at 30 fps",
+    "Dismissed companions return to their routes at 30 fps",
+    "Five companions arrive across the village at 60 fps",
+    "Five companions follow over the bridge and around cottages at 60 fps",
+    "All companions respect world and water bounds at 60 fps",
+    "Dismissed companions return to their routes at 60 fps",
+    "Five companions arrive across the village at 120 fps",
+    "Five companions follow over the bridge and around cottages at 120 fps",
+    "All companions respect world and water bounds at 120 fps",
+    "Dismissed companions return to their routes at 120 fps"
+  ],
+  "metrics": [
+    {
+      "fps": 30,
+      "maxError": 0.12946479090076213
+    },
+    {
+      "fps": 60,
+      "maxError": 0.11877806974992783
+    },
+    {
+      "fps": 120,
+      "maxError": 0.17502260661243857
+    },
+    {
+      "handGap": 1.398554252558452e-8
+    },
+    {
+      "turnClearance": 0.8874214798719682
+    }
+  ],
+  "encounters": {
+    "pass": true,
+    "checks": 20,
+    "results": [
+      "Approach stops with personal space at 30 fps",
+      "One resident approaches at a time at 30 fps",
+      "Approach stops with personal space at 60 fps",
+      "One resident approaches at a time at 60 fps",
+      "Resident settles without orbiting or shuffling",
+      "Resident returns to their original routine",
+      "Staying nearby does not repeatedly summon the same resident",
+      "Leaving and returning allows a new greeting",
+      "Opening a menu cancels the approach and returns the resident",
+      "Approach stops with personal space at 120 fps",
+      "One resident approaches at a time at 120 fps",
+      "Approach distance stays consistent across frame rates",
+      "Maple also walks over to greet the player",
+      "Moss also walks over to greet the player",
+      "Luma also walks over to greet the player",
+      "Residents do not approach through a wall",
+      "Approach planning rejects a river shortcut",
+      "Approach planning accepts the real bridge",
+      "Walking away ends pursuit and returns the resident",
+      "Arrival and activities do not attract villagers"
+    ],
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+  },
+  "errors": []
+}

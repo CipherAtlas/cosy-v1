@@ -11,12 +11,17 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     const checks = await page.evaluate(async () => {
       const { VillageEngine } = await import('/modules/features/village/VillageEngine.js');
       const { gardenAction } = await import('/modules/features/village/garden.js');
-      const near = [], seats = [];
+      const near = [], seats = [], scatters = [];
       const engine = new VillageEngine(document.querySelector('#scene'), {
         progress: () => {}, ready: () => {}, near: id => near.push(id),
         nearBench: id => near.push(id), seat: id => seats.push(id),
         interact: () => {}, error: message => { throw Error(message); },
         stats: () => {}, movement: () => {}, contact: () => {}, environment: () => {},
+        scatterBirds: fromBench => {
+          scatters.push(fromBench);
+          if (fromBench) engine.setGarden(gardenAction(engine.gardenState, { kind: 'birdCrumbs' }));
+          engine.gardenAction({ kind: 'feedBirds' });
+        },
       });
       try {
         await engine.load(); engine.setBlocked(false);
@@ -90,12 +95,17 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
         if (engine.near !== 'birds') throw Error('Bird clearing does not offer nearby scattering');
         if (engine.gardenState.crumbPouch) throw Error('Test expected no crumb pouch');
         if (engine.gardenAction({ kind: 'feedBirds' })) throw Error('Scattering should wait for an NPC pouch');
-        engine.setGarden(gardenAction(engine.gardenState, { kind: 'birdCrumbs' }));
-        if (!engine.gardenAction({ kind: 'feedBirds' }) || engine.gardenAction({ kind: 'feedBirds' }))
-          throw Error('First scatter should work with a pouch; repeat should wait for the flock');
+        const birdBench = engine.world.benches.find(value => value.birdClearing);
+        engine.movement.settle(birdBench.x, birdBench.z + 1.35); tick(); engine.sit(birdBench.id); tick();
+        engine.onKeyDown(new KeyboardEvent('keydown', { key: 'f' }));
+        if (scatters.length !== 1 || scatters[0] !== true || engine.birds.status !== 'crumbs' || !engine.sittingAtBirdBench)
+          throw Error('Seated F should feed from the bench supply and keep the spirit seated');
+        if (engine.gardenAction({ kind: 'feedBirds' })) throw Error('Repeat feeding should wait for the flock');
+        engine.onKeyDown(new KeyboardEvent('keydown', { key: 'e' })); tick();
+        if (engine.sittingAtBirdBench) throw Error('E should still stand up after scattering');
         engine.movement.settle(24.6, -2.7); tick();
         if (engine.near === 'garden') throw Error('Walking into the kitchen garden still offers a scene transition');
-        return { benches, nearBirds: true, scatterRequiresPouch: true, noGardenTransition: true, simultaneousSeatResolved: true, overflowStacks: true, focusPrivate: true, sharedActivityVisible: true, seatEvents: seats.length, nearEvents: near.length };
+        return { benches, nearBirds: true, standingRequiresPouch: true, seatedFUsesSupply: true, noGardenTransition: true, simultaneousSeatResolved: true, overflowStacks: true, focusPrivate: true, sharedActivityVisible: true, seatEvents: seats.length, nearEvents: near.length };
       } finally { engine.dispose(); }
     });
     if (errors.length) throw Error(errors.join('\n'));

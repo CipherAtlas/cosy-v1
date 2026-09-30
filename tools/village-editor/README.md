@@ -1,6 +1,6 @@
 # Cosy Layout Studio
 
-A private map editor using the village’s actual Three.js artwork. It runs outside Next.js, binds to your computer’s loopback address, and is excluded from the public static export. It uses the project’s existing TypeScript and Three.js installation plus Python 3; no new dependencies are required. Paths, oak fence lines, meadow grass, trees, walkable areas, oak meadow benches, existing cottage/spire positions and resident routes feed the playable scene through `public/village/world-layout.json`.
+A private map editor using the village’s actual Three.js artwork. It runs outside Next.js, binds to your computer’s loopback address, and is excluded from the public static export. It uses the project’s existing TypeScript and Three.js installation plus Python 3; no new dependencies are required. Paths, oak fence lines, meadow grass, trees, walkable areas, oak meadow benches, crumb pouches, existing cottage/spire positions and resident routes feed the playable scene through `public/village/world-layout.json`.
 
 ```bash
 npm run dev:editor
@@ -21,7 +21,7 @@ Keep the process running while editing. Restart it after source changes; ordinar
 - **Open meadow:** the valley scenery, ready for a new composition.
 - **Original snapshot:** the earlier 231-object layout, retained in `presets/original-village.json`.
 
-The studio opens a working copy of **Playable village**, the local game's current 355-object layout: the saved **My village** design plus six newer low stone lanterns and four puppies. It includes the eastern Sunrise meadow and four moonlit lampposts. The named My village copy remains unchanged. Every protected preset still opens as a new working copy. Choosing another layout is undoable, and the browser cannot write to presets. The current default was refreshed at the user’s request after the new garden and bird work; the earlier snapshot was retained. These JSON files preserve layout transforms and reference the shared asset kit, so future artwork updates can change an asset’s appearance while its placement stays preserved.
+The studio opens a working copy of **Playable village**, the local game's current 358-object layout: the saved **My village** design plus six newer low stone lanterns, six puppies and the bench-side crumb pouch. It includes the eastern Sunrise meadow and four moonlit lampposts. The named My village copy remains unchanged. Every protected preset still opens as a new working copy. Choosing another layout is undoable, and the browser cannot write to presets. The current default was refreshed at the user’s request after the new garden and bird work; the earlier snapshot was retained. These JSON files preserve layout transforms and reference the shared asset kit, so future artwork updates can change an asset’s appearance while its placement stays preserved.
 
 **Save layout** writes a named JSON file under `tools/village-editor/layouts/`. A browser recovery draft is kept after each edit. **Save current as a new copy** creates another file. **Export JSON** downloads a portable copy; **Import JSON** validates a file before replacing the working view. Saved layouts and their previous versions are ignored by Git.
 
@@ -43,9 +43,11 @@ Use **Erase** in the toolbar to clear meadow grass and decorative lane wildflowe
 
 **Walkable meadow area** in Landscape expands where the spirit and residents can travel; its X/Z scale and yaw shape an ellipse. It marks movement space over the existing valley terrain rather than creating new terrain geometry. The active eastern area connects to the old boundary. **Oak meadow bench** in Furnishings is a reusable playable seat with collision and scaled seat height. Trees, grass, paths, this bench and the walkable area use their saved transforms in the local game.
 
+**Sourdough crumb pouch** in Furnishings is the small cloth drawstring bag beside the birdwatching bench. It has a rendered shelf preview and supports placement, position, full XYZ rotation, nonuniform scale, duplication and visibility. Save/reload preserves these values; **Apply to local game** carries them into the playable scene. Its placement is visual; the seated F action stays attached to the birdwatching bench. Protected presets and existing named working copies remain unchanged.
+
 **Resident routes** in the right panel lets you choose Pip, Maple, Moss, Luma or Wren, add waypoints on the map, set a pause at each point, remove points, and check reachability using the playable movement rules. The route line appears while adding points. Roads receive a modest travel preference; residents can still cross clear meadow. Save or Apply to keep authored routes.
 
-**Puppies** contains Mochi the corgi, Kiko the Shiba Inu, Biscuit the beagle and Cloud the Samoyed. Each has a rendered shelf preview. Place additional dogs or select one of the four current instances to move, rotate, scale, rename or hide; save/reload keeps the edit, and **Apply to local game** carries it into the playable layout. Each pup's short patrol stays relative to its placement and facing; use a clear, walkable area so the dog can roam safely. The runtime checks route points against its movement rules.
+**Puppies** contains Mochi the corgi, Kiko the Shiba Inu, Biscuit the beagle, Cloud the Samoyed, Fern the Border Collie and Atlas the German Shepherd. Their rendered shelf previews use the same Blender skins as the game. Place additional dogs or select any of the six current instances to move, rotate, scale, rename or hide; save/reload keeps the edit, and **Apply to local game** carries it into the playable layout. `puppy-collie` and `puppy-shepherd` join the original four compatible asset IDs. Every instance gets an independent 26-bone skeleton and all ten clips in the game; the studio shows a still standing pose. Residents also use the updated blob artwork with articulated arms and rounded hands. [Pack and editor checks](../../VILLAGE_BUILD.md#2026-09-30-six-dogs-pack-walks-and-articulated-blob-hands-local) cover previews, placement, saved transforms and isolated Apply with protected presets unchanged. Each dog's patrol remains relative to its placement and facing; place it on clear, walkable ground. Pack invitations and petting run in the game.
 
 **Landscape** includes 20 m and 40 m meadow ground tiles, a gentle grassy hill, the round meadow platform and floating gardens. Place a tile, then use its **Expand ground** north/east/south/west buttons to add matching pieces edge-to-edge. Scale X/Z independently for custom dimensions. These pieces can extend beyond the original terrain, within the studio's 1,500 m placement range. **Set on ground**, new object placement and camera height recognize the added surfaces.
 
@@ -79,7 +81,7 @@ Perspective, top-down view, a ground grid, position/rotation snapping, four ligh
 
 ## Integration boundary
 
-**Save layout** keeps an editable local working file. **Apply to local game** writes `public/village/world-layout.json` after a reachability check, revision check, server validation and backup under `layouts/.history/`. Reload a local game preview to see the result. The original presets and saved working copies are not rewritten by Apply. Path, fence, planting, eraser clearing, tree, bench, walkability, puppy placement, cottage/spire position and route data then drive the local runtime; a normal build and release would be required before any visitor sees it.
+**Save layout** keeps an editable local working file. **Apply to local game** writes `public/village/world-layout.json` after a reachability check, revision check, server validation and backup under `layouts/.history/`. Reload a local game preview to see the result. The original presets and saved working copies are not rewritten by Apply. Path, fence, planting, eraser clearing, tree, bench, walkability, crumb pouches, puppy placement, cottage/spire position and route data then drive the local runtime; a normal build and release would be required before any visitor sees it.
 
 The game now reads position and facing for its seven existing cottages and the village spire, plus new authored fence lines. It still owns their artwork, legacy roadside fence pieces, bridges, activity anchors, garden interactions, cameras and most legacy scenery in code. Apply rejects unsupported transforms instead of silently ignoring them: existing cottages/spire must stay visible at 1× scale, and arbitrary new buildings or edited legacy props remain working-copy only. New editor ground tiles and hills are visual authoring surfaces only; playable terrain sculpting and general prop integration remain future engine work. Editor collision uses oriented bounds; inspect paths, fence runs, tree trunks, seats and bridge approaches in the local game before a release. The Apply endpoint accepts only same-origin loopback requests and does not ship in the static site.
 
@@ -122,3 +124,13 @@ PLAYWRIGHT_PATH=/path/to/playwright STUDIO_URL=http://127.0.0.1:3041 node tools/
 ```
 
 This checks repeated shelf placement, fence drawing/height and playable projection, right-click paste/remove/undo, and local save/reload.
+
+Focused crumb-pouch verification requires an isolated playable file as well as a temporary save directory:
+
+```bash
+cp public/village/world-layout.json /tmp/cosy-pouch-playable.json
+python3 tools/village-editor/server.py --port 3058 --layouts-dir /tmp/cosy-pouch-layouts --playable-file /tmp/cosy-pouch-playable.json
+PLAYWRIGHT_PATH=/path/to/playwright EDITOR_URL=http://127.0.0.1:3058 node tools/village-editor/tests/crumb-pouch.cjs
+```
+
+It checks the rendered library preview, transforms, named save/reload, Apply, runtime projection and the protected preset hash.

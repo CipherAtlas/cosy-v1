@@ -17,7 +17,7 @@ const crypto = require('node:crypto');
     page.on('pageerror', error => errors.push(String(error)));
     await page.goto(url);
     await page.waitForFunction(() => window.cosyStudio, { timeout: 60000 });
-    const breeds = ['corgi', 'shiba', 'beagle', 'samoyed'];
+    const breeds = ['corgi', 'shiba', 'beagle', 'samoyed', 'collie', 'shepherd'];
     for (const breed of breeds) {
       const card = page.locator(`[data-asset="puppy-${breed}"]`);
       await card.waitFor();
@@ -25,7 +25,7 @@ const crypto = require('node:crypto');
       check(true, `${breed} is in the shelf with a rendered preview`);
     }
     const initial = await page.evaluate(() => cosyStudio.snapshot());
-    check(initial.layout.objects.filter(o => o.asset.startsWith('puppy-')).length === 4, 'Four pups are in the playable working copy');
+    check(initial.layout.objects.filter(o => o.asset.startsWith('puppy-')).length === 6, 'Six pups are in the playable working copy');
     await page.locator('#scene-tab').click();
     await page.locator('#search').fill('Mochi');
     await page.locator('#scene-list .scene-select').filter({ hasText: 'Mochi' }).click();
@@ -36,11 +36,13 @@ const crypto = require('node:crypto');
     check(edited.position[0] === 3.4 && edited.rotation[1] === 180 && edited.scale.every(value => Math.abs(value - 1.15) < .001), 'Mochi supports saved placement, facing and uniform scale');
     await page.locator('#search').fill('');
     await page.locator('#assets-tab').click();
-    await page.locator('[data-asset="puppy-beagle"]').click();
-    const spot = await page.evaluate(() => cosyStudio.screenPoint('puppy-mochi', [2.3, 0, 0]));
-    await page.mouse.click(spot.x, spot.y);
-    const placed = await page.evaluate(() => cosyStudio.snapshot().layout.objects.filter(o => o.asset === 'puppy-beagle').length);
-    check(placed === 2, 'A second beagle can be placed from the library');
+    for (const [index, breed] of ['beagle','collie','shepherd'].entries()) {
+      await page.locator(`[data-asset="puppy-${breed}"]`).click();
+      const spot = await page.evaluate(offset => cosyStudio.screenPoint('puppy-mochi', [offset, 0, 0]), 2.3 + index * 1.5);
+      await page.mouse.click(spot.x, spot.y);
+      const placed = await page.evaluate(breed => cosyStudio.snapshot().layout.objects.filter(o => o.asset === `puppy-${breed}`).length, breed);
+      check(placed === 2, `An additional ${breed} can be placed from the library`);
+    }
     await page.getByLabel('Layout name', { exact: true }).fill('Puppy layout QA');
     await page.getByLabel('Layout name', { exact: true }).press('Tab');
     await page.locator('#save').click();
@@ -54,7 +56,7 @@ const crypto = require('node:crypto');
     await page.locator('#layouts').click(); await page.locator('#apply-game').click();
     await page.waitForTimeout(500);
     const playable = await (await page.request.get(`${url}/api/playable`)).json();
-    check(playable.layout.objects.find(o => o.id === 'puppy-mochi').position[0] === 3.4 && playable.layout.objects.filter(o => o.asset === 'puppy-beagle').length === 2,
+    check(playable.layout.objects.find(o => o.id === 'puppy-mochi').position[0] === 3.4 && ['beagle','collie','shepherd'].every(breed => playable.layout.objects.filter(o => o.asset === `puppy-${breed}`).length === 2),
       'Apply carries puppy placement into the isolated playable layout');
     check(hash() === before, 'Protected preset is byte-identical');
     check(errors.length === 0, 'Editor has no page errors');

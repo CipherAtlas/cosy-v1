@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "Z desktop touch target fits",
+    "Z desktop keycap visible",
+    "X desktop touch target fits",
+    "X desktop keycap visible",
+    "V desktop touch target fits",
+    "V desktop keycap visible",
+    "Q desktop touch target fits",
+    "Q desktop keycap visible",
+    "J desktop touch target fits",
+    "J desktop keycap visible",
+    "K desktop touch target fits",
+    "K desktop keycap visible",
+    "Desktop click starts Dance",
+    "Focused trick button accepts Wave key",
+    "Z phone-size touch target fits",
+    "Z phone-size keycap visible",
+    "X phone-size touch target fits",
+    "X phone-size keycap visible",
+    "V phone-size touch target fits",
+    "V phone-size keycap visible",
+    "Q phone-size touch target fits",
+    "Q phone-size keycap visible",
+    "J phone-size touch target fits",
+    "J phone-size keycap visible",
+    "K phone-size touch target fits",
+    "K phone-size keycap visible",
+    "Phone-size Roll over click starts",
+    "Static app has no captured page errors"
+  ],
+  "errors": []
+}
