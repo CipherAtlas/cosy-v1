@@ -12,20 +12,16 @@ export const PageTransition = ({ children }: PropsWithChildren) => {
 
   const origin = useMemo(() => consumeTransitionOrigin(pathname), [pathname]);
 
-  if (shouldReduceMotion) {
-    return <div>{children}</div>;
-  }
-
   return (
     <AnimatePresence mode="wait">
       <motion.main
         key={pathname}
-        className="min-h-screen"
+        className="page-transition min-h-screen"
         style={{ transformOrigin: origin }}
         initial={{ opacity: 0, scale: 1.04, filter: "blur(10px)" }}
         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 0.99, filter: "blur(6px)" }}
-        transition={{ duration: MOTION.pageTransition, ease: MOTION.ease }}
+        exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.99, filter: "blur(6px)" }}
+        transition={{ duration: shouldReduceMotion ? 0 : MOTION.pageTransition, ease: MOTION.ease }}
       >
         {children}
       </motion.main>

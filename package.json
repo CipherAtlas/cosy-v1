@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "dev:editor": "python3 tools/village-editor/server.py"
+    "dev:editor": "python3 tools/village-editor/server.py",
+    "test": "node scripts/village/check.cjs",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "check:export": "node scripts/village/check-export.cjs",
+    "test:browser": "node scripts/village/check-browser.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

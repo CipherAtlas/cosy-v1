@@ -18,7 +18,7 @@ vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };
 });
 const { VillageWorld, workerDefault } = moduleRef.exports;
 
-const saved = { hour: nowHour, entries: [{ id: 'visitor', name: 'Cosy Otter', message: 'Hello' }] };
+const saved = { hour: nowHour, entries: [{ id: 'visitor', messageId: webcrypto.randomUUID(), name: 'Cosy Otter', message: 'Hello', sentAt: Date.now() }] };
 const records = new Map([['chat', saved]]);
 const messages = [];
 const socket = { send: raw => messages.push(JSON.parse(raw)), deserializeAttachment: () => null };
@@ -37,7 +37,7 @@ const request = (path, method = 'GET', token = secret, headers = {}) => new Requ
 });
 
 (async () => {
-  assert.equal(records.get('chat').entries[0].messageId.length, 36, 'older messages receive stable IDs');
+  assert.equal(room.chat[0].messageId, saved.entries[0].messageId, 'Current stored messages retain their identity');
   assert.equal((await workerDefault.fetch(request('/admin/chat', 'GET', 'bad'), env)).status, 401);
   assert.equal((await workerDefault.fetch(new Request('https://world.example/admin/chat'), env)).status, 401);
   const initial = await (await workerDefault.fetch(request('/admin/chat'), env)).json();
@@ -57,7 +57,7 @@ const request = (path, method = 'GET', token = secret, headers = {}) => new Requ
   assert.equal(room.chat.length, 1);
   const cleared = await (await workerDefault.fetch(request('/admin/chat', 'DELETE', secret, { 'If-Match': `"${nowHour}"` }), env)).json();
   assert.equal(cleared.entries.length, 0);
-  assert.equal(messages.at(-2).type, 'hour', 'already-open older clients also clear their log');
+  assert.equal(messages.at(-1).type, 'chat_sync', 'Current clients receive the cleared log');
   assert.equal(messages.at(-1).removedMessageIds[0], nextId);
 
   const clientSource = ts.transpileModule(fs.readFileSync('features/village/sharedWorld.ts', 'utf8'), {
@@ -95,5 +95,5 @@ const request = (path, method = 'GET', token = secret, headers = {}) => new Requ
   assert.equal(snapshots.at(-1).chat.length, 0);
   assert.deepEqual(moderated, [nextId]);
   connection.close();
-  console.log('Admin authentication, legacy IDs, message removal, stale-hour guard, clear, and client sync pass.');
+  console.log('Admin authentication, stored message identity, message removal, stale-hour guard, clear, and client sync pass.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

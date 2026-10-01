@@ -11,6 +11,10 @@ When the current reasoning level is appropriate or the user has explicitly resol
 - Run the smallest useful verification and all applicable required project checks. Expand testing only for changed behavior, failures or unresolved risks; avoid new temporary test harnesses and repeated broad suites without a concrete need. Shared interaction changes still require the multiple-client checks below.
 - For an authorized routine release, use the existing deployment workflow, fill only relevant verification gaps, wait for deployment completion and perform a focused live smoke check. Keep documentation updates concise and proportional to the change.
 
+# Cohesive helper modules
+
+Keep scene engines and React controllers focused on orchestration. When a feature introduces a distinct responsibility such as asset loading, scene construction, camera calculations, visitor rendering, settings or audio lifecycle, put it in a clearly named helper module or hook. Extract an existing responsibility before substantially extending a large mixed-purpose file. Prefer cohesive helpers with small typed interfaces; avoid generic utility buckets, giant context objects and tiny-file fragmentation. File length is a signal to review responsibilities, not a reason to split related code arbitrarily.
+
 # Laptop and desktop experience
 
 The village is for laptops and desktop PCs. Do not optimize the village game or its controls for phones. Prioritize available world-view space, keyboard access and compatibility with 13-inch laptop screens.

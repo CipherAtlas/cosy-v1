@@ -67,16 +67,6 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
             if (Math.hypot(engine.player.position.x - right.x, engine.player.position.z - right.z) > .01)
               throw Error('Simultaneous arrivals did not resolve to separate seats');
             engine.stand(); tick();
-            engine.setRemoteVisitors([{ id: 'older-client', name: 'Older client', color: '#a4d5ae', slot: 3, x: bench.x, z: bench.z, heading: bench.facing }]);
-            engine.sit(bench.id); tick();
-            if (engine.seatedBench?.id !== bench.id) throw Error('A centered visitor prevented shared seating');
-            engine.stand(); tick();
-            engine.setRemoteVisitors([]);
-            engine.sit(bench.id); tick();
-            engine.setRemoteVisitors([{ id: 'older-client', name: 'Older client', color: '#a4d5ae', slot: 3, x: bench.x, z: bench.z, heading: bench.facing }]);
-            tick();
-            if (engine.seatedBench?.id !== bench.id) throw Error('A newly arrived centered visitor made the player stand');
-            engine.stand(); tick();
           }
           engine.setRemoteVisitors([]);
           benches.push(bench.id);

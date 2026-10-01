@@ -5,6 +5,10 @@ import type { AudioMix } from "./places";
 import type { RadioTrack } from "./soundtrack";
 import "./radio.css";
 
+export type RadioPreferences = { mode: "radio" | "village"; station: RadioStationId; track: RadioTrack | null; favorites: RadioTrack[]; queue: RadioTrack[]; paused: boolean };
+// Retained for a later release; the village currently plays its original recordings.
+export const PERSONAL_RADIO_ENABLED = false;
+
 type Language = "en" | "ja";
 
 export function RadioDock({ expanded, setExpanded, track, mode, sound, paused, loading, toggleMusic, next, openSound, language }: {

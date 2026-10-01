@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noImplicitAny": false,
+    "allowImportingTsExtensions": true,
+    "incremental": false
+  },
+  "include": ["index.js", "runtime.d.ts", "cloudflare.d.ts"],
+  "exclude": []
+}

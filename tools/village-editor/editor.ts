@@ -21,7 +21,7 @@ let extendingPath: string | null = null;
 const categories = ["All", "Buildings", "Bridges", "Nature", "Animals", "Villagers", "Puppies", "Furnishings", "Paths", "Landscape"];
 let state: DocumentState;
 let selection: string[] = [];
-let category = "All", tab = "assets", activeTool = "select", placement: string | null = null;
+let category = "All", tab = "assets", placement: string | null = null;
 let before: DocumentState | null = null;
 let savedFingerprint = "";
 let past: DocumentState[] = [], future: DocumentState[] = [];
@@ -201,7 +201,7 @@ function showContextMenu(id: string | null, point: [number, number, number] | nu
   menu.style.top = `${Math.max(8, Math.min(y, innerHeight - bounds.height - 8))}px`;
   menu.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus({ preventScroll: true });
 }
-function setTool(tool: string) { cancelPlacement(); routeEditing = false; activeTool = tool; view.setTool(tool); renderRoute(); for (const el of document.querySelectorAll<HTMLButtonElement>("[data-tool]")) el.setAttribute("aria-pressed", String(el.dataset.tool === tool)); }
+function setTool(tool: string) { cancelPlacement(); routeEditing = false; view.setTool(tool); renderRoute(); for (const el of document.querySelectorAll<HTMLButtonElement>("[data-tool]")) el.setAttribute("aria-pressed", String(el.dataset.tool === tool)); }
 function startPlacement(asset: Asset) {
   if (!ready) return;
   if (asset.id === "fence-line") { startFence(); return; }

@@ -8,8 +8,6 @@ import {
   ArrowCounterClockwise,
   Heart,
   Check,
-  SpeakerHigh,
-  SpeakerSlash,
 } from "@phosphor-icons/react";
 import type { AudioMix, PlaceId } from "./places";
 import type { ActivityMoment } from "./environment";

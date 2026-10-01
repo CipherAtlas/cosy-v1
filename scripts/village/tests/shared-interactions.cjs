@@ -43,7 +43,10 @@ const fs = require('node:fs');
       const e = testEngine, s = e.world.swings[0];
       s.root.localToWorld(e.temp.set(-.98, 0, 1.65)); e.movement.settle(e.temp.x, e.temp.z);
     });
+    const swingApproach = await rider.evaluate(() => ({ x: testEngine.movement.position.x, z: testEngine.movement.position.z }));
+    await observer.waitForFunction(({ x, z }) => [...testEngine.remoteVisitors.values()].some(remote => Math.hypot(remote.target.x - x, remote.target.z - z) < .3), swingApproach);
     await rider.getByRole('button', { name: 'Left swing', exact: true }).click();
+    await rider.waitForFunction(() => !!testEngine.ridingSwing);
     await rider.keyboard.down('w');
     await observer.waitForFunction(() => [...testEngine.remoteVisitors.values()].some(remote => Math.abs(remote.swing?.angle ?? 0) > .1));
     await observer.evaluate(() => {
@@ -69,6 +72,7 @@ const fs = require('node:fs');
     await rider.getByRole('button', { name: 'Get off', exact: true }).click();
     await observer.waitForFunction(() => [...testEngine.remoteVisitors.values()].every(remote => !remote.swing));
     check(await observer.getByRole('button', { name: 'Left swing', exact: true }).isEnabled(), 'Getting off releases the shared seat');
+    await rider.waitForTimeout(100); // The next claim follows the Worker's 80 ms action cooldown.
     const dogId = await rider.evaluate(() => {
       const e = testEngine, dog = e.puppies.puppies[0];
       e.movement.settle(dog.actor.position.x, dog.actor.position.z + 1.5);
@@ -79,15 +83,28 @@ const fs = require('node:fs');
     await observer.waitForFunction(({x,z}) => [...testEngine.remoteVisitors.values()].some(remote =>
       Math.hypot(remote.target.x-x,remote.target.z-z)<.05), approach);
     await rider.getByRole('button', { name: 'Tricks', exact: true }).click();
-    const initial = await rider.evaluate(id => testEngine.puppies.puppies.find(p => p.info.id === id).actor.position.toArray(), dogId);
+    await rider.waitForFunction(id => {
+      const actor = testEngine.sharedActors.actors.find(actor => actor.id === id);
+      return actor.owner === testEngine.sharedSelfId && actor.mode === 'hold'
+        && testEngine.pendingInteractions.size === 0 && Date.now() - actor.startedAt >= 100;
+    }, dogId);
     await rider.getByRole('button', { name: 'Dance', exact: true }).click();
     await observer.waitForFunction(id => testEngine.puppies.puppies.find(p => p.info.id === id)?.command === 'dance', dogId);
     check(await rider.locator('#v-puppy-tricks').isVisible(), 'Clicking Dance keeps the trick menu open');
-    const sharedDog = await observer.evaluate(id => {
-      const p = testEngine.puppies.puppies.find(p => p.info.id === id);
-      return { position: p.actor.position.toArray(), age: p.commandAge, clip: p.animation.actions.dance.time };
+    await observer.waitForFunction(id => {
+      const dog = testEngine.puppies.puppies.find(puppy => puppy.info.id === id);
+      const accepted = testEngine.sharedActors.actors.find(actor => actor.id === id);
+      return accepted.action === 'dance' && accepted.mode === 'trick'
+        && Math.hypot(dog.actor.position.x - accepted.x, dog.actor.position.z - accepted.z) < .01;
     }, dogId);
-    check(Math.hypot(initial[0] - sharedDog.position[0], initial[2] - sharedDog.position[2]) < .001, 'Shared dog dances at the requesting visitor’s dog position');
+    const accepted = await observer.evaluate(id => testEngine.sharedActors.actors.find(actor => actor.id === id), dogId);
+    const heldPosition = [accepted.x, accepted.y, accepted.z];
+    check(accepted.owner === await rider.evaluate(() => testEngine.sharedSelfId), 'The Worker keeps the dancing dog owned by the requesting visitor');
+    await rider.waitForFunction(({ id, x, z }) => {
+      const dog = testEngine.puppies.puppies.find(puppy => puppy.info.id === id);
+      return Math.hypot(dog.actor.position.x - x, dog.actor.position.z - z) < .01;
+    }, accepted);
+    check(true, 'Both clients render the Worker-accepted dog position');
     await observer.evaluate(id => {
       const e = testEngine, dog = e.puppies.puppies.find(p => p.info.id === id);
       e.movement.settle(dog.actor.position.x, dog.actor.position.z + 1.8); e.yaw = 0; e.pitch = .35;
@@ -120,7 +137,7 @@ const fs = require('node:fs');
     await rider.waitForFunction(id => !testEngine.puppies.puppies.find(p => p.info.id === id).command, dogId, { timeout: 12000 });
     await rider.waitForTimeout(1800);
     const final = await rider.evaluate(id => testEngine.puppies.puppies.find(p => p.info.id === id).actor.position.toArray(), dogId);
-    check(Math.hypot(initial[0] - final[0], initial[2] - final[2]) < .001, 'Dog stays beside the open controls after its trick finishes');
+    check(Math.hypot(heldPosition[0] - final[0], heldPosition[2] - final[2]) < .001, 'Dog stays beside the open controls after its trick finishes');
     check(await rider.locator('#v-puppy-tricks').isVisible(), 'Completed tricks keep the list open');
     for (const [width, height] of [[1280,720],[1366,768],[1440,900],[1024,640],[844,390]]) {
       await rider.setViewportSize({ width, height });
@@ -131,8 +148,8 @@ const fs = require('node:fs');
         `${width}×${height} panel fits the desktop window`);
       const metrics = await panel.evaluate(el => ({ alpha: +getComputedStyle(el).backgroundColor.match(/[\d.]+/g)[3],
         buttons: [...el.querySelectorAll('button')].map(b => ({ height: b.getBoundingClientRect().height, overflow: b.scrollWidth > b.clientWidth + 1,
-          key: !!b.querySelector('kbd') && getComputedStyle(b.querySelector('kbd')).display !== 'none' })) }));
-      check(metrics.alpha < .8 && metrics.buttons.every(b => b.height >= 44 && !b.overflow && b.key),
+          action: b.classList.contains('v-interact'), key: !!b.querySelector('kbd') && getComputedStyle(b.querySelector('kbd')).display !== 'none' })) }));
+      check(metrics.alpha < .8 && metrics.buttons.every(b => b.height >= 44 && !b.overflow && (!b.action || b.key)),
         `${width}×${height} translucent panel has readable keycaps and 44 px buttons without overflow`);
       if (width === 1366) {
         await rider.screenshot({ path: output + '/dog-panel-open.png' });

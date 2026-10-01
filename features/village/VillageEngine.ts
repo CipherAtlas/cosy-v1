@@ -1,7 +1,5 @@
 import * as T from "three";
-import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
-import { makeFlame } from "./flame";
+import { VillageVisitors, tintSpirit, glowSpirit } from "./villageVisitors";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 import { buildWorld, type VillageBench, type World } from "./world";
@@ -22,10 +20,12 @@ import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphics
 import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
 import { withBasePath } from "@/lib/basePath";
-import type { SharedChatEntry, SharedVisitor, SharedSwingRide, SharedPuppyTrick } from "./sharedWorld";
-import { cottageMaterials, makeBridgeWindow, makeCoffeeCup, makeDeskInkwell, makeDeskJournal, makeCottageCouch, makeCottageLamp, makeCottageFern, makeCottagePrint, makeCatCushion, makeCottageChair, makeCottageBooks, makeCottagePottery, makeCottageWallShelf } from "./focusCottageProps";
+import type { SharedChatEntry, SharedVisitor, SharedPuppyTrick } from "./sharedWorld";
+import { loadVillageLayout, loadPlacedPuppies, disposeModel } from "./villageAssets";
+import { VillageCamera } from "./villageCamera";
+import { buildFocusCottage } from "./focusCottageScene";
 import { CottageCat, type CottageCatStatus } from "./cottageCat";
-import { SWING_MAX_ANGLE, type SwingSeat } from "./swings";
+import { type SwingSeat } from "./swings";
 import type { SharedActors, SharedInteraction, InteractionResult } from "./sharedActors";
 
 export class VillageEngine {
@@ -55,9 +55,9 @@ export class VillageEngine {
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
   private character?: T.Object3D;
-  private remoteVisitors = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null }>();
+  private visitors: VillageVisitors;
+  private get remoteVisitors() { return this.visitors.entries; }
   private pendingPuppyTricks = new Map<string, SharedPuppyTrick>();
-  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private sharedSlot: number | null = null;
   private sharedColor: string | null = null;
   private sharedSpawnPlaced = false;
@@ -71,7 +71,6 @@ export class VillageEngine {
   private activitySeat: 0 | 1 | null = null;
   private activityPosition: [number, number, number] | null = null;
   private lastSharedFollowers = "";
-  private visitorLabelPoint = new T.Vector3();
   private movement?: VillageMovement;
   private running = false;
   private lastStatus = "";
@@ -90,7 +89,6 @@ export class VillageEngine {
   private teaPan = 1;
   private teaPanHeld = false;
   private activityOrbit = { yaw: 0, pitch: 0 };
-  private orbit = new T.Spherical();
   private pointer?: {
     id: number;
     x: number;
@@ -141,14 +139,14 @@ export class VillageEngine {
   private bounce = new T.DirectionalLight("#c4d9ef", .48);
   private lightColor = new T.Color();
   private fill = new T.HemisphereLight("#bdd7f2", "#6b6550", .9);
-  private cameraGoal = new T.Vector3();
-  private lookGoal = new T.Vector3();
+  private view = new VillageCamera();
   private currentLook = new T.Vector3();
   private compactView = false;
   private direction = new T.Vector3();
   private temp = new T.Vector3();
   private indoor?: T.Group;
   private cottageCat?: CottageCat;
+  private cottageCatLoading?: Promise<void>;
   private catPetTarget = new T.Vector3();
   private coffeeSteam: T.Mesh[] = [];
   private bridgeWindow?: T.WebGLRenderTarget;
@@ -156,14 +154,10 @@ export class VillageEngine {
   private bridgeWindowTime = -1000;
   private rain?: T.LineSegments;
   private weather: Weather = "golden";
-  private collisionBox = new T.Box3();
-  private cameraRay = new T.Ray();
-  private cameraHit = new T.Vector3();
   private treeFrustum = new T.Frustum();
   private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
   private spiritLights = [new T.PointLight("#ffd17d", 0, 5, 2)];
-  private spiritGlowColor = new T.Color("#ffd58e");
   private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -432,7 +426,10 @@ export class VillageEngine {
       alpha: false,
       powerPreference: "high-performance",
     });
+    this.visitors = new VillageVisitors(this.scene, host);
     this.renderer.outputColorSpace = T.SRGBColorSpace;
+    // A cottage frame can render the outdoor window and the interior.
+    this.renderer.info.autoReset = false;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
     this.renderer.shadowMap.enabled = true;
@@ -499,15 +496,15 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const [world, gltf, gardenKit, dove, puppyKit, catKit] = await Promise.all([
-      buildWorld(this.callbacks.progress, this.renderer),
+    const layout = loadVillageLayout();
+    const [world, gltf, gardenKit, dove, puppyKit] = await Promise.all([
+      layout.then(authored => buildWorld(this.callbacks.progress, this.renderer, undefined, authored)),
       new GLTFLoader().loadAsync(
         withBasePath("/village/models/spirit.glb?v=3"),
       ),
       new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
       new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
-      new GLTFLoader().loadAsync(withBasePath("/village/models/puppies.glb?v=4")),
-      new GLTFLoader().loadAsync(withBasePath("/village/models/cottage-cat.glb?v=1")),
+      layout.then(loadPlacedPuppies),
     ]);
     if (this.disposed) {
       world.dispose();
@@ -556,7 +553,7 @@ export class VillageEngine {
     });
     this.player.add(root);
     this.character = root;
-    if (this.sharedColor) this.tintSpirit(root, this.sharedColor, false);
+    if (this.sharedColor) tintSpirit(root, this.sharedColor, false);
     this.placeSharedSpawn();
     this.garden = new GardenScene(gardenKit.scene, world.colliders, (kind, position) => this.callbacks.gardenSound?.(kind, position), world.gardenSurfaces, this.sun.position.clone().sub(this.sun.target.position));
     this.garden.setLanguage(this.language);
@@ -588,9 +585,10 @@ export class VillageEngine {
     this.dialogue.setEnabled(!this.blocked && !this.place);
     if (this.sharedActors) this.setSharedActors(this.sharedActors, this.sharedSelfId);
     this.resize();
-    this.buildInterior();
-    this.cottageCat = new CottageCat(catKit.scene, status => this.callbacks.cottageCat?.(status));
-    this.indoor!.add(this.cottageCat.root);
+    const cottage = buildFocusCottage(this.scene, this.indoorLight, world.flames);
+    this.indoor = cottage.group;
+    this.bridgeWindow = cottage.bridgeWindow;
+    this.coffeeSteam = cottage.coffeeSteam;
     skipDistantPointLights();
     softenShadowEdges(this.scene);
     const rainGeometry = new T.BufferGeometry(),
@@ -621,147 +619,19 @@ export class VillageEngine {
     this.applyGraphicsTier();
     this.renderer.setAnimationLoop((t) => this.frame(t));
   }
-  private buildInterior() {
-    // Indoor surfaces use their own subtle textures and metre-scaled UVs.
-    const g = new T.Group();
-    g.position.set(110, 0, 0);
-    this.scene.add(g);
-    this.indoor = g;
-    g.visible = false;
-    const surfaces = cottageMaterials();
-    const wooden = surfaces.wood, stone = surfaces.stone, plaster = surfaces.plaster;
-    const cube = (
-      m: T.Material,
-      x: number,
-      y: number,
-      z: number,
-      w: number,
-      h: number,
-      d: number,
-    ) => {
-      const geometry = new T.BoxGeometry(w, h, d), p = geometry.attributes.position, n = geometry.attributes.normal, uv = geometry.attributes.uv;
-      for (let i = 0; i < p.count; i++) {
-        if (Math.abs(n.getY(i)) > .5) uv.setXY(i, (p.getX(i) + x) / 2, (p.getZ(i) + z) / 2);
-        else if (Math.abs(n.getZ(i)) > .5) uv.setXY(i, (p.getX(i) + x) / 2, (p.getY(i) + y) / 2);
-        else uv.setXY(i, (p.getZ(i) + z) / 2, (p.getY(i) + y) / 2);
-      }
-      const o = new T.Mesh(geometry, m);
-      o.position.set(x, y, z);
-      o.receiveShadow = true;
-      o.castShadow = true;
-      g.add(o);
-      return o;
-    };
-    cube(surfaces.floor, 0, -0.13, 0, 9, 0.2, 9);
-    cube(wooden, 0, 4.9, 0, 9, 0.15, 9);
-    cube(plaster, 0, 2.5, -4.5, 9, 5, 0.25);
-    cube(plaster, 0, 2.5, 4.5, 9, 5, 0.25);
-    cube(plaster, 4.5, 2.5, 0, 0.25, 5, 9);
-    cube(plaster, -4.5, 2.5, 0, 0.25, 5, 9);
-    const panel = surfaces.plaster.clone(); panel.color.set("#788679");
-    // The room remains enclosed when the focus camera is dragged around the desk.
-    for (const z of [-4.31, 4.31]) {
-      cube(panel, 0, .58, z, 8.8, 1.16, .085);
-      cube(wooden, 0, 1.2, z + (z > 0 ? -.07 : .07), 8.8, .11, .15);
-      for (let x = -4.25; x <= 4.25; x += .85) cube(wooden, x, .55, z + (z > 0 ? -.07 : .07), .055, 1.05, .11);
-    }
-    for (const x of [-4.31, 4.31]) {
-      cube(panel, x, .58, 0, .085, 1.16, 8.8);
-      cube(wooden, x + (x > 0 ? -.07 : .07), 1.2, 0, .15, .11, 8.8);
-      for (let z = -4.25; z <= 4.25; z += .85) cube(wooden, x + (x > 0 ? -.07 : .07), .55, z, .11, 1.05, .055);
-    }
-    for (const x of [-4, -2, 0, 2, 4]) {
-      cube(wooden, x, 4.5, 0, 0.2, 0.2, 9);
-    }
-    for (const x of [-4, 0, 2, 4]) cube(wooden, x, 2.2, -4.3, 0.18, 4.5, 0.18);
-    this.bridgeWindow = new T.WebGLRenderTarget(400, 345, { depthBuffer: true });
-    this.bridgeWindow.texture.colorSpace = T.SRGBColorSpace;
-    const window = makeBridgeWindow(this.bridgeWindow.texture);
-    window.position.set(-2.1, 1.23, -4.12);
-    g.add(window);
-    cube(wooden, -1.6, 1, -2, 3.4, 0.16, 1.4);
-    for (const x of [-2.85, -0.35])
-      for (const z of [-2.5, -1.5]) cube(wooden, x, 0.45, z, 0.12, 0.95, 0.12);
-    const journal = makeDeskJournal();
-    journal.position.set(-1.55, 1.08, -1.95);
-    journal.rotation.y = .12;
-    g.add(journal);
-    const inkwell = makeDeskInkwell();
-    inkwell.position.set(-1.15, 1.08, -2.36);
-    g.add(inkwell);
-    const coffeeCup = makeCoffeeCup();
-    coffeeCup.position.set(-.72, 1.08, -2.43);
-    coffeeCup.traverse(object => {
-      if (object instanceof T.Mesh && object.name.startsWith("Coffee steam")) this.coffeeSteam.push(object);
-    });
-    g.add(coffeeCup);
-    cube(stone, 2.7, 1.35, -4.05, 2.5, 2.7, 0.65);
-    cube(
-      new T.MeshBasicMaterial({ color: "#271b12" }),
-      2.7,
-      0.75,
-      -3.7,
-      1.65,
-      1.45,
-      0.02,
-    );
-    const embers=new T.MeshStandardMaterial({color:"#6b2b12",emissive:"#f27b23",emissiveIntensity:1.1,roughness:1});
-    const charred=wooden.clone();charred.color.set("#3a2117");charred.roughness=1;
-    for(let i=0;i<5;i++) {
-      const log=new T.Mesh(new T.CylinderGeometry(.095,.13,1.05,10),charred);
-      log.position.set(2.7+Math.sin(i*2.3)*.22,.38+(i%2)*.12,-3.38+Math.cos(i*2.3)*.14);
-      log.rotation.set(Math.PI/2,i*.9,.14);log.castShadow=log.receiveShadow=true;g.add(log);
-    }
-    for(let i=0;i<16;i++) {
-      const ember=new T.Mesh(new T.IcosahedronGeometry(.075+(i%3)*.016,0),embers);
-      ember.position.set(2.7+Math.sin(i*2.4)*.57,.32,-3.42+Math.cos(i*2.4)*.24);ember.scale.y=.45;g.add(ember);
-    }
-    const hearthGlow = new T.Mesh(new T.PlaneGeometry(1.55, 1.3), new T.MeshBasicMaterial({ color: "#ff9f4c", transparent: true, opacity: .28, depthWrite: false }));
-    hearthGlow.position.set(2.7, .87, -3.67); g.add(hearthGlow);
-    const firelight = new T.Mesh(new T.CircleGeometry(1.5, 32), new T.MeshBasicMaterial({ color: "#ffb663", transparent: true, opacity: .14, depthWrite: false }));
-    firelight.rotation.x = -Math.PI / 2; firelight.scale.y = .55; firelight.position.set(2.4, .025, -2.25); g.add(firelight);
-    cube(wooden, 2.7, 2.75, -3.9, 2.8, 0.18, 0.9);
-    const f = makeFlame(1.2, 1.1);
-    f.position.set(112.7, .82, -3.38);this.scene.add(f);
-    f.visible=false;f.userData.interior=true;f.userData.light=this.indoorLight;f.userData.coal=embers;
-    this.world?.flames.push(f);
-    const cloth = surfaces.rug, linen = surfaces.linen;
-    cube(cloth, -.6, .006, .1, 4.8, .018, 3.2);
-    for (const z of [-1.37, -1.25, 1.42, 1.54]) cube(linen, -.6, .021, z, 4.6, .012, .025);
-    for (const x of [-2.85, 1.65]) cube(linen, x, .021, .1, .025, .012, 2.85);
-    for (const x of [-2.95, 1.75]) for (let i = 0; i < 36; i++) cube(linen, x, .019, -1.35 + i * .083, .12, .012, .015);
-    const chair = makeCottageChair(surfaces); chair.position.set(-1.4, 0, -.7); g.add(chair);
-    for (const side of [-1, 1]) for (let row = 0; row < 5; row++) cube(stone, 2.7 + side * 1.02, .23 + row * .44, -3.53, .35, .39, .42);
-    for (let i = 0; i < 7; i++) cube(stone, 1.84 + i * .285, 2.4, -3.48, .26, .3, .48);
-    cube(wooden, 1.5, 3.45, -4.04, 3.4, .12, .55);
-    const pottery = makeCottagePottery(); pottery.position.set(2.35, 3.51, -4.02); g.add(pottery);
-    const mantelBooks = makeCottageBooks(); mantelBooks.position.set(.45, 3.51, -4.02); g.add(mantelBooks);
-    const bookShelf = makeCottageWallShelf(surfaces); bookShelf.position.set(.65, 2.16, -4.02); g.add(bookShelf);
-    const upperShelf = makeCottageWallShelf(surfaces, "pottery"); upperShelf.position.set(.65, 2.94, -4.02); g.add(upperShelf);
-    const cushion = makeCatCushion(surfaces); cushion.position.set(.5, 0, -.3); g.add(cushion);
-    const couch = makeCottageCouch(surfaces); couch.position.set(3.5, 0, -.4); couch.rotation.y = -Math.PI / 2; g.add(couch);
-    const lamp = makeCottageLamp(); lamp.position.set(3.5, 0, -2.2); g.add(lamp);
-    const fern = makeCottageFern(); fern.position.set(3.65, 0, 1.55); g.add(fern);
-    const print = makeCottagePrint(); print.position.set(4.15, 1.75, -.5); print.rotation.y = -Math.PI / 2; g.add(print);
-    const windowBounce = new T.PointLight("#ffe1b5", 5, 8, 2);
-    windowBounce.position.set(-2.1, 2.7, -3.3); g.add(windowBounce);
-    const lampGlow = new T.PointLight("#ffd4a0", 2.3, 4, 2); lampGlow.position.set(3.5, 1.6, -2.2); g.add(lampGlow);
-    // Batch static furniture while retaining light and flame objects independently.
-    g.updateMatrixWorld(true);
-    const interiorInverse = g.matrixWorld.clone().invert();
-    const batches = new Map<T.Material, T.BufferGeometry[]>();
-    const pieces: T.Mesh[] = [];
-    g.traverse(o => {
-      if (!(o instanceof T.Mesh) || Array.isArray(o.material) || o.material.transparent) return;
-      const geometry = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(interiorInverse.clone().multiply(o.matrixWorld));
-      const list = batches.get(o.material) ?? []; list.push(geometry); batches.set(o.material, list); pieces.push(o);
-    });
-    pieces.forEach(o => { o.removeFromParent(); o.geometry.dispose(); });
-    batches.forEach((parts, material) => {
-      const geometry = mergeGeometries(parts); parts.forEach(p => p.dispose());
-      if (geometry) { const mesh = new T.Mesh(geometry, material); mesh.receiveShadow = mesh.castShadow = true; g.add(mesh); }
-    });
-    this.indoorLight.position.set(112.7, 2, -2.8);
+  private async loadCottageCat() {
+    if (this.cottageCat || this.disposed) return;
+    if (this.cottageCatLoading) return this.cottageCatLoading;
+    this.cottageCatLoading = new GLTFLoader().loadAsync(withBasePath("/village/models/cottage-cat.glb?v=1")).then(kit => {
+      if (this.disposed) { disposeModel(kit.scene); return; }
+      this.cottageCat = new CottageCat(kit.scene, status => this.callbacks.cottageCat?.(status));
+      this.indoor!.add(this.cottageCat.root);
+      this.cottageCat.enter(this.place === "focus");
+      softenShadowEdges(this.cottageCat.root);
+    }).catch(() => {
+      if (!this.disposed) this.callbacks.sharedNotice?.("The cottage cat couldn't load. Leave and return to try again.");
+    }).finally(() => { this.cottageCatLoading = undefined; });
+    return this.cottageCatLoading;
   }
   private renderBridgeWindow(now: number, time: number) {
     const interval = this.graphicsTier === "minimal" ? 50 : 33;
@@ -906,6 +776,7 @@ export class VillageEngine {
       if (this.disposed || prepareId !== this.sceneryPrepareId) return;
       const now = performance.now();
       this.bridgeWindowTime = -1000;
+      this.renderer.info.reset();
       this.renderBridgeWindow(now, this.elapsed);
       this.renderer.shadowMap.needsUpdate = this.place !== "focus";
       this.renderer.render(this.scene, this.camera);
@@ -947,9 +818,9 @@ export class VillageEngine {
     this.world?.updateLampLights(this.player.position.x, this.player.position.z);
     this.atmosphere.setWeather(rain, dusk, night);
     if (Math.abs(night - this.spiritGlowApplied) > .015 || night === 0 && this.spiritGlowApplied !== 0) {
-      this.glowSpirit(this.player, night);
-      this.life?.residents.forEach(resident => this.glowSpirit(resident.spirit, night));
-      this.remoteVisitors.forEach(remote => this.glowSpirit(remote.group, night));
+      glowSpirit(this.player, night);
+      this.life?.residents.forEach(resident => glowSpirit(resident.spirit, night));
+      this.remoteVisitors.forEach(remote => glowSpirit(remote.group, night));
       this.spiritGlowApplied = night;
     }
   }
@@ -1015,30 +886,8 @@ export class VillageEngine {
   swingOccupied(id: string, index: 0 | 1) {
     return [...this.remoteVisitors.values()].some(remote => remote.swing?.id === id && remote.swing.index === index);
   }
-  showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) {
-    const id = entry.id ?? (entry.name === selfName ? selfId : [...this.remoteVisitors].find(([, remote]) => remote.name === entry.name)?.[0]);
-    if (!id || (id !== selfId && !this.remoteVisitors.has(id))) return;
-    const previous = this.chatBubbles.get(id);
-    if (previous) { clearTimeout(previous.timer); previous.element.remove(); }
-    const element = document.createElement("div");
-    element.className = "v-visitor-chat";
-    element.textContent = entry.message;
-    this.host.append(element);
-    const timer = window.setTimeout(() => {
-      element.remove();
-      this.chatBubbles.delete(id);
-    }, 6000);
-    this.chatBubbles.set(id, { element, timer, messageId: entry.messageId });
-  }
-  removeChatBubbles(messageIds: string[]) {
-    const removed = new Set(messageIds);
-    for (const [id, bubble] of this.chatBubbles) {
-      if (!bubble.messageId || !removed.has(bubble.messageId)) continue;
-      clearTimeout(bubble.timer);
-      bubble.element.remove();
-      this.chatBubbles.delete(id);
-    }
-  }
+  showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) { this.visitors.showChatBubble(entry, selfId, selfName); }
+  removeChatBubbles(messageIds: string[]) { this.visitors.removeChatBubbles(messageIds); }
   private seatPoint(bench: VillageBench, index: 0 | 1) {
     const offset = index === 0 ? -.68 : .68;
     return { x: bench.x + Math.cos(bench.facing) * offset, z: bench.z - Math.sin(bench.facing) * offset };
@@ -1098,7 +947,7 @@ export class VillageEngine {
     this.sharedSlot = slot;
     this.sharedColor = color;
     this.distance = Math.max(this.distance, 5);
-    if (this.character) this.tintSpirit(this.character, color, false);
+    if (this.character) tintSpirit(this.character, color, false);
     this.placeSharedSpawn();
   }
   private placeSharedSpawn() {
@@ -1113,40 +962,10 @@ export class VillageEngine {
     this.player.position.set(x, floorHeight(x, z), z);
     if (!this.place) {
       this.updateWalkingCamera();
-      this.camera.position.copy(this.cameraGoal);
-      this.currentLook.copy(this.lookGoal);
+      this.camera.position.copy(this.view.goal);
+      this.currentLook.copy(this.view.look);
       this.camera.lookAt(this.currentLook);
     }
-  }
-  private tintSpirit(spirit: T.Object3D, color: string, copyMaterials: boolean) {
-    spirit.traverse(object => {
-      if (!(object instanceof T.Mesh)) return;
-      const materials = (Array.isArray(object.material) ? object.material : [object.material]).map(material => {
-        const result = copyMaterials ? material.clone() : material;
-        if (result instanceof T.MeshStandardMaterial && result.name === "Pearl white spirit") {
-          result.color.set(color);
-          result.userData.dayColor = result.color.getHex();
-        }
-        return result;
-      });
-      if (copyMaterials) object.material = Array.isArray(object.material) ? materials : materials[0];
-    });
-  }
-  private glowSpirit(spirit: T.Object3D, night: number) {
-    spirit.traverse(object => {
-      if (!(object instanceof T.Mesh)) return;
-      for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
-        if (!(material instanceof T.MeshStandardMaterial) || material.name !== "Pearl white spirit") continue;
-        if (material.userData.dayEmissive === undefined) {
-          material.userData.dayColor = material.color.getHex();
-          material.userData.dayEmissive = material.emissive.getHex();
-          material.userData.dayEmissiveIntensity = material.emissiveIntensity;
-        }
-        material.color.setHex(material.userData.dayColor).lerp(this.spiritGlowColor, night * .72);
-        material.emissive.setHex(material.userData.dayEmissive).lerp(this.spiritGlowColor, night);
-        material.emissiveIntensity = material.userData.dayEmissiveIntensity + night * .65;
-      }
-    });
   }
   private updateSpiritLights() {
     const night = this.weatherBlend.night;
@@ -1158,54 +977,10 @@ export class VillageEngine {
     }
   }
   setRemoteVisitors(visitors: SharedVisitor[]) {
-    if (!this.character) return;
-    const active = new Set(visitors.map(visitor => visitor.id));
-    for (const [id, remote] of this.remoteVisitors) if (!active.has(id)) {
-      remote.group.traverse(object => {
-        if (object instanceof T.SkinnedMesh) object.skeleton.dispose();
-        if (object instanceof T.Mesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.dispose();
-      });
-      remote.label.remove();
-      const bubble = this.chatBubbles.get(id);
-      if (bubble) { clearTimeout(bubble.timer); bubble.element.remove(); this.chatBubbles.delete(id); }
-      remote.group.removeFromParent(); this.remoteVisitors.delete(id);
-    }
-    for (const visitor of visitors) {
+    this.visitors.sync(visitors, this.character, this.world, this.elapsed, this.weatherBlend.night, this.place === "focus", visitor => {
       const seat = this.visitorSeat(visitor.x, visitor.z, visitor.heading);
-      const height = visitor.y !== undefined && Number.isFinite(visitor.y) ? visitor.y
-        : seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z);
-      let remote = this.remoteVisitors.get(visitor.id);
-      if (!remote) {
-        const group = new T.Group(), spirit = cloneSkeleton(this.character);
-        spirit.position.set(0, .62, 0); spirit.rotation.set(0, 0, 0);
-        this.tintSpirit(spirit, visitor.color, true);
-        this.glowSpirit(spirit, this.weatherBlend.night);
-        const label = document.createElement("div");
-        label.className = "v-visitor-name";
-        label.textContent = visitor.name;
-        label.style.setProperty("--visitor-color", visitor.color);
-        this.host.append(label);
-        group.add(spirit);
-        group.position.set(visitor.x, height, visitor.z);
-        group.rotation.y = visitor.heading;
-        this.scene.add(group);
-        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: this.elapsed, bench: null, activity: null };
-        this.remoteVisitors.set(visitor.id, remote);
-      }
-      if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
-      remote.name = visitor.name;
-      remote.slot = visitor.slot;
-      remote.label.style.setProperty("--visitor-color", visitor.color);
-      remote.target.set(visitor.x, height, visitor.z);
-      remote.heading = visitor.heading;
-      remote.bench = visitor.bench ?? null; remote.activity = visitor.activity ?? null;
-      const ride = visitor.swing;
-      const swing = ride && [0, 1].includes(ride.index) && [ride.angle, ride.velocity].every(Number.isFinite)
-        && this.world?.swings.find(value => value.placement.id === ride.id);
-      if (JSON.stringify(remote.swing) !== JSON.stringify(swing ? ride : null)) remote.swingReceivedAt = this.elapsed;
-      remote.swing = swing && ride ? { ...ride } : null;
-      remote.group.visible = this.place !== "focus" && visitor.activity !== "focus";
-    }
+      return seat ? seat.bench.seatHeight - .62 : floorHeight(visitor.x, visitor.z);
+    });
     this.resolveSeatCollision();
   }
   gardenAction(action: GardenAction, source?: { x: number; z: number }, animateSelf = true) {
@@ -1324,8 +1099,8 @@ export class VillageEngine {
     this.life?.setActivity(id, arrival ? [arrival.x, arrival.z] : undefined);
     if (id) {
       this.updateActivityCamera(id);
-      this.camera.position.copy(this.cameraGoal);
-      this.currentLook.copy(this.lookGoal);
+      this.camera.position.copy(this.view.goal);
+      this.currentLook.copy(this.view.look);
     }
     this.clearKeys();
     this.movement?.settle();
@@ -1335,14 +1110,15 @@ export class VillageEngine {
       this.player.rotation.y=this.walkingHeading;
       this.yaw = previousPlace === "mood" ? -Math.PI + .4 : 0;
       this.updateWalkingCamera();
-      this.camera.position.copy(this.cameraGoal);
-      this.currentLook.copy(this.lookGoal);
+      this.camera.position.copy(this.view.goal);
+      this.currentLook.copy(this.view.look);
       this.camera.lookAt(this.currentLook);
     }
     this.player.visible = true;
     this.resize();
     if (this.indoor) this.indoor.visible = id === "focus";
     this.cottageCat?.enter(id === "focus");
+    if (id === "focus") void this.loadCottageCat();
     this.indoorLight.intensity = id === "focus" ? 10 : 0;
     if (id === "focus") this.bridgeWindowTime = -1000;
     this.world?.flames.forEach((f) => {
@@ -1401,8 +1177,8 @@ export class VillageEngine {
     this.callbacks.nearGarden?.(null);
     this.callbacks.nearPuppy?.(null);
     this.updateWalkingCamera();
-    this.camera.position.copy(this.cameraGoal);
-    this.currentLook.copy(this.lookGoal);
+    this.camera.position.copy(this.view.goal);
+    this.currentLook.copy(this.view.look);
     this.camera.lookAt(this.currentLook);
     this.reportMovement(true);
     this.callbacks.recovered?.(nearby ? "nearby" : "entrance");
@@ -1502,110 +1278,17 @@ export class VillageEngine {
   }
   private updateSwingCamera() {
     const swing = this.world?.swings.find(value => value.placement.id === this.ridingSwing?.id);
-    if (!swing) return;
-    swing.root.localToWorld(this.lookGoal.set(0, this.compactView ? 2 : 1.6, 0));
-    const distance = (this.compactView ? 10.5 : 7.3) * swing.placement.scale[0];
-    this.cameraGoal.copy(this.lookGoal).add(this.temp.set(Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
-      Math.sin(this.pitch) * distance + .7, Math.cos(this.yaw) * Math.cos(this.pitch) * distance));
-    this.cameraGoal.y = Math.max(this.cameraGoal.y, floorHeight(this.cameraGoal.x, this.cameraGoal.z) + .4);
+    if (swing) this.view.swing(swing, this.yaw, this.pitch, this.compactView);
   }
   private updateActivityCamera(place: PlaceId) {
-    const stage=ACTIVITY_STAGES[place];
-    this.cameraGoal.fromArray(stage.camera);
-    this.lookGoal.fromArray(stage.look);
-    if (place === "focus") {
-      this.cameraGoal.set(110.3, 2.9, 3.45);
-      this.lookGoal.set(109.85, 1.2, -1.65);
-    }
-    if (place === "mood") {
-      if (!this.teaPanHeld) this.teaPan = this.reducedMotion ? 1 : T.MathUtils.smoothstep(this.elapsed - this.teaPanAt, 0, 4);
-      this.cameraGoal.lerp(this.temp.set(11.6, 2.6, -8.3), 1 - this.teaPan);
-    }
-    if (this.companions.length) {
-      this.cameraGoal.sub(this.lookGoal).multiplyScalar(place === "focus" ? 1.28 : 1.15).add(this.lookGoal);
-      this.cameraGoal.y += .2;
-    }
-    if (this.compactView && place === "mood") {
-      // Keep both the gardener and Luma above the phone's activity sheet.
-      this.lookGoal.set(15.2, 1.35, -10.7);
-      this.cameraGoal.x = this.lookGoal.x + (this.cameraGoal.x - this.lookGoal.x) * 1.8;
-      this.cameraGoal.z = this.lookGoal.z + (this.cameraGoal.z - this.lookGoal.z) * 1.8;
-    } else if (this.compactView && place === "birds") {
-      this.lookGoal.set(BIRD_CLEARING.x, .3, BIRD_CLEARING.z);
-      this.cameraGoal.set(BIRD_CLEARING.x + 7, 7.3, BIRD_CLEARING.z + 10.5);
-    } else if(this.compactView) {
-      this.temp.fromArray(stage.actor).y+=1.1;
-      this.lookGoal.lerp(this.temp,.7);
-    }
-    if (this.activityOrbit.yaw === 0 && this.activityOrbit.pitch === 0) return;
-    this.orbit.setFromVector3(this.temp.subVectors(this.cameraGoal, this.lookGoal));
-    this.orbit.theta += this.activityOrbit.yaw;
-    this.orbit.phi = T.MathUtils.clamp(this.orbit.phi - this.activityOrbit.pitch, .2, Math.PI / 2 - .04);
-    this.cameraGoal.copy(this.lookGoal).add(this.temp.setFromSpherical(this.orbit));
-    if (place === "focus") {
-      // Keep the orbit inside the cottage walls and below its ceiling.
-      this.cameraGoal.set(T.MathUtils.clamp(this.cameraGoal.x, 106.5, 113.5),
-        T.MathUtils.clamp(this.cameraGoal.y, .6, 3.9), T.MathUtils.clamp(this.cameraGoal.z, -3.45, 3.5));
-    } else {
-      this.cameraRay.origin.copy(this.lookGoal);
-      this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
-      for (const c of this.world?.colliders ?? []) {
-        this.collisionBox.min.set(c.x - c.w / 2 - .25, c.bottom ?? 0, c.z - c.d / 2 - .25);
-        this.collisionBox.max.set(c.x + c.w / 2 + .25, c.top ?? 8, c.z + c.d / 2 + .25);
-        // The activity's own table or prop can contain the authored look point.
-        if (this.collisionBox.containsPoint(this.lookGoal)) continue;
-        if (this.cameraRay.intersectBox(this.collisionBox, this.cameraHit)) {
-          const distance = this.cameraHit.distanceTo(this.lookGoal);
-          if (distance < this.cameraGoal.distanceTo(this.lookGoal))
-            this.cameraGoal.copy(this.lookGoal).addScaledVector(this.cameraRay.direction, Math.max(.55, distance - .2));
-        }
-      }
-      this.cameraGoal.y = Math.max(this.cameraGoal.y, floorHeight(this.cameraGoal.x, this.cameraGoal.z) + .35);
-    }
+    if (place === "mood" && !this.teaPanHeld)
+      this.teaPan = this.reducedMotion ? 1 : T.MathUtils.smoothstep(this.elapsed - this.teaPanAt, 0, 4);
+    this.view.activity(place, { teaPan: this.teaPan, companionCount: this.companions.length,
+      compactView: this.compactView, activityOrbit: this.activityOrbit, colliders: this.world?.colliders ?? [] });
   }
   private updateWalkingCamera() {
-    this.lookGoal.copy(this.player.position).add(this.temp.set(0, 1.35, 0));
-    this.lookGoal.y += Math.max(0, -Math.sin(this.pitch)) * 2.4;
-    const followers = this.puppies?.followers ?? [];
-    const dogs = this.seatedBench ? 0 : followers.length;
-    const packBack = Math.max(0, Math.min(1.8, (dogs - 1) * .3));
-    this.lookGoal.y -= packBack * .4;
-    if (dogs && this.puppies) {
-      let minX = this.player.position.x, maxX = minX, minZ = this.player.position.z, maxZ = minZ;
-      for (const puppy of this.puppies.puppies) {
-        if (!followers.some(value => value.id === puppy.info.id) || puppy.actor.position.distanceTo(this.player.position) > 9) continue;
-        minX = Math.min(minX, puppy.actor.position.x); maxX = Math.max(maxX, puppy.actor.position.x);
-        minZ = Math.min(minZ, puppy.actor.position.z); maxZ = Math.max(maxZ, puppy.actor.position.z);
-      }
-      const offsetX = (minX + maxX) * .5 - this.player.position.x;
-      const offsetZ = (minZ + maxZ) * .5 - this.player.position.z;
-      // Keep the player as the anchor when a dog falls behind or rounds a corner.
-      const weight = Math.min(1, 1.2 / Math.max(.001, Math.hypot(offsetX, offsetZ)));
-      this.lookGoal.x += offsetX * weight;
-      this.lookGoal.z += offsetZ * weight;
-    }
-    const distance = this.seatedBench ? 3 : this.distance + (dogs ? Math.min(2.8, 1.6 + (dogs - 1) * .24) : 0);
-    this.cameraGoal.copy(this.player.position).add(this.temp.set(
-      this.lookGoal.x - this.player.position.x + Math.sin(this.yaw) * Math.cos(this.pitch) * distance,
-      1.35 + Math.sin(this.pitch) * distance + packBack * .4,
-      this.lookGoal.z - this.player.position.z + Math.cos(this.yaw) * Math.cos(this.pitch) * distance,
-    ));
-    this.cameraRay.origin.copy(this.lookGoal);
-    this.cameraRay.direction.subVectors(this.cameraGoal, this.lookGoal).normalize();
-    for (const c of this.world?.colliders ?? []) {
-      this.collisionBox.min.set(c.x - c.w / 2 - 0.3, c.bottom ?? 0, c.z - c.d / 2 - 0.3);
-      this.collisionBox.max.set(c.x + c.w / 2 + 0.3, c.top ?? 8, c.z + c.d / 2 + 0.3);
-      if (this.seatedBench && this.collisionBox.containsPoint(this.lookGoal)) continue;
-      if (this.cameraRay.intersectBox(this.collisionBox, this.cameraHit)) {
-        const hitDistance = this.cameraHit.distanceTo(this.lookGoal);
-        if (hitDistance < this.cameraGoal.distanceTo(this.lookGoal)) {
-          this.cameraGoal.copy(this.lookGoal).addScaledVector(
-            this.cameraRay.direction, Math.max(0.55, hitDistance - 0.2),
-          );
-        }
-      }
-    }
-    this.cameraGoal.y = Math.max(this.cameraGoal.y, floorHeight(this.cameraGoal.x, this.cameraGoal.z) + .3);
+    this.view.walking({ player: this.player, yaw: this.yaw, pitch: this.pitch, distance: this.distance,
+      seated: !!this.seatedBench, puppies: this.puppies, colliders: this.world?.colliders ?? [] });
   }
   private reportMovement(force = false) {
     const m = this.movement;
@@ -1752,8 +1435,8 @@ export class VillageEngine {
         const frameZ = watchingTrick ? target.z - directionZ * offset : middleZ - Math.sin(this.player.rotation.y) * this.puppyPetSide * .3;
         const back = watchingTrick ? 0 : distance * .94;
         const lateral = watchingTrick ? distance : distance * .35;
-        this.lookGoal.set(frameX, this.player.position.y + .86, frameZ);
-        this.cameraGoal.set(frameX + sideX * side * lateral - directionX * back,
+        this.view.look.set(frameX, this.player.position.y + .86, frameZ);
+        this.view.goal.set(frameX + sideX * side * lateral - directionX * back,
           this.player.position.y + 2.2, frameZ + sideZ * side * lateral - directionZ * back);
       }
     }
@@ -1774,9 +1457,9 @@ export class VillageEngine {
     const cameraResponse = !this.place && !this.seatedBench && !this.ridingSwing
       && (this.puppies?.followers.length ?? 0) > 1 && movement.speed > .12 ? 14 : 7;
     const blend = this.reducedMotion ? 1 : 1 - Math.exp(-dt * cameraResponse);
-    this.camera.position.lerp(this.cameraGoal, blend);
+    this.camera.position.lerp(this.view.goal, blend);
     if (!this.place) this.camera.position.y = Math.max(this.camera.position.y, floorHeight(this.camera.position.x, this.camera.position.z) + .3);
-    this.currentLook.lerp(this.lookGoal, blend);
+    this.currentLook.lerp(this.view.look, blend);
     this.camera.lookAt(this.currentLook);
     const t = this.reducedMotion ? 0 : this.elapsed;
     this.updateLighting(dt);
@@ -1889,47 +1572,16 @@ export class VillageEngine {
     }
     this.birds?.update(dt, this.elapsed, this.reducedMotion, this.camera, this.player.position,
       this.life?.caretakerPresent ?? false, this.place !== "focus" && !this.blocked, otherBlobNearby);
-    for (const remote of this.remoteVisitors.values()) {
-      const ride = remote.swing, swing = ride && this.world.swings.find(value => value.placement.id === ride.id);
-      if (ride && swing) {
-        // Predict only a short gap between packets, then hold if the rider stops sending.
-        const age = Math.min(.24, Math.max(0, this.elapsed - remote.swingReceivedAt));
-        const angle = T.MathUtils.clamp(ride.angle + ride.velocity * age, -SWING_MAX_ANGLE, SWING_MAX_ANGLE);
-        swing.showSharedMotion(ride.index, angle, ride.velocity, dt);
-        swing.seatPoint(ride.index, remote.group.position); remote.group.position.y -= .62;
-        remote.heading = swing.placement.yaw;
-      } else remote.group.position.lerp(remote.target, 1 - Math.exp(-dt * 12));
-      const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
-      remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
-      remote.group.traverse(node => {
-        if (node.name.startsWith("SpiritFin")) relaxBlobArm(node, this.elapsed + remote.slot, remote.group.position.distanceTo(remote.target) > .05, this.reducedMotion);
-      });
-    }
+    this.visitors.update(dt, this.elapsed, this.reducedMotion, this.world.swings);
     this.updateSpiritLights();
     const renderStart = performance.now();
+    this.renderer.info.reset();
     this.renderBridgeWindow(now, t);
     if (this.place === "focus") this.sun.intensity = 0;
     this.renderer.render(this.scene, this.camera);
     if (now - this.qualityChangedAt > 4000)
       this.longestRenderSubmitMs = Math.max(this.longestRenderSubmitMs, performance.now() - renderStart);
-    for (const remote of this.remoteVisitors.values()) {
-      const point = this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0)).project(this.camera);
-      remote.label.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || this.place === "focus";
-      if (!remote.label.hidden) {
-        remote.label.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
-        remote.label.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
-      }
-    }
-    for (const [id, bubble] of this.chatBubbles) {
-      const origin = this.remoteVisitors.get(id)?.group.position ?? this.player.position;
-      const point = this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0)).project(this.camera);
-      bubble.element.hidden = (this.place === "focus" && this.remoteVisitors.has(id)) ||
-        point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
-      if (!bubble.element.hidden) {
-        bubble.element.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
-        bubble.element.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
-      }
-    }
+    this.visitors.projectLabels(this.camera, this.player.position, this.place === "focus");
     this.dialogue?.update(dt, this.camera, this.player.position, this.weather);
     this.frameSum += frameDelta;
     this.frames++;
@@ -1961,8 +1613,7 @@ export class VillageEngine {
   }
   dispose() {
     this.disposed = true;
-    for (const bubble of this.chatBubbles.values()) clearTimeout(bubble.timer);
-    this.chatBubbles.clear();
+    this.visitors.dispose();
     this.releaseMouseLook();
     this.renderer.setAnimationLoop(null);
     this.resizeObserver.disconnect();

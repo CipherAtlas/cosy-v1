@@ -1,5 +1,13 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — blob NPC movement smoothing (local)
+
+Shared blob positions now interpolate timestamped Worker poses with a 180 ms buffer, eliminating repeated snapshot catch-up pulses in the high-fps regression. Reconnects and activity relocations clear the buffered path; stalled delivery holds the last accepted position. The 113 motion checks, 21 existing renderer checks, `npm run check`, isolated static build/export-boundary check and 26 actual three-client ownership/seat/reconnect/private-focus checks passed. Physical-laptop and production perception remain unverified; this client-only fix is not deployed. [Behavior, reproduction and limits](VILLAGE_BUILD.md#2026-10-01--blob-npc-movement-smoothing-local).
+
+## Active local audit follow-up
+
+Work starts from `03aab76` (`origin/main` at the start). Focused scene/camera/visitor/landscape and UI helper modules, selective runtime dog kits, first-entry private cat loading, stable reduced-motion hydration and complete cottage render counters are implemented locally. Entry village payload fell 17.4%. Current-contract fast checks are exposed through `npm test` and enforced by the existing Pages build; application/Worker type checking, production export, export privacy, the complete physics/browser/multiple-client runner and isolated puppy editor checks passed. See the [build-ledger entry](VILLAGE_BUILD.md#2026-10-01--audit-follow-up-local) for evidence and limits. Remote `main` advanced separately to `b588573` with Worker write cleanup; reconcile it before publishing these uncommitted changes. Concurrent resident-motion work is preserved. No Git writes or deployment.
+
 ## 2026-10-01 — map and kind-note release published
 
 All pending map/keyboard, note/editor and documentation changes are pushed in source `136c2f3` and published through successful [Pages run 36837408922](https://github.com/CipherAtlas/cosy-v1/actions/runs/36837408922). Fresh build/typecheck, 27 device fixtures, 84 three-client local checks, 16 two-client production checks and 13 HTTP/asset checks passed. The Worker is unchanged, private tools remain excluded and existing visitors need to reload. [Release evidence and limits](VILLAGE_BUILD.md#2026-10-01--map-and-kind-note-release-published). Safari, physical hardware, screen readers and long-session/performance acceptance remain open.

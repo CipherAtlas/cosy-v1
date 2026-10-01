@@ -150,7 +150,7 @@ const path = require('node:path');
       engine.commandPuppy(mochi.info.id, 'dance');
       const frame = () => engine.frame((engine.lastTime || performance.now()) + 1000 / 60);
       frame();
-      check(Math.abs(engine.lookGoal.y - engine.player.position.y - .86) < .01,
+      check(Math.abs(engine.view.look.y - engine.player.position.y - .86) < .01,
         'A stationary trick frames the puppy and spirit together');
       for (let count = 0; count < 50; count++) frame();
       let projected = mochi.head.getWorldPosition(new T.Vector3()).project(engine.camera);
@@ -163,13 +163,13 @@ const path = require('node:path');
       engine.camera.aspect = aspect; engine.camera.updateProjectionMatrix();
       engine.keys.add('w');
       for (let count = 0; count < 20; count++) frame();
-      check(engine.movement.speed > .12 && engine.lookGoal.y > engine.player.position.y + 1,
+      check(engine.movement.speed > .12 && engine.view.look.y > engine.player.position.y + 1,
         'Walking immediately restores the normal camera during a trick');
       engine.clearKeys(); engine.movement.pause();
       engine.reducedMotion = true; frame();
-      check(engine.lookGoal.y > engine.player.position.y + 1, 'Reduced motion avoids automatic trick camera movement');
+      check(engine.view.look.y > engine.player.position.y + 1, 'Reduced motion avoids automatic trick camera movement');
       engine.reducedMotion = false; pack.dismiss(); mochi.command = null; frame();
-      check(engine.lookGoal.y > engine.player.position.y + 1, 'Ending the trick releases its camera framing');
+      check(engine.view.look.y > engine.player.position.y + 1, 'Ending the trick releases its camera framing');
       const audio = new VillageAudio();
       audio.setMix({ ...DEFAULT_MIX, music: 0 });
       await audio.start();

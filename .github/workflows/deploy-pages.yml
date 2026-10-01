@@ -33,11 +33,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check current village contracts
+        run: npm test
+
       - name: Build static site
         env:
           NEXT_PUBLIC_BASE_PATH: ""
           NEXT_PUBLIC_SHARED_WORLD_URL: "wss://cosy-village-world.sabargulati777.workers.dev/"
         run: npm run build
+
+      - name: Check public export boundaries
+        run: npm run check:export
 
       - name: Add .nojekyll
         run: touch out/.nojekyll

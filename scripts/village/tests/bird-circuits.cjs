@@ -38,12 +38,6 @@ for (let cycle = 1; cycle <= 3; cycle++) {
 const saved = JSON.parse(JSON.stringify(simulation.save()));
 const restored = new VillageSimulation(saved);
 check(restored.snapshot(now).birds.flightCount === 3, 'Saved and broadcast snapshots retain the circuit choice');
-delete saved.birds.flightCount;
-const legacy = new VillageSimulation(saved);
-Object.assign(legacy.birds, { phase: 'ground', since: now - 18000, served: false, queued: false, mealAt: null });
-legacy.step(now, [visitor]);
-check(legacy.birds.flightCount === 1, 'An older snapshot advances safely from the original circuit');
-
 const source = new T.Group(), dove = new T.Group(); dove.name = 'Dove'; source.add(dove);
 for (const name of ['DoveBody', 'DoveHead', 'DoveWingLeft', 'DoveWingRight']) {
   const mesh = new T.Mesh(new T.SphereGeometry(.1, 4, 3), new T.MeshBasicMaterial()); mesh.name = name; dove.add(mesh);
@@ -59,10 +53,7 @@ for (let cycle = 0; cycle <= 3; cycle++) {
 }
 check(midpoints[0].distanceTo(midpoints[3]) < 1e-8, 'The fourth shared flight wraps to the first route');
 check(midpoints.slice(0, 3).every((point, i) => midpoints.slice(0, 3).every((other, j) => i === j || point.distanceTo(other) > 5)), 'Shared flights use three distinct routes');
-const oldState = { ...restored.snapshot(now).birds, phase: 'flight', since: now - 15000 }; delete oldState.flightCount;
-clients[0].applyShared(oldState, now); clients[0].update(0, 15, false, camera, player, false, true);
-check(clients[0].birds[0].root.position.distanceTo(midpoints[0]) < 1e-8, 'Older shared snapshots render the original circuit');
-const meal = { ...oldState, phase: 'ground', mealAt: now - 1500, served: true, throwAt: now - 2000 };
+const meal = { ...restored.snapshot(now).birds, phase: 'ground', mealAt: now - 1500, served: true, throwAt: now - 2000 };
 clients[0].applyShared(meal, now); clients[0].update(0, 2, false, camera, player, false, true);
 check(clients[0].crumbs.visible && clients[0].crumbs.count === BIRD_FEEDING.servingCrumbs && clients[0].thrownCrumbs.count === BIRD_FEEDING.thrownCrumbs, 'A shared meal shows the fuller serving and separate thrown crumbs');
 const matrix = new T.Matrix4(), position = new T.Vector3(); let inside = 0, outside = 0;

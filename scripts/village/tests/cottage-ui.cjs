@@ -16,9 +16,9 @@ const path = require('node:path');
       for(let el=document.querySelector('canvas');el;el=el.parentElement)for(let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))];f;f=f.return)for(let h=f.memoizedState;h;h=h.next){const e=h.memoizedState?.current;if(e?.petCottageCat&&e.world){window.cottageUIEngine=e;return true}}
       return false;
     },{timeout:90000});
-    await page.getByRole('button',{name:'Places',exact:true}).click();
+    await page.getByRole('button',{name:'Expand village map',exact:true}).click();
     await page.getByRole('button',{name:/Focus cottage/}).click();
-    await page.locator('.v-focus').waitFor();await page.waitForTimeout(300);
+    await page.locator('.v-focus').waitFor();await page.waitForFunction(()=>!!cottageUIEngine.cottageCat);
     for(const [width,height] of [[1280,720],[1366,768],[1024,640]]){
       await page.setViewportSize({width,height});await page.waitForTimeout(250);
       const result=await page.evaluate(()=>{

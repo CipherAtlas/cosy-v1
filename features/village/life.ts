@@ -9,6 +9,7 @@ import type { PlaceId } from "./places";
 import { CROP_MODELS, type Crop, type GardenAction } from "./garden";
 import { CompanionWalk, relaxBlobArm } from "./companionWalk";
 import { RESIDENT_IDS, type AuthoredWorld } from "./worldLayout";
+import { ResidentMotion } from "./residentMotion";
 
 
 
@@ -43,18 +44,27 @@ export class VillageLife {
   private sharedStates: Map<string, SharedActor> | null = null;
   private selfId = "";
   private sharedClock = 0;
+  private sharedMotion = new ResidentMotion();
 
   applyShared(states: SharedActor[], selfId: string, time = Date.now()) {
+    const initial = !this.sharedStates || this.selfId !== selfId;
     this.selfId = selfId;
     this.sharedClock = time - Date.now();
-    const initial = !this.sharedStates;
-    this.sharedStates = new Map(states.filter(state => state.kind === "resident").map(state => [state.id, state]));
+    const residents = states.filter(state => state.kind === "resident");
+    const previous = this.sharedStates;
+    this.sharedStates = new Map(residents.map(state => [state.id, state]));
+    this.sharedMotion.receive(residents, time, initial);
     this.residents.forEach((resident, index) => {
       const state = this.sharedStates!.get(VILLAGERS[index].id);
       if (!state) return;
       resident.following = state.following && state.owner === selfId;
       resident.chatting = ["visit", "talk"].includes(state.mode);
-      if (initial || resident.root.position.distanceTo(new T.Vector3(state.x, state.y, state.z)) > 4) resident.root.position.set(state.x, state.y, state.z);
+      if (initial || previous?.get(state.id)?.activity !== state.activity
+        || resident.root.position.distanceTo(new T.Vector3(state.x, state.y, state.z)) > 4) {
+        resident.root.position.set(state.x, state.y, state.z);
+        resident.root.rotation.y = state.heading;
+        this.sharedMotion.reset(state, time);
+      }
     });
   }
   syncSharedGift(gift: SharedActors["gift"], time: number) {
@@ -227,17 +237,17 @@ export class VillageLife {
     this.lastTime = elapsed;
     if (this.sharedStates) {
       if (!this.activity) this.companionWalk.update(delta, player, this.residents.filter(resident => resident.following).length, playerHeading);
-      const blend = 1 - Math.exp(-delta * 18);
       this.residents.forEach((resident, index) => {
         const state = this.sharedStates!.get(VILLAGERS[index].id);
         if (!state) return;
-        resident.root.position.lerp(new T.Vector3(state.x, state.y, state.z), blend);
+        const pose = this.sharedMotion.sample(state);
+        resident.root.position.set(pose.x, pose.y, pose.z);
         resident.movement.position = { x: resident.root.position.x, y: floorHeight(resident.root.position.x, resident.root.position.z), z: resident.root.position.z };
-        resident.root.rotation.y += Math.atan2(Math.sin(state.heading - resident.root.rotation.y), Math.cos(state.heading - resident.root.rotation.y)) * blend;
-        resident.walking = state.speed > .1;
+        resident.root.rotation.y = pose.heading;
+        resident.walking = pose.speed > .1;
         resident.root.visible = this.activity !== "focus" || state.owner === this.selfId && state.mode === "activity";
         resident.spirit.position.y = .55 + (reduced ? 0 : Math.sin(elapsed * 2.5 + resident.phase) * .065);
-        resident.spirit.rotation.x = reduced ? 0 : state.speed * .025;
+        resident.spirit.rotation.x = reduced ? 0 : pose.speed * .025;
         resident.spirit.rotation.z = reduced ? 0 : Math.sin(elapsed * 1.6 + resident.phase) * .035;
         const activity = state.mode === "activity" ? state.activity : null;
         const gestureAge = state.gesture ? (Date.now() + this.sharedClock - state.gesture.at) / 1000 : Infinity;

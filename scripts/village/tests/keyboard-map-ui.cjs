@@ -29,7 +29,7 @@ const check = (ok, label) => { assert(ok, label); checks.push(label); console.lo
           for (let fiber = el[Object.keys(el).find(key => key.startsWith('__reactFiber'))]; fiber; fiber = fiber.return)
             for (let hook = fiber.memoizedState; hook; hook = hook.next) {
               const ref = hook.memoizedState?.current;
-              if (ref?.setSharedActors && ref.sharedActors && ref.cottageCat) window.testEngine = ref;
+              if (ref?.setSharedActors && ref.sharedActors) window.testEngine = ref;
               if (ref?.interact && ref.sendChat) window.testConnection = ref;
             }
         return !!window.testEngine && !!window.testConnection && testEngine.sharedConnected;

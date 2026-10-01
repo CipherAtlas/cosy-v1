@@ -72,6 +72,8 @@ To manage players and live shared chat, follow the [local village admin guide](t
 
 Release history, current verification and remaining limits are recorded in [the implementation ledger](VILLAGE_BUILD.md).
 
+Shared blob residents now interpolate timestamped Worker positions and facing with a short display buffer, so high frame rates do not repeatedly show snapshot catch-up pulses. Stalled delivery holds the last accepted position; reconnects and activity relocations reset the path. This fix is local and not deployed; [NPC motion checks and limits](VILLAGE_BUILD.md#2026-10-01--blob-npc-movement-smoothing-local) record its verification.
+
 ## Local development and verification
 
 Use the existing npm lockfile and the project's supported Node environment:
@@ -117,3 +119,11 @@ NEXT_PUBLIC_BASE_PATH= npm run build
 ```
 
 After pushing, confirm that both workflow jobs succeed for the pushed commit, then open [the live village](https://cosy.sabarg.com/). Check arrival, loaded scene assets, an activity exit and villager chat. A successful build alone does not prove a working deployment. Browser data saved under the old `cipheratlas.github.io` origin does not transfer to the custom domain. The old URL still served its previous subpath export during cutover verification, but its continued availability is not guaranteed. Local QA scripts, editable Blender source and documentation evidence remain outside the exported site.
+
+### Village verification
+
+`npm run check` runs lint, application type checking and the current village contract suite, including Worker JavaScript type checking. `npm run build` produces the static site; follow it with `npm run check:export` to guard the editor/server boundary. Run build and type checking sequentially. The Pages build enforces the fast contracts and export checks.
+
+For local browser verification, build with `NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_SHARED_WORLD_URL=ws://127.0.0.1:2567 npm run build` so the exported client connects to the local Worker. In separate terminals, run `python3 scripts/village/preview_qa.py --port 3063`, `python3 -m http.server 3051 --bind 127.0.0.1 --directory out` and the existing Wrangler CLI with `wrangler dev --local --port 2567`. With an existing Playwright installation, run `PLAYWRIGHT_PATH=/absolute/path/to/playwright QA_URL=http://127.0.0.1:3063 VILLAGE_URL=http://127.0.0.1:3051 npm run test:browser`. This covers actual physics parity, keyboard/laptop layouts, contention, disconnect/reconnect, private focus, startup loading, reduced-motion hydration and render counters. These checks target today's shared-world contract; historical compatibility fixtures are excluded. Rebuild with the production Worker URL before any authorized release.
+
+Runtime dogs load per placed breed from `public/village/models/puppies/`; regenerate them with `python3 scripts/village/split_puppies.py` after changing the original kit. The local editor continues to use the full six-breed kit. The private cottage cat loads on first focus entry. See the latest `VILLAGE_BUILD.md` entry for local results and deployment status.

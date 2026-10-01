@@ -1,7 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import * as Dialog from "@radix-ui/react-dialog";
+import { VillageMenus, type VillagePanel } from "./VillageMenus";
+import { useVillagePreferences } from "./useVillagePreferences";
 import {
   ArrowDown,
   ArrowLeft,
@@ -13,8 +14,6 @@ import {
   Leaf,
   Bird,
   MapTrifold,
-  SpeakerHigh,
-  SpeakerSlash,
   X,
   UsersThree,
   PawPrint,
@@ -22,19 +21,13 @@ import {
 import {
   PLACES,
   JAPANESE_PLACE_NAMES as japaneseNames,
-  DEFAULT_MIX,
   type PlaceId,
-  type Quality,
   type Weather,
-  type AudioMix,
-  localTimeWeather,
 } from "./places";
-import { Activities, MixSliders, SoundtrackChoices } from "./Activities";
-import { VillageMap, VillageMinimap } from "./VillageMap";
-import { RadioDock, SoundPanel } from "./RadioControls";
-import { isRadioStationId, isRadioTrack, RADIO_PAGE_SIZE, RADIO_STATIONS, searchRadio, type RadioStationId } from "./radioCatalog";
-import type { RadioTrack } from "./soundtrack";
-import { HarvestInventory } from "./GardenActivities";
+import { Activities } from "./Activities";
+import { VillageMinimap } from "./VillageMap";
+import { RadioDock, PERSONAL_RADIO_ENABLED } from "./RadioControls";
+import { useVillageRadio } from "./useVillageRadio";
 import { VillageAudio } from "./audio";
 import { PUPPY_INFO, PUPPY_TRICKS, puppyCommandForKey, type NearbyPuppy } from "./puppies";
 import { useSession } from "./useSession";
@@ -42,7 +35,6 @@ import type { ActivityMoment, MovementStatus } from "./environment";
 import type { CottageCatStatus } from "./cottageCat";
 import type { VillageEngine } from "./VillageEngine";
 import "./village.css";
-import { withBasePath } from "@/lib/basePath";
 import type { BirdStatus } from "./birds";
 import { VILLAGERS } from "./villagers";
 import { GARDEN_KEY, CROP_NAMES, freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed, nearbyGardenAction, type GardenAction } from "./garden";
@@ -50,10 +42,6 @@ import type { SharedChatEntry, SharedWorldConnection, SharedVisitor } from "./sh
 import type { SwingSeat } from "./swings";
 import { installButtonFeedback } from "./buttonFeedback";
 
-type RadioPreferences = { mode: "radio" | "village"; station: RadioStationId; track: RadioTrack | null; favorites: RadioTrack[]; queue: RadioTrack[]; paused: boolean };
-const INITIAL_RADIO: RadioPreferences = { mode: "radio", station: "lofi", track: null, favorites: [], queue: [], paused: false };
-// The personal radio is retained for a later release; the village currently plays its original recordings.
-const PERSONAL_RADIO_ENABLED = false;
 
 export function Village() {
   const [isPhone, setIsPhone] = useState<boolean | null>(null);
@@ -101,7 +89,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [engineAttempt, setEngineAttempt] = useState(0);
   const [place, setPlace] = useState<PlaceId | null>(null),
     [near, setNear] = useState<PlaceId | null>(null),
-    [panel, setPanel] = useState<"places" | "sound" | "settings" | "controls" | "basket" | null>(null);
+    [panel, setPanel] = useState<VillagePanel>(null);
   const [birdStatus, setBirdStatus] = useState<BirdStatus>("flying");
   const [nearBench, setNearBench] = useState<string | null>(null);
   const [seatedBench, setSeatedBench] = useState<string | null>(null);
@@ -142,31 +130,11 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [movement, setMovement] = useState<MovementStatus>({ gait: "idle", running: false });
   const [mouseLook, setMouseLook] = useState<"free" | "locked" | "drag">("free");
   const [soundLoading, setSoundLoading] = useState(false);
-  const [radioExpanded, setRadioExpanded] = useState(false);
-  const [radioPrefs, setRadioPrefs] = useState<RadioPreferences>(INITIAL_RADIO);
-  const radioPrefsRef = useRef(radioPrefs);
-  radioPrefsRef.current = radioPrefs;
-  const radioEnded = useRef<() => void>(() => {});
-  const radioChoiceId = useRef(0);
-  const [radioLoaded, setRadioLoaded] = useState(false);
-  const [radioRequest, setRadioRequest] = useState(0);
-  const radioStation = useRef<RadioTrack[]>([]);
-  const radioPage = useRef(0);
-  const radioHasMore = useRef(false);
-  const radioNextBusy = useRef(false);
-  const radioNextController = useRef<AbortController | null>(null);
-  const [radioLoading, setRadioLoading] = useState(false);
-  const [radioError, setRadioError] = useState("");
-  const [sound, setSound] = useState(false),
-    [mix, setMix] = useState<AudioMix>(DEFAULT_MIX),
-    [quality, setQuality] = useState<Quality>("low"),
-    [weather, setWeather] = useState<Weather>("golden"),
-    [weatherMode, setWeatherMode] = useState<"auto" | "manual">("auto"),
-    [language, setLanguage] = useState<"en" | "ja">("en"),
-    [mouseSensitivity, setMouseSensitivity] = useState(1),
-    [showStats, setShowStats] = useState(false),
-    [stats, setStats] = useState({ fps: 0, draws: 0, triangles: 0 });
-  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
+  const settings = useVillagePreferences();
+  const { mix, setMix, quality, weather, language, mouseSensitivity } = settings;
+  const [sound, setSound] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [stats, setStats] = useState({ fps: 0, draws: 0, triangles: 0 });
   const preferences = useRef({ quality, weather, language, mouseSensitivity });
   preferences.current = { quality, weather, language, mouseSensitivity };
   const [notice, setNotice] = useState("");
@@ -180,7 +148,6 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const activityRequestRef = useRef(0);
   const escapeInteraction = useRef(() => {});
   const pendingActivityRef = useRef<number | null>(null);
-  const [performanceReport, setPerformanceReport] = useState("");
   const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
   const enterRef = useRef(false);
   const ja = language === "ja",
@@ -303,62 +270,14 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     audio.current = new VillageAudio(() => setNotice(preferences.current.language === "ja"
       ? "音楽を切り替えられませんでした。音をオフにして、もう一度お試しください。"
       : "The music couldn't change. Turn sound off and on to retry."), () => radioEnded.current());
-    if (PERSONAL_RADIO_ENABLED) try {
-      const stored = JSON.parse(localStorage.getItem("cosy-village-radio") || "null");
-      if (stored && typeof stored === "object") {
-        const saved: RadioPreferences = {
-          mode: stored.mode === "village" ? "village" : "radio",
-          station: isRadioStationId(stored.station) ? stored.station : "lofi",
-          track: isRadioTrack(stored.track) ? stored.track : null,
-          favorites: Array.isArray(stored.favorites) ? stored.favorites.filter(isRadioTrack).slice(0, 100) : [],
-          queue: Array.isArray(stored.queue) ? stored.queue.filter(isRadioTrack).slice(0, 100) : [],
-          paused: stored.paused === true,
-        };
-        radioPrefsRef.current = saved; setRadioPrefs(saved);
-        if (typeof stored.expanded === "boolean") setRadioExpanded(stored.expanded);
-        if (saved.mode === "radio" && saved.track) void audio.current.selectRadio(saved.track);
-        audio.current.setMusicPaused(saved.paused);
-      }
-    } catch {}
-    if (PERSONAL_RADIO_ENABLED) setRadioLoaded(true);
     try { const saved = { ...readGarden(localStorage.getItem(GARDEN_KEY)), crumbPouch: false }; gardenRef.current = saved; setGarden(saved); }
     catch { setGardenStorageError(true); }
-    try {
-      const p = JSON.parse(
-        localStorage.getItem("cosy-village-preferences") || "null",
-      );
-      if (p) {
-        // Graphics are chosen per visit so older saved Detailed choices cannot raise the default.
-        const savedWeather: Weather | null = ["golden", "dusk", "night", "rain"].includes(p.weather) ? p.weather : null;
-        // Older preferences saved the default golden scene even if it was never selected.
-        if (savedWeather && (p.weatherMode === "manual" || (p.weatherMode === undefined && savedWeather !== "golden"))) {
-          setWeather(savedWeather);
-          setWeatherMode("manual");
-        }
-        if (p.language === "ja") setLanguage("ja");
-        if (typeof p.mouseSensitivity === "number" && Number.isFinite(p.mouseSensitivity)
-          && p.mouseSensitivity >= .25 && p.mouseSensitivity <= 2)
-          setMouseSensitivity(p.mouseSensitivity);
-        if (
-          p.mix &&
-          ["piano", "lofi", "jazz"].includes(p.mix.vibe) &&
-          ["music", "rain", "fire", "master"].every(
-            (k) =>
-              typeof p.mix[k] === "number" && p.mix[k] >= 0 && p.mix[k] <= 1,
-          )
-        )
-          setMix({ ...p.mix,
-            soundtrack: ["auto", "village", "water", "rest", "hearth"].includes(p.mix.soundtrack) ? p.mix.soundtrack : "auto",
-            ambience: typeof p.mix.ambience === "number" && p.mix.ambience >= 0 && p.mix.ambience <= 1 ? p.mix.ambience : .5,
-            effects: typeof p.mix.effects === "number" && p.mix.effects >= 0 && p.mix.effects <= 1 ? p.mix.effects : .6,
-            river: typeof p.mix.river === "number" && p.mix.river >= 0 && p.mix.river <= 1 ? p.mix.river : 1,
-            wind: typeof p.mix.wind === "number" && p.mix.wind >= 0 && p.mix.wind <= 1 ? p.mix.wind : 1,
-          });
-      }
-    } catch {}
-    setPreferencesLoaded(true);
     return () => audio.current?.dispose();
   }, []);
+  const { radioExpanded, setRadioExpanded, radioPrefs, radioLoading, radioError, radioEnded,
+    updateRadio, playVillageMusic, selectStation, nextRadioTrack, toggleMusic } = useVillageRadio({
+      audio, language, entered, panel, sound, enableSound, setNotice,
+    });
   useEffect(() => {
     const refresh = () => {
       const next = growGarden(gardenRef.current);
@@ -632,56 +551,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weather]);
   useEffect(() => {
-    if (!preferencesLoaded || weatherMode !== "auto") return;
-    const refresh = () => setWeather(localTimeWeather(new Date()));
-    refresh();
-    const interval = window.setInterval(refresh, 60_000);
-    window.addEventListener("focus", refresh);
-    document.addEventListener("visibilitychange", refresh);
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", refresh);
-      document.removeEventListener("visibilitychange", refresh);
-    };
-  }, [preferencesLoaded, weatherMode]);
-  useEffect(() => {
     audio.current?.setMix(mix);
   }, [mix]);
-  useEffect(() => {
-    if (!preferencesLoaded) return;
-    try {
-      localStorage.setItem(
-        "cosy-village-preferences",
-        JSON.stringify({ mix, weather, weatherMode, language, mouseSensitivity }),
-      );
-    } catch {}
-  }, [mix, weather, weatherMode, language, mouseSensitivity, preferencesLoaded]);
-  useEffect(() => {
-    if (!PERSONAL_RADIO_ENABLED || !radioLoaded) return;
-    try { localStorage.setItem("cosy-village-radio", JSON.stringify({ ...radioPrefs, expanded: radioExpanded })); } catch {}
-  }, [radioPrefs, radioExpanded, radioLoaded]);
-  const shouldSearchRadio = PERSONAL_RADIO_ENABLED && (entered || panel === "sound");
-  useEffect(() => {
-    if (!shouldSearchRadio || !radioLoaded || radioPrefs.mode !== "radio") return;
-    const controller = new AbortController();
-    radioNextController.current?.abort();
-    radioStation.current = [];
-    radioPage.current = 0;
-    radioHasMore.current = false;
-    setRadioLoading(true);
-    setRadioError("");
-    const query = RADIO_STATIONS.find(station => station.id === radioPrefs.station)!.query;
-    void searchRadio(query, 0, controller.signal).then(({ tracks, hasMore }) => {
-      if (controller.signal.aborted) return;
-      radioStation.current = tracks.filter(track => track.duration >= 90 && track.duration <= 600);
-      radioHasMore.current = hasMore;
-      if (!radioPrefsRef.current.track && radioStation.current.length) void chooseRadioTrack(radioStation.current[0], entered);
-      if (!radioStation.current.length) setRadioError(preferences.current.language === "ja" ? "この局の曲を読み込めませんでした。別の局をお試しください。" : "No songs loaded for this station. Try another.");
-    }).catch(() => {
-      if (!controller.signal.aborted) setRadioError(preferences.current.language === "ja" ? "局を読み込めませんでした。もう一度お試しください。" : "Could not tune the station. Try it again.");
-    }).finally(() => { if (!controller.signal.aborted) setRadioLoading(false); });
-    return () => { controller.abort(); radioNextController.current?.abort(); };
-  }, [shouldSearchRadio, radioLoaded, radioPrefs.mode, radioPrefs.station, radioRequest]);
   useEffect(() => {
     if (!notice) return;
     const id = setTimeout(() => setNotice(""), 7000);
@@ -790,73 +661,6 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       audio.current?.stop();
       setSound(false);
     } else void enableSound();
-  }
-  function updateRadio(change: (current: RadioPreferences) => RadioPreferences) {
-    const next = change(radioPrefsRef.current);
-    radioPrefsRef.current = next;
-    setRadioPrefs(next);
-  }
-  async function chooseRadioTrack(track: RadioTrack, startIfNeeded = true) {
-    const choiceId = ++radioChoiceId.current;
-    try {
-      await audio.current?.selectRadio(track);
-      if (choiceId !== radioChoiceId.current) return;
-      updateRadio(current => ({ ...current, mode: "radio", track }));
-      if (startIfNeeded && !sound) void enableSound();
-    } catch {
-      setNotice(t("That track could not play. Please choose another.", "この曲は再生できませんでした。別の曲を選んでください。"));
-    }
-  }
-  async function playVillageMusic() {
-    const choiceId = ++radioChoiceId.current;
-    try {
-      await audio.current?.selectRadio(null);
-      if (choiceId !== radioChoiceId.current) return;
-      updateRadio(current => ({ ...current, mode: "village", track: null }));
-    } catch { setNotice(t("Village music could not start.", "村の音楽を再生できませんでした。")); }
-  }
-  function selectStation(station: RadioStationId) {
-    ++radioChoiceId.current;
-    radioNextController.current?.abort();
-    updateRadio(current => ({ ...current, mode: "radio", station, track: null, paused: false }));
-    audio.current?.setMusicPaused(false);
-    setRadioRequest(request => request + 1);
-  }
-  function nextRadioTrack() {
-    if (radioPrefsRef.current.mode === "village") { selectStation(radioPrefsRef.current.station); return; }
-    if (radioLoading || radioNextBusy.current) return;
-    const songs = radioStation.current;
-    const index = songs.findIndex(track => track.id === radioPrefsRef.current.track?.id);
-    if (index + 1 < songs.length) { void chooseRadioTrack(songs[index + 1]); return; }
-    if (!radioHasMore.current) { if (songs.length) void chooseRadioTrack(songs[0]); return; }
-    radioNextBusy.current = true;
-    setRadioLoading(true);
-    const controller = new AbortController();
-    radioNextController.current = controller;
-    const stationId = radioPrefsRef.current.station;
-    const query = RADIO_STATIONS.find(station => station.id === stationId)!.query;
-    const offset = radioPage.current + RADIO_PAGE_SIZE;
-    void searchRadio(query, offset, controller.signal).then(({ tracks, hasMore }) => {
-      if (controller.signal.aborted || radioPrefsRef.current.mode !== "radio" || radioPrefsRef.current.station !== stationId) return;
-      radioPage.current = offset;
-      radioHasMore.current = hasMore;
-      const fresh = tracks.filter(track => track.duration >= 90 && track.duration <= 600 && !songs.some(item => item.id === track.id));
-      radioStation.current = [...songs, ...fresh];
-      if (fresh.length) void chooseRadioTrack(fresh[0]);
-      else if (songs.length) void chooseRadioTrack(songs[0]);
-    }).catch(() => {
-      if (!controller.signal.aborted) setRadioError(preferences.current.language === "ja" ? "次の曲を読み込めませんでした。" : "Could not load the next song.");
-    }).finally(() => {
-      if (radioNextController.current === controller) { radioNextController.current = null; radioNextBusy.current = false; setRadioLoading(false); }
-    });
-  }
-  radioEnded.current = nextRadioTrack;
-  function toggleMusic() {
-    const paused = radioPrefsRef.current.paused;
-    const next = sound ? !paused : false;
-    updateRadio(current => ({ ...current, paused: next }));
-    audio.current?.setMusicPaused(next);
-    if (!sound) void enableSound();
   }
   function openRadio() { setPanel("sound"); }
   const current = PLACES.find((p) => p.id === place),
@@ -1285,232 +1089,11 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           {Math.round(stats.triangles / 1000)}k triangles
         </output>
       )}
-      <Dialog.Root
-        open={panel !== null}
-        onOpenChange={(v) => {
-          if (!v) setPanel(null);
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
-          <Dialog.Content
-            className={`v-dialog${panel === "places" ? " v-map-dialog" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
-            onOpenAutoFocus={event => {
-              if (panel === "places") {
-                event.preventDefault();
-                requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(".v-map-marker.is-selected")?.focus());
-              }
-            }}
-            onCloseAutoFocus={(e) => {
-              e.preventDefault();
-              canvas.current?.querySelector("canvas")?.focus();
-            }}
-          >
-            <Dialog.Title>
-              {panel === "places"
-                ? t("Hearthwillow", "ハースウィロー")
-                : panel === "sound"
-                  ? PERSONAL_RADIO_ENABLED ? t("Sound", "音") : t("A little atmosphere.", "心地よい音を。")
-                  : panel === "basket"
-                    ? t("Harvest basket", "収穫かご")
-                  : panel === "controls"
-                    ? t("Getting around", "移動と操作")
-                    : t("Make it yours.", "お好みに。")}
-            </Dialog.Title>
-            <Dialog.Description className="sr-only">
-              {panel === "places"
-                ? t("Village map. Use WASD or arrow keys to choose a destination, Enter to travel and Escape to close. You can also click a place on the map.", "村の地図。WASDか矢印キーで選び、Enterで移動、Escapeで閉じます。地図の場所をクリックしても移動できます。")
-                : panel === "sound"
-                  ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
-                  : panel === "basket"
-                    ? t("Stored harvests from your garden.", "庭で収穫して保存したもの。")
-                  : panel === "controls"
-                    ? "Gliding, camera and interaction controls."
-                    : "Village appearance and accessibility settings."}
-            </Dialog.Description>
-            <Dialog.Close
-              className="v-dialog-close"
-              aria-label={t("Close", "閉じる")}
-            >
-              <X size={22} />
-            </Dialog.Close>
-            {panel === "basket" && <HarvestInventory garden={garden} language={language} />}
-            {panel === "controls" && (
-              <div className="v-control-guide">
-                <p>{t("Wander at your own pace, or use the village map to settle into an activity.", "自分のペースでお散歩。村の地図から、好きな場所へすぐに移動できます。")}</p>
-                <dl>
-                  {[
-                    ["W A S D / ↑ ↓ ← →", t("Glide", "浮かんで移動")],
-                    [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
-                    ["Esc", t("Leave an activity, stand up, get off, or close tricks / a menu", "アクティビティ終了・立ち上がる・降りる・芸やメニューを閉じる")],
-                    ["Tab / Shift Tab", t("Choose any control; Enter / Space activates it", "操作を選ぶ（Enter / Spaceで実行）")],
-                    ["U", t("Show activity controls / enjoy the view", "操作を表示 / 景色を楽しむ")],
-                    ["Space / R", t("In focus or breathing: begin / pause and reset", "集中や呼吸では開始 / 一時停止・リセット")],
-                    [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
-                    [t("Click or tap a bench side", "ベンチの左右をクリック・タップ"), t("Sit on that side", "選んだ側に座る")],
-                    ["F", t("Scatter crumbs from the birdwatching bench", "野鳥観察のベンチでパンくずを撒く")],
-                    [t("Mouse / drag while settled", "ひと休み中にマウス / ドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
-                    [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
-                    ["G", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
-                    ["R", t("Move to nearby safe ground if stuck", "動けなくなったら近くの安全な場所へ")],
-                    ["Shift", t("Hold to dash", "長押しでダッシュ")],
-                    ["Space", t("Jump", "ジャンプ")],
-                    ["W / S · ↑ / ↓", t("On a swing: pump forward / back in rhythm to go higher", "ブランコではリズムに合わせて前へ / 後ろへ")],
-                    ["Space / E / Esc", t("On a swing: brake / get off / get off", "ブランコではブレーキ / 降りる / 降りる")],
-                    ["E", t("Pet a puppy, tend plants, sit, enter an activity, or share harvest over tea with Luma", "子犬をなでる・植物のお世話・座る・近くの場所に入る・ルマと収穫をお茶で分かち合う")],
-                    ["P", t("Invite a nearby dog to walk / let that dog go home", "近くの犬と一緒に歩く / 元の場所に戻す")],
-                    ["H", t("Send all walking dogs home", "犬たちを元の場所に戻す")],
-                    ["T", t("Open / close nearby dog tricks; Esc also closes them", "近くの犬の芸を開く / 閉じる（Escでも閉じる）")],
-                    ["Z / X / V / Q / J / K", t("Sit / dance / spin / bow / wave / roll over (even with Tricks closed)", "おすわり / ダンス / まわって / おじぎ / おてて / ごろん（芸を閉じていても使えます）")],
-                    ["Enter", t("Message the village", "村のチャットに入力")],
-                    ["F", t("Chat with a villager", "村人とおしゃべり")],
-                    ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
-                    ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
-                    ["M", t("Village map (WASD / arrows to choose; Enter to go)", "村の地図（WASD / 矢印で選ぶ・Enterで移動）")],
-                    ["O / ,", t("Sound / settings", "音 / 設定")],
-                  ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
-                </dl>
-              </div>
-            )}
-            {panel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} language={language} notice={notice} travel={id => {
-              if (!entered) void enableSound();
-              setEntered(true);
-              openPlace(id);
-            }} />}
-            {panel === "sound" && (
-              <>
-                <button className="v-button v-primary" disabled={soundLoading} aria-busy={soundLoading} onClick={toggleSound}>
-                  {sound ? (
-                    <SpeakerSlash size={18} />
-                  ) : (
-                    <SpeakerHigh size={18} />
-                  )}{" "}
-                  {soundLoading ? t("Loading sound…", "音を準備中…") : sound
-                    ? t("Turn sound off", "音をオフ")
-                    : t("Turn sound on", "音をオン")}
-                </button>
-                {PERSONAL_RADIO_ENABLED ? <SoundPanel station={radioPrefs.station} mode={radioPrefs.mode}
-                  track={radioPrefs.mode === "radio" ? radioPrefs.track : null}
-                  loading={radioLoading} error={radioError} selectStation={selectStation} next={nextRadioTrack}
-                  useVillageMusic={() => { void playVillageMusic(); }}
-                  mix={mix} setMix={setMix} language={language} /> : <>
-                  <SoundtrackChoices mix={mix} setMix={setMix} language={language} />
-                  <MixSliders mix={mix} setMix={setMix} language={language} />
-                </>}
-              </>
-            )}
-            {panel === "settings" && (
-              <div className="v-settings">
-                <button className="v-controls-button" onClick={openRadio}><SpeakerHigh size={18} />{t("Sound & music", "音と音楽")}</button>
-                <button className="v-controls-button" onClick={() => setPanel("controls")}>
-                  {t("Gliding & camera controls", "移動とカメラの操作")}
-                </button>
-                <label>
-                  {t("Time & weather", "時間と天気")}
-                  <select
-                    value={weatherMode === "auto" ? "auto" : weather}
-                    onChange={(e) => {
-                      if (e.target.value === "auto") {
-                        setWeatherMode("auto");
-                        setWeather(localTimeWeather(new Date()));
-                      } else {
-                        setWeatherMode("manual");
-                        setWeather(e.target.value as Weather);
-                      }
-                      if (e.target.value === "rain")
-                        setMix({ ...mix, rain: 0.5 });
-                    }}
-                  >
-                    <option value="auto">{t("Follow local time", "現地時間に合わせる")}</option>
-                    <option value="golden">{t("Golden hour", "夕暮れ")}</option>
-                    <option value="dusk">{t("Blue hour", "薄暮")}</option>
-                    <option value="night">{t("Starlit night", "星降る夜")}</option>
-                    <option value="rain">
-                      {t("Rainy afternoon", "雨の午後")}
-                    </option>
-                  </select>
-                </label>
-                <label>
-                  {t("Graphics", "画質")}
-                  <select
-                    value={quality}
-                    onChange={(e) => setQuality(e.target.value as Quality)}
-                  >
-                    <option value="low">
-                      {t("Gentle on battery", "省電力")}
-                    </option>
-                    <option value="high">{t("Detailed", "高画質")}</option>
-                    <option value="auto">{t("Automatic", "自動")}</option>
-                  </select>
-                </label>
-                <label className="v-sensitivity">
-                  <span>
-                    {t("Mouse sensitivity", "マウス感度")}
-                    <output>{Math.round(mouseSensitivity * 100)}%</output>
-                  </span>
-                  <input
-                    type="range"
-                    aria-label={t("Mouse sensitivity", "マウス感度")}
-                    aria-valuetext={`${Math.round(mouseSensitivity * 100)}%`}
-                    min=".25"
-                    max="2"
-                    step=".05"
-                    value={mouseSensitivity}
-                    onChange={(e) => setMouseSensitivity(Number(e.target.value))}
-                  />
-                </label>
-                <label>
-                  {t("Language", "言語")}
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as "en" | "ja")}
-                  >
-                    <option value="en">English</option>
-                    <option value="ja">日本語</option>
-                  </select>
-                </label>
-                <label className="v-check">
-                  <input
-                    type="checkbox"
-                    checked={showStats}
-                    onChange={(e) => setShowStats(e.target.checked)}
-                  />
-                  {t("Show performance", "パフォーマンス表示")}
-                </label>
-                {showStats && engine.current && (
-                  <div className="v-performance-report">
-                    <button type="button" onClick={() => setPerformanceReport(JSON.stringify({
-                      ...engine.current?.getPerformanceReport(), ...stats,
-                    }, null, 2))}>
-                      {t("Get performance report", "パフォーマンスレポートを表示")}
-                    </button>
-                    {performanceReport && (
-                      <label>
-                        {t("Share this report when something runs slowly. It stays on this device until you share it.", "動作が遅い場合は、このレポートを共有してください。共有するまで端末内に保存されます。")}
-                        <textarea readOnly value={performanceReport} onFocus={e => e.target.select()} />
-                      </label>
-                    )}
-                  </div>
-                )}
-                <p>
-                  {t(
-                    "Your device’s reduced-motion setting is respected. Notes stay in this browser.",
-                    "端末の視差効果設定に従います。メモはこのブラウザに保存されます。",
-                  )}
-                </p>
-                <a
-                  className="v-credits"
-                  href={withBasePath("/village/CREDITS.txt")}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("Art & music credits", "アートと音楽のクレジット")}
-                </a>
-              </div>
-            )}
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <VillageMenus panel={panel} setPanel={setPanel} canvas={canvas} engine={engine} settings={settings}
+        garden={garden} place={place} notice={notice} entered={entered} setEntered={setEntered} enableSound={enableSound} openPlace={openPlace}
+        sound={sound} soundLoading={soundLoading} toggleSound={toggleSound} openRadio={openRadio}
+        radioPrefs={radioPrefs} radioLoading={radioLoading} radioError={radioError} selectStation={selectStation}
+        nextRadioTrack={nextRadioTrack} playVillageMusic={playVillageMusic} showStats={showStats} setShowStats={setShowStats} stats={stats} />
     </div>
   );
 }

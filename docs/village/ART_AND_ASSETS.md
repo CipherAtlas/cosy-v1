@@ -265,3 +265,7 @@ Use the bundled approved image as reference whenever the tool supports reference
 An asset is ready only after source/license checks, technical validation, a neutral-light inspection, a final-light inspection, and actual in-engine near/far/motion views. Test a group of assets together for scale, texel density and style consistency. A beautiful isolated render cannot certify the village composition or frame time.
 
 Update [design QA](../../design-qa.md) with fresh evidence after integration. Keep unfinished assets labeled as candidates and preserve the approved target; do not quietly redefine success around whatever the generator happened to produce.
+
+## Runtime puppy subsets
+
+The complete authored `puppies.glb` and Blender source remain intact for the local editor. Public entry loads only breeds present in the saved playable layout, using `models/puppies/<breed>.glb`. `scripts/village/split_puppies.py` subsets the original GLB without changing vertices, skinning or the ten animation clips; identical binary views are shared inside each subset. Run it after changing the full kit, and run `--check` to verify committed runtime files. No decoder or new dependency is required. The cottage cat is requested on first private focus entry rather than during outdoor startup. See the latest build ledger for measured startup bytes and local validation.

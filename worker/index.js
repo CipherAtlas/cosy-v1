@@ -12,6 +12,7 @@ const validObjectId = id => typeof id === "string" && /^[a-zA-Z0-9_-]{1,100}$/.t
 const adjectives = ["Relaxed", "Sleepy", "Cosy", "Sunny", "Gentle", "Snuggly", "Cheerful", "Drowsy", "Mellow", "Kind", "Rosy", "Dreamy", "Soft", "Warm", "Little", "Jolly", "Calm", "Cloudy", "Happy", "Fluffy"];
 const animals = ["Panda", "Bunny", "Otter", "Duckling", "Fox", "Kitten", "Hedgehog", "Fawn", "Penguin", "Puffin", "Koala", "Sparrow", "Seal", "Mouse", "Lamb", "Turtle", "Robin", "Swan", "Cub", "Wren"];
 
+/** @param {number} slot */
 function colorForSlot(slot) {
   const hue = (slot * 137.508 + 10) % 360;
   const saturation = 0.62, lightness = 0.68;
@@ -23,6 +24,7 @@ function colorForSlot(slot) {
   return `#${[r, g, b].map(value => Math.round((value + m) * 255).toString(16).padStart(2, "0")).join("")}`;
 }
 
+/** @returns {action is import("../features/village/garden").GardenAction} */
 function validAction(action, bedCount) {
   if (!action || typeof action !== "object") return false;
   if (["plant", "water", "harvest"].includes(action.kind)) {
@@ -33,11 +35,13 @@ function validAction(action, bedCount) {
   return ["flowers", "drink", "crumbs", "feed", "birdCrumbs", "feedBirds"].includes(action.kind);
 }
 
+/** @param {import("./runtime").WorkerSocket} socket @param {unknown} message */
 function send(socket, message) {
   try { socket.send(JSON.stringify(message)); }
   catch { /* A closed connection is removed by webSocketClose. */ }
 }
 
+/** @param {Request} request @param {unknown} token */
 async function authorized(request, token) {
   const header = request.headers.get("Authorization") || "";
   if (typeof token !== "string" || token.length < 32 || !header.startsWith("Bearer ")) return false;
@@ -55,6 +59,7 @@ async function authorized(request, token) {
   return difference === 0;
 }
 
+/** @param {Request} request */
 async function ipFingerprint(request) {
   const ip = request.headers.get("CF-Connecting-IPv6") || request.headers.get("CF-Connecting-IP");
   if (!ip) return null;
@@ -63,16 +68,20 @@ async function ipFingerprint(request) {
 }
 
 export class VillageWorld extends DurableObject {
+  /** @param {import("./runtime").WorkerState} ctx @param {import("./runtime").WorkerEnvironment} env */
   constructor(ctx, env) {
     super(ctx, env);
     this.garden = readGarden(JSON.stringify(ctx.storage.kv.get("garden") || freshGarden()));
     const savedChat = ctx.storage.kv.get("chat");
     this.chatHour = savedChat?.hour ?? -1;
+    /** @type {import("../features/village/sharedWorld").SharedChatEntry[]} */
     this.chat = (savedChat?.entries ?? []).map(entry => entry.messageId ? entry : { ...entry, messageId: crypto.randomUUID() });
+    /** @type {Map<string, import("../features/village/sharedWorld").SharedPuppyTrick>} */
     this.puppyTricks = new Map((ctx.storage.kv.get("puppyTricks") || []).filter(trick =>
       Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000).map(trick => [trick.id, trick]));
     this.simulation = new VillageSimulation(ctx.storage.kv.get("sharedActors"));
     this.lastWorldTick = 0;
+    /** @type {Map<string | null, number>} */
     this.ipKicks = new Map(ctx.storage.kv.get("ipKicks") || []);
     this.pruneKicks();
     if (savedChat && this.chat.some((entry, index) => entry !== savedChat.entries[index])) {
@@ -96,6 +105,7 @@ export class VillageWorld extends DurableObject {
     return this.sockets().map(socket => socket.deserializeAttachment()).filter(visitor => visitor && !visitor.left);
   }
 
+  /** @param {unknown} message @param {import("./runtime").WorkerSocket} [except] */
   broadcast(message, except) {
     for (const socket of this.sockets()) if (socket !== except) send(socket, message);
   }
@@ -116,9 +126,10 @@ export class VillageWorld extends DurableObject {
     this.lastWorldTick = now;
   }
 
+  /** @param {import("./runtime").WorkerVisitor} visitor @param {import("../features/village/sharedActors").SharedInteraction} request @param {number} now */
   interaction(visitor, request, now) {
     if (!request || typeof request !== "object") return { ok: false, reason: "That action is unavailable." };
-    if (["puppy", "resident"].includes(request.kind)) {
+    if ((request.kind === "puppy" || request.kind === "resident")) {
       const result = this.simulation.interact(visitor, request, now);
       if (result.ok && request.kind === "puppy") {
         if (request.action === "hold") visitor.holdingPuppy = request.id;
@@ -151,7 +162,7 @@ export class VillageWorld extends DurableObject {
       visitor.holdingPuppy = null; visitor.activity = request.id; visitor.activityPosition = position;
       return { ok: true, ...(position ? { position } : {}) };
     }
-    if (!["bench", "swing"].includes(request.kind)) return { ok: false, reason: "That action is unavailable." };
+    if (request.kind !== "bench" && request.kind !== "swing") return { ok: false, reason: "That action is unavailable." };
     const item = request.kind === "bench" ? this.simulation.benches.find(item => item.id === request.id)
       : this.simulation.authored.swings.find(item => item.id === request.id);
     if (!item) return { ok: false, reason: "That seat is unavailable." };
@@ -159,12 +170,14 @@ export class VillageWorld extends DurableObject {
       return { ok: false, reason: "Come a little closer to the swing." };
     if (request.kind === "bench" && !visitor.requestingActivity && Math.hypot(item.x - visitor.x, item.z - visitor.z) > 3)
       return { ok: false, reason: "Come a little closer to the bench." };
+    /** @type {(0 | 1)[]} */
     const choices = request.index === undefined ? [0, 1] : [request.index];
     const index = choices.find(index => [0, 1].includes(index) && !this.visitors().some(other => other.id !== visitor.id
-      && other[request.kind]?.id === request.id && other[request.kind].index === index));
+      && other[request.kind]?.id === request.id && other[request.kind]?.index === index));
     if (index === undefined) return { ok: false, reason: "That seat is occupied. Try a free seat." };
     visitor.bench = visitor.swing = visitor.activity = visitor.activityPosition = null; visitor.holdingPuppy = null;
-    visitor[request.kind] = { id: request.id, index, ...(request.kind === "swing" ? { angle: 0, velocity: 0 } : {}) };
+    if (request.kind === "swing") visitor.swing = { id: request.id, index, angle: 0, velocity: 0 };
+    else visitor.bench = { id: request.id, index };
     return { ok: true, index };
   }
 
@@ -181,6 +194,7 @@ export class VillageWorld extends DurableObject {
 
   async alarm() { this.pruneKicks(); this.rollHour(); }
 
+  /** @param {Request} request */
   async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname === "/admin/players" && request.method === "GET") return Response.json(this.adminPlayers());
@@ -269,6 +283,7 @@ export class VillageWorld extends DurableObject {
     return new Response(null, { status: 101, webSocket: client });
   }
 
+  /** @param {import("./runtime").WorkerSocket} socket @param {string | ArrayBuffer} raw */
   async webSocketMessage(socket, raw) {
     if (typeof raw !== "string" || raw.length > 2048) return;
     let message;
@@ -337,8 +352,9 @@ export class VillageWorld extends DurableObject {
         : claimedSwing && ride?.id === claimedSwing.id && ride.index === claimedSwing.index && [0, 1].includes(ride.index)
         && [ride.angle, ride.velocity].every(Number.isFinite)
         ? { id: ride.id, index: ride.index, angle: Math.max(-MAX_SWING_ANGLE, Math.min(MAX_SWING_ANGLE, ride.angle)), velocity: Math.max(-4, Math.min(4, ride.velocity)) } : null;
-      if (visitor.swing && this.visitors().some(other => other.id !== visitor.id
-        && other.swing?.id === visitor.swing.id && other.swing.index === visitor.swing.index)) {
+      const currentSwing = visitor.swing;
+      if (currentSwing && this.visitors().some(other => other.id !== visitor.id
+        && other.swing?.id === currentSwing.id && other.swing.index === currentSwing.index)) {
         visitor.swing = null;
         send(socket, { type: "swing_taken" });
       }
@@ -354,7 +370,8 @@ export class VillageWorld extends DurableObject {
         || Math.hypot(trick.x - visitor.x, trick.z - visitor.z) > 3) return;
       const result = this.simulation.interact(visitor, { kind: "puppy", id: trick.id, action: trick.command }, now);
       if (!result.ok) return;
-      const actor = this.simulation.actor(trick.id, "puppy").state;
+      const actor = this.simulation.actor(trick.id, "puppy")?.state;
+      if (!actor) return;
       const accepted = { id: trick.id, command: trick.command,
         x: actor.x, z: actor.z, heading: actor.heading, startedAt: now };
       visitor.lastTrick = now;
@@ -388,7 +405,7 @@ export class VillageWorld extends DurableObject {
         const targetId = "bed" in action ? `bed-${action.bed}` : ["gift", "drink"].includes(action.kind) ? "tea" : action.kind;
         const target = GARDEN_TARGETS.find(target => target.id === targetId);
         allowed = visitor.activity !== "focus" && !!target && (visitor.activity === "garden" && "bed" in action
-          || Math.hypot(Math.max(0, Math.abs(visitor.x - target.x) - (target.halfWidth ?? 0)), visitor.z - target.z) <= target.radius + .8);
+          || Math.hypot(Math.max(0, Math.abs(visitor.x - target.x) - ("halfWidth" in target ? target.halfWidth : 0)), visitor.z - target.z) <= target.radius + .8);
       }
       if (!allowed) { send(socket, { type: "action_rejected", message: "Come closer, or wait until this interaction is free." }); return; }
       if ((action.kind === "feed" || action.kind === "feedBirds") && !visitor.crumbPouch) return;
@@ -427,6 +444,7 @@ export class VillageWorld extends DurableObject {
     }
   }
 
+  /** @param {import("./runtime").WorkerSocket} socket */
   async webSocketClose(socket) {
     const visitor = socket.deserializeAttachment();
     if (visitor?.kickedUntil) return;
@@ -440,10 +458,12 @@ export class VillageWorld extends DurableObject {
     }
   }
 
+  /** @param {import("./runtime").WorkerSocket} socket */
   async webSocketError(socket) { await this.webSocketClose(socket); }
 }
 
 export default {
+  /** @param {Request} request @param {import("./runtime").WorkerEnvironment} env */
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/health") return Response.json({ ok: true });

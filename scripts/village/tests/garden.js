@@ -294,8 +294,8 @@ export async function checkCosyFeedback(engine, capture, save) {
     engine.setCompanions([]); engine.setBlocked(false);
     for (const place of PLACES) {
       engine.travel(place.id); const walking = [engine.yaw, engine.pitch], player = { ...engine.movement.position };
-      const before = engine.cameraGoal.clone(); engine.onDown(down); engine.onMove(move); engine.updateActivityCamera(place.id);
-      check(captured.has(91) && engine.cameraGoal.distanceTo(before) > .2, `${place.name}: mouse dragging moves the activity camera`);
+      const before = engine.view.goal.clone(); engine.onDown(down); engine.onMove(move); engine.updateActivityCamera(place.id);
+      check(captured.has(91) && engine.view.goal.distanceTo(before) > .2, `${place.name}: mouse dragging moves the activity camera`);
       check(JSON.stringify(engine.movement.position) === JSON.stringify(player) && engine.yaw === walking[0] && engine.pitch === walking[1], `${place.name}: dragging leaves the player seated and walking orientation unchanged`);
       engine.onUp(move); const yaw = engine.activityOrbit.yaw; engine.onMove({ ...move, clientX: 800 });
       check(!captured.size && engine.activityOrbit.yaw === yaw, `${place.name}: releasing the pointer stops orbiting`);
@@ -303,7 +303,7 @@ export async function checkCosyFeedback(engine, capture, save) {
       check(engine.activityOrbit.yaw === 0 && engine.activityOrbit.pitch === 0, `${place.name}: a new visit restores the authored view`);
     }
     engine.travel('focus'); engine.onDown(down); engine.onMove({ ...move, clientX: 6000, clientY: -2000 }); engine.updateActivityCamera('focus');
-    const c = engine.cameraGoal;
+    const c = engine.view.goal;
     check(c.x >= 105.9 && c.x <= 114.1 && c.y >= .45 && c.y <= 4.5 && c.z >= -4 && c.z <= 4.1, 'Cottage orbit stays inside walls and ceiling');
     engine.setBlocked(true); const angle = engine.activityOrbit.yaw; engine.onMove(move); engine.onDown(down);
     check(!engine.pointer && !captured.size && engine.activityOrbit.yaw === angle, 'Opening a menu cancels captured activity dragging');
@@ -390,8 +390,8 @@ export async function checkGentleGrowth(engine, capture, save) {
   engine.life.update(.016, engine.elapsed, engine.player.position, false, false, engine.camera.quaternion);
   const luma = engine.life.residents[3];
   check(!luma.following && luma.root.position.distanceTo(engine.player.position) < 5, 'Luma hosts tea without changing the companion selection');
-  const cameraStart = engine.cameraGoal.clone(); await delay(4600);
-  check(engine.cameraGoal.distanceTo(cameraStart) > 3 && engine.player.position.x === 13.9, 'Tea camera gently pans to the garden-facing bench');
+  const cameraStart = engine.view.goal.clone(); await delay(4600);
+  check(engine.view.goal.distanceTo(cameraStart) > 3 && engine.player.position.x === 13.9, 'Tea camera gently pans to the garden-facing bench');
   await capture('tea-garden-view.png');
   engine.gardenAction({ kind: 'gift', crop: 'carrot' }); await delay(650);
   check(engine.life.giftHeart.visible && engine.life.giftProps.get('carrot').visible, 'Giving a harvest shows Luma holding it with a thank-you heart');

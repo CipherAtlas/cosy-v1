@@ -70,17 +70,17 @@ const fs = require('node:fs');
     }
     const connection = await observer.evaluate(async () => {
       const e = engine, bench = e.world.benches[0];
-      const visitor = { id: 'legacy', name: 'Legacy visitor', color: '#ccbb99', slot: 99,
-        x: bench.x, z: bench.z, heading: bench.facing };
+      const visitor = { id: 'current', name: 'Current visitor', color: '#ccbb99', slot: 99,
+        x: bench.x, y: bench.seatHeight - .62, z: bench.z, heading: bench.facing, bench: { id: bench.id, index: 0 } };
       e.setRemoteVisitors([visitor]);
-      const legacyHeight = e.remoteVisitors.get('legacy').target.y;
+      const seatedHeight = e.remoteVisitors.get('current').target.y;
       e.setRemoteVisitors([{ ...visitor, y: .85 }]);
-      const explicitHeight = e.remoteVisitors.get('legacy').target.y;
+      const explicitHeight = e.remoteVisitors.get('current').target.y;
       e.setRemoteVisitors([{ ...visitor, y: NaN }]);
-      return { legacyHeight, expected: bench.seatHeight - .62, explicitHeight,
-        invalidHeight: e.remoteVisitors.get('legacy').target.y };
+      return { seatedHeight, expected: bench.seatHeight - .62, explicitHeight,
+        invalidHeight: e.remoteVisitors.get('current').target.y };
     });
-    check(Math.abs(connection.legacyHeight - connection.expected) < .001, 'Visitors without a height retain legacy bench positioning');
+    check(Math.abs(connection.seatedHeight - connection.expected) < .001, 'Current visitor packets retain their explicit seated height');
     check(connection.explicitHeight === .85, 'Explicit airborne height overrides ground/bench inference');
     check(Number.isFinite(connection.invalidHeight), 'Invalid visitor height cannot enter the rendered transform');
     check(errors.length === 0, 'Two local clients have no captured page errors');

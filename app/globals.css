@@ -141,3 +141,11 @@ canvas {
     scroll-behavior: auto !important;
   }
 }
+/* Keep the server and client wrapper identical; reduced motion also applies before hydration. */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
