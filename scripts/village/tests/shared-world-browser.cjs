@@ -20,14 +20,14 @@ const assert = require('node:assert/strict');
         const types = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary' };
         await route.fulfill({ path: file, contentType: types[path.extname(file)] || 'application/octet-stream' });
       });
-      await page.addInitScript(() => {
+      await page.addInitScript(localWorker => {
         localStorage.setItem('cosy-village-preferences', JSON.stringify({ weather: 'golden', weatherMode: 'manual' }));
         window.testSockets = [];
         window.testMessages = [];
         const Native = window.WebSocket;
-        window.WebSocket = class extends Native { constructor(...args) { super(...args); window.testSockets.push(this);
+        window.WebSocket = class extends Native { constructor(...args) { super(localWorker || args[0], ...args.slice(1)); window.testSockets.push(this);
           this.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'interaction_result' || message.type === 'action_rejected') window.testMessages.push(message); }); } };
-      });
+      }, process.env.LOCAL_WORKER_URL || null);
       console.log('Loading client', index + 1);
       await page.goto('http://127.0.0.1:3051');
       await page.getByRole('button', { name: 'Enter Hearthwillow' }).click({ timeout: 120000 });

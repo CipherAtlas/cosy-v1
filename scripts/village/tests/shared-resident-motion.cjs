@@ -15,7 +15,7 @@ const fs = require('node:fs');
       let now = 500000; Date.now = () => now;
       performance.now = () => now - 500000;
       try {
-        for (const fps of [30, 60, 90, 120]) for (const cadence of [100, 120]) for (const jitter of [false, true]) {
+        for (const fps of [30, 60, 90, 120]) for (const cadence of [100, 120]) for (const jitter of ['none', 'mild', 'burst']) {
           now = 500000;
           const life = new VillageLife(new T.Group(), []);
           const resident = life.residents[0];
@@ -23,7 +23,7 @@ const fs = require('node:fs');
             owner: null, following: false, mode: 'roam', action: null, startedAt: now, until: 0, speech: null };
           life.applyShared([state], 'observer', now);
           let nextSnapshot = cadence, previousX = 4, packet = 0;
-          const delays = jitter ? [0, 25, 10, 35, 0] : [0];
+          const delays = jitter === 'burst' ? [0, 150, 0, 0, 120, 0] : jitter === 'mild' ? [0, 25, 10, 35, 0] : [0];
           const speeds = [];
           for (let frame = 1; frame <= fps * 4; frame++) {
             const ms = frame * 1000 / fps; now = 500000 + ms;
@@ -38,7 +38,7 @@ const fs = require('node:fs');
           const mean = speeds.reduce((a, b) => a + b) / speeds.length;
           const variation = Math.sqrt(speeds.reduce((sum, speed) => sum + (speed - mean) ** 2, 0) / speeds.length) / mean;
           results.push({ fps, cadence, jitter, meanSpeed: mean, variation, minSpeed: Math.min(...speeds), maxSpeed: Math.max(...speeds) });
-          check(12 - resident.root.position.x < .5, `${fps} fps / ${cadence} ms / jitter ${jitter}: display lag stays below 250 ms`);
+          check(12 - resident.root.position.x < (jitter === 'burst' ? .85 : .5), `${fps} fps / ${cadence} ms / jitter ${jitter}: display lag stays bounded`);
           now += 1000;
           life.update(1 / fps, 5, new T.Vector3(), false, false);
           const lastX = 4 + (nextSnapshot - cadence) / 1000 * 2;
@@ -56,6 +56,27 @@ const fs = require('node:fs');
           now += 10; life.applyShared([rejoined], 'reconnected-observer', now);
           life.setActivity(null); life.update(.01, 5.31, new T.Vector3(), true, false);
           check(resident.root.position.x === 8 && resident.root.rotation.y === -3.13, 'Reconnect discards the previous interpolation path');
+          life.dispose();
+        }
+        for (const gap of [600, 1100]) {
+          now = 500000;
+          const life = new VillageLife(new T.Group(), []), resident = life.residents[0];
+          const state = { id: 'pip', kind: 'resident', x: 4, y: .05, z: 20, heading: Math.PI / 2, speed: 2,
+            owner: null, following: false, mode: 'roam', action: null, startedAt: now, until: 0, speech: null };
+          life.applyShared([state], 'observer', now);
+          let nextSnapshot = 120, previousX = 4, peak = 0;
+          for (let frame = 1; frame <= 90 * 18; frame++) {
+            const ms = frame * 1000 / 90; now = 500000 + ms;
+            if (ms < 1000 || ms >= 1000 + gap) while (nextSnapshot <= ms) {
+              life.applyShared([{ ...state, x: 4 + nextSnapshot / 1000 * 2 }], 'observer', 500000 + nextSnapshot);
+              nextSnapshot += 120;
+            }
+            life.update(1 / 90, ms / 1000, new T.Vector3(40, .05, 20), false, false);
+            peak = Math.max(peak, (resident.root.position.x - previousX) * 90);
+            previousX = resident.root.position.x;
+          }
+          check(peak <= 2.21, `${gap} ms interruption resumes without a display jump`);
+          check(40 - resident.root.position.x < .8, `${gap} ms interruption recovers display delay below 400 ms gradually`);
           life.dispose();
         }
         now = 500000;

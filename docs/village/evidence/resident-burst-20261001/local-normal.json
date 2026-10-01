@@ -1,0 +1,40 @@
+{
+  "checks": [
+    "Three actual village clients share the same world",
+    "All five roaming residents avoid rapid display jumps across the real clients",
+    "An unclaimed resident is available without interrupting another visitor",
+    "The unclaimed resident accepts the owner invitation",
+    "The observing client cannot take the same blob",
+    "The accepted blob reaches its shared side-by-side walking position",
+    "Both actual views show steady follower movement without repeated speed pulses",
+    "No captured browser page errors"
+  ],
+  "metrics": [
+    {
+      "frames": 836,
+      "samples": 240,
+      "meanSpeed": 2.5890529284586012,
+      "variation": 0.0536387352549574,
+      "minSpeed": 2.2197257131674903,
+      "maxSpeed": 2.860718738953647,
+      "maxOwnerGap": 1.2569211855422282
+    },
+    {
+      "frames": 1309,
+      "samples": 240,
+      "meanSpeed": 2.589514465996887,
+      "variation": 0.052856030921103046,
+      "minSpeed": 2.3427438842170765,
+      "maxSpeed": 2.858564241364176,
+      "maxOwnerGap": null
+    }
+  ],
+  "errors": [],
+  "roamingPeakSpeeds": {
+    "pip": 1.4617277335379106,
+    "maple": 1.4530377573209434,
+    "moss": 1.4565684067411035,
+    "luma": 1.4530377572160973,
+    "wren": 1.4446978456341397
+  }
+}

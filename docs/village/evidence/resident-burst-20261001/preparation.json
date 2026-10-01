@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-01T14:15:23.832762+00:00",
+  "baselineCommit": "5a16e6cd519ed59bde50ee44a106050b4126c86d",
+  "environment": "Local headless Chrome; actual production-configured static export and actual local shared-world Worker",
+  "checks": {
+    "motionReplay": 173,
+    "ordinaryAndBurstRealClients": 3,
+    "sharedOwnershipChecks": 26,
+    "build": "Passed, 22 static pages, production shared-world URL",
+    "source": "npm run check passed",
+    "publicExport": "npm run check:export passed",
+    "scripts": "Four changed browser script syntax checks passed",
+    "visual": "Inspected owner/observer/all-five-roaming burst frame sequences and ordinary stop/turn sequence"
+  },
+  "sourceSha256": {
+    "features/village/residentMotion.ts": "5ef053ac627760bea39766598ddda81a94591b545f8e289251e33850d958a8bd",
+    "features/village/life.ts": "a4c088a2c58ff28096666231a8d3b341389d8b06ec1fef351bf9c41dcc3a4dab",
+    "worker/index.js": "3676f1edcf55d548587fa215ee06ad9436c4ba1872e4d80ffe53b993795dd14e",
+    "scripts/village/tests/resident-motion-browser.cjs": "1c3bedc0441214975513012f180651283fc77360d01e815359d21d0cab03612a",
+    "scripts/village/tests/shared-resident-motion.cjs": "7966bcff3a61ada6563877049d5ea4ec93ea52d2b5df6d85414dcabb560f8c8d"
+  },
+  "limits": [
+    "Publication and live verification pending",
+    "No affected-user hardware or Safari/Firefox checks",
+    "No crowded-world or long-session proof"
+  ]
+}
