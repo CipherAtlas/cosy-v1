@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-01",
+  "sourceCommit": "a32a529424d09245b74888f451a2eb8aafa58e21",
+  "sourceCommitUrl": "https://github.com/CipherAtlas/cosy-v1/commit/a32a529424d09245b74888f451a2eb8aafa58e21",
+  "publishedUrl": "https://cosy.sabarg.com/",
+  "pages": {
+    "runId": 36853181662,
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36853181662",
+    "status": "completed",
+    "conclusion": "success",
+    "deploymentId": 6782676667,
+    "deploymentState": "success",
+    "jobs": [
+      {
+        "name": "build",
+        "conclusion": "success"
+      },
+      {
+        "name": "deploy",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "worker": {
+    "version": "82f30689-af92-4a25-b3ca-829895685ad0",
+    "previousVersion": "82b5d21e-adfb-4dfa-bdbb-8236f49acfbd",
+    "deploymentId": "a05675ea-af6d-4126-a4a9-f3c4e3f90fa4",
+    "percentage": 100,
+    "sourceTag": "a32a529",
+    "healthy": true
+  },
+  "liveChecks": {
+    "browser": 20,
+    "pageErrors": [],
+    "httpAndAssets": 19,
+    "privateRoutesReturn404": 9,
+    "allSixPuppySubsetsMatchSource": true,
+    "layoutAndCatMatchSource": true
+  },
+  "sourceChecks": "Preparation record and successful CI build; current-contract tests and export privacy gates both passed in Pages.",
+  "scope": "Audit fixes plus verified resident-motion work, with published Worker write cleanup retained. Dependencies, authored layout, private tools and authentication are preserved.",
+  "verificationNote": "Local and CI JavaScript chunk hashes differ between builds; release identity uses the successful Pages deployment SHA, live features and byte-identical model/layout files.",
+  "limits": [
+    "Existing visitors must reload to receive the new client",
+    "No physical-laptop FPS improvement claim",
+    "Safari/Firefox, screen readers, crowded-world load and long-session acceptance remain unverified"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "checks": [
+    "Client 1: initial page hydrates without errors",
+    "Initial reduced-motion page has a visible, still wrapper",
+    "Client 1: connects to the production shared Worker and receives actors",
+    "Client 1: only placed dog subsets load, with all animations",
+    "Client 1: no cottage cat request at entry",
+    "Client 1: complete-frame render counters are enabled",
+    "Client 2: initial page hydrates without errors",
+    "Client 2: connects to the production shared Worker and receives actors",
+    "Client 2: only placed dog subsets load, with all animations",
+    "Client 2: no cottage cat request at entry",
+    "Client 2: complete-frame render counters are enabled",
+    "Both production clients see one another in the shared outdoor village",
+    "Private focus hides other production visitors and loads its cat",
+    "Private focus hides other production visitors and loads its cat",
+    "Simultaneous private cottages retain independent timer settings and running state",
+    "Private focus controls fit the smaller desktop window",
+    "Leaving private focus restores the outdoor controls",
+    "Leaving private focus restores the outdoor controls",
+    "Production phone gate refuses entry before scene, world assets and shared connection",
+    "All production browser checks have no captured page errors"
+  ],
+  "errors": [],
+  "startup": [
+    {
+      "dogs": [
+        {
+          "breed": "corgi",
+          "actions": 10
+        },
+        {
+          "breed": "shiba",
+          "actions": 10
+        },
+        {
+          "breed": "beagle",
+          "actions": 10
+        },
+        {
+          "breed": "samoyed",
+          "actions": 10
+        }
+      ],
+      "catLoaded": false,
+      "actors": 9,
+      "counterAutoReset": false
+    },
+    {
+      "dogs": [
+        {
+          "breed": "corgi",
+          "actions": 10
+        },
+        {
+          "breed": "shiba",
+          "actions": 10
+        },
+        {
+          "breed": "beagle",
+          "actions": 10
+        },
+        {
+          "breed": "samoyed",
+          "actions": 10
+        }
+      ],
+      "catLoaded": false,
+      "actors": 9,
+      "counterAutoReset": false
+    }
+  ],
+  "scope": "Fresh production clients; private-focus actions only, no public chat, actor ownership, feeding, moderation or kick tests"
+}

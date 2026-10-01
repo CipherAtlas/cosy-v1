@@ -1,0 +1,99 @@
+{
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "livePageChunk": "/_next/static/chunks/app/page-62aed71ded2eb540.js"
+    },
+    {
+      "path": "/village/world-layout.json",
+      "status": 200,
+      "bytes": 131151,
+      "sha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab"
+    },
+    {
+      "path": "/village/models/cottage-cat.glb",
+      "status": 200,
+      "bytes": 487400,
+      "sha256": "94715996a07031e7dc75391c5182849283d9dd20c2d23c85c1e80d029125d197"
+    },
+    {
+      "path": "/village/models/puppies/beagle.glb",
+      "status": 200,
+      "bytes": 1111496,
+      "sha256": "3ef202c7194d2672aa746c19df48a2f9670914b52f14cecb05b95a85cf0ebe7d"
+    },
+    {
+      "path": "/village/models/puppies/collie.glb",
+      "status": 200,
+      "bytes": 1213676,
+      "sha256": "e74020c6afce8e2a2641f5a141b4c4a64036051f2312f1ef708fe1c5d2a4e89a"
+    },
+    {
+      "path": "/village/models/puppies/corgi.glb",
+      "status": 200,
+      "bytes": 1185776,
+      "sha256": "8878e8dacda6db8a0b8594af0c0e006e4c4b8d76a2794a81b467d9f531ada9d9"
+    },
+    {
+      "path": "/village/models/puppies/samoyed.glb",
+      "status": 200,
+      "bytes": 1251476,
+      "sha256": "59003c2a9fed475baffc6aebcea67ee1b8d41e664239509ae4e250a1898735b0"
+    },
+    {
+      "path": "/village/models/puppies/shepherd.glb",
+      "status": 200,
+      "bytes": 1212148,
+      "sha256": "dfc8fea754ee54aed718486eb9a89c73d2ea05e7342403df181e3336bf0ab30e"
+    },
+    {
+      "path": "/village/models/puppies/shiba.glb",
+      "status": 200,
+      "bytes": 1198884,
+      "sha256": "1048fca5fc9041ab0d9d819e5c2abcfdb910a1f28f14b3fdad56a053b8518ef1"
+    },
+    {
+      "path": "/editor/",
+      "status": 404
+    },
+    {
+      "path": "/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/api/layout",
+      "status": 404
+    },
+    {
+      "path": "/api/save",
+      "status": 404
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/api/admin",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/",
+      "status": 404
+    },
+    {
+      "path": "/AGENTS.md",
+      "status": 404
+    },
+    {
+      "path": "Worker /health",
+      "status": 200,
+      "ok": true
+    }
+  ],
+  "releaseIdentity": "Verified by the successful Pages deployment SHA and live feature checks; local and CI JavaScript chunk hashes are build-specific."
+}
