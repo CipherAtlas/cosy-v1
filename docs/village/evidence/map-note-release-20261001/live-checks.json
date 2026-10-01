@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "Two production clients connect to the shared Worker",
+    "Production minimap is visible",
+    "Live map includes meadow swing and northern spire",
+    "Live WASD map navigation selects the northern destination",
+    "Simultaneous production private focus timers remain independent",
+    "Private cottage hides other visitors",
+    "Live Tab reaches activity controls while retaining capture",
+    "One live Esc leaves activity and releases the mouse",
+    "Production envelope stays attached to its reader",
+    "Live note uses the original small fins",
+    "Live E changes the note",
+    "Live K keeps the note",
+    "Live contextual X leaves and hides the note",
+    "Live O opens sound controls",
+    "Production phone refusal precedes scene assets and shared connection",
+    "No production browser page errors"
+  ],
+  "errors": []
+}

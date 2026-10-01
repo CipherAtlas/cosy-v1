@@ -2,7 +2,9 @@
 
 Updated: 2026-10-01. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
 
-## Minimap and keyboard controls — 2026-10-01 local
+## Minimap and keyboard controls — 2026-10-01 published
+
+[Release and live checks](../../VILLAGE_BUILD.md#2026-10-01--map-and-kind-note-release-published) confirm publication; local evidence below covers the broader three-client suite.
 
 The top right contains a persistent north-up minimap and Settings. It follows the spirit's position and heading with a 60 fps requestAnimationFrame target by updating only the SVG viewport and player glyph. The landscape stays mounted between frames; stationary/hidden states avoid redundant map writes. M or clicking the map opens the full illustrated village; WASD/arrows choose destinations spatially, Enter travels and Escape closes. The map reads built-world path spines, cottage/spire sizes and rotations, tree and bench positions, authored fencing and rotated swing placements. Pond, river, bridge, dock, garden beds and clearing use their shared game constants. Bounds include the northern spire and Sunrise meadow swings; callout lines retain true destination anchors while separating nearby controls. Inside the private cottage the marker stays at its outdoor entrance.
 

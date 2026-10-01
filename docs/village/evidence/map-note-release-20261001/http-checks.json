@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/mood/",
+      "status": 200
+    },
+    {
+      "path": "/gratitude/",
+      "status": 200
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/",
+      "status": 404
+    },
+    {
+      "path": "/api/layouts",
+      "status": 404
+    },
+    {
+      "path": "/api/playable",
+      "status": 404
+    },
+    {
+      "path": "/api/players",
+      "status": 404
+    },
+    {
+      "path": "/admin/players",
+      "status": 404
+    },
+    {
+      "path": "/village/world-layout.json",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab"
+    },
+    {
+      "live_map_styles": true
+    },
+    {
+      "worker_health": true
+    }
+  ]
+}

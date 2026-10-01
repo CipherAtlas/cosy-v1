@@ -1,5 +1,15 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-01 — map and kind-note release published
+
+All pending minimap, keyboard/capture, kind-note reading pose, local editor and documentation changes are committed and pushed in source `136c2f36ea685eb54d251015727032223793ca3f`. [Pages run 36837408922](https://github.com/CipherAtlas/cosy-v1/actions/runs/36837408922) completed build and deployment successfully; [the live village](https://cosy.sabarg.com/) serves the release. The Worker is unchanged and its health passed. [Publication record](docs/village/evidence/map-note-release-20261001/publication.json).
+
+Fresh local release checks passed: production build, sequential full typecheck, 27 device-gate checks, 84 actual three-client Chrome checks, source/evidence credential-pattern scan, diff/test syntax and export privacy checks. The [preparation record](#2026-10-01--map-and-kind-note-release-preparation) distinguishes these from the reused unchanged note/editor evidence.
+
+Sixteen actual production Chrome checks with two clients passed: shared connection; persistent minimap; meadow swing/spire landmarks; WASD map selection; simultaneous independent private timers with hidden remote visitors; captured Tab controls; single Esc exit/release; reader-attached envelope and original small fins; E/Another note, K/Keep and contextual X cleanup; O/Sound; and phone refusal before scene/assets/shared connection. No captured page errors. [Live browser checks](docs/village/evidence/map-note-release-20261001/live-checks.json), [live note view](docs/village/evidence/map-note-release-20261001/live-note.png). Earlier smoke harness attempts counted landmarks in both maps and timed out acquiring capture using an older Playwright runtime; the corrected selector and bundled runtime used by the passing local suite passed on unchanged application source.
+
+Thirteen [HTTP/asset checks](docs/village/evidence/map-note-release-20261001/http-checks.json) passed: root, Tea garden and Writing nook 200; seven private-tooling paths 404; byte-identical world layout; current minimap/map CSS; Worker health. Editor/admin tools remain local. Existing visitors must reload. Safari, physical laptops, screen readers and long-session/full-world performance acceptance remain open. The evidence-only documentation follow-up skips CI because application source is unchanged.
+
 ## 2026-10-01 — map and kind-note release preparation
 
 The user authorized committing, pushing and deploying all pending minimap, keyboard/capture, kind-note artwork/editor and documentation changes. The Worker, dependency lockfile, world layout and deployment configuration are unchanged; publication uses the existing main-branch GitHub Pages workflow.

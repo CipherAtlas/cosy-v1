@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "136c2f36ea685eb54d251015727032223793ca3f",
+  "pagesRun": {
+    "conclusion": "success",
+    "headSha": "136c2f36ea685eb54d251015727032223793ca3f",
+    "updatedAt": "2026-10-01T08:38:28Z",
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36837408922"
+  },
+  "site": "https://cosy.sabarg.com/",
+  "workerUnchanged": true,
+  "checks": {
+    "localThreeClientChrome": 84,
+    "deviceGate": 27,
+    "liveTwoClientChrome": 16,
+    "liveHttpAndAssets": 13
+  },
+  "remainingLimits": [
+    "Safari",
+    "physical laptops",
+    "screen readers",
+    "long sessions and full-world performance"
+  ]
+}

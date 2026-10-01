@@ -2,7 +2,9 @@
 
 The cottage cat/furnishings, four-dog layout and larger bird bowl/circuits are published in the [2026-10-01 integrated release](../../VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published). The earlier local evidence below describes asset production; the release record separates current source, editor and live verification.
 
-## Kind note and envelope (local)
+## Kind note and envelope (published)
+
+The [map and kind-note release](../../VILLAGE_BUILD.md#2026-10-01--map-and-kind-note-release-published) publishes the runtime artwork; editor tooling remains local.
 
 `makeKindNote` in `features/village/activityScene.ts` supplies the reader and local editor with the same original cream envelope, rose seal, hinged flap and separate inked sheet. The editor's **Kind note and envelope** Furnishings entry has an open preview and saved working-copy transforms. Runtime poses retain the spirit's original short fins. [Local preview, checks and limits](../../VILLAGE_BUILD.md#2026-10-01--kind-note-reading-pose-local).
 
