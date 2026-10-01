@@ -1,0 +1,52 @@
+{
+  "checks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/_next/static/chunks/151.bc6ac1bebd34be8b.js",
+      "status": 200,
+      "playbackRecovery": true
+    },
+    {
+      "path": "/editor/",
+      "status": 404
+    },
+    {
+      "path": "/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/api/layout",
+      "status": 404
+    },
+    {
+      "path": "/api/save",
+      "status": 404
+    },
+    {
+      "path": "/admin/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor/",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-admin/",
+      "status": 404
+    },
+    {
+      "path": "/village/world-layout.json",
+      "status": 200,
+      "sha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab",
+      "matchesSource": true
+    },
+    {
+      "path": "Worker /health",
+      "status": 200,
+      "ok": true
+    }
+  ]
+}

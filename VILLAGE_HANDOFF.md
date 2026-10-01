@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — blob delivery-burst fix published
+
+Source `945aea0` is pushed and deployed by successful [Pages run 36875083940](https://github.com/CipherAtlas/cosy-v1/actions/runs/36875083940). The Worker is unchanged. Three fresh live clients passed roaming/following/stopping/turning and competing-invitation checks; recorded frame sequences show continuous owner/observer movement, with no page errors. Eleven live HTTP/engine/layout/privacy checks passed. Local proof includes 173 replay checks, normal/burst three-client visual captures and 26 fresh ownership/reconnect/seat/private-focus checks. Existing visitors must reload. Packet gaps can still pause movement, and real network latency remains; hardware, Safari/Firefox, crowded-world and long sessions are unverified. [Publication, recordings and limits](VILLAGE_BUILD.md#2026-10-01--blob-delivery-burst-fix-published) supersede the pending-publication notes below.
+
 ## 2026-10-01 — blob delivery-burst fix verified locally
 
 The playback timeline now preserves unseen accepted poses through bursts and short interruptions, then recovers excess delay gradually. The 173 replay checks, ordinary/burst three-client visual recordings of all five roaming blobs plus owner/observer following, production build and source/export checks passed. The 26 fresh three-client ownership/reconnect/bench/feeding/private-focus checks also passed. The user's authorized commit/push/deployment and live verification remain pending. Preserve Worker ownership and existing layouts/assets. [Cause, checks, recordings and limits](VILLAGE_BUILD.md#2026-10-01--blob-movement-during-delivery-bursts-local).

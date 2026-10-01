@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-10-01T14:25:38.000374+00:00",
+  "sourceCommit": "945aea0f044f313fb747ec099987cfd1c468754b",
+  "workflow": {
+    "run": 36875083940,
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36875083940",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "build",
+        "conclusion": "success"
+      },
+      {
+        "name": "deploy",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "liveSite": "https://cosy.sabarg.com/",
+  "liveWorker": "https://cosy-village-world.sabargulati777.workers.dev/",
+  "workerChanged": false,
+  "browserEvidence": "live-browser.json",
+  "httpEvidence": "live-http.json",
+  "remainingLimits": [
+    "Affected-user hardware, Safari/Firefox, crowded-world and long-session behavior unverified",
+    "Missing packets can still pause motion; long interruptions and large relocations intentionally reset it",
+    "Live follower separation peaked at 2.38 metres during steady travel; no elimination of network latency claimed"
+  ]
+}

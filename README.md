@@ -74,7 +74,7 @@ The [redundant-write cleanup](VILLAGE_BUILD.md#2026-10-01--write-cleanup-release
 
 Release history, current verification and remaining limits are recorded in [the implementation ledger](VILLAGE_BUILD.md).
 
-Shared blob residents interpolate timestamped Worker positions and facing with a short display buffer. During bursts and short interruptions, playback retains unseen accepted poses and resumes along that same path; excess delay recovers gradually. Stalled delivery holds the last accepted position; reconnects, long interruptions and activity relocations reset the path. [NPC burst-delivery checks and release status](VILLAGE_BUILD.md#2026-10-01--blob-movement-during-delivery-bursts-local) record its verification.
+Shared blob residents interpolate timestamped Worker positions and facing with a short display buffer. During bursts and short interruptions, playback retains unseen accepted poses and resumes along that same path; excess delay recovers gradually. Stalled delivery holds the last accepted position; reconnects, long interruptions and activity relocations reset the path. [NPC burst-delivery release and local/live checks](VILLAGE_BUILD.md#2026-10-01--blob-delivery-burst-fix-published) record its verification.
 
 ## Local development and verification
 
