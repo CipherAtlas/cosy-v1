@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-01T10:08:32.803034+00:00",
+  "sourceCommit": "bf7e359df5c852d8da6004307a39805e685271a9",
+  "baseCommit": "03aab76ac4d12a385a721420d6f08c838dd552a0",
+  "remoteSourceVerified": true,
+  "worker": {
+    "name": "cosy-village-world",
+    "versionId": "82b5d21e-adfb-4dfa-bdbb-8236f49acfbd",
+    "sourceTag": "bf7e359",
+    "deploymentId": "42454acf-7c2c-4ee5-8cc8-308709548b6f",
+    "trafficPercentage": 100,
+    "createdOn": "2026-10-01T10:00:47.422935Z",
+    "precedingVersionId": "7888d371-63a9-4487-a142-d780a37f0e3c",
+    "sourceSha256": "b58c59248ed5c3873539fc1f64f1856ac7d7fcaad7fe2b00cd590c85a45c772b",
+    "bundleSha256": "ef82959694e622769f85a09fd7cc043cf49114385232029e3cf9297f83bb484f",
+    "health": {
+      "status": 200,
+      "ok": true
+    }
+  },
+  "pages": {
+    "runId": 36846547186,
+    "url": "https://github.com/CipherAtlas/cosy-v1/actions/runs/36846547186",
+    "headSha": "bf7e359df5c852d8da6004307a39805e685271a9",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "build",
+        "conclusion": "success"
+      },
+      {
+        "name": "deploy",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "liveBrowserChecks": 6,
+  "liveHttpChecks": 13,
+  "capturedLivePageErrors": [],
+  "productionModerationOrKicks": false,
+  "originalCheckout": "/Users/sabar/Documents/cosy-v1",
+  "originalCheckoutHead": "03aab76ac4d12a385a721420d6f08c838dd552a0",
+  "concurrentLocalChangesPreserved": true,
+  "releaseCheckout": "/Users/sabar/Documents/Codex/2026-10-01/task/cosy-release",
+  "notes": [
+    "Worker deployed before source push/Pages",
+    "Frontend, dependencies and deployment configuration unchanged",
+    "Normal local console and existing archive never read or restarted",
+    "Original checkout developed concurrent changes; no fast-forward/stash/rebase attempted",
+    "Documentation follow-up uses skip ci; Pages success belongs to exact source commit above"
+  ],
+  "limits": [
+    "No production UTC boundary or remote replication failure injection",
+    "No live billing/free-quota guarantee",
+    "Safari, physical hardware and long sessions remain unverified"
+  ]
+}

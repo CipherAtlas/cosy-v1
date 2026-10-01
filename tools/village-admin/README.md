@@ -2,7 +2,7 @@
 
 ## Worker write cleanup
 
-The [narrow Worker cleanup](../../VILLAGE_BUILD.md#2026-10-01--write-cleanup-mac-verification) preserves this console's five-second page refresh and five-second background archive capture. It checks the actual persisted hourly alarm and skips exact unchanged chat values while retaining responses, reset/sync events, clear/remove version guards, kick handling, authentication and seven-day retention. Seven Python tests, 26 three-client checks and 20 actual console/browser recovery checks pass; the existing console and archive are preserved. Worker publication evidence is recorded in the ledger.
+The [narrow Worker cleanup](../../VILLAGE_BUILD.md#2026-10-01--write-cleanup-release-published) preserves this console's five-second page refresh and five-second background archive capture. It checks the actual persisted hourly alarm and skips exact unchanged chat values while retaining responses, reset/sync events, clear/remove version guards, kick handling, authentication and seven-day retention. Seven Python tests, 26 three-client checks and 20 actual console/browser recovery checks pass; the existing console and archive are preserved. The matching Worker is deployed and healthy; publication evidence is recorded in the ledger.
 
 This private console lists connected players, manages the shared village chat for the current UTC hour and keeps a searchable local archive for seven days. You can kick a player for five minutes, remove one live message or clear the current hour. The console runs on your computer; it is not a page on the public site. The matching Worker and village client are published, and the player controls are verified against production. The local console was restarted after this release with its archive preserved.
 

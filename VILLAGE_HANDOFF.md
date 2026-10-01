@@ -1,5 +1,11 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — write cleanup published
+
+Scoped source `bf7e359` is pushed. Worker version `82b5d21e-adfb-4dfa-bdbb-8236f49acfbd` is verified at 100% with healthy `/health`, and [Pages run 36846547186](https://github.com/CipherAtlas/cosy-v1/actions/runs/36846547186) succeeds for the same source. All source/build checks, seven Python tests, 35 deterministic checks, 14 actual runtime checks, 46 rendered local Chrome checks, six safe live-browser checks and 13 HTTP/asset checks pass. [Publication evidence and limits](VILLAGE_BUILD.md#2026-10-01--write-cleanup-release-published). Preserve both admin pollers, every sharedActors snapshot and the existing ownership/recovery contract. No simulation checkpointing or UI change.
+
+The original Mac checkout acquired concurrent refactor/test/Worker edits during QA and was left untouched at `03aab76`; reconcile those edits with the published source before their next release. The clean release checkout is `/Users/sabar/Documents/Codex/2026-10-01/task/cosy-release`. Existing console/archive and real users were preserved. No production moderation or kicks were tested.
+
 ## 2026-10-01 — write-cleanup Mac verification
 
 The reviewed alarm/exact-no-op patch is reconciled with clean main `03aab76`, preserving the newer map/note release. Ten deterministic runners, seven Python tests, 14 real SQLite/WebSocket recovery checks, sequential export/typecheck/lint and Worker dry-run pass. The actual three-client Chrome suite now passes 26 checks after updating its stale Places selector to the published map. Twenty additional actual console/browser checks pass for both polling paths, archive behavior, hibernation/ownership, full restart/reconnect, chat recovery, real alarm rollover and stale-hour refusal. No page errors were captured. Publication evidence follows in the ledger. [Scope, checks and reproduction](VILLAGE_BUILD.md#2026-10-01--write-cleanup-mac-verification). Preserve both five-second admin pollers, every sharedActors snapshot, ownership and recovery; no simulation checkpointing. Worker source/publication is still pending at this checkpoint.

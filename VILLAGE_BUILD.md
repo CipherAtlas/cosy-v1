@@ -1,5 +1,17 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-01 — write-cleanup release published
+
+Source [`bf7e359`](https://github.com/CipherAtlas/cosy-v1/commit/bf7e359df5c852d8da6004307a39805e685271a9) is pushed to `main`. The actual `cosy-village-world` Worker deployed first as version `82b5d21e-adfb-4dfa-bdbb-8236f49acfbd`, source tag `bf7e359`, verified at 100% traffic with healthy `/health`. Its preceding version is `7888d371-63a9-4487-a142-d780a37f0e3c`. [Pages run 36846547186](https://github.com/CipherAtlas/cosy-v1/actions/runs/36846547186) completed build and deploy successfully for that exact source commit. Pages alone does not publish the Worker; both are confirmed separately in the [publication record](docs/village/evidence/write-cleanup-20261001/publication.json).
+
+The narrow change skips already-correct real next-hour alarms and exact unchanged garden/chat writes. Both five-second admin pollers, every sharedActors snapshot, simulation cadence, ownership/seat validation, moderation, recovery, archive retention and UI are preserved. The published map/note release is retained. No simulation checkpointing, dependency or deployment-configuration change was introduced.
+
+[Mac verification](docs/village/evidence/write-cleanup-20261001/mac-verification.json) records ten deterministic runners, seven Python tests, 35 new deterministic checks, 14 real runtime checks, 46 actual rendered Chrome checks, the 22-page export, sequential typecheck/lint and production Worker dry-run. [Six safe production browser checks](docs/village/evidence/write-cleanup-20261001/live-browser.json) verified shared connection, authoritative actors, private focus opening/exit and cat asset loading with no captured page errors. [Thirteen HTTP/asset checks](docs/village/evidence/write-cleanup-20261001/live-http.json) verified health, root delivery, matching layout/cat bytes and nine private paths returning 404. No production messages, moderation, kicks or destructive tests were sent.
+
+The synthetic two-poller model retains the reduction from 34,560 to 24 alarm writes/day; ten unchanged flower actions retain zero garden writes and all ten sharedActors writes. These are API-call counts, not live billing or a free-quota guarantee. The cloud verification entries below are historical and superseded by this Mac/browser/deployment evidence. Production UTC-hour observation, remote replication failures, Safari, physical hardware and long-session acceptance remain open; seven-day archive expiry uses controlled-time tests.
+
+The original `/Users/sabar/Documents/cosy-v1` checkout developed concurrent refactor/test/Worker changes during QA and remains untouched at `03aab76`. The clean isolated release checkout is `/Users/sabar/Documents/Codex/2026-10-01/task/cosy-release`. Preserve the concurrent edits and reconcile them with this published source before their next release. The normal local console and existing archive were never read or restarted. This documentation follow-up does not change the deployed source and uses `[skip ci]`.
+
 ## 2026-10-01 — write-cleanup Mac verification
 
 The Library handoff patch was checksum-verified and reconciled against clean current `main` `03aab76ac4d12a385a721420d6f08c838dd552a0`, preserving the published map/note release. Worker source matches the reviewed SHA-256 `b58c59248ed5c3873539fc1f64f1856ac7d7fcaad7fe2b00cd590c85a45c772b`. The original Mac checkout, running console, production visitors and existing archive were preserved; work and generated output use an isolated checkout.

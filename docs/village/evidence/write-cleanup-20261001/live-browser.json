@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Production village loads and joins the shared Worker",
+    "Production supplies authoritative shared actors",
+    "Production private focus opens with its rendered controls",
+    "Production activity exit returns to the village",
+    "Production cottage cat asset is loaded",
+    "No captured production browser page errors"
+  ],
+  "errors": [],
+  "syntheticModeration": false,
+  "productionAdminWrites": false
+}
