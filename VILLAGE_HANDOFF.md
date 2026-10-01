@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — write-cleanup Mac verification
+
+The reviewed alarm/exact-no-op patch is reconciled with clean main `03aab76`, preserving the newer map/note release. Ten deterministic runners, seven Python tests, 14 real SQLite/WebSocket recovery checks, sequential export/typecheck/lint and Worker dry-run pass. The actual three-client Chrome suite now passes 26 checks after updating its stale Places selector to the published map. Twenty additional actual console/browser checks pass for both polling paths, archive behavior, hibernation/ownership, full restart/reconnect, chat recovery, real alarm rollover and stale-hour refusal. No page errors were captured. Publication evidence follows in the ledger. [Scope, checks and reproduction](VILLAGE_BUILD.md#2026-10-01--write-cleanup-mac-verification). Preserve both five-second admin pollers, every sharedActors snapshot, ownership and recovery; no simulation checkpointing. Worker source/publication is still pending at this checkpoint.
+
 ## 2026-10-01 — map and kind-note release published
 
 All pending map/keyboard, note/editor and documentation changes are pushed in source `136c2f3` and published through successful [Pages run 36837408922](https://github.com/CipherAtlas/cosy-v1/actions/runs/36837408922). Fresh build/typecheck, 27 device fixtures, 84 three-client local checks, 16 two-client production checks and 13 HTTP/asset checks passed. The Worker is unchanged, private tools remain excluded and existing visitors need to reload. [Release evidence and limits](VILLAGE_BUILD.md#2026-10-01--map-and-kind-note-release-published). Safari, physical hardware, screen readers and long-session/performance acceptance remain open.

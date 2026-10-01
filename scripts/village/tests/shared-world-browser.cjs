@@ -151,8 +151,8 @@ const assert = require('node:assert/strict');
     check(true, 'Observers receive the same accepted flock serving time');
     for (const page of [b, c]) await page.evaluate(() => testEngine.stand());
     for (const page of [a, b]) {
-      await page.getByRole('button', { name: 'Places', exact: true }).click();
-      await page.getByRole('button', { name: /Focus cottage/ }).click();
+      await page.getByRole('button', { name: 'Expand village map', exact: true }).click();
+      await page.getByRole('button', { name: 'Focus cottage', exact: true }).click();
     }
     await a.waitForFunction(() => testEngine.place === 'focus'); await b.waitForFunction(() => testEngine.place === 'focus');
     check(await a.evaluate(() => [...testEngine.remoteVisitors.values()].every(visitor => !visitor.group.visible)), 'Private focus shows no other visitors');

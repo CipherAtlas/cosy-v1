@@ -1,0 +1,44 @@
+{
+  "baseCommit": "03aab76ac4d12a385a721420d6f08c838dd552a0",
+  "utcCheckedAt": "2026-10-01T09:59:53.212597+00:00",
+  "workerSha256": "b58c59248ed5c3873539fc1f64f1856ac7d7fcaad7fe2b00cd590c85a45c772b",
+  "libraryPatchSha256": "c3b3855fe7501c26084b8d6373237e24327fbeb00ec7976a944184bc863623b6",
+  "syntheticDataOnly": true,
+  "productionModerationOrKicks": false,
+  "deterministicJavaScriptRunners": 10,
+  "newDeterministicChecks": 35,
+  "realRuntimeChecks": 14,
+  "pythonTests": 7,
+  "threeClientChromeChecks": 26,
+  "consoleRecoveryChromeChecks": 20,
+  "capturedPageErrors": [],
+  "exportPages": 22,
+  "typecheck": "passed after build",
+  "lint": "passed with existing warnings",
+  "productionWorkerDryRun": "passed",
+  "privateExportPathsChecked": 8,
+  "adminPollingIntervalsMs": [
+    5001
+  ],
+  "workerUploadKiB": 717.59,
+  "workerGzipKiB": 134.4,
+  "unchanged": [
+    "all sharedActors snapshot boundaries",
+    "both five-second admin pollers",
+    "multiplayer cadence",
+    "ownership and reservations",
+    "moderation",
+    "archive retention",
+    "frontend",
+    "dependencies and deployment configuration"
+  ],
+  "limits": [
+    "No real production hour boundary observed",
+    "Seven-day expiry uses controlled-time Python tests",
+    "No physical-hardware/Safari/long-session or live billing measurement"
+  ],
+  "historicalCloudEvidence": [
+    "results.json",
+    "release-verification.json"
+  ]
+}

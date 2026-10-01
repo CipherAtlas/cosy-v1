@@ -1,0 +1,143 @@
+{
+  "baseCommit": "56bfe595fdf37f580d3312a95bd43e27cfcfed6f",
+  "date": "2026-10-01",
+  "status": "local-unpublished",
+  "workerSha256": "b58c59248ed5c3873539fc1f64f1856ac7d7fcaad7fe2b00cd590c85a45c772b",
+  "productionMutations": false,
+  "syntheticDataOnly": true,
+  "checks": {
+    "deterministic": {
+      "passed": 35,
+      "checks": [
+        "34,560 same/next-hour admin polls schedule exactly 24 hourly alarms",
+        "Polling only persists the 23 elapsed chat-hour changes",
+        "Admin polling does not touch world/garden writes",
+        "Reconstruction reads the persisted matching alarm without rewriting",
+        "Missing, overdue and wrong future alarms are repaired",
+        "Consumed alarm resets the hour with no connected visitors and schedules its successor",
+        "Duplicate alarm delivery with a correct successor does not rewrite it",
+        "A retry repairs an absent alarm without clearing the same hour twice",
+        "No-visitor alarm emits no stale socket messages",
+        "Scheduling failure is awaited/propagated and a retry can restore the alarm",
+        "A failed alarm read is surfaced and later requests recover",
+        "Hour boundary during getAlarm does not leave a stale chat hour or past alarm",
+        "Repeated empty chat clears skip all identical KV writes",
+        "Empty clear still broadcasts both legacy reset and current chat sync events",
+        "A new chat message still persists and receives a stable ID",
+        "A stale clear version neither writes nor removes a message",
+        "In-place message removal persists despite the immutable prior-value baseline",
+        "Missing message removal and already-empty clear add no writes",
+        "Legacy message-ID migration writes once and survives reconstruction",
+        "An absent chat record is initialized rather than treated as already persisted",
+        "Ten unchanged flower actions skip ten garden writes",
+        "No-op garden actions retain every action event and authoritative world snapshot write",
+        "No-op persistent garden value still grants crumbs to the socket attachment",
+        "Feeding retains the durable shared meal clock while skipping unchanged garden storage",
+        "Reconstructed shared meal refuses a competing early restart",
+        "Harvest inventory and nested bed changes still persist",
+        "Duplicate harvest cannot create another crop or redundant garden write",
+        "Plant/water transitions and watering timestamp persist",
+        "Constructor-applied growth is compared against raw persisted state and saved by an otherwise no-op action",
+        "Normalization repairs are not incorrectly suppressed",
+        "A missing garden is persisted on the first accepted action",
+        "A synchronous garden-write failure emits no garden acceptance and preserves durable inventory",
+        "Reconstruction after a failed garden write permits one durable harvest",
+        "Failed put does not advance the baseline; later nested mutation is compared to immutable serialized bytes",
+        "World publish cadence and persistence remain one snapshot write per publish"
+      ],
+      "writeCounts": {
+        "adminPolls": 34560,
+        "alarmWrites": 24,
+        "unchangedFlowerActions": 10,
+        "gardenWritesForFlowers": 0,
+        "sharedActorsWritesForFlowers": 10
+      }
+    },
+    "runtime": {
+      "passed": 14,
+      "checks": [
+        "Forty concurrent admin polls all succeed with actual SQLite Durable Object storage",
+        "Concurrent initial polls create exactly one successor alarm",
+        "Concurrent polls repair a removed real runtime alarm exactly once",
+        "Two real WebSocket clients join the same local Worker",
+        "Chat is broadcast to the other real client and immediately readable by the admin API",
+        "Concurrent rollover/message/admin polls refuse a stale-hour clear",
+        "Concurrent rollover leaves exactly the new-hour message durably readable",
+        "Continued real admin polling adds no duplicate alarm writes",
+        "Retained-socket hibernation resumes heartbeat/world publication and preserves chat/alarm without rescheduling",
+        "Full local-runtime restart restores the acknowledged concurrent message",
+        "Runtime restart preserves the real alarm and does not reschedule it",
+        "Admin removes the restored message using its stable ID",
+        "Twenty concurrent empty clears perform no chat/alarm rewrites in actual storage",
+        "A real scheduled local-runtime alarm clears seeded prior-hour chat without visitors and schedules the next UTC hour"
+      ],
+      "runtime": "5.20260930.0-alpha"
+    }
+  },
+  "existingJavaScriptRunners": {
+    "passed": [
+      "shared-world-worker",
+      "shared-actions-worker",
+      "player-kick",
+      "chat-admin",
+      "chat-hour",
+      "chat-cooldown",
+      "device-gate",
+      "bird-circuits",
+      "activity-seating"
+    ],
+    "reportedNamedChecks": {
+      "shared-world-worker": 66,
+      "device-gate": 27,
+      "bird-circuits": 18,
+      "activity-seating": 81
+    }
+  },
+  "pythonAdminArchive": {
+    "passedTests": 7,
+    "command": "python3 -m unittest discover -s tools/village-admin -p 'test_*.py' -v"
+  },
+  "aggregate": {
+    "typecheck": "passed",
+    "lint": "passed with existing warnings",
+    "staticExport": "passed, 22 pages, local Worker URL",
+    "workerSyntax": "passed",
+    "diffWhitespace": "passed",
+    "privateToolingExport": "passed: eight checked admin/editor/API paths absent"
+  },
+  "warnings": [
+    "Existing RoomScene img lint warning",
+    "next lint deprecation",
+    "Stale Browserslist data",
+    "Three.js CommonJS deprecation"
+  ],
+  "blocked": {
+    "threeClientBrowser": "Chromium failed before page launch: required Unix socket denied in sandbox; elevated retry same failure; 26 visual checks not run",
+    "wranglerCLI": "uv_interface_addresses denied; direct Miniflare API local runtime tests passed"
+  },
+  "limits": [
+    "Worker API call counts, not production billing measurements",
+    "No production or user local-console testing",
+    "No real wall-clock hourly boundary observation; controlled clock/seeded rollover plus real local alarm firing",
+    "Synchronous write and alarm read/schedule errors injected in fixtures; no real disk/replication output-gate fault injection",
+    "No rendered-browser, hardware or long-session performance acceptance for this patch"
+  ],
+  "unchanged": [
+    "sharedActors snapshot storage/cadence",
+    "simulation and ownership rules",
+    "seat arbitration and feeding clocks",
+    "admin/archive five-second polling",
+    "moderation and kick behavior",
+    "UI",
+    "package and lockfile",
+    "deployment configuration"
+  ],
+  "baselineMeasurements": {
+    "adminPolls": 34560,
+    "alarmWrites": 34560,
+    "chatHourWrites": 23,
+    "unchangedFlowerActions": 10,
+    "gardenWritesForFlowers": 10,
+    "sharedActorsWritesForFlowers": 10
+  }
+}

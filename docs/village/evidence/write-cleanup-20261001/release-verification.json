@@ -1,0 +1,24 @@
+{
+  "baseCommit": "56bfe595fdf37f580d3312a95bd43e27cfcfed6f",
+  "date": "2026-10-01",
+  "sourcePublicationAuthorized": true,
+  "workerDeploymentAuthorized": true,
+  "workerDeploymentStatus": "blocked: Wrangler not authenticated",
+  "checksRerun": {
+    "javascriptRunnersPassed": 11,
+    "pythonTestsPassed": 7,
+    "typecheck": "passed",
+    "lint": "passed with existing warnings",
+    "workerSyntax": "passed",
+    "diffWhitespace": "passed",
+    "wranglerProductionDryRun": "passed"
+  },
+  "bundle": {
+    "sha256": "557ccf43a0686ceb0e78823b0bbeae9ac40ca2b6a09ee9da81f8a7a01637fff4",
+    "bytes": 734769
+  },
+  "cloudBrowserFixture": "blocked before page load: net::ERR_BLOCKED_BY_CLIENT",
+  "productionGameplayWritesTested": false,
+  "note": "Pages CI deploys the static frontend only. It cannot activate this Worker fix.",
+  "cloudflareDashboard": "blocked at security verification after one reload; authentication not established"
+}

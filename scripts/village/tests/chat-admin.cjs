@@ -25,7 +25,7 @@ const socket = { send: raw => messages.push(JSON.parse(raw)), deserializeAttachm
 const ctx = {
   storage: {
     kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) },
-    setAlarm: () => {},
+    getAlarm: async () => null, setAlarm: async () => {},
   },
   getWebSockets: () => [socket],
 };

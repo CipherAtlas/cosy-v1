@@ -23,7 +23,7 @@ const makeSocket = id => {
 };
 const a = makeSocket('a'), b = makeSocket('b'), c = makeSocket('c');
 const ctx = { getWebSockets: () => sockets, acceptWebSocket: socket => sockets.push(socket),
-  storage: { kv: { get: key => records.get(key), put: (key, value) => records.set(key, JSON.parse(JSON.stringify(value))) }, setAlarm: () => {} } };
+  storage: { kv: { get: key => records.get(key), put: (key, value) => records.set(key, JSON.parse(JSON.stringify(value))) }, getAlarm: async () => null, setAlarm: async () => {} } };
 const mod = { exports: {} };
 const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n/gm, '')
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');

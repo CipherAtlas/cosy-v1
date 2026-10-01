@@ -38,7 +38,7 @@ vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };
 });
 const { VillageWorld, workerDefault } = workerModule.exports;
 const ctx = {
-  storage: { kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) }, setAlarm() {} },
+  storage: { kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) }, getAlarm: async () => null, setAlarm: async () => {} },
   getWebSockets: () => sockets, acceptWebSocket: socket => sockets.push(socket),
 };
 let world = new VillageWorld(ctx);

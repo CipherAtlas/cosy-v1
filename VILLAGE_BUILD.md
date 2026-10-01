@@ -1,5 +1,74 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-01 — write-cleanup Mac verification
+
+The Library handoff patch was checksum-verified and reconciled against clean current `main` `03aab76ac4d12a385a721420d6f08c838dd552a0`, preserving the published map/note release. Worker source matches the reviewed SHA-256 `b58c59248ed5c3873539fc1f64f1856ac7d7fcaad7fe2b00cd590c85a45c772b`. The original Mac checkout, running console, production visitors and existing archive were preserved; work and generated output use an isolated checkout.
+
+All ten deterministic JavaScript runners, seven Python admin/archive tests, 14 actual SQLite/workerd/WebSocket checks, 22-page export, sequential typecheck, lint, syntax and whitespace checks pass on this checkout. Wrangler 4.145.0's Worker dry-run passes with the existing binding, 717.59 KiB / 134.40 KiB gzip. Existing lint/tool warnings remain. The local optional tools use Miniflare `5.20260930.0-alpha`, esbuild `0.28.1`, and installed Chrome through Playwright; no app dependencies, lockfile or deployment configuration changed.
+
+[26 rendered three-client Chrome checks](docs/village/evidence/write-cleanup-20261001/browser/checks.json) pass against the actual exported app and a synthetic local Worker: ownership rejection, held/trick/follower rendering, occupied seats, feeding, disconnect/reconnect, independent private cottages and 1280×720 / 1024×640 windows. The test's former Places selector was updated to the already-published map. No application UI was changed. The cloud browser limitations below are historical; the Mac closes the rendered-browser verification gap.
+
+[20 additional actual console/browser checks](docs/village/evidence/write-cleanup-20261001/console-browser/checks.json) pass: real chat composer and console display, two players, five-second page polling, unchanged alarm/chat writes, continuing sharedActors writes, archive deduplication/search, background capture with the page closed, retained-socket hibernation with ownership, full-runtime browser reconnect and chat recovery, real alarm rollover, stale-hour refusal and private archive permissions. Neither browser suite captured page errors. The seven-day expiry is covered with controlled-time Python tests; no seven-day wall-clock wait was performed. [Mac verification](docs/village/evidence/write-cleanup-20261001/mac-verification.json). Authenticated publication evidence follows when completed; the production Worker is still unchanged at this checkpoint. Both admin pollers and every authoritative snapshot remain intact; no periodic simulation checkpoint was introduced.
+
+To reproduce rendered checks, build as in the original entry below, then use three terminals with existing external test tools:
+
+```bash
+SERVE_LOCAL_FIXTURE=1 TEST_TOOLS_ROOT=/path/to/test-tools node scripts/village/tests/write-cleanup-runtime.cjs
+PLAYWRIGHT_PATH=/path/to/playwright EXPORT_DIR="$PWD/out" node scripts/village/tests/shared-world-browser.cjs
+PLAYWRIGHT_PATH=/path/to/playwright EXPORT_DIR="$PWD/out" node scripts/village/tests/write-cleanup-browser.cjs
+```
+
+The fixture binds only `127.0.0.1:2567` and its control interface `127.0.0.1:2568`; stop/restart it between browser runners for a fresh world. The console runner creates its own loopback server on `3053` and disposable private archive, leaving the normal `3052` console untouched. Synthetic controls exist only in a test bundle. Neither test tooling nor the admin/editor/save routes are exported.
+
+## 2026-10-01 — exact redundant-write cleanup (local, unpublished)
+
+Prepared against `56bfe595fdf37f580d3312a95bd43e27cfcfed6f`. The Worker now reads the actual persisted alarm and schedules the next UTC hour only when the deadline differs. Every caller awaits alarm work, including the alarm handler, so scheduling errors propagate for retry. The current hour is calculated after the alarm read. Missing, consumed, overdue and incorrectly scheduled alarms are repaired; a memory-only alarm flag is not used.
+
+Only JSON-shaped garden/chat values use exact serialized-value suppression. The comparison baseline is an immutable string of the raw persisted value, before constructor normalization or garden growth, and advances only after the synchronous KV write succeeds. New chat entries, message-ID migration, removals, hour changes, inventory/crop transitions and normalized/grown garden values still persist. Repeated empty clears preserve both `hour` and `chat_sync` broadcasts. Unchanged garden actions preserve crumb attachments, accepted events, actor interactions and world publication.
+
+`sharedActors` snapshots still write on every existing publish/disconnect boundary. Simulation cadence, ownership arbitration, seats, feeding clocks, kicks, moderation, browser UI and both five-second local-admin polling loops are unchanged. This deliberately does not implement five-second simulation checkpoints or change restart recovery. The dominant active-world snapshot cost remains; this patch does not establish that an always-active village fits the free quota.
+
+### Local verification
+
+- All 11 JavaScript runners listed below passed. The new deterministic suite has 35 named checks and the new actual-runtime suite has 14. Existing runners include 66 Worker ownership scenarios, 27 device-gate fixtures, 18 bird-circuit checks and 81 activity-seating checks; five other contract/admin/chat/kick runners do not print assertion totals.
+- Seven Python admin/archive tests passed, including background capture, seven-day retention, deduplication, private archive permissions, local Origin/session guards, clear/remove preservation and kick handling.
+- Full source typecheck, lint, 22-page root-path static export, Worker/test syntax and diff whitespace checks passed. Existing RoomScene `<img>`, Next lint deprecation, stale Browserslist and Three.js CommonJS warnings remain.
+- The same instrumented 24-hour, two-poller model ran against original and patched Worker code: 34,560 admin GETs scheduled 34,560 alarms before and 24 after. It recorded 23 chat-hour changes after the seeded initial hour, no garden/world writes, and preserved hourly empty state. Ten unchanged flower actions made ten garden writes before and zero after, and both versions still made ten `sharedActors` writes with ten garden events. These count Worker API calls, not account billing or a production traffic measurement.
+- Actual Miniflare `5.20260930.0-alpha` / workerd `1.20260930.2` SQLite storage and real WebSockets verified concurrent polls (one schedule), missing-alarm repair (one schedule), chat broadcast, seeded rollover concurrent with chat and stale clear, retained-socket hibernation, full-runtime restart preserving chat/alarm, stable-ID removal and 20 concurrent empty clears without extra writes. A real scheduled local alarm fired with no visitors, cleared seeded previous-hour chat and scheduled the next UTC hour.
+
+All test data and tokens were synthetic. No live admin endpoint, production visitor, user's local console/archive, Git push, PR or deployment was touched. [Machine-readable local results](docs/village/evidence/write-cleanup-20261001/results.json).
+
+### Reproduce
+
+Use the existing lockfile with `npm ci`, then run:
+
+```bash
+for file in shared-world-worker shared-actions-worker player-kick chat-admin chat-hour chat-cooldown device-gate bird-circuits activity-seating write-cleanup; do
+  node scripts/village/tests/$file.cjs || exit
+done
+python3 -m unittest discover -s tools/village-admin -p 'test_*.py' -v
+npm run typecheck
+npm run lint
+NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_SHARED_WORLD_URL=ws://127.0.0.1:2567 npm run build
+node --check worker/index.js
+git diff --check
+```
+
+The runtime test's optional development tools are installed outside the app, with no package/lockfile changes:
+
+```bash
+npm install --prefix /tmp/cosy-write-test-tools --no-audit --no-fund esbuild@0.28.2 miniflare@5.20260930.0-alpha
+TEST_TOOLS_ROOT=/tmp/cosy-write-test-tools node scripts/village/tests/write-cleanup-runtime.cjs
+```
+
+The test bundles an instrumented copy in memory and uses a fresh temporary SQLite directory removed on completion. Its synthetic helpers are absent from the production Worker and static export.
+
+### Remaining limits
+
+The existing three-client Chromium/WebGL suite was attempted but blocked before browser/page launch because the cloud sandbox denies Chromium's required Unix socket; an authorized elevated retry hit the same restriction. Its 26 visual checks were not run and are not claimed as passing. Protocol fixtures and actual workerd WebSocket tests are distinct from a rendered-browser check. Wrangler's CLI also failed on network-interface enumeration; Miniflare's direct API successfully ran the local runtime checks.
+
+Hourly rollover tests use a controlled clock or seeded previous-hour state; a real wall-clock UTC-hour boundary in production was not observed. Failed writes/read/schedule retries are injected in deterministic fixtures; actual disk/replication failure and Cloudflare's remote output gates were not fault-injected. Local runtime hibernation/restart passed, but deployment and production-host behavior remain unverified. There is no measured live billing or visual/hardware/performance acceptance for this patch.
+
 ## 2026-10-01 — map and kind-note release published
 
 All pending minimap, keyboard/capture, kind-note reading pose, local editor and documentation changes are committed and pushed in source `136c2f36ea685eb54d251015727032223793ca3f`. [Pages run 36837408922](https://github.com/CipherAtlas/cosy-v1/actions/runs/36837408922) completed build and deployment successfully; [the live village](https://cosy.sabarg.com/) serves the release. The Worker is unchanged and its health passed. [Publication record](docs/village/evidence/map-note-release-20261001/publication.json).
