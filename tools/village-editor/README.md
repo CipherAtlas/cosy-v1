@@ -34,6 +34,8 @@ Writes are atomic. Previous file contents are retained under `layouts/.history/`
 
 ## Editing
 
+**Kind note and envelope** is under Furnishings with a rendered open-note preview. Place it in a working copy, then move, rotate on all axes or scale it; named save/reload preserves the transform. The game's reading pose follows its reader and remains code-authored, so Apply does not add or move this prop. [Local checks and limits](../../VILLAGE_BUILD.md#2026-10-01--kind-note-reading-pose-local).
+
 The shelf includes **Cream & caramel cottage cat** under Animals, **Sage linen couch**, **Pleated reading lamp**, **Framed botanical print** and **Cat’s woven nap cushion** under Furnishings, and **Fern in ceramic pot** under Nature. Each has a rendered preview and supports selection, position, rotation, scale, named save and reload. Cat behavior runs only in the private focus cottage; the editor displays a still model. These assets can be kept in editor working copies, but Apply cannot move/add the private code-authored room assembly. Protected layouts are unchanged.
 
 The cottage window-wall refresh adds **Cushioned oak writing chair**, **Clothbound cottage books**, **Hand-thrown glazed pottery**, **Oak cottage book shelf** and **Oak cottage pottery shelf** under Furnishings. Both shelves include their displayed contents; books and pottery are also available separately. **Bridge-view cottage window** stays under Buildings with its existing asset ID, a larger pane and no curtains. Its existing saved transforms remain compatible. [Local verification](../../VILLAGE_BUILD.md#2026-09-30--focus-cottage-window-wall-and-comfy-chair-local) uses temporary layout storage and preserves the playable layout and protected presets.

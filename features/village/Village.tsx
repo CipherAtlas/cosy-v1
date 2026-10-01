@@ -11,8 +11,8 @@ import {
   CaretDown,
   GearSix,
   Leaf,
+  Bird,
   MapTrifold,
-  Timer, Fire, Drop, Coffee, BookOpen, EnvelopeSimple, Bird,
   SpeakerHigh,
   SpeakerSlash,
   X,
@@ -30,6 +30,7 @@ import {
   localTimeWeather,
 } from "./places";
 import { Activities, MixSliders, SoundtrackChoices } from "./Activities";
+import { VillageMap, VillageMinimap } from "./VillageMap";
 import { RadioDock, SoundPanel } from "./RadioControls";
 import { isRadioStationId, isRadioTrack, RADIO_PAGE_SIZE, RADIO_STATIONS, searchRadio, type RadioStationId } from "./radioCatalog";
 import type { RadioTrack } from "./soundtrack";
@@ -88,6 +89,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
     audio = useRef<VillageAudio | null>(null);
+  const readMapPose = useCallback(() => engine.current?.getPlayerPose() ?? null, []);
   useEffect(() => {
     const root = canvas.current?.parentElement;
     if (root) return installButtonFeedback(root);
@@ -175,8 +177,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [followingPuppies, setFollowingPuppies] = useState<NearbyPuppy[]>([]);
   const [tricksPuppyId, setTricksPuppyId] = useState<string | null>(null);
   const [occupiedSwings, setOccupiedSwings] = useState<SwingSeat[]>([]);
-  const puppyTricksToggle = useRef<HTMLButtonElement>(null);
   const activityRequestRef = useRef(0);
+  const escapeInteraction = useRef(() => {});
   const pendingActivityRef = useRef<number | null>(null);
   const [performanceReport, setPerformanceReport] = useState("");
   const [sceneryLoading, setSceneryLoading] = useState<Weather | null>(null);
@@ -214,6 +216,12 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       ?? canvas.current?.parentElement?.querySelector<HTMLButtonElement>(".v-wordmark");
     target?.focus();
   }, []);
+  escapeInteraction.current = () => {
+    if (panel || sceneryLoading) return;
+    setTricksPuppyId(null);
+    if (place || pendingActivityRef.current !== null) leave();
+    else canvas.current?.querySelector("canvas")?.focus();
+  };
   const toggleCompanion = useCallback((id: string) => {
     if (!VILLAGERS.some(v => v.id === id)) return;
     if (sharedTrialModeRef.current) {
@@ -503,6 +511,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
               ? preferences.current.language === "ja" ? "近くに安全な場所がないため、村の入り口に戻りました。" : "No clear ground nearby, so you returned to the village entrance."
               : preferences.current.language === "ja" ? "安全な場所が見つかりませんでした。" : "Could not find safe ground."),
           mouseLook: setMouseLook,
+          escape: () => escapeInteraction.current(),
           companion: toggleCompanion,
           crumbs: id => onGardenAction({ kind: id === "wren" ? "birdCrumbs" : "crumbs" }),
           birds: setBirdStatus,
@@ -693,31 +702,66 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   }, [chatCooldownUntil]);
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.repeat || e.isComposing) return;
+      if (e.key === "Escape" && entered && !panel && !sceneryLoading) {
+        e.preventDefault();
+        escapeInteraction.current();
+        return;
+      }
+      if (e.key === "Tab" && entered && !panel && !sceneryLoading) {
+        const root = canvas.current?.parentElement;
+        if (!root) return;
+        const controls = [...root.querySelectorAll<HTMLElement>("button, input:not([type='hidden']), textarea, select, summary, a[href]")]
+          .filter(control => !control.matches(":disabled, [tabindex='-1']") && control.getClientRects().length > 0 && getComputedStyle(control).visibility !== "hidden");
+        if (!controls.length) return;
+        const index = controls.indexOf(document.activeElement as HTMLElement);
+        const first = place ? controls.findIndex(control => !!control.closest("#v-activity-panel")) : -1;
+        const next = index < 0 ? e.shiftKey ? controls.length - 1 : Math.max(0, first)
+          : (index + (e.shiftKey ? -1 : 1) + controls.length) % controls.length;
+        e.preventDefault();
+        controls[next].focus();
+        return;
+      }
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
         e.target instanceof HTMLSelectElement ||
-        (e.target instanceof HTMLButtonElement && !e.target.closest(".v-puppy-actions, .v-puppy-home, .v-swing-controls")) ||
         (e.target instanceof HTMLElement && e.target.isContentEditable)
       )
         return;
+      if (e.metaKey || e.ctrlKey || e.altKey || !entered || panel || sceneryLoading) return;
+      if (e.target instanceof Element && e.target.closest("button, summary, a[href]") && (e.key === "Enter" || e.key === " ")) return;
       if (e.key === "Enter" && !(e.target instanceof HTMLButtonElement) && sharedTrialEnabled && entered && !panel && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
         setChatOpen(true);
         setChatUnread(false);
-        if (document.pointerLockElement) document.exitPointerLock();
+        engine.current?.releaseMouseLook();
         requestAnimationFrame(() => chatInput.current?.focus());
         return;
       }
-      if (e.key === "Escape" && place && !panel) {
-        leave();
+      const key = e.key.toLowerCase();
+      if (key === "m" || key === "o" || e.key === ",") {
+        e.preventDefault();
+        setPanel(key === "m" ? "places" : key === "o" ? "sound" : "settings");
+        return;
       }
-      if (e.key.toLowerCase() === "m" && !place && entered)
-        setPanel((p) => (p === "places" ? null : "places"));
+      if (place && key === "u") {
+        e.preventDefault();
+        setActivityCompact(value => !value);
+        canvas.current?.querySelector("canvas")?.focus();
+        return;
+      }
+      if (place && !(e.target instanceof HTMLButtonElement && (e.key === " " || e.key === "Enter"))) {
+        const shortcut = e.key === " " ? "space" : key;
+        const button = [...(canvas.current?.parentElement?.querySelectorAll<HTMLButtonElement>("#v-activity-panel button[aria-keyshortcuts]") ?? [])]
+          .find(control => !control.disabled && control.getClientRects().length > 0
+            && control.getAttribute("aria-keyshortcuts")?.toLowerCase().split(/\s+/).includes(shortcut));
+        if (button) { e.preventDefault(); button.click(); }
+      }
     };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, [place, entered, panel, leave, sharedTrialEnabled]);
+  }, [place, entered, panel, sharedTrialEnabled, sceneryLoading]);
   async function enableSound() {
     if (soundBusy.current || sound) return;
     try {
@@ -844,14 +888,11 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       if (event.defaultPrevented || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
         event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement ||
         event.target instanceof HTMLSelectElement ||
-        (event.target instanceof HTMLElement && event.target.isContentEditable) ||
-        (event.target instanceof HTMLButtonElement && !event.target.closest(".v-puppy-actions, .v-puppy-home"))) return;
-      if (event.key.toLowerCase() === "t" || (event.key === "Escape" && puppyTricksOpen)) {
+        (event.target instanceof HTMLElement && event.target.isContentEditable)) return;
+      if (event.key.toLowerCase() === "t") {
         event.preventDefault();
         setTricksPuppyId(puppyTricksOpen ? null : nearPuppy.id);
-        if (document.pointerLockElement) document.exitPointerLock();
-        if (puppyTricksOpen) canvas.current?.querySelector("canvas")?.focus();
-        else puppyTricksToggle.current?.focus();
+        canvas.current?.querySelector("canvas")?.focus();
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -897,34 +938,23 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           {!current && <Leaf size={24} weight="light" />}
         </button>
         <nav aria-label={t("Village controls", "村の操作")}>
-          {place && (
-            <button className="v-leave" onClick={leave}>
-              <ArrowLeft size={18} />
-              {t("Back to village", "村に戻る")}
-            </button>
-          )}
-          <button
+          {ready ? <VillageMinimap scenery={engine.current?.mapScenery} current={place} language={language}
+            readPose={readMapPose} expand={() => setPanel("places")} /> : <button
             disabled={!ready}
-            aria-label={t("Places", "場所")}
+            aria-label={t("Village map", "村の地図")}
+            aria-keyshortcuts="M"
             onClick={() => setPanel("places")}
           >
-            <MapTrifold size={19} />
-            <span>{t("Places", "場所")}</span>
-          </button>
-          <button
-            disabled={!ready}
-            aria-label={t("Sound", "音")}
-            onClick={openRadio}
-          >
-            {sound ? <SpeakerHigh size={20} /> : <SpeakerSlash size={20} />}
-            <span>{t("Sound", "音")}</span>
-          </button>
+            <kbd aria-hidden="true">M</kbd><MapTrifold size={19} />
+            <span>{t("Map", "地図")}</span>
+          </button>}
           <button
             disabled={!ready}
             aria-label={t("Settings", "設定")}
+            aria-keyshortcuts=","
             onClick={() => setPanel("settings")}
           >
-            <GearSix size={20} />
+            <kbd aria-hidden="true">,</kbd><GearSix size={20} />
           </button>
         </nav>
       </header>
@@ -976,7 +1006,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             <span><kbd>Shift</kbd>{t("Hold to run", "押して走る")}</span>
             <span><kbd>E</kbd>{t("Interact", "調べる")}</span>
             <span><kbd>R</kbd>{t("Recover", "安全な場所へ")}</span>
-            <span>{mouseLook === "locked" ? t("Mouse to look · Esc to release", "マウスで見回す · Escで解除")
+            <span><kbd>Tab</kbd>{t("Choose controls", "操作を選ぶ")}</span>
+            <span>{mouseLook === "locked" ? t("Mouse to look · Esc to leave / release", "マウスで見回す · Escで終了 / 解除")
               : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
                 : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
           </footer>
@@ -1030,6 +1061,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       {entered && place && (
         <div id="v-activity-panel" hidden={activityCompact}>
         {notice && <div className="v-notice" role="status">{notice}</div>}
+        <div className="v-activity-content">
         <Activities
           key={place}
           onMoment={onMoment}
@@ -1047,12 +1079,20 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           language={language}
           gardenControls={{ garden, onGardenAction, birdStatus, language, travel: openPlace }}
         />
+        <button className="v-context-close v-activity-close" aria-label={t("Leave activity", "アクティビティを閉じる")} aria-keyshortcuts="Escape" onClick={leave}><X size={19} aria-hidden="true" /></button>
+        </div>
         </div>
       )}
       {entered && place && (
-        <button className="v-scene-toggle" aria-controls="v-activity-panel" aria-expanded={!activityCompact} onClick={()=>setActivityCompact(value=>!value)}>
+        <div className="v-activity-controls" role="group" aria-label={t("Activity controls", "アクティビティの操作")}>
+        <button className="v-interact v-leave" aria-keyshortcuts="Escape" onClick={leave}>
+          <kbd aria-hidden="true">Esc</kbd>{t("Back to village", "村に戻る")}
+        </button>
+        <button className="v-interact v-scene-toggle" aria-keyshortcuts="U" aria-controls="v-activity-panel" aria-expanded={!activityCompact} onClick={()=>setActivityCompact(value=>!value)}>
+          <kbd aria-hidden="true">U</kbd>
           {activityCompact ? t("Show activity", "操作を表示") : t("Enjoy the view", "景色を楽しむ")}<CaretDown size={16} style={{transform:activityCompact?"rotate(180deg)":undefined}} />
         </button>
+        </div>
       )}
       {entered && focus.running && place !== "focus" && (
         <button className="v-session-mini" onClick={() => openPlace("focus")}>
@@ -1081,6 +1121,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         {notice && !showPuppyActions && <div className="v-notice" role="status">{notice}</div>}
         {showSwingActions && <section className="v-swing-controls" aria-label={t("Swing controls", "ブランコの操作")}>
           <h2>{t("Meadow swings", "草原のブランコ")}</h2>
+          {ridingSwing && <button className="v-context-close" aria-label={t("Get off the swing", "ブランコを降りる")} aria-keyshortcuts="Escape" onClick={() => { engine.current?.leaveSwing(); canvas.current?.querySelector("canvas")?.focus(); }}><X size={18} aria-hidden="true" /></button>}
           {ridingSwing ? <>
             <p>{t("Alternate with the arc to swing higher.", "揺れに合わせて前へ・後ろへ。もっと高く！")}</p>
             <div className="v-swing-pump">
@@ -1106,7 +1147,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
                 <kbd aria-hidden="true">␣</kbd>{t("Brake", "ブレーキ")}
               </button>
               <button className="v-interact" aria-keyshortcuts="E Escape" onClick={() => { engine.current?.leaveSwing(); canvas.current?.querySelector("canvas")?.focus(); }}>
-                <kbd aria-hidden="true">E</kbd>{t("Get off", "降りる")}
+                <kbd aria-hidden="true">Esc</kbd>{t("Get off", "降りる")}
               </button>
             </div>
           </> : nearSwing && <div className="v-swing-pump">
@@ -1117,9 +1158,12 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             </button>)}
           </div>}
         </section>}
-        {showWorldInteraction && seatedBench && <button className="v-interact" onClick={() => engine.current?.stand()}><kbd>E</kbd>{t("Stand up", "立ち上がる")}</button>}
-        {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" onClick={() => engine.current?.sit(nearBench)}><kbd>E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
-        {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" onClick={() => interactGarden(nearGarden)}><kbd>E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
+        {showWorldInteraction && seatedBench && <div className="v-bench-actions">
+          <button className="v-interact" aria-keyshortcuts="E Escape" onClick={() => { engine.current?.stand(); canvas.current?.querySelector("canvas")?.focus(); }}><kbd aria-hidden="true">Esc</kbd>{t("Stand up", "立ち上がる")}</button>
+          <button className="v-context-close" aria-label={t("Leave bench", "ベンチを離れる")} onClick={() => { engine.current?.stand(); canvas.current?.querySelector("canvas")?.focus(); }}><X size={18} aria-hidden="true" /></button>
+        </div>}
+        {showWorldInteraction && !seatedBench && nearBench && <button className="v-interact" aria-keyshortcuts="E" onClick={() => { engine.current?.sit(nearBench); canvas.current?.querySelector("canvas")?.focus(); }}><kbd aria-hidden="true">E</kbd>{t("Sit on the bench", "ベンチに座る")}</button>}
+        {showWorldInteraction && !seatedBench && !nearBench && nearGarden && nearbyAction && <button className="v-interact" aria-keyshortcuts="E" onClick={() => interactGarden(nearGarden)}><kbd aria-hidden="true">E</kbd>{nearbyLabel}<Leaf size={17} /></button>}
         {showWorldInteraction && nearBirds && !nearbyAction && <button className="v-interact v-bird-feed-button" disabled={birdMealBusy}
           aria-keyshortcuts={seatedBench === "bird-clearing-bench" ? "F" : !nearBench && !seatedBench ? "E" : undefined}
           onClick={() => seatedBench === "bird-clearing-bench" ? scatterBenchCrumbs() : onGardenAction({ kind: "feedBirds" })}
@@ -1159,6 +1203,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             <PawPrint size={22} aria-hidden="true" />
             <div><h2>{t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name)}</h2>
               <p>{t(puppyBusy ? "Spending time with another visitor" : puppyIsFollowing ? "Walking with you" : PUPPY_INFO[nearPuppy.breed].breed, puppyBusy ? "ほかの人とふれあい中" : puppyIsFollowing ? "一緒にお散歩中" : "小さなお友だち")}</p></div>
+            {puppyTricksOpen && <button className="v-context-close" aria-label={t("Close dog tricks", "犬の芸を閉じる")} aria-keyshortcuts="Escape" onClick={() => { setTricksPuppyId(null); canvas.current?.querySelector("canvas")?.focus(); }}><X size={18} aria-hidden="true" /></button>}
           </div>
           <div className="v-puppy-main-actions">
             <button disabled={puppyBusy} className="v-interact" aria-keyshortcuts="E" aria-label={t(`Pet ${nearPuppy.name}`, `${nearPuppy.name}をなでる`)}
@@ -1169,7 +1214,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
               onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}>
               <kbd aria-hidden="true">P</kbd>{t(puppyIsFollowing ? "Home" : "Walk", puppyIsFollowing ? "おうちへ" : "お散歩")}
             </button>
-            <button disabled={puppyBusy} ref={puppyTricksToggle} className="v-interact v-puppy-tricks-toggle" aria-keyshortcuts={puppyTricksOpen ? "T Escape" : "T"} aria-expanded={puppyTricksOpen} aria-controls="v-puppy-tricks"
+            <button disabled={puppyBusy} className="v-interact v-puppy-tricks-toggle" aria-keyshortcuts={puppyTricksOpen ? "T Escape" : "T"} aria-expanded={puppyTricksOpen} aria-controls="v-puppy-tricks"
               onClick={() => setTricksPuppyId(puppyTricksOpen ? null : nearPuppy.id)}>
               <kbd aria-hidden="true">T</kbd>{t("Tricks", "芸")}
               <CaretDown size={12} aria-hidden="true" />
@@ -1187,7 +1232,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           </button>}
           {notice && <div className="v-puppy-response" role="status">{notice}</div>}
         </section>}
-        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <button className="v-interact" onClick={() => openPlace(nearPlace.id)}>
+        {showWorldInteraction && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <button className="v-interact" aria-keyshortcuts="E" onClick={() => openPlace(nearPlace.id)}>
           <kbd>E</kbd>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </button>}
       </div>}
@@ -1218,7 +1263,14 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             if (sharedTrialRef.current?.sendChat(message)) setChatDraft("");
             else setNotice(t("Chat isn't ready yet. Your message is still here.", "チャットの準備ができていません。メッセージは入力欄に残っています。"));
           }}>
-            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => { event.stopPropagation(); if (event.key === "Enter" && Date.now() < chatCooldownUntil) event.preventDefault(); }} maxLength={180} placeholder='Press "Enter" to type!' disabled={sharedStatus !== "Connected"} />
+            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => {
+              event.stopPropagation();
+              if (event.key === "Escape") {
+                event.preventDefault();
+                setChatOpen(false);
+                canvas.current?.querySelector("canvas")?.focus();
+              } else if (event.key === "Enter" && Date.now() < chatCooldownUntil) event.preventDefault();
+            }} maxLength={180} placeholder='Press "Enter" to type!' disabled={sharedStatus !== "Connected"} />
             <button type="submit" aria-label={chatCooldownSeconds > 0 ? `Send in ${chatCooldownSeconds} seconds` : "Send message"} disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
               <ArrowUp size={20} weight="bold" aria-hidden="true" />
               {chatCooldownSeconds > 0 && <span className="v-shared-send-count" aria-hidden="true">{chatCooldownSeconds}</span>}
@@ -1242,7 +1294,13 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         <Dialog.Portal>
           <Dialog.Overlay className={`v-dialog-overlay${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${panel === "places" ? " v-map-dialog" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
+            onOpenAutoFocus={event => {
+              if (panel === "places") {
+                event.preventDefault();
+                requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(".v-map-marker.is-selected")?.focus());
+              }
+            }}
             onCloseAutoFocus={(e) => {
               e.preventDefault();
               canvas.current?.querySelector("canvas")?.focus();
@@ -1250,7 +1308,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           >
             <Dialog.Title>
               {panel === "places"
-                ? t("Where would you like to go?", "どこへ行きましょうか？")
+                ? t("Hearthwillow", "ハースウィロー")
                 : panel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? t("Sound", "音") : t("A little atmosphere.", "心地よい音を。")
                   : panel === "basket"
@@ -1261,7 +1319,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             </Dialog.Title>
             <Dialog.Description className="sr-only">
               {panel === "places"
-                ? "Travel directly to a village activity."
+                ? t("Village map. Use WASD or arrow keys to choose a destination, Enter to travel and Escape to close. You can also click a place on the map.", "村の地図。WASDか矢印キーで選び、Enterで移動、Escapeで閉じます。地図の場所をクリックしても移動できます。")
                 : panel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
                   : panel === "basket"
@@ -1279,16 +1337,19 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             {panel === "basket" && <HarvestInventory garden={garden} language={language} />}
             {panel === "controls" && (
               <div className="v-control-guide">
-                <p>{t("Wander at your own pace, or use Places to settle straight into an activity.", "自分のペースでお散歩。場所メニューから、好きな場所へすぐに移動できます。")}</p>
+                <p>{t("Wander at your own pace, or use the village map to settle into an activity.", "自分のペースでお散歩。村の地図から、好きな場所へすぐに移動できます。")}</p>
                 <dl>
                   {[
                     ["W A S D / ↑ ↓ ← →", t("Glide", "浮かんで移動")],
                     [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
-                    ["Esc", t("Release the mouse / close", "マウスを解除 / 閉じる")],
+                    ["Esc", t("Leave an activity, stand up, get off, or close tricks / a menu", "アクティビティ終了・立ち上がる・降りる・芸やメニューを閉じる")],
+                    ["Tab / Shift Tab", t("Choose any control; Enter / Space activates it", "操作を選ぶ（Enter / Spaceで実行）")],
+                    ["U", t("Show activity controls / enjoy the view", "操作を表示 / 景色を楽しむ")],
+                    ["Space / R", t("In focus or breathing: begin / pause and reset", "集中や呼吸では開始 / 一時停止・リセット")],
                     [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
                     [t("Click or tap a bench side", "ベンチの左右をクリック・タップ"), t("Sit on that side", "選んだ側に座る")],
                     ["F", t("Scatter crumbs from the birdwatching bench", "野鳥観察のベンチでパンくずを撒く")],
-                    [t("Drag while settled", "ひと休み中にドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
+                    [t("Mouse / drag while settled", "ひと休み中にマウス / ドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
                     ["G", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
                     ["R", t("Move to nearby safe ground if stuck", "動けなくなったら近くの安全な場所へ")],
@@ -1305,32 +1366,17 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
                     ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
-                    ["M", t("Places", "場所")],
+                    ["M", t("Village map (WASD / arrows to choose; Enter to go)", "村の地図（WASD / 矢印で選ぶ・Enterで移動）")],
+                    ["O / ,", t("Sound / settings", "音 / 設定")],
                   ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
                 </dl>
               </div>
             )}
-            {panel === "places" && (
-              <div className="v-place-list">
-                {PLACES.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      if (!entered) void enableSound();
-                      setEntered(true);
-                      openPlace(p.id);
-                    }}
-                  >
-                    <span className="v-place-icon" aria-hidden="true">{[<Timer key="focus" size={23}/>,<Fire key="music" size={23}/>,<Drop key="breathe" size={23}/>,<Coffee key="mood" size={23}/>,<BookOpen key="gratitude" size={23}/>,<EnvelopeSimple key="compliment" size={23}/>,<Leaf key="garden" size={23}/>,<Bird key="birds" size={23}/>][PLACES.findIndex(a=>a.id===p.id)]}</span>
-                    <div>
-                      <strong>{placeName(p.id)}</strong>
-                      <span>{ja ? ["集中", "音楽", "深呼吸", "気持ち", "感謝", "やさしい言葉", "野菜、お花とミント"][PLACES.findIndex(a => a.id === p.id)] : p.description}</span>
-                    </div>
-                    <ArrowUpRight size={23} />
-                  </button>
-                ))}
-              </div>
-            )}
+            {panel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} language={language} notice={notice} travel={id => {
+              if (!entered) void enableSound();
+              setEntered(true);
+              openPlace(id);
+            }} />}
             {panel === "sound" && (
               <>
                 <button className="v-button v-primary" disabled={soundLoading} aria-busy={soundLoading} onClick={toggleSound}>
@@ -1355,6 +1401,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             )}
             {panel === "settings" && (
               <div className="v-settings">
+                <button className="v-controls-button" onClick={openRadio}><SpeakerHigh size={18} />{t("Sound & music", "音と音楽")}</button>
                 <button className="v-controls-button" onClick={() => setPanel("controls")}>
                   {t("Gliding & camera controls", "移動とカメラの操作")}
                 </button>

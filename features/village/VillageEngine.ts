@@ -199,8 +199,7 @@ export class VillageEngine {
       this.callbacks.scatterBirds?.(true);
       return;
     }
-    if (e.target instanceof HTMLButtonElement &&
-      (!e.target.closest(".v-puppy-actions, .v-puppy-home, .v-swing-controls") || e.key === " " || e.key === "Enter")) return;
+    if (e.target instanceof HTMLButtonElement && (e.key === " " || e.key === "Enter")) return;
     if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)
     )
@@ -275,7 +274,7 @@ export class VillageEngine {
       startY: e.clientY,
       seat: seat ?? undefined,
     };
-    if (seat || e.pointerType !== "mouse" || this.place) canvas.setPointerCapture(e.pointerId);
+    if (seat || e.pointerType !== "mouse") canvas.setPointerCapture(e.pointerId);
     else this.captureMouse();
   };
   private onMove = (e: PointerEvent) => {
@@ -308,9 +307,16 @@ export class VillageEngine {
     if (seat && Math.hypot(e.clientX - startX, e.clientY - startY) < 8) this.sit(seat.id, seat.index);
   };
   private onMouseMove = (e: MouseEvent) => {
-    if (document.pointerLockElement !== this.renderer.domElement || this.blocked || this.place) return;
-    this.yaw -= e.movementX * .004 * this.mouseSensitivity;
-    this.pitch = T.MathUtils.clamp(this.pitch + e.movementY * .004 * this.mouseSensitivity, -.85, 1.35);
+    if (document.pointerLockElement !== this.renderer.domElement || this.blocked) return;
+    const step = .004 * this.mouseSensitivity;
+    if (this.place) {
+      this.teaPanHeld = true;
+      this.activityOrbit.yaw = T.MathUtils.euclideanModulo(this.activityOrbit.yaw - e.movementX * step + Math.PI, Math.PI * 2) - Math.PI;
+      this.activityOrbit.pitch = T.MathUtils.clamp(this.activityOrbit.pitch + e.movementY * step, -.8, .9);
+    } else {
+      this.yaw -= e.movementX * step;
+      this.pitch = T.MathUtils.clamp(this.pitch + e.movementY * step, -.85, 1.35);
+    }
   };
   private setMouseLook(mode: "free" | "locked" | "drag") {
     if (this.mouseLook === mode) return;
@@ -326,16 +332,23 @@ export class VillageEngine {
       return;
     }
     if (document.pointerLockElement === this.renderer.domElement) {
-      if (!this.wantsMouseLook || this.blocked || this.place || this.disposed || document.hidden) {
+      if (!this.wantsMouseLook || this.blocked || this.disposed || document.hidden) {
         this.releaseMouseLook();
         return;
       }
       this.pointer = undefined;
       this.setMouseLook("locked");
     } else {
+      // Browsers can consume Esc while releasing pointer lock, without a page keydown.
+      const escaped = this.mouseLook === "locked" && this.wantsMouseLook && !this.blocked && !document.hidden;
       this.wantsMouseLook = false;
       this.clearKeys();
       this.setMouseLook("free");
+      if (escaped) {
+        if (this.ridingSwing) this.leaveSwing();
+        if (this.seatedBench) this.stand();
+        this.callbacks.escape?.();
+      }
     }
   };
   private onPointerLockError = () => {
@@ -344,12 +357,12 @@ export class VillageEngine {
       document.removeEventListener("pointerlockchange", this.onPointerLockChange);
       document.removeEventListener("pointerlockerror", this.onPointerLockError);
     }
-    if (this.wantsMouseLook && !this.disposed && !this.blocked && !this.place) this.setMouseLook("drag");
+    if (this.wantsMouseLook && !this.disposed && !this.blocked) this.setMouseLook("drag");
     this.wantsMouseLook = false;
   };
   captureMouse() {
     const canvas = this.renderer.domElement;
-    if (this.blocked || this.place || this.disposed || !this.world || document.hidden
+    if (this.blocked || this.disposed || !this.world || document.hidden
       || this.pointerLockPending || document.pointerLockElement === canvas) return;
     this.wantsMouseLook = true;
     this.pointerLockPending = true;
@@ -359,7 +372,7 @@ export class VillageEngine {
       request?.catch(this.onPointerLockError);
     } catch { this.onPointerLockError(); }
   }
-  private releaseMouseLook() {
+  releaseMouseLook() {
     this.wantsMouseLook = false;
     if (document.pointerLockElement === this.renderer.domElement) document.exitPointerLock();
     this.setMouseLook("free");
@@ -410,6 +423,7 @@ export class VillageEngine {
       puppyPetted?: (puppy: NearbyPuppy) => void;
       puppyCommanded?: (puppy: NearbyPuppy, command: PuppyCommand) => void;
       sharedNotice?: (message: string) => void;
+      escape?: () => void;
       puppySound?: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void;
     },
   ) {
@@ -427,7 +441,7 @@ export class VillageEngine {
     this.renderer.shadowMap.type = T.PCFShadowMap;
     this.renderer.domElement.setAttribute(
       "aria-label",
-      "Walkable Hearthwillow village. Use arrow keys or WASD to move, G to glide faster, hold Shift to run, Space to jump, or R to move to nearby safe ground if stuck. Click to capture the mouse, move it to look, and press Escape to release. While settled into an activity, drag the scene to look around. On touch screens, drag to look and use the movement buttons. E to pet a nearby puppy, tend plants, sit, enter activities, or share harvest over tea with nearby Luma; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for crumbs when close.",
+      "Walkable Hearthwillow village. Use arrow keys or WASD to move, G to glide faster, hold Shift to run, Space to jump, or R to move to nearby safe ground if stuck. Click to capture the mouse and move it to look, including while seated or in an activity. Escape leaves an activity, stands up, gets off a swing or closes dog tricks, and releases the mouse. Tab and Shift Tab choose controls; Enter or Space activates them. M expands the village map, O opens Sound, comma opens Settings. E to pet a nearby puppy, tend plants, sit, enter activities, or share harvest over tea with nearby Luma; Enter to chat; F to chat with a villager; C to invite a nearby villager; B to ask Maple or Wren for crumbs when close.",
     );
     this.renderer.domElement.tabIndex = 0;
     this.host.appendChild(this.renderer.domElement);
@@ -1282,6 +1296,7 @@ export class VillageEngine {
   }
   setActivityMoment(moment:ActivityMoment) { this.activities?.setMoment(moment); this.life?.setMoment(moment); }
   get currentPlace() { return this.place; }
+  get mapScenery() { return this.world?.mapScenery; }
   setPlace(id: PlaceId | null) {
     if (id && this.ridingSwing) this.leaveSwing(false);
     if (id !== "mood") this.dialogue?.clearTeaSpeech();
@@ -1290,7 +1305,6 @@ export class VillageEngine {
       this.seatedIndex = null;
       this.callbacks.seat?.(null);
     }
-    this.releaseMouseLook();
     this.dialogue?.setEnabled(!id && !this.blocked);
     const previousPlace = this.place;
     this.activityOrbit.yaw = this.activityOrbit.pitch = 0;
@@ -1404,7 +1418,6 @@ export class VillageEngine {
       : this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
     const index = accepted ? selectedSide : preferred.find(value => !occupied.has(value));
     if (index === undefined) { this.callbacks.sharedNotice?.("That bench is occupied. Try another bench."); return; }
-    this.releaseMouseLook();
     this.clearKeys();
     this.seatedBench = bench;
     this.seatedIndex = index;
@@ -1446,7 +1459,7 @@ export class VillageEngine {
     if (this.temp.distanceTo(this.player.position) > 2.9) return false;
     if (!accepted && this.requestShared({ kind: "swing", id, index }, () => this.rideSwing(id, index, true))) return true;
     this.puppies?.cancelPet(); this.puppyTrickId = null;
-    this.releaseMouseLook(); this.clearKeys();
+    this.clearKeys();
     this.swingCamera = { yaw: this.yaw, pitch: this.pitch };
     this.ridingSwing = { id, index }; this.nearSwing = null;
     this.yaw = swing.placement.yaw + 1.1; this.pitch = .45;
@@ -1477,7 +1490,7 @@ export class VillageEngine {
     const exit = exits.find(point => this.movement!.clear(point.x, point.z));
     if (!exit) return false;
     if (releaseShared && this.sharedMode && this.sharedConnected) this.requestShared({ kind: "leave" }, () => {});
-    this.ridingSwing = null; this.releaseMouseLook(); this.clearKeys();
+    this.ridingSwing = null; this.clearKeys();
     this.player.rotation.set(0, swing.placement.yaw, 0);
     this.yaw = this.swingCamera.yaw; this.pitch = this.swingCamera.pitch;
     this.movement.settle(exit.x, exit.z);

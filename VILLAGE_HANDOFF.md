@@ -1,5 +1,17 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — map and note release authorized
+
+All pending map/keyboard and note/editor changes are approved for commit, push and deployment. Fresh production export, sequential typecheck, 27 device-gate checks, 84 actual three-client local Chrome checks and private-tooling exclusion passed. The Worker is unchanged. [Release preparation](VILLAGE_BUILD.md#2026-10-01--map-and-kind-note-release-preparation) records fresh versus reused evidence. Wait for Pages completion and verify production before claiming publication.
+
+## 2026-10-01 — minimap and keyboard interactions (local)
+
+The corner minimap stays visible beside Settings, follows the spirit with a 60 fps target and expands with M/click. The full illustrated map uses the built-world layout, includes the distant meadow swings and northern spire, and supports WASD/arrows/Enter/Esc. Activities, benches, swings and dog tricks retain capture; Tab reaches controls, real shortcut keycaps activate actions and one Esc exits/releases. Contextual X buttons support pointer use. Sound is in Settings and O. Full typecheck, the 22-page static export and 84 actual three-client Chrome checks passed, including four desktop sizes, shared seat contention/disconnect/reconnect and private timers. No captured page errors. Local preview: `http://127.0.0.1:3051/`. [Behavior and verification](VILLAGE_BUILD.md#2026-10-01--minimap-and-keyboard-interactions-local). This task has not committed, pushed or deployed these changes. Preserve concurrent kind-note artwork/docs and other pending release work.
+
+## 2026-10-01 — kind-note reading pose (local)
+
+The Little postbox note is held below the spirit's face in a cream envelope with a rose seal. Opening eases gently, Another note moves only the sheet, and Keep gives a small tuck; reduced motion stays still and leaving restores the original fins. The matching **Kind note and envelope** editor asset supports saved working-copy transforms. The activity position/claims, camera, note content/storage and layouts are preserved. Full typecheck, static export, 81 staging checks and 24 exported-app/editor Chrome checks passed. [Preview and limits](VILLAGE_BUILD.md#2026-10-01--kind-note-reading-pose-local). This follow-up is local and requires a separately authorized release.
+
 ## 2026-10-01 — integrated village release published
 
 The complete shared-world, four-dog, bird and private-cottage changes are pushed in source commit `9e76eaf` and published by successful [Pages run 36762483970](https://github.com/CipherAtlas/cosy-v1/actions/runs/36762483970). Matching Worker version `7888d371-63a9-4487-a142-d780a37f0e3c` deployed before the Pages client reached visitors; its preceding version is `8693cad0-6aba-4320-9693-e59756ea6206`. Twenty actual production two-client Chrome checks, twelve HTTP/asset checks and Worker health passed. The layout and cat GLB match committed bytes, and private-tooling paths remain 404. [Release, local checks and remaining limits](VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published) supersede older pending-publication and unresolved full-typecheck/export notes below. Existing visitors must reload. Preserve private focus and Worker-owned outdoor interactions; Safari, physical hardware, screen readers, 64-client runtime load and long sessions remain open.

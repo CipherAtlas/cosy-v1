@@ -1,0 +1,29 @@
+{
+  "checks": [
+    "The visible note stays attached to its reader",
+    "The original small fins hold the envelope without elongation",
+    "1280 × 720: note controls fit",
+    "1280 × 720: envelope stays clear of the controls",
+    "1280 × 720: the reader's face stays above the envelope",
+    "1366 × 768: note controls fit",
+    "1366 × 768: envelope stays clear of the controls",
+    "1366 × 768: the reader's face stays above the envelope",
+    "1024 × 640: note controls fit",
+    "1024 × 640: envelope stays clear of the controls",
+    "1024 × 640: the reader's face stays above the envelope",
+    "Another note changes the displayed phrase",
+    "Another note moves the paper while the envelope stays open",
+    "Keep retains the note",
+    "Keep makes a gentle tuck without ballooning the envelope",
+    "Reduced motion holds the note and fins still",
+    "Reduced motion changes notes without paper movement",
+    "Leaving hides the note and restores the fins",
+    "The kind note has a Furnishings entry and rendered preview",
+    "The note can be placed in the editor",
+    "The note supports position, full rotation and scale",
+    "Named save and reload retain the note transform",
+    "Playable layout and protected presets remain byte-identical",
+    "No browser page errors"
+  ],
+  "errors": []
+}

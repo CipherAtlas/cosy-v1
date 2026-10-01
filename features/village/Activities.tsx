@@ -105,12 +105,14 @@ export function Activities(p: Props) {
           </>
         )}
         {!p.session.running && !p.session.done && <div className="v-preset-row" role="group" aria-label={t("Focus and break length", "集中と休憩の長さ")}>
-          {[[25, 5], [50, 10], [10, 2]].map(([minutes, rest]) => <button key={minutes} className="v-chip" aria-pressed={p.session.minutes === minutes && p.session.breakMinutes === rest} onClick={() => p.session.duration(minutes, rest)}>
+          {[[25, 5], [50, 10], [10, 2]].map(([minutes, rest], i) => <button key={minutes} className="v-chip" aria-keyshortcuts={String(i + 1)} aria-pressed={p.session.minutes === minutes && p.session.breakMinutes === rest} onClick={() => p.session.duration(minutes, rest)}>
+            <kbd aria-hidden="true">{i + 1}</kbd>
             {minutes} {t("min focus", "分集中")} · {rest} {t("rest", "分休憩")}
           </button>)}
         </div>}
         <div className="v-actions">
-          <button className="v-button v-primary" onClick={p.session.toggle}>
+          <button className="v-button v-primary" aria-keyshortcuts="Space" onClick={p.session.toggle}>
+            <kbd aria-hidden="true">␣</kbd>
             {p.session.running ? (
               <Pause size={17} weight="fill" />
             ) : (
@@ -128,12 +130,14 @@ export function Activities(p: Props) {
                   ? t("Begin again", "もう一度始める")
                   : t("Resume", "再開")}
           </button>
-          <button className="v-button" onClick={p.session.reset}>
+          <button className="v-button" aria-keyshortcuts="R" onClick={p.session.reset}>
+            <kbd aria-hidden="true">R</kbd>
             <ArrowCounterClockwise size={17} />
             {t("Reset", "リセット")}
           </button>
           {p.session.done && p.session.mode === "focus" && (
-            <button className="v-button" onClick={p.session.takeBreak}>
+            <button className="v-button" aria-keyshortcuts="B" onClick={p.session.takeBreak}>
+              <kbd aria-hidden="true">B</kbd>
               {t("Take a break", "休憩する")}
             </button>
           )}
@@ -141,10 +145,12 @@ export function Activities(p: Props) {
         {p.session.done && p.session.mode === "break" && (
           <button
             className="v-button"
+            aria-keyshortcuts="B"
             onClick={() =>
               p.session.duration(p.session.minutes, p.session.breakMinutes)
             }
           >
+            <kbd aria-hidden="true">B</kbd>
             {t("Back to focus", "集中に戻る")}
           </button>
         )}
@@ -190,7 +196,8 @@ export function Activities(p: Props) {
             "やさしい音楽と、あたたかな火。",
           )}
         </p>
-        <button className="v-button v-primary" disabled={p.soundLoading} aria-busy={p.soundLoading} onClick={p.radioEnabled ? p.toggleMusic : p.toggleSound}>
+        <button className="v-button v-primary" aria-keyshortcuts="Space" disabled={p.soundLoading} aria-busy={p.soundLoading} onClick={p.radioEnabled ? p.toggleMusic : p.toggleSound}>
+          <kbd aria-hidden="true">␣</kbd>
           {musicPlaying ? <Pause size={18} /> : <Play size={18} weight="fill" />}
           {p.soundLoading ? t("Loading sound…", "音を準備中…") : musicPlaying
             ? t("Pause music", "音楽を止める")
@@ -316,18 +323,22 @@ function Breathing({ language, onMoment, gardenControls }: { language: "en" | "j
       <div className="v-actions">
         <button
           className="v-button v-primary"
+          aria-keyshortcuts="Space"
           onClick={() => setRunning((v) => !v)}
         >
+          <kbd aria-hidden="true">␣</kbd>
           {running ? <Pause size={18} /> : <Play size={18} />}{" "}
           {running ? (ja ? "一時停止" : "Pause") : ja ? "始める" : "Begin"}
         </button>
         <button
           className="v-button"
+          aria-keyshortcuts="R"
           onClick={() => {
             setRunning(false);
             setElapsed(0);
           }}
         >
+          <kbd aria-hidden="true">R</kbd>
           {ja ? "リセット" : "Reset"}
         </button>
       </div>
@@ -336,6 +347,7 @@ function Breathing({ language, onMoment, gardenControls }: { language: "en" | "j
           <button
             className="v-chip"
             key={p.name}
+            aria-keyshortcuts={String(i + 1)}
             aria-pressed={pattern === i}
             onClick={() => {
               setRunning(false);
@@ -343,6 +355,7 @@ function Breathing({ language, onMoment, gardenControls }: { language: "en" | "j
               setPattern(i);
             }}
           >
+            <kbd aria-hidden="true">{i + 1}</kbd>
             {ja ? p.ja : p.name} · {p.times.filter(Boolean).join("–")}
           </button>
         ))}
@@ -449,14 +462,20 @@ function Journal({ language, onMoment }: { language: "en" | "ja"; onMoment: Prop
               <label htmlFor="v-note">
                 {ja ? "今日、ありがとうと思ったことは？" : "What brought a little warmth to your day?"}
               </label>
-              <textarea id="v-note" value={text} maxLength={10000} onChange={(e) => {
+              <textarea id="v-note" value={text} maxLength={10000} onKeyDown={event => {
+                if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !event.altKey && !event.repeat && !event.nativeEvent.isComposing) {
+                  event.preventDefault();
+                  event.currentTarget.form?.querySelector<HTMLButtonElement>(".v-journal-save")?.click();
+                }
+              }} onChange={(e) => {
                 setText(e.target.value);
                 onMoment({kind:"write"});
                 if (!readFailed) setStatus("");
               }} />
             </div>
             <div className="v-journal-actions">
-              <button disabled={!text.trim()} className="v-button v-primary v-journal-save" type="submit">
+              <button disabled={!text.trim()} className="v-button v-primary v-journal-save" aria-keyshortcuts="Control+Enter Meta+Enter" type="submit">
+                <kbd aria-hidden="true">⌘/Ctrl ↵</kbd>
                 {ja ? "残す" : "Keep this thought"}
               </button>
               <button ref={historyButton} className="v-journal-history" type="button" onClick={() => {
@@ -587,18 +606,21 @@ function KindNote({ language, onMoment }: { language: "en" | "ja"; onMoment: Pro
       <div className="v-actions">
         <button
           className="v-button"
+          aria-keyshortcuts="E"
           onClick={() => {
             setIndex((i) => (i + 1) % phrases.length);
             setSaved(false);
             onMoment({kind:"letter"});
           }}
         >
+          <kbd aria-hidden="true">E</kbd>
           {ja ? "もうひとつ" : "Another note"}
           <ArrowRight size={17} />
         </button>
         <button
           className="v-button"
           aria-pressed={saved}
+          aria-keyshortcuts="K"
           onClick={() => {
             try {
               localStorage.setItem("cosy-kept-note", phrases[index]);
@@ -609,6 +631,7 @@ function KindNote({ language, onMoment }: { language: "en" | "ja"; onMoment: Pro
             }
           }}
         >
+          <kbd aria-hidden="true">K</kbd>
           {saved ? <Check size={18} /> : <Heart size={18} />}{" "}
           {saved ? (ja ? "残しました" : "Kept") : ja ? "残す" : "Keep"}
         </button>

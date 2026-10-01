@@ -12,6 +12,7 @@ import { RESIDENT_IDS, type ResidentRoute, type ResidentId } from "../../feature
 import { fenceGeometry } from "../../features/village/fenceGeometry";
 import { PUPPY_INFO } from "../../features/village/puppies";
 import { VillageSwingSet } from "../../features/village/swings";
+import { makeKindNote } from "../../features/village/activityScene";
 
 export type LayoutItem = {
   id: string; asset: string; name: string; position: [number, number, number];
@@ -205,6 +206,7 @@ export class LayoutScene {
     this.assets.set("raised-bed", { id: "raised-bed", name: "Raised garden bed", category: "Furnishings", template: raisedBed, shelf: true });
     this.assets.set("coffee-cup", { id: "coffee-cup", name: "Coffee cup", category: "Furnishings", template: makeCoffeeCup(), shelf: true });
     this.assets.set("writing-journal", { id: "writing-journal", name: "Open writing journal", category: "Furnishings", template: makeDeskJournal(), shelf: true });
+    this.assets.set("kind-note", { id: "kind-note", name: "Kind note and envelope", category: "Furnishings", template: makeKindNote().root, shelf: true });
     this.assets.set("desk-inkwell", { id: "desk-inkwell", name: "Desk inkwell", category: "Furnishings", template: makeDeskInkwell(), shelf: true });
     this.assets.set("desk-quill", { id: "desk-quill", name: "Desk quill", category: "Furnishings", template: makeDeskQuill(), shelf: true });
     this.assets.set("focus-hourglass", { id: "focus-hourglass", name: "Focus hourglass", category: "Furnishings", template: makeFocusHourglass().hourglass, shelf: true });

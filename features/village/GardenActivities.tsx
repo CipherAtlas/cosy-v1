@@ -99,7 +99,7 @@ export function BirdActivity(p: GardenControls) {
     <h2>{t("A picnic for little wings.", "小さな翼のピクニック。")}</h2>
     <p role="status">{status[p.birdStatus]}</p>
     <div className="v-garden-bed-actions">
-      <button className="v-button v-primary" disabled={busy || !p.garden.crumbPouch} onClick={() => p.onGardenAction({ kind: "feedBirds" })}>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</button>
+      <button className="v-button v-primary" aria-keyshortcuts="F" disabled={busy || !p.garden.crumbPouch} onClick={() => p.onGardenAction({ kind: "feedBirds" })}><kbd aria-hidden="true">F</kbd>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</button>
     </div>
     <p>{p.garden.crumbPouch ? t("You have crumbs. The birds will be delighted.", "パンくずを持っています。鳥たちもきっと喜びます。") : t("Find Maple or Wren in the village and ask for crumbs first.", "まず村のメープルかレンに会って、パンくずをもらいましょう。")}</p>
   </section>;
@@ -108,7 +108,7 @@ export function BirdActivity(p: GardenControls) {
 export function PondFeeding(p: GardenControls) {
   const ja = p.language === "ja";
   return <div className="v-garden-ritual">
-    {p.garden.crumbPouch && <button className="v-button" onClick={() => p.onGardenAction({ kind: "feed" })}>{ja ? "アヒルたちにパンくずをあげる" : "Feed the little duckies"}</button>}
+    {p.garden.crumbPouch && <button className="v-button" aria-keyshortcuts="F" onClick={() => p.onGardenAction({ kind: "feed" })}><kbd aria-hidden="true">F</kbd>{ja ? "アヒルたちにパンくずをあげる" : "Feed the little duckies"}</button>}
     <p>{p.garden.crumbPouch ? (ja ? "パンくずの袋を持っています。" : "You have a pouch of crumbs.") : (ja ? "村のメープルかレンに会って、パンくずをもらいましょう。" : "Find Maple or Wren in the village and ask for crumbs first.")}</p>
   </div>;
 }
@@ -124,7 +124,7 @@ export function MintTea(p: GardenControls) {
       {p.garden.daisies > 0 && <button className="v-button v-gift" data-crop="daisy" onClick={() => p.onGardenAction({ kind: "gift", crop: "daisy" })}><Flower size={18} />{t("Give Luma a daisy", "ルマにデイジーを渡す")}</button>}
       {p.garden.mint > 0 && <button className="v-button v-gift" data-crop="mint" onClick={() => p.onGardenAction({ kind: "gift", crop: "mint" })}><Leaf size={18} />{t("Give Luma mint for special tea", "ルマにミントを渡して特別なお茶に")}</button>}
     </div>
-    {p.garden.mintTea > 0 && <><button className="v-button v-primary" onClick={() => p.onGardenAction({ kind: "drink" })}><Coffee size={18} />{t("Drink your special mint tea", "特別なミントティーを飲む")}</button>
+    {p.garden.mintTea > 0 && <><button className="v-button v-primary" aria-keyshortcuts="E" onClick={() => p.onGardenAction({ kind: "drink" })}><kbd aria-hidden="true">E</kbd><Coffee size={18} />{t("Drink your special mint tea", "特別なミントティーを飲む")}</button>
       <p>{t(`${p.garden.mintTea} cup${p.garden.mintTea === 1 ? "" : "s"} waiting for you.`, `${p.garden.mintTea}杯のお茶が待っています。`)}</p></>}
     {p.garden.carrots + p.garden.radishes + p.garden.mint + p.garden.daisies + p.garden.sunflowers === 0 && <button className="v-text-button" onClick={() => p.travel("garden")}>{t("Visit the kitchen garden", "菜園に行く")}</button>}
   </div>;

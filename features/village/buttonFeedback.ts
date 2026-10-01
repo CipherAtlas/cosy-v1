@@ -39,10 +39,6 @@ export function installButtonFeedback(root: HTMLElement) {
       && root.querySelector(".v-swing-controls button[aria-keyshortcuts='Space']");
     if (focused && (event.key === "Enter" || (event.key === " " && !swingBrake))) { feedback(focused); return; }
     if (document.querySelector(".v-dialog")) return;
-    if (focused && !focused.closest(".v-puppy-actions, .v-puppy-home, .v-swing-controls")) {
-      if (focused.getAttribute("aria-keyshortcuts")?.toLowerCase().split(/\s+/).includes(event.key.toLowerCase())) feedback(focused);
-      return;
-    }
     // Focused dog controls handle their own shortcuts; scene shortcuts follow engine priority.
     const buttons = root.querySelectorAll<HTMLButtonElement>("button");
     const candidates = [...(focused?.closest(".v-puppy-actions")?.querySelectorAll<HTMLButtonElement>("button") ?? []),

@@ -41,6 +41,13 @@ export type World = {
   wind: { time: { value: number }; strength: { value: number } };
   vegetation: T.InstancedMesh[];
   authored: AuthoredWorld;
+  mapScenery: {
+    layout: AuthoredWorld;
+    paths: Pick<AuthoredWorld["paths"][number], "spine" | "width">[];
+    buildings: { id: string; x: number; z: number; yaw: number; width: number; depth: number }[];
+    trees: AuthoredWorld["trees"];
+    benches: VillageBench[];
+  };
   gardenSurfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial };
   dispose: () => void;
 };
@@ -564,10 +571,12 @@ export async function buildWorld(
     ).rotation.y = Math.PI / 4;
   }
   let houseIndex = 0;
+  const mapBuildings: World["mapScenery"]["buildings"] = [];
   function house(x: number, z: number, w: number, d: number, h: number, rot: number, roofMat = mat.roof) {
     const index = houseIndex++;
     const saved = authored.structures[`cottage-${index + 1}`];
     if (saved) { x = saved.x; z = saved.z; rot = saved.yaw; }
+    mapBuildings.push({ id: `cottage-${index + 1}`, x, z, yaw: rot, width: w, depth: d });
     const cottage = buildCottage({ ...mat, roof: index % 3 === 2 ? mat.lilac : roofMat }, w, d, h, index);
     cottage.name = `Fantasy cottage ${index + 1}`;
     cottage.position.set(x, saved?.y ?? 0, z); cottage.rotation.y = rot; group.add(cottage);
@@ -594,6 +603,7 @@ export async function buildWorld(
   const savedTower = authored.structures.tower;
   tower.position.set(savedTower?.x ?? 4, savedTower?.y ?? 0, savedTower?.z ?? -57);
   tower.rotation.y = savedTower?.yaw ?? 0;
+  mapBuildings.push({ id: "tower", x: tower.position.x, z: tower.position.z, yaw: tower.rotation.y, width: 5.2, depth: 5.2 });
   group.add(tower);
   add(
     new T.CylinderGeometry(2.3, 2.6, 14, 12),
@@ -1532,6 +1542,8 @@ export async function buildWorld(
     wind,
     vegetation,
     authored,
+    mapScenery: { layout: authored, buildings: mapBuildings, trees: treeRecords, benches,
+      paths: pathSurfaces.map(path => ({ width: path.width, spine: path.spine.map(point => [point.x, point.z]) })) },
     gardenSurfaces: { paving: mat.path, wood: mat.wood, ground: mat.ground },
     dispose() {
       const geometries = new Set<T.BufferGeometry>(),

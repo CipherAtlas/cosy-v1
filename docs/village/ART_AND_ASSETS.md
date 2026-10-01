@@ -2,6 +2,10 @@
 
 The cottage cat/furnishings, four-dog layout and larger bird bowl/circuits are published in the [2026-10-01 integrated release](../../VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published). The earlier local evidence below describes asset production; the release record separates current source, editor and live verification.
 
+## Kind note and envelope (local)
+
+`makeKindNote` in `features/village/activityScene.ts` supplies the reader and local editor with the same original cream envelope, rose seal, hinged flap and separate inked sheet. The editor's **Kind note and envelope** Furnishings entry has an open preview and saved working-copy transforms. Runtime poses retain the spirit's original short fins. [Local preview, checks and limits](../../VILLAGE_BUILD.md#2026-10-01--kind-note-reading-pose-local).
+
 ## Focus cottage cat and furnishings (local)
 
 The original cream/caramel kitten is authored in Blender 5.2.1 LTS by `scripts/village/create_cottage_cat.py`; editable source is `assets/village/cottage-cat.blend`, runtime export is `public/village/models/cottage-cat.glb`, and the studio portrait is `evidence/cottage-cat-blender.png`. Named body/head/eye/leg/tail pivots support runtime naps, stretching, walking and petting in `features/village/cottageCat.ts`. No purchased models, generators or new dependencies were used. The room uses original procedural surface textures and reusable sage couch, reading lamp, fern, botanical print and nap cushion from `focusCottageProps.ts`. [Cat and furnishing checks](../../VILLAGE_BUILD.md#2026-09-30--focus-cottage-cat-and-furnishings-local).

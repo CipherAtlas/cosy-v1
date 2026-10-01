@@ -1,3 +1,16 @@
+# Reasoning level and efficient execution
+
+Before starting substantive work, assess whether the current reasoning level is appropriate for the requested task. Use the request and only the minimal reads needed to understand its scope. Routine documentation, small isolated fixes and straightforward commit/push/deploy requests usually need low or medium reasoning; broader implementation or difficult debugging may need high reasoning. Reserve xhigh or higher for work whose complexity justifies it. Use the current turn's declared reasoning level when available; do not assume the saved default proves the active setting.
+
+If the current reasoning level is higher than the task warrants, **do not perform the task**. Briefly explain the mismatch, recommend a supported reasoning level and ask the user to switch to it or explicitly authorize continuing at the current level. Stop and wait for their response before editing, testing, building, Git writes or deployment. Do not silently change the model, reasoning setting or configuration. Once the user switches or explicitly overrides the recommendation, continue the authorized task without repeating the question unless its scope materially changes.
+
+When the current reasoning level is appropriate or the user has explicitly resolved the mismatch:
+
+- Read relevant file sections and reuse findings while those files remain unchanged; avoid repeatedly loading entire files or rediscovering established project workflows. Batch independent reads and searches.
+- Reuse earlier passing checks only when the relevant source, dependencies, configuration and test inputs remain unchanged and the checks cover the current change. Clearly distinguish reused evidence from checks run now.
+- Run the smallest useful verification and all applicable required project checks. Expand testing only for changed behavior, failures or unresolved risks; avoid new temporary test harnesses and repeated broad suites without a concrete need. Shared interaction changes still require the multiple-client checks below.
+- For an authorized routine release, use the existing deployment workflow, fill only relevant verification gaps, wait for deployment completion and perform a focused live smoke check. Keep documentation updates concise and proportional to the change.
+
 # Laptop and desktop experience
 
 The village is for laptops and desktop PCs. Do not optimize the village game or its controls for phones. Prioritize available world-view space, keyboard access and compatibility with 13-inch laptop screens.
