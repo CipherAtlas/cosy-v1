@@ -1,0 +1,29 @@
+{
+  "checks": [
+    "Real chat composer broadcasts to a second rendered client",
+    "The actual console displays live chat and the captured archive",
+    "The actual console lists both synthetic players",
+    "The console page retains its actual five-second polling cadence",
+    "Unchanged page and background polls add no alarm/chat writes",
+    "Active browser heartbeats keep writing authoritative sharedActors snapshots",
+    "Repeated capture keeps exactly one archive row per message",
+    "Removing a synthetic message synchronizes both live UIs",
+    "A removed message remains searchable in the private archive",
+    "Five-second background capture saves chat while the console page is closed",
+    "Retained-socket hibernation keeps browser identities and active ownership",
+    "Hibernation and resumed real polling preserve the persisted alarm without rewriting it",
+    "A full local runtime restart reconnects both rendered browsers",
+    "Acknowledged chat is restored in the UI after full runtime restart",
+    "Recovery releases abandoned ownership instead of assigning it to reconnecting identities",
+    "A real local alarm clears seeded previous-hour chat in both browser and console",
+    "The actual console proxy refuses a stale-hour clear after rollover",
+    "Rollover retains both captured messages in the seven-day archive",
+    "Synthetic archive retains private 0700 directory and 0600 file permissions",
+    "No captured browser page errors during console, hibernation, restart and rollover"
+  ],
+  "errors": [],
+  "pollIntervalsMs": [
+    5001
+  ],
+  "syntheticDataOnly": true
+}

@@ -28,7 +28,8 @@ function room(savedChat, connected = true) {
   const sockets = connected ? [{ send: raw => messages.push(JSON.parse(raw)), deserializeAttachment: () => null }] : [];
   const storage = {
     kv: { get: key => records.get(key), put: (key, value) => records.set(key, value) },
-    setAlarm: time => { storage.alarmAt = time; },
+    getAlarm: async () => storage.alarmAt ?? null,
+    setAlarm: async time => { storage.alarmAt = time; },
   };
   const ctx = { storage, getWebSockets: () => sockets };
   return { ctx, records, messages, sockets, storage };
@@ -38,7 +39,7 @@ function room(savedChat, connected = true) {
   let resetEvent;
   for (const savedChat of [undefined, { hour: 100, entries: [{ name: 'Visitor', message: 'Hello' }] }]) {
     const testRoom = room(savedChat);
-    new VillageWorld(testRoom.ctx).rollHour();
+    await new VillageWorld(testRoom.ctx).rollHour();
     assert.equal(testRoom.storage.alarmAt, 101 * hourMs);
     testRoom.messages.length = 0;
 

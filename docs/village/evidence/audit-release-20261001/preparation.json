@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-01",
+  "remoteMerged": "b5885736a9a7543c9088f8e655bf19608ca554b9",
+  "scope": "Audit fixes and verified resident-motion work, preserving the published Worker write cleanup",
+  "freshChecks": {
+    "check": "passed (includes Worker typing and write-cleanup regression)",
+    "productionBuild": "passed (22 static pages)",
+    "sequentialTypecheck": "passed",
+    "exportBoundaries": "passed",
+    "threeClientBrowserChecks": 84,
+    "runtimeChecks": 14,
+    "workerDryRun": "passed"
+  },
+  "reusedChecks": "Earlier complete browser runner and 16 isolated editor checks cover unchanged client/helper/assets/editor source; merged Worker validated by fresh three-client and real runtime checks.",
+  "sourceHashes": {
+    "worker/index.js": "3676f1edcf55d548587fa215ee06ad9436c4ba1872e4d80ffe53b993795dd14e",
+    "worker/runtime.d.ts": "7676214dd869344032dcba5a28ba7de6beee3d66a698d23135d51c64ee707bde",
+    "features/village/Village.tsx": "4d89aa7b92d32ff1a38803b678ba0af7866be73d9be475bec54c0eae4f4c4a7e",
+    "features/village/VillageEngine.ts": "df670134ab169078d672cc4063329be06d689715589a7c55572ce5807b6d627f",
+    "features/village/world.ts": "551688a1293e8dc9aa61dc30e740c29d523684d5dd041f30b2c48e007d4f8891",
+    "features/village/life.ts": "a4c088a2c58ff28096666231a8d3b341389d8b06ec1fef351bf9c41dcc3a4dab",
+    "features/village/residentMotion.ts": "3717a4f32c3ea1dd7158a0eb0f2d158e110f847d15c9abb697a6d91b9a68640c",
+    "scripts/village/check.cjs": "2dc88802ebb4fdee0a613c37af6ae1c15284419e7ec38b3300c3ba9c5cbd9cec",
+    ".github/workflows/deploy-pages.yml": "f503757c2fea329e34375841c73a9ca059baa6f7493b2c5fd33025c785f5bed0"
+  },
+  "preserved": {
+    "worldLayoutSha256": "4c5b65a7a3074afcfe6237ca0a98d2a8d97ad70de2b0f216add1511223043fab",
+    "dependencyLockfileSha256": "8d5d58c8620610c8c997259d19a2f6c7f84acc1117a75c1e12907cd8d350adc9"
+  },
+  "previousWorkerVersion": "82b5d21e-adfb-4dfa-bdbb-8236f49acfbd",
+  "publication": "pending",
+  "limits": [
+    "Existing lint/tool warnings",
+    "No physical-laptop FPS improvement claim",
+    "Safari/Firefox, screen readers, crowded-world load and long sessions remain unverified"
+  ]
+}

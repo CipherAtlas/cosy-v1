@@ -3,7 +3,7 @@ import type { SharedChatEntry, SharedPuppyTrick } from "../features/village/shar
 import type { GardenState } from "../features/village/garden";
 import type { VillageSimulation } from "./simulation";
 
-type StoredRecords = {
+export type StoredRecords = {
   garden: GardenState;
   chat: { hour: number; entries: SharedChatEntry[] };
   puppyTricks: SharedPuppyTrick[];
@@ -35,6 +35,7 @@ export type WorkerState = {
       get<K extends keyof StoredRecords>(key: K): StoredRecords[K] | undefined;
       put<K extends keyof StoredRecords>(key: K, value: StoredRecords[K]): void;
     };
+    getAlarm(): Promise<number | null>;
     setAlarm(time: number): Promise<void>;
   };
 };

@@ -1,0 +1,20 @@
+{
+  "passed": 14,
+  "checks": [
+    "Forty concurrent admin polls all succeed with actual SQLite Durable Object storage",
+    "Concurrent initial polls create exactly one successor alarm",
+    "Concurrent polls repair a removed real runtime alarm exactly once",
+    "Two real WebSocket clients join the same local Worker",
+    "Chat is broadcast to the other real client and immediately readable by the admin API",
+    "Concurrent rollover/message/admin polls refuse a stale-hour clear",
+    "Concurrent rollover leaves exactly the new-hour message durably readable",
+    "Continued real admin polling adds no duplicate alarm writes",
+    "Retained-socket hibernation resumes heartbeat/world publication and preserves chat/alarm without rescheduling",
+    "Full local-runtime restart restores the acknowledged concurrent message",
+    "Runtime restart preserves the real alarm and does not reschedule it",
+    "Admin removes the restored message using its stable ID",
+    "Twenty concurrent empty clears perform no chat/alarm rewrites in actual storage",
+    "A real scheduled local-runtime alarm clears seeded prior-hour chat without visitors and schedules the next UTC hour"
+  ],
+  "runtime": "5.20260930.0-alpha"
+}

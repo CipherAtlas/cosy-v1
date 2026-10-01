@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-01 — audit fixes release preparation
+
+The audit and verified resident-motion fixes are committed locally, and published `b588573` is reconciled with them, preserving Worker write cleanup. Fresh source/build/type/export checks, 84 actual three-client interaction checks, 14 real runtime checks and Worker dry-run passed. The earlier unchanged renderer/asset/editor evidence is reused. The user authorized push/deployment; publish the matching Worker before the Pages workflow and verify both plus live reduced-motion entry, selective dog loading and private focus. [Preparation and limits](VILLAGE_BUILD.md#2026-10-01--audit-fixes-release-preparation).
+
 ## 2026-10-01 — blob NPC movement smoothing (local)
 
 Shared blob positions now interpolate timestamped Worker poses with a 180 ms buffer, eliminating repeated snapshot catch-up pulses in the high-fps regression. Reconnects and activity relocations clear the buffered path; stalled delivery holds the last accepted position. The 113 motion checks, 21 existing renderer checks, `npm run check`, isolated static build/export-boundary check and 26 actual three-client ownership/seat/reconnect/private-focus checks passed. Physical-laptop and production perception remain unverified; this client-only fix is not deployed. [Behavior, reproduction and limits](VILLAGE_BUILD.md#2026-10-01--blob-npc-movement-smoothing-local).
@@ -7,6 +11,16 @@ Shared blob positions now interpolate timestamped Worker poses with a 180 ms buf
 ## Active local audit follow-up
 
 Work starts from `03aab76` (`origin/main` at the start). Focused scene/camera/visitor/landscape and UI helper modules, selective runtime dog kits, first-entry private cat loading, stable reduced-motion hydration and complete cottage render counters are implemented locally. Entry village payload fell 17.4%. Current-contract fast checks are exposed through `npm test` and enforced by the existing Pages build; application/Worker type checking, production export, export privacy, the complete physics/browser/multiple-client runner and isolated puppy editor checks passed. See the [build-ledger entry](VILLAGE_BUILD.md#2026-10-01--audit-follow-up-local) for evidence and limits. Remote `main` advanced separately to `b588573` with Worker write cleanup; reconcile it before publishing these uncommitted changes. Concurrent resident-motion work is preserved. No Git writes or deployment.
+
+## 2026-10-01 — write cleanup published
+
+Scoped source `bf7e359` is pushed. Worker version `82b5d21e-adfb-4dfa-bdbb-8236f49acfbd` is verified at 100% with healthy `/health`, and [Pages run 36846547186](https://github.com/CipherAtlas/cosy-v1/actions/runs/36846547186) succeeds for the same source. All source/build checks, seven Python tests, 35 deterministic checks, 14 actual runtime checks, 46 rendered local Chrome checks, six safe live-browser checks and 13 HTTP/asset checks pass. [Publication evidence and limits](VILLAGE_BUILD.md#2026-10-01--write-cleanup-release-published). Preserve both admin pollers, every sharedActors snapshot and the existing ownership/recovery contract. No simulation checkpointing or UI change.
+
+The original Mac checkout acquired concurrent refactor/test/Worker edits during QA and was left untouched at `03aab76`; reconcile those edits with the published source before their next release. The clean release checkout is `/Users/sabar/Documents/Codex/2026-10-01/task/cosy-release`. Existing console/archive and real users were preserved. No production moderation or kicks were tested.
+
+## 2026-10-01 — write-cleanup Mac verification
+
+The reviewed alarm/exact-no-op patch is reconciled with clean main `03aab76`, preserving the newer map/note release. Ten deterministic runners, seven Python tests, 14 real SQLite/WebSocket recovery checks, sequential export/typecheck/lint and Worker dry-run pass. The actual three-client Chrome suite now passes 26 checks after updating its stale Places selector to the published map. Twenty additional actual console/browser checks pass for both polling paths, archive behavior, hibernation/ownership, full restart/reconnect, chat recovery, real alarm rollover and stale-hour refusal. No page errors were captured. Publication evidence follows in the ledger. [Scope, checks and reproduction](VILLAGE_BUILD.md#2026-10-01--write-cleanup-mac-verification). Preserve both five-second admin pollers, every sharedActors snapshot, ownership and recovery; no simulation checkpointing. Worker source/publication is still pending at this checkpoint.
 
 ## 2026-10-01 — map and kind-note release published
 

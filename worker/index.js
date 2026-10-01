@@ -71,8 +71,11 @@ export class VillageWorld extends DurableObject {
   /** @param {import("./runtime").WorkerState} ctx @param {import("./runtime").WorkerEnvironment} env */
   constructor(ctx, env) {
     super(ctx, env);
-    this.garden = readGarden(JSON.stringify(ctx.storage.kv.get("garden") || freshGarden()));
+    const savedGarden = ctx.storage.kv.get("garden");
     const savedChat = ctx.storage.kv.get("chat");
+    // Compare immutable, raw persisted values, before readGarden applies growth or repairs.
+    this.persistedValues = new Map([["garden", JSON.stringify(savedGarden)], ["chat", JSON.stringify(savedChat)]]);
+    this.garden = readGarden(JSON.stringify(savedGarden || freshGarden()));
     this.chatHour = savedChat?.hour ?? -1;
     /** @type {import("../features/village/sharedWorld").SharedChatEntry[]} */
     this.chat = (savedChat?.entries ?? []).map(entry => entry.messageId ? entry : { ...entry, messageId: crypto.randomUUID() });
@@ -85,8 +88,18 @@ export class VillageWorld extends DurableObject {
     this.ipKicks = new Map(ctx.storage.kv.get("ipKicks") || []);
     this.pruneKicks();
     if (savedChat && this.chat.some((entry, index) => entry !== savedChat.entries[index])) {
-      ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+      this.putIfChanged("chat", { hour: this.chatHour, entries: this.chat });
     }
+  }
+
+  /** @template {keyof import("./runtime").StoredRecords} K @param {K} key @param {import("./runtime").StoredRecords[K]} value */
+  putIfChanged(key, value) {
+    const serialized = JSON.stringify(value);
+    if (this.persistedValues.get(key) === serialized) return;
+    this.ctx.storage.kv.put(key, value);
+    // A failed write must not advance the comparison baseline. Async durability failures
+    // still use the storage output gate and reset this instance (no allowUnconfirmed).
+    this.persistedValues.set(key, serialized);
   }
 
   sockets() { return this.ctx.getWebSockets().filter(socket => { const visitor = socket.deserializeAttachment(); return !visitor?.kickedUntil && !visitor?.left; }); }
@@ -181,18 +194,21 @@ export class VillageWorld extends DurableObject {
     return { ok: true, index };
   }
 
-  rollHour() {
+  async rollHour() {
+    // Consult storage on every call: an in-memory deadline misses consumed/deleted alarms.
+    const alarmAt = await this.ctx.storage.getAlarm();
     const hour = Math.floor(Date.now() / 3_600_000);
     if (hour !== this.chatHour) {
       this.chatHour = hour;
       this.chat = [];
-      this.ctx.storage.kv.put("chat", { hour, entries: [] });
+      this.putIfChanged("chat", { hour, entries: [] });
       this.broadcast({ type: "hour", chatHour: hour });
     }
-    void this.ctx.storage.setAlarm((hour + 1) * 3_600_000);
+    const nextHour = (hour + 1) * 3_600_000;
+    if (alarmAt !== nextHour) await this.ctx.storage.setAlarm(nextHour);
   }
 
-  async alarm() { this.pruneKicks(); this.rollHour(); }
+  async alarm() { this.pruneKicks(); await this.rollHour(); }
 
   /** @param {Request} request */
   async fetch(request) {
@@ -220,7 +236,7 @@ export class VillageWorld extends DurableObject {
       return Response.json({ ...this.adminPlayers(), until, kickedCount: affected.length });
     }
     if (url.pathname === "/admin/chat") {
-      this.rollHour();
+      await this.rollHour();
       if (request.method === "GET") return Response.json({ chatHour: this.chatHour, entries: this.chat });
       if (request.method === "DELETE") {
         if (request.headers.get("If-Match") !== `"${this.chatHour}"`) {
@@ -228,7 +244,7 @@ export class VillageWorld extends DurableObject {
         }
         const removedMessageIds = this.chat.map(entry => entry.messageId);
         this.chat = [];
-        this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+        this.putIfChanged("chat", { hour: this.chatHour, entries: this.chat });
         // Older open clients already understand this reset event.
         this.broadcast({ type: "hour", chatHour: this.chatHour });
         this.broadcast({ type: "chat_sync", chatHour: this.chatHour, chat: this.chat, removedMessageIds });
@@ -238,11 +254,11 @@ export class VillageWorld extends DurableObject {
     }
     const removeMatch = /^\/admin\/chat\/([0-9a-f-]{36})$/.exec(url.pathname);
     if (removeMatch && request.method === "DELETE") {
-      this.rollHour();
+      await this.rollHour();
       const index = this.chat.findIndex(entry => entry.messageId === removeMatch[1]);
       if (index < 0) return new Response("Message no longer exists", { status: 404 });
       this.chat.splice(index, 1);
-      this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+      this.putIfChanged("chat", { hour: this.chatHour, entries: this.chat });
       this.broadcast({ type: "chat_sync", chatHour: this.chatHour, chat: this.chat, removedMessageIds: [removeMatch[1]] });
       return Response.json({ chatHour: this.chatHour, entries: this.chat });
     }
@@ -258,7 +274,7 @@ export class VillageWorld extends DurableObject {
       server.close(4003, "Kicked for 5 minutes");
       return new Response(null, { status: 101, webSocket: client });
     }
-    this.rollHour();
+    await this.rollHour();
     this.publishWorld();
     if (this.sockets().length >= MAX_VISITORS) return new Response("Village full", { status: 503 });
     const used = new Set(this.visitors().map(visitor => visitor.name));
@@ -427,7 +443,7 @@ export class VillageWorld extends DurableObject {
       if (action.kind === "feed") this.simulation.pondFeedAt = now;
       if (action.kind === "gift") this.simulation.gift = { crop: action.crop, at: now };
       this.simulation.gardenMoment(visitor, action, now);
-      this.ctx.storage.kv.put("garden", this.garden);
+      this.putIfChanged("garden", this.garden);
       this.broadcast({ type: "garden", garden: this.garden, event: { action, actor: visitor.id, x: visitor.x, z: visitor.z } });
       if (["feedBirds", "feed", "gift", "crumbs", "birdCrumbs", "water", "flowers", "drink"].includes(action.kind)) this.publishWorld(now);
     } else if (message.type === "chat" && typeof message.message === "string") {
@@ -436,10 +452,10 @@ export class VillageWorld extends DurableObject {
       if (!text || now - visitor.lastChat < 3000) return;
       visitor.lastChat = now;
       socket.serializeAttachment(visitor);
-      this.rollHour();
+      await this.rollHour();
       const entry = { id: visitor.id, messageId: crypto.randomUUID(), name: visitor.name, message: text, sentAt: now };
       this.chat = [...this.chat, entry].slice(-80);
-      this.ctx.storage.kv.put("chat", { hour: this.chatHour, entries: this.chat });
+      this.putIfChanged("chat", { hour: this.chatHour, entries: this.chat });
       this.broadcast({ type: "chat", chatHour: this.chatHour, entry });
     }
   }
