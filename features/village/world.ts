@@ -1,17 +1,25 @@
+import { sampleTerrainHeight } from "./terrain";
+import { spatialMesh, spatialBatch } from "./spatialRendering";
+import { optimizeGeometry } from "./geometryOptimization";
+import { SceneLayout } from "./sceneLayout";
 import * as T from "three";
+import { townPlantingClearance } from "./worldLayout";
+import { inRiver } from "./environment";
 import { makeFlame } from "./flame";
 import { makeWater } from "./water";
+import { conformRiverBank, riverGeometry } from "./riverGeometry";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { loadVillageLayout } from "./villageAssets";
 import { buildWorldLandscape } from "./worldLandscape";
+import { PlantingSurfaceMask, plantingRadius, clearPavingBorders } from "./plantingClearance";
 import { buildWayfinding } from "./wayfinding";
 import { BIRD_CLEARING, BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, landscapeHeight, riverX, roadX, type Collider } from "./environment";
 import { GARDEN_COURT, HARVEST_BASKET } from "./garden";
 import { distanceToPath, insidePlantingClearance, type AuthoredWorld } from "./worldLayout";
-import { fenceGeometry } from "./fenceGeometry";
+import { fenceGeometry, fenceCollisionBoxes, fenceWoodMaterial, conformFenceGeometry } from "./fenceGeometry";
 import { setAuthoredWorld } from "./environment";
 import { VillageSwingSet } from "./swings";
 import { BIRD_FEEDING, fillBirdCrumbs } from "./birds";
@@ -74,6 +82,8 @@ export async function buildWorld(
     benches: VillageBench[] = [],
     flames: T.Mesh[] = [],
     lanterns: T.Mesh[] = [];
+  const sceneLayout = new SceneLayout(authored, group, colliders, benches);
+  const record: WorldLayoutCapture = capture ?? sceneLayout.capture;
   const wind = { time: { value: 0 }, strength: { value: 0.3 } };
   const swings: VillageSwingSet[] = [];
   const vegetation: T.InstancedMesh[] = [];
@@ -82,17 +92,21 @@ export async function buildWorld(
   const gardenPathClearance = new Set<number>();
   const plantingCell = (x: number, z: number) => (Math.floor(x * 2) + 256) * 1024 + Math.floor(z * 2) + 256;
   const teaCourtyardDistance = (x: number, z: number) => Math.hypot((x - 15.5) / 3.8, (z + 10.4) / 3.2);
-  const onAuthoredPath = (x: number, z: number) => authored.paths.some(path => distanceToPath(x, z, path) < path.width * .5 + .5);
+  const plantingLanes = [...authored.paths, ...(authored.rivers ?? [])];
+  const onAuthoredPath = (x: number, z: number) => plantingLanes.some(path => distanceToPath(x, z, path) < path.width * .5 + .5);
   // The editor captures uncut source instances so moving or undoing a clearing can restore them.
   const erasedPlanting = (x: number, z: number) => !capture && insidePlantingClearance(x, z, authored.clearings);
+  const townPlantingItems = (authored.items ?? []).filter(item => ["horse-racetrack", "farm-row", "horse-stable", "hay-bale"].includes(item.asset));
   const clearPlanting = (x: number, z: number) =>
+    inRiver(x, z) ||
+    townPlantingClearance(x, z, townPlantingItems) ||
     authored.swings.some(swing => {
       const dx = x - swing.x, dz = z - swing.z, c = Math.cos(swing.yaw), s = Math.sin(swing.yaw);
       return Math.abs(dx * c - dz * s) < 3.1 * swing.scale[0] && Math.abs(dx * s + dz * c) < 3.3 * swing.scale[0];
     }) ||
     (Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 2 && Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1.1)
     || Math.hypot(x - HEARTH.x, z - HEARTH.z) < 3.9
-    || pondDistance(x, z) < 1.12
+    || pondDistance(x, z) < 1.035
     || Math.hypot(x + 24, z + 31) < 4.35
     || Math.hypot(x - HARVEST_BASKET[0], z - HARVEST_BASKET[2]) < 1.25
     || teaCourtyardDistance(x, z) < 1.16
@@ -229,30 +243,34 @@ export async function buildWorld(
     sz: number,
     parent: T.Object3D = group,
   ) => add(boxGeo, m, x, y, z, sx, sy, sz, parent);
-  const terrain = new T.PlaneGeometry(650, 650, 210, 210);
+  const editableTerrain = Boolean(capture || authored.terrain?.samples.length);
+  const terrain = editableTerrain ? new T.PlaneGeometry(640, 640, 320, 320) : new T.PlaneGeometry(650, 650, 210, 210);
   terrain.rotateX(-Math.PI / 2);
   const pos = terrain.attributes.position;
   const colors = [];
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i),
       z = pos.getZ(i);
-    pos.setY(i, pondDistance(x, z) < 1.35 ? Math.min(-.85, landscapeHeight(x, z)) : landscapeHeight(x, z));
+    const height = sampleTerrainHeight(authored.terrain, x, z);
+    const pondBaseDistance = capture ? Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz) : pondDistance(x, z);
+    pos.setY(i, pondBaseDistance < 1.35 ? Math.min(-.85, height) : height);
     const patch = .5 + .5 * Math.sin(x * .12) * Math.sin(z * .09);
     const c = new T.Color().setHSL(.235 + patch * .035, .54, .56 + patch * .13);
     colors.push(c.r, c.g, c.b);
   }
   terrain.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
   terrain.computeVertexNormals();
+  if (!capture) await optimizeGeometry(terrain, .00001);
   const terrainMesh = add(terrain, mat.ground, 0, 0, 0);
   terrainMesh.castShadow = false;
-  capture?.("terrain", "Valley ground", "Landscape", [terrainMesh]);
+  record("terrain", "Valley ground", "Landscape", [terrainMesh]);
   // The valley grid is coarse; a local shoreline gives the larger pond a continuous bank.
   const shoreGeometry = new T.RingGeometry(.78, 1.65, 128, 18);
   shoreGeometry.rotateX(-Math.PI / 2);
   const shorePositions = shoreGeometry.attributes.position, shoreColors: number[] = [];
   for (let i = 0; i < shorePositions.count; i++) {
     const x = POND.x + shorePositions.getX(i) * POND.rx, z = POND.z + shorePositions.getZ(i) * POND.rz;
-    const d = pondDistance(x, z), river = Math.abs(x - riverX(z));
+    const d = Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz), river = Math.abs(x - riverX(z));
     const bank = -.72 + Math.max(0, Math.min(1, (d - .93) / .11)) * .72;
     const y = d < 1.04 ? Math.min(bank, river < 4 ? -.85 + river * .15 : 0) : landscapeHeight(x, z);
     shorePositions.setXYZ(i, x, y + .007, z);
@@ -262,9 +280,10 @@ export async function buildWorld(
     shoreColors.push(c.r, c.g, c.b);
   }
   shoreGeometry.setAttribute("color", new T.Float32BufferAttribute(shoreColors, 3));
+  shoreGeometry.userData.riverBank = true;
   shoreGeometry.computeVertexNormals();
   const shoreMesh = add(shoreGeometry, mat.ground, 0, 0, 0); shoreMesh.castShadow = false;
-  capture?.("shore", "Willow pond bank", "Landscape", [shoreMesh], [POND.x, 0, POND.z]);
+  record("shore", "Willow pond bank", "Landscape", [shoreMesh], [POND.x, 0, POND.z]);
   const surfaceShader = mat.ground.onBeforeCompile;
   mat.ground.onBeforeCompile = shader => {
     surfaceShader(shader, renderer);
@@ -331,8 +350,9 @@ export async function buildWorld(
     g.setAttribute("color", new T.Float32BufferAttribute(shoulderColors, 3));
     g.setIndex(indices);
     g.computeVertexNormals();
+    g.userData.plantingSurface = "paving";
     const ribbon = add(g, pathMaterial, 0, 0, 0); ribbon.castShadow = false;
-    capture?.(`path-${pathSurfaces.length + 1}`, name ?? `Village path ${pathSurfaces.length + 1}`, "Paths", [ribbon], c.getPoint(.5).toArray() as [number, number, number]);
+    record(`path-${pathSurfaces.length + 1}`, name ?? `Village path ${pathSurfaces.length + 1}`, "Paths", [ribbon], c.getPoint(.5).toArray() as [number, number, number]);
     pathSurfaces.push({ geometry: g, spine: c.getPoints(100), width });
   }
   path(
@@ -401,8 +421,9 @@ export async function buildWorld(
   terrace.setAttribute("uv", new T.Float32BufferAttribute(terraceUV, 2));
   terrace.setAttribute("color", new T.Float32BufferAttribute(terraceColors, 3));
   terrace.setIndex(terraceIndices); terrace.computeVertexNormals();
+  terrace.userData.plantingSurface = "paving";
   const teaTerrace = add(terrace, pathMaterial, 0, 0, 0); teaTerrace.castShadow = false;
-  capture?.("tea-terrace", "Tea courtyard paving", "Paths", [teaTerrace], [15.5, 0, -10.4]);
+  record("tea-terrace", "Tea courtyard paving", "Paths", [teaTerrace], [15.5, 0, -10.4]);
   // One continuous level surface gives the rectangular beds even, seam-free aisles.
   const court = GARDEN_COURT, shoulder = .45;
   const courtCoverage = (x: number, z: number) => 1 - T.MathUtils.smoothstep(
@@ -420,9 +441,10 @@ export async function buildWorld(
     courtColors.set([coverage, 1, 1], i * 3);
   }
   courtGeometry.setAttribute("color", new T.BufferAttribute(courtColors, 3));
+  courtGeometry.userData.plantingSurface = "paving";
   const gardenCourt = add(courtGeometry, pathMaterial, 0, 0, 0);
   gardenCourt.name = "Continuous kitchen garden paving"; gardenCourt.castShadow = false;
-  capture?.("garden-paving", "Kitchen garden paving", "Paths", [gardenCourt], [24.7, 0, -6]);
+  record("garden-paving", "Kitchen garden paving", "Paths", [gardenCourt], [24.7, 0, -6]);
   // Reserve the full ribbons and shoulders before scattering meadow plants.
   for (const surface of pathSurfaces) for (const p of surface.spine) {
     if (p.x < 2 || p.z > 2) continue;
@@ -464,7 +486,7 @@ export async function buildWorld(
   }
   const pondRestPaving = add(terrace, pathMaterial, -39.5, .02867727470825035, -19.1);
   pondRestPaving.castShadow = false;
-  capture?.("pond-rest-paving", "Pond rest paving", "Paths", [pondRestPaving], [-24, .02867727470825035, -29.5]);
+  record("pond-rest-paving", "Pond rest paving", "Paths", [pondRestPaving], [-24, .02867727470825035, -29.5]);
   // Water occupies a shallow channel, with shader normals moving independently of the banks.
   const waterUniform = { time: { value: 0 } };
   const riverSurface=makeWater(waterUniform.time,wind.strength);
@@ -478,18 +500,27 @@ export async function buildWorld(
     wp.setXYZ(i, riverX(z) + wp.getX(i) * 6.4, -0.32, z);
   }
   wg.computeVertexNormals();
+  wg.userData.plantingSurface = "water";
   const water = add(wg, waterMat, 0, 0, 0);
   water.castShadow = false;
   water.userData.time = waterUniform.time;
   const pondGeo = new T.CircleGeometry(1, 96);
   pondGeo.rotateX(-Math.PI / 2);
+  pondGeo.userData.plantingSurface = "water";
   const pond = add(pondGeo, pondSurface.material, POND.x, POND.y, POND.z, POND.rx, 1, POND.rz);
   pond.name = "Willow pond water";
   pond.castShadow = false;
-  capture?.("river", "Flowing river", "Landscape", [water]);
-  capture?.("pond", "Willow pond", "Landscape", [pond], [POND.x, 0, POND.z]);
+  record("river", "Flowing river", "Landscape", [water]);
+  record("pond", "Willow pond", "Landscape", [pond], [POND.x, 0, POND.z]);
+  if (!capture) for (const river of authored.rivers ?? []) {
+    const item = authored.items!.find(item => item.id === river.id)!;
+    const offset = item.position[1] - landscapeHeight(item.position[0], item.position[2]);
+    const stream = add(riverGeometry(river.points, river.width, (x, z) => landscapeHeight(x, z) + offset), waterMat, 0, 0, 0);
+    stream.name = `Authored river ${river.id}`; stream.castShadow = false;
+  }
   let layoutStart = group.children.length;
   // River stones, a shallow arch bridge, and rustic railings.
+  const bankPaving = new PlantingSurfaceMask(group, "paving");
   for (let i = 0; i < 240; i++) {
     let z = -65 + rnd() * 125,
       s = rnd() > 0.5 ? 1 : -1,
@@ -506,10 +537,12 @@ export async function buildWorld(
       0.4 + rnd() * 0.4,
     );
     o.rotation.set(rnd(), rnd(), rnd());
+    o.updateMatrixWorld(true);
+    if (bankPaving.covers(x, z, plantingRadius(o.geometry, o.matrixWorld))) o.removeFromParent();
   }
-  capture?.("river-stones", "Riverbank stones", "Landscape", group.children.slice(layoutStart));
+  record("river-stones", "Riverbank stones", "Landscape", group.children.slice(layoutStart));
   const bridge = buildBridge(mat.stone, mat.path, colliders); group.add(bridge);
-  capture?.("bridge", "Stone arch bridge", "Bridges", [bridge], [BRIDGE.x, 0, BRIDGE.z]);
+  record("bridge", "Stone arch bridge", "Bridges", [bridge], [BRIDGE.x, 0, BRIDGE.z]);
   const haloCanvas = document.createElement("canvas");
   haloCanvas.width = haloCanvas.height = 64;
   const haloContext = haloCanvas.getContext("2d")!;
@@ -558,8 +591,9 @@ export async function buildWorld(
   const mapBuildings: World["mapScenery"]["buildings"] = [];
   function house(x: number, z: number, w: number, d: number, h: number, rot: number, roofMat = mat.roof) {
     const index = houseIndex++;
-    const saved = authored.structures[`cottage-${index + 1}`];
+    const saved = authored.sceneVersion === 1 ? undefined : authored.structures[`cottage-${index + 1}`];
     if (saved) { x = saved.x; z = saved.z; rot = saved.yaw; }
+    if (!capture && authored.sceneVersion === 1) rot = 0;
     mapBuildings.push({ id: `cottage-${index + 1}`, x, z, yaw: rot, width: w, depth: d });
     const cottage = buildCottage({ ...mat, roof: index % 3 === 2 ? mat.lilac : roofMat }, w, d, h, index);
     cottage.name = `Fantasy cottage ${index + 1}`;
@@ -571,7 +605,7 @@ export async function buildWorld(
       const lamp = new T.PointLight("#ffd19b", 0, 8, 2);
       lamp.position.set(.95, 2, d / 2 + .7); lamp.visible = false; lamp.userData.villageLamp = true; cottage.add(lamp); lampLights.push(lamp);
     }
-    capture?.(`cottage-${index + 1}`, ["Bluebell cottage", "Rosewood cottage", "Lilac cottage", "Waterside cottage", "", "", "Hilltop cottage", "Orchard cottage", "Meadow cottage"][index], "Buildings", [cottage], [x, 0, z]);
+    record(`cottage-${index + 1}`, ["Bluebell cottage", "Rosewood cottage", "Lilac cottage", "Waterside cottage", "", "", "Hilltop cottage", "Orchard cottage", "Meadow cottage"][index], "Buildings", [cottage], [x, 0, z]);
   }
   house(10, 11, 6, 5.4, 4.2, -Math.PI / 2);
   house(10, -4, 5.8, 5.3, 3.8, -Math.PI / 2, mat.terra);
@@ -617,7 +651,7 @@ export async function buildWorld(
     ).rotation.y = a;
   }
   colliders.push({ x: tower.position.x, z: tower.position.z, w: 5.2, d: 5.2, top: tower.position.y + 14 });
-  capture?.("tower", "Village spire", "Buildings", [tower], tower.position.toArray() as [number, number, number]);
+  record("tower", "Village spire", "Buildings", [tower], tower.position.toArray() as [number, number, number]);
   let benchIndex = 0;
   function bench(x: number, z: number, rot: number, scaleX = 1, authoredId?: string, y = 0, scaleY = 1, scaleZ = 1) {
     const b = new T.Group();
@@ -638,16 +672,17 @@ export async function buildWorld(
     const id = authoredId ?? `bench-${++benchIndex}`;
     benches.push({ id, x, z, facing: rot, seatHeight: y + .7 * scaleY, birdClearing: false,
       hitBox: new T.Box3(new T.Vector3(-1.1 * scaleX, y, -.4 * scaleZ), new T.Vector3(1.1 * scaleX, y + 1.35 * scaleY, .4 * scaleZ)) });
-    capture?.(id, authoredId ? "Meadow bench" : `Oak bench ${benchIndex}`, "Furnishings", [b], [x, y, z]);
+    record(id, authoredId ? "Meadow bench" : `Oak bench ${benchIndex}`, "Furnishings", [b], [x, y, z]);
     return collider;
   }
   // The saved copy places the feeding clearing at the western end of the bridge path.
   layoutStart = group.children.length;
   const clearing = new T.CircleGeometry(BIRD_CLEARING.radius, 64); clearing.rotateX(-Math.PI / 2);
+  clearing.userData.plantingSurface = "paving";
   const cp = clearing.attributes.position, cuv = clearing.attributes.uv;
   for (let i = 0; i < cp.count; i++) cuv.setXY(i, (cp.getX(i) + BIRD_CLEARING.x) / 3, (cp.getZ(i) + BIRD_CLEARING.z) / 3);
   add(clearing, mat.path, BIRD_CLEARING.x, .1, BIRD_CLEARING.z).castShadow = false;
-  capture?.("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
+  record("bird-clearing-terrace", "Bird clearing terrace", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
   const rim = new T.TorusGeometry(BIRD_FEEDING.bowlRadius, .065, 8, 48); rim.rotateX(-Math.PI / 2);
   add(rim, mat.stone, BIRD_CLEARING.x, .2, BIRD_CLEARING.z);
@@ -661,18 +696,18 @@ export async function buildWorld(
     fillBirdCrumbs(serving, new T.Object3D()); serving.receiveShadow = true;
     group.add(serving);
   }
-  capture?.("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
+  record("bird-feeding-dish", "Sourdough feeding dish", "Furnishings", group.children.slice(layoutStart), [BIRD_CLEARING.x, 0, BIRD_CLEARING.z]);
   layoutStart = group.children.length;
   // A low bench faces the birds, leaving the eastern entrance completely open.
   const birdBenchX = BIRD_CLEARING.x, birdBenchZ = BIRD_CLEARING.benchZ;
   box(mat.wood, birdBenchX, .4, birdBenchZ, 2.5, .14, .65);
   box(mat.wood, birdBenchX, .87, birdBenchZ + .32, 2.5, .48, .1);
   for (const x of [-.9, .9]) for (const z of [-.23, .23]) box(mat.darkWood, birdBenchX + x, .2, birdBenchZ + z, .11, .4, .11);
-  const birdBenchCollider = {x:-24,z:-27.75,w:2.6,d:.85,top:1.12};
+  const birdBenchCollider = {x: authored.sceneVersion === 1 ? birdBenchX : -24,z: authored.sceneVersion === 1 ? birdBenchZ + .05 : -27.75,w:2.6,d:.85,top:1.12};
   colliders.push(birdBenchCollider);
   benches.push({ id: "bird-clearing-bench", x: birdBenchX, z: birdBenchZ, facing: Math.PI, seatHeight: .47, birdClearing: true,
     hitBox: new T.Box3(new T.Vector3(-1.25, 0, -.4), new T.Vector3(1.25, 1.12, .4)) });
-  capture?.("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [birdBenchX, 0, birdBenchZ]);
+  record("bird-clearing-bench", "Birdwatching bench", "Furnishings", group.children.slice(layoutStart), [birdBenchX, 0, birdBenchZ]);
   const pouchCloth = new T.MeshStandardMaterial({ color: "#c9a679", roughness: 1, bumpMap: plasterMap, bumpScale: .018 });
   const pouchCord = new T.MeshStandardMaterial({ color: "#805a3c", roughness: 1 });
   const bread = new T.MeshStandardMaterial({ color: "#e8c694", roughness: 1 });
@@ -719,14 +754,17 @@ export async function buildWorld(
   const petal = new T.MeshStandardMaterial({color:'#fff9e9',roughness:.85});
   const flowerGold = new T.MeshStandardMaterial({color:'#e4b958',roughness:.8});
   for (let i = 0; i < 28; i++) {
-    const angle = 1.25 + i / 27 * 3.8, x = -24 + Math.cos(angle) * 3.75, z = -31 + Math.sin(angle) * 3.75;
-    add(cylGeo, leaf, x, .22, z, .015, .4, .015);
-    for (let p=0;p<5;p++) { const a=p*Math.PI*2/5; add(sphereGeo,petal,x+Math.cos(a)*.072,.44,z+Math.sin(a)*.072,.066,.028,.066); }
-    add(sphereGeo,flowerGold,x,.465,z,.04,.025,.04);
+    const angle = 1.25 + i / 27 * 3.8, x = -24 + Math.cos(angle) * 4.25, z = -31 + Math.sin(angle) * 4.25;
+    const flower = new T.Group(); flower.position.set(x, 0, z);
+    flower.userData.pavingBorder = true; flower.userData.pavingBorderRadius = .15;
+    group.add(flower);
+    add(cylGeo, leaf, 0, .22, 0, .015, .4, .015, flower);
+    for (let p=0;p<5;p++) { const a=p*Math.PI*2/5; add(sphereGeo,petal,Math.cos(a)*.072,.44,Math.sin(a)*.072,.066,.028,.066, flower); }
+    add(sphereGeo,flowerGold,0,.465,0,.04,.025,.04, flower);
   }
   const clearingFlowers = group.children.slice(layoutStart);
   for (const flower of clearingFlowers) flower.position.add(new T.Vector3(-13, -.12, 34.993025));
-  capture?.("bird-clearing-flowers", "Dove clearing flower border", "Nature", clearingFlowers, [-37, -.12, 3.993025]);
+  record("bird-clearing-flowers", "Dove clearing flower border", "Nature", clearingFlowers, [-37, -.12, 3.993025]);
   // Seats face the fire; the main village path stays unobstructed.
   bench(HEARTH.x, HEARTH.z + 2.9, Math.PI);
   bench(HEARTH.x, HEARTH.z - 2.9, 0);
@@ -740,7 +778,7 @@ export async function buildWorld(
   for (const placed of authored.swings) {
     const swing = new VillageSwingSet(placed); swings.push(swing); group.add(swing.root);
     colliders.push(...swing.colliders());
-    capture?.(placed.id, "Meadow swing set", "Furnishings", [swing.root], [placed.x, placed.y, placed.z]);
+    record(placed.id, "Meadow swing set", "Furnishings", [swing.root], [placed.x, placed.y, placed.z]);
   }
   layoutStart = group.children.length;
   // Hearth with glowing embers and gently animated flame geometry.
@@ -794,7 +832,7 @@ export async function buildWorld(
   const hearthLight = new T.PointLight("#ffad54", 9, 12, 2);
   hearthLight.position.set(HEARTH.x, 1, HEARTH.z); group.add(hearthLight);
   fire.userData.light=hearthLight;fire.userData.coal=coal;
-  capture?.("hearth", "Hearth clearing", "Furnishings", group.children.slice(layoutStart), [HEARTH.x, 0, HEARTH.z]);
+  record("hearth", "Hearth clearing", "Furnishings", group.children.slice(layoutStart), [HEARTH.x, 0, HEARTH.z]);
   layoutStart = group.children.length;
   // Pond dock.
   for (let i = 0; i < 28; i++) {
@@ -805,7 +843,7 @@ export async function buildWorld(
     for (const z of [-6.4, -4.6])
       add(cylGeo, mat.darkWood, x, 0.05, z, 0.13, 1.2, 0.13);
   lantern(-24.1, 0.3, -4.6);
-  capture?.("dock", "Willow fishing dock", "Bridges", group.children.slice(layoutStart), [POND_DOCK.x, 0, POND_DOCK.z]);
+  record("dock", "Willow fishing dock", "Bridges", group.children.slice(layoutStart), [POND_DOCK.x, 0, POND_DOCK.z]);
   layoutStart = group.children.length;
   // Tea garden pergola.
   for (const x of [13, 18])
@@ -828,7 +866,7 @@ export async function buildWorld(
   }
   add(cylGeo, mat.wood, 15.2, 0.6, -10, 0.12, 1.2, 0.12);
   add(cylGeo, mat.wood, 15.2, 1.2, -10, 0.8, 0.12, 0.8);
-  capture?.("pergola", "Tea garden pergola", "Furnishings", group.children.slice(layoutStart), [15.5, 0, -10.5]);
+  record("pergola", "Tea garden pergola", "Furnishings", group.children.slice(layoutStart), [15.5, 0, -10.5]);
   layoutStart = group.children.length;
   // Postbox and hand-lettered sign geometry use readable DOM labels on approach.
   box(mat.wood, 3, 0.7, -1, 0.16, 1.4, 0.16);
@@ -836,34 +874,34 @@ export async function buildWorld(
   box(mat.metal, 3, 1.7, -0.765, 0.38, 0.06, 0.02);
   add(new T.ConeGeometry(0.49, 0.3, 4), mat.terra, 3, 2.1, -1).rotation.y =
     Math.PI / 4;
-  capture?.("postbox", "Little postbox", "Furnishings", group.children.slice(layoutStart), [3, 0, -1]);
+  record("postbox", "Little postbox", "Furnishings", group.children.slice(layoutStart), [3, 0, -1]);
   // Fences and lamps guide movement without a HUD full of markers.
+  const fenceMaterial = fenceWoodMaterial(mat.wood);
+  const addFence = (geometry: T.BufferGeometry, transform = new T.Matrix4()) => {
+    const mesh = new T.Mesh(geometry, fenceMaterial); mesh.applyMatrix4(transform); mesh.castShadow = mesh.receiveShadow = true; group.add(mesh);
+    for (const bounds of fenceCollisionBoxes(geometry, transform)) {
+      const center = bounds.getCenter(new T.Vector3()), size = bounds.getSize(new T.Vector3());
+      colliders.push({ x: center.x, z: center.z, w: size.x, d: size.z, bottom: bounds.min.y, top: bounds.max.y });
+    }
+    return mesh;
+  };
   for (const side of [-1, 1])
     for (let z = 18; z < 39; z += 2.4) {
-      layoutStart = group.children.length;
       const x = roadX(z) + side * 3.2;
-      box(mat.wood, x, 0.7, z, 0.13, 1.4, 0.13);
-      for (const y of [0.45, 0.95])
-        box(mat.wood, x, y, z + 1.2, 0.09, 0.11, 2.5);
-      capture?.(`fence-${side}-${Math.round(z * 10)}`, "Oak fence", "Furnishings", group.children.slice(layoutStart), [x, 0, z + 1.2]);
+      const mesh = addFence(fenceGeometry([[x, z], [roadX(z + 2.4) + side * 3.2, z + 2.4]], 1.4, landscapeHeight));
+      record(`fence-${side}-${Math.round(z * 10)}`, "Oak fence", "Furnishings", [mesh], [x, 0, z + 1.2]);
     }
   for (const fence of authored.fences) {
-    const geometry = fenceGeometry(fence.points, fence.height);
-    const positions = geometry.attributes.position;
-    for (let i = 0; i < positions.count; i++) positions.setY(i, positions.getY(i) + landscapeHeight(positions.getX(i), positions.getZ(i)));
-    positions.needsUpdate = true; geometry.computeVertexNormals(); geometry.computeBoundingBox(); geometry.computeBoundingSphere();
-    const mesh = new T.Mesh(geometry, mat.wood); mesh.castShadow = mesh.receiveShadow = true; group.add(mesh);
-    for (let i = 1; i < fence.points.length; i++) {
-      const [ax, az] = fence.points[i - 1], [bx, bz] = fence.points[i];
-      const steps = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / 2));
-      for (let step = 0; step < steps; step++) {
-        const x0 = ax + (bx - ax) * step / steps, z0 = az + (bz - az) * step / steps;
-        const x1 = ax + (bx - ax) * (step + 1) / steps, z1 = az + (bz - az) * (step + 1) / steps;
-        const x = (x0 + x1) / 2, z = (z0 + z1) / 2;
-        colliders.push({ x, z, w: Math.abs(x1 - x0) + .35, d: Math.abs(z1 - z0) + .35, top: landscapeHeight(x, z) + fence.height });
-      }
-    }
-    capture?.(fence.id, "Oak fence line", "Furnishings", [mesh], [fence.points[0][0], 0, fence.points[0][1]]);
+    const item = authored.items?.find(item => item.id === fence.id && item.asset === "fence-line");
+    let mesh: T.Mesh;
+    if (item?.path) {
+      const matrix = new T.Matrix4().compose(new T.Vector3(...item.position), new T.Quaternion().setFromEuler(new T.Euler(...item.rotation.map(T.MathUtils.degToRad) as [number, number, number])), new T.Vector3(...item.scale));
+      const source = fenceGeometry(item.path.points, item.path.width);
+      const lift = Math.max(0, item.position[1] - landscapeHeight(item.position[0], item.position[2]));
+      const geometry = conformFenceGeometry(source, matrix, (x, z) => landscapeHeight(x, z) + lift); source.dispose();
+      mesh = addFence(geometry, matrix);
+    } else mesh = addFence(fenceGeometry(fence.points, fence.height, landscapeHeight));
+    record(fence.id, "Oak fence line", "Furnishings", [mesh], [fence.points[0][0], 0, fence.points[0][1]]);
   }
   for (const z of [20, 0, -27]) {
     layoutStart = group.children.length;
@@ -872,7 +910,7 @@ export async function buildWorld(
     lantern(-2.5, 2.55, z);
     const light = new T.PointLight("#ffd09a", 0, 10, 2);
     light.position.set(-2.5, 2.95, z); light.visible = false; light.userData.villageLamp = true; group.add(light); lampLights.push(light);
-    capture?.(`lamp-${z}`, "Hanging lantern", "Furnishings", group.children.slice(layoutStart), [-3.1, 0, z]);
+    record(`lamp-${z}`, "Hanging lantern", "Furnishings", group.children.slice(layoutStart), [-3.1, 0, z]);
   }
   for (const [id, x, z, angle] of [
     ["lamp-moon-bridge", -4.5, 8.5, 0],
@@ -890,7 +928,7 @@ export async function buildWorld(
     light.position.set(.62, 2.9, 0); light.visible = false; light.userData.villageLamp = true; post.add(light); lampLights.push(light);
     group.add(post);
     colliders.push({ x, z, w: .4, d: .4, top: 3.5 });
-    capture?.(id, "Moonlit path lamppost", "Furnishings", [post], [x, 0, z]);
+    record(id, "Moonlit path lamppost", "Furnishings", [post], [x, 0, z]);
   }
   // Low shielded lanterns light the planted edge and trace the pond bank without standing in the aisles or water.
   for (const [id, x, z, y] of [
@@ -913,17 +951,30 @@ export async function buildWorld(
     fixture.add(light); lampLights.push(light);
     group.add(fixture);
     colliders.push({ x, z, w: .64, d: .64, top: y + 1 });
-    capture?.(id, "Low stone lantern", "Furnishings", [fixture], [x, y, z]);
+    record(id, "Low stone lantern", "Furnishings", [fixture], [x, y, z]);
   }
   onProgress(45);
+  if (!capture) sceneLayout.apply();
   // Static architectural geometry is merged per material into a handful of draw calls.
   if (!capture) {
   group.updateMatrixWorld(true);
-  const batches = new Map<T.Material, T.BufferGeometry[]>();
+  const groundBatch = spatialMesh(terrainMesh.geometry, mat.ground, 96);
+  groundBatch.name = "Valley ground";
+  groundBatch.position.copy(terrainMesh.position); groundBatch.quaternion.copy(terrainMesh.quaternion); groundBatch.scale.copy(terrainMesh.scale);
+  terrainMesh.parent!.add(groundBatch); terrainMesh.removeFromParent(); terrain.dispose();
+  group.traverse(object => {
+    if (object instanceof T.Mesh && object.geometry.userData.riverBank) {
+      object.geometry = object.geometry.clone();
+      conformRiverBank(object.geometry, object.matrixWorld, authored);
+    }
+  });
+  clearPavingBorders(group);
+  const batches = new Map<T.Material, Map<string, T.BufferGeometry[]>>();
   const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh, shoreMesh]);
+  groundBatch.traverse(object => keep.add(object));
   swings.forEach(swing => swing.dynamicMeshes.forEach(mesh => keep.add(mesh)));
   const remove: T.Object3D[] = [];
-  group.traverse((o) => {
+  group.traverseVisible((o) => {
     if (o instanceof T.Mesh && !keep.has(o)) {
       const g = o.geometry.clone().applyMatrix4(o.matrixWorld);
       if (!g.index)
@@ -950,35 +1001,45 @@ export async function buildWorld(
           const colors = new Float32Array(count*3);
           for(let i=0;i<count;i++) colors.set([tint.r,tint.g,tint.b],i*3);
           g.setAttribute("color",new T.BufferAttribute(colors,3));
-        } else if (g.attributes.color) g.deleteAttribute("color");
+        } else if (g.attributes.color && material !== fenceMaterial) g.deleteAttribute("color");
       }
       const m = o.material as T.Material;
-      if (!batches.has(m)) batches.set(m, []);
-      batches.get(m)!.push(g);
+      if (!batches.has(m)) batches.set(m, new Map());
+      const surface = g.userData.plantingSurface ?? "", surfaces = batches.get(m)!;
+      if (!surfaces.has(surface)) surfaces.set(surface, []);
+      surfaces.get(surface)!.push(g);
       remove.push(o);
     }
   });
   remove.forEach((o) => o.removeFromParent());
-  batches.forEach((gs, m) => {
+  batches.forEach((surfaces, m) => surfaces.forEach((gs, surface) => {
     const g = mergeGeometries(gs);
     gs.forEach((g) => g.dispose());
     if (g) {
-      const mesh = add(g, m, 0, 0, 0);
-      mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial;
+      if (surface) g.userData.plantingSurface = surface;
+      const mesh = spatialBatch(g, m, 32); mesh.name = `Village architecture ${surface || m.name || m.type}`;
+      mesh.receiveShadow = true; mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial; group.add(mesh); g.dispose();
     }
-  });
+  }));
   }
   const { trees, treeLod, treeRecords } = buildWorldLandscape({
     group, colliders, vegetation, wind, authored, mat, dummy, rnd, add,
-    clearPlanting, erasedPlanting, onAuthoredPath, capture, onProgress,
+    clearPlanting, erasedPlanting, onAuthoredPath, capture, record, applyLayout: () => sceneLayout.apply(), onProgress,
   });
-  birdBenchCollider.x = birdBenchX; birdBenchCollider.z = birdBenchZ + .05;
-  colliders.push(pondRestBench);
+  if (authored.sceneVersion !== 1) { birdBenchCollider.x = birdBenchX; birdBenchCollider.z = birdBenchZ + .05; }
+  if (authored.sceneVersion !== 1) colliders.push(pondRestBench);
   const wayfinding = buildWayfinding(colliders);
   group.add(wayfinding.group);
-  capture?.("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);
+  record("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);
+  if (!capture) sceneLayout.apply();
   onProgress(80);
   group.updateMatrixWorld(true);
+  if (authored.sceneVersion === 1) {
+    mapBuildings.splice(0, mapBuildings.length, ...mapBuildings.flatMap(building => (authored.items ?? [])
+      .filter(item => item.visible && item.asset === building.id).map(item => ({ ...building, id: item.id,
+        x: item.position[0], z: item.position[2], yaw: item.rotation[1] * Math.PI / 180,
+        width: building.width * item.scale[0], depth: building.depth * item.scale[2] }))));
+  }
   const lampPositions = lampLights.map(light => light.getWorldPosition(new T.Vector3()));
   let lampDusk = 0, lampNight = 0;
   const updateLampLights = (x: number, z: number) => {
@@ -1030,7 +1091,8 @@ export async function buildWorld(
         materials = new Set<T.Material>();
       group.traverse((o) => {
         if (o instanceof T.Mesh || o instanceof T.Points || o instanceof T.Sprite) {
-          if (!(o instanceof T.Sprite)) geometries.add(o.geometry);
+          if (o instanceof T.BatchedMesh) o.dispose();
+          else if (!(o instanceof T.Sprite)) geometries.add(o.geometry);
           if (o instanceof T.Mesh && o.customDepthMaterial) materials.add(o.customDepthMaterial);
           (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
             materials.add(m),

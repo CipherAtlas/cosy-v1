@@ -31,6 +31,7 @@ vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
   freshGarden: () => ({ beds: [] }), readGarden: raw => JSON.parse(raw),
   VillageSimulation: class {
+    mountedHorse() { return undefined; }
     step() {} snapshot() { return {}; } save() { return {}; }
     releaseVisitor(id) { releases.push(id); }
   },

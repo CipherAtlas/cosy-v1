@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Client1 lazily loads two native skins in its private room and hides outdoor actors",
+    "Client2 lazily loads two native skins in its private room and hides outdoor actors",
+    "Leaving pauses this visitor’s native cat",
+    "The other visitor’s native cat and private room remain active",
+    "No application page errors"
+  ],
+  "errors": []
+}

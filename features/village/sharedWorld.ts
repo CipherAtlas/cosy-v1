@@ -2,26 +2,29 @@ import { readGarden, type GardenAction, type GardenState } from "./garden";
 import type { PuppyCommand } from "./puppies";
 import type { SwingSeat } from "./swings";
 import type { PlaceId } from "./places";
-import type { SharedActors, SharedInteraction, InteractionResult } from "./sharedActors";
+import type { SharedActors, SharedInteraction, InteractionResult, SharedHorseInput } from "./sharedActors";
+import type { ForageInventory } from "./townShared";
 
 export type SharedSwingRide = SwingSeat & { angle: number; velocity: number };
 export type SharedPuppyTrick = { id: string; command: PuppyCommand; x: number; z: number; heading: number; startedAt: number };
-export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null };
+export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; y?: number; z: number; heading: number; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null };
 export type SharedChatEntry = { id?: string; messageId?: string; name: string; message: string; sentAt?: number };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
   sendChat: (message: string) => boolean;
   sendPuppyTrick: (trick: SharedPuppyTrick) => void;
   interact: (request: SharedInteraction) => Promise<InteractionResult>;
+  sendHorseInput: (input: SharedHorseInput) => void;
   close: () => void;
 };
 
 type WorldMessage =
-  | { type: "welcome"; protocol?: number; world?: SharedActors; hasCrumbs?: boolean; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[]; puppyTricks?: SharedPuppyTrick[] }
+  | { type: "welcome"; protocol?: number; world?: SharedActors; hasCrumbs?: boolean; forageInventory?: ForageInventory; inventoryToken?: string; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[]; puppyTricks?: SharedPuppyTrick[] }
   | { type: "join"; visitor: SharedVisitor }
-  | { type: "move"; id: string; x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null }
+  | { type: "move"; id: string; x: number; y?: number; z: number; heading: number; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null }
   | { type: "actors"; world: SharedActors }
   | { type: "crumbs"; hasCrumbs: boolean }
+  | { type: "forageInventory"; inventory: ForageInventory; token?: string }
   | { type: "interaction_result"; requestId: string; result: InteractionResult }
   | { type: "action_rejected"; message: string }
   | { type: "swing_taken" }
@@ -35,7 +38,7 @@ type WorldMessage =
   | { type: "error"; message: string };
 
 export function connectSharedWorld(options: {
-  getPose: () => { x: number; y?: number; z: number; heading: number; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null; active?: boolean; holdingPuppy?: string | null } | null;
+  getPose: () => { x: number; y?: number; z: number; heading: number; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null; active?: boolean; holdingPuppy?: string | null } | null;
   onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
   onChat: (entry: SharedChatEntry) => void;
   onChatModerated?: (removedMessageIds: string[]) => void;
@@ -47,9 +50,21 @@ export function connectSharedWorld(options: {
   onPuppyTrick?: (trick: SharedPuppyTrick) => void;
   onWorld?: (world: SharedActors, selfId: string) => void;
   onCrumbs?: (hasCrumbs: boolean) => void;
+  onForageInventory?: (inventory: ForageInventory) => void;
   onRejected?: (message: string) => void;
   signal?: AbortSignal;
 }): Promise<SharedWorldConnection> {
+  let inventoryToken = "";
+  try {
+    const cached = JSON.parse(localStorage.getItem("cosy.village.inventory.v1") || "null");
+    if (typeof cached?.token === "string" && /^[0-9a-f-]{36}$/.test(cached.token)) inventoryToken = cached.token;
+  } catch { /* A private basket remains available for this connection when storage is disabled. */ }
+  const acceptedInventory = (inventory: ForageInventory, token?: string) => {
+    if (token) inventoryToken = token;
+    try { localStorage.setItem("cosy.village.inventory.v1", JSON.stringify({ token: inventoryToken, inventory })); }
+    catch { /* Local storage can be unavailable in a private browser. */ }
+    options.onForageInventory?.(inventory);
+  };
   const endpoint = process.env.NEXT_PUBLIC_SHARED_WORLD_URL || "ws://127.0.0.1:2567";
   return new Promise((resolve, reject) => {
     const visitors = new Map<string, SharedVisitor>();
@@ -78,6 +93,9 @@ export function connectSharedWorld(options: {
       selfId, visitors: [...visitors.values()], garden, gardenChanged, chatHour, chat,
     });
     const connection: SharedWorldConnection = {
+      sendHorseInput: input => {
+        if (!closed && socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "horseInput", ...input }));
+      },
       sendGarden: action => { if (!closed && socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "garden", action })); },
       sendPuppyTrick: trick => {
         window.clearTimeout(trickTimer);
@@ -152,23 +170,28 @@ export function connectSharedWorld(options: {
           chat = message.chat;
           publish(true);
           options.onCrumbs?.(message.hasCrumbs === true);
+          if (inventoryToken) active.send(JSON.stringify({ type: "inventory_resume", token: inventoryToken }));
+          else {
+            acceptedInventory(message.forageInventory ?? { apples: 0, mushrooms: 0 }, message.inventoryToken);
+            active.send(JSON.stringify({ type: "inventory_resume", token: inventoryToken }));
+          }
           if (message.world) options.onWorld?.(message.world, selfId);
           for (const trick of message.puppyTricks ?? []) options.onPuppyTrick?.(trick);
           window.clearInterval(interval);
           interval = window.setInterval(() => {
             const pose = options.getPose();
-            if (pose && active.readyState === WebSocket.OPEN && (!lastPose
+            if (pose && !pose.horse && active.readyState === WebSocket.OPEN && (!lastPose
               || Math.hypot(pose.x - lastPose.x, pose.z - lastPose.z) > 0.01
               || pose.y !== lastPose.y
               || Math.abs(pose.heading - lastPose.heading) > 0.01
               || JSON.stringify(pose.swing ?? null) !== JSON.stringify(lastPose.swing ?? null)
               || JSON.stringify(pose.bench ?? null) !== JSON.stringify(lastPose.bench ?? null)
-              || pose.activity !== lastPose.activity)) {
+              || pose.activity !== lastPose.activity || pose.horse !== lastPose.horse)) {
               lastPose = pose;
               active.send(JSON.stringify({ type: "move", ...pose }));
             }
             if (pose && active.readyState === WebSocket.OPEN) active.send(JSON.stringify({ type: "heartbeat", active: pose.active !== false,
-              holdingPuppy: pose.holdingPuppy ?? null, activity: pose.activity ?? null, bench: pose.bench ?? null,
+              holdingPuppy: pose.holdingPuppy ?? null, activity: pose.activity ?? null, bench: pose.bench ?? null, horse: pose.horse ?? null,
               swing: pose.swing ? { id: pose.swing.id, index: pose.swing.index } : null }));
           }, 120);
           if (!connectedOnce) { connectedOnce = true; resolve(connection); }
@@ -177,7 +200,7 @@ export function connectSharedWorld(options: {
           publish();
         } else if (message.type === "move") {
           const visitor = visitors.get(message.id);
-          if (visitor) { Object.assign(visitor, { x: message.x, y: message.y, z: message.z, heading: message.heading, swing: message.swing ?? null, bench: message.bench ?? null, activity: message.activity ?? null }); publish(); }
+          if (visitor) { Object.assign(visitor, { x: message.x, y: message.y, z: message.z, heading: message.heading, horse: message.horse ?? null, swing: message.swing ?? null, bench: message.bench ?? null, activity: message.activity ?? null }); publish(); }
         } else if (message.type === "actors") {
           options.onWorld?.(message.world, selfId);
         } else if (message.type === "crumbs") {
@@ -187,6 +210,8 @@ export function connectSharedWorld(options: {
         } else if (message.type === "interaction_result") {
           const request = pending.get(message.requestId);
           if (request) { pending.delete(message.requestId); window.clearTimeout(request.timer); request.resolve(message.result); }
+        } else if (message.type === "forageInventory") {
+          acceptedInventory(message.inventory, message.token);
         } else if (message.type === "swing_taken") {
           options.onSwingTaken?.();
         } else if (message.type === "puppy_trick") {
@@ -228,6 +253,7 @@ export function connectSharedWorld(options: {
         failPending();
         if (closed) return;
         selfId = "";
+        options.onForageInventory?.({ apples: 0, mushrooms: 0 });
         options.onDisconnect();
         retry = window.setTimeout(open, retryDelay);
         retryDelay = Math.min(retryDelay * 2, 10_000);

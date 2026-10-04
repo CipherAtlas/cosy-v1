@@ -1,0 +1,334 @@
+{
+  "scope": "Fresh compiled production-engine QA; fixed shared visual snapshot; real keyboard movement and native walking camera",
+  "captures": [
+    {
+      "name": "east-street",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 34,
+          "y": 0.05,
+          "z": 24
+        }
+      },
+      "frame": {
+        "position": [
+          34,
+          0.05,
+          21.768246592186166
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 350,
+        "triangles": 6653942
+      }
+    },
+    {
+      "name": "apple-garden",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 32,
+          "y": 0.05,
+          "z": 5.5
+        }
+      },
+      "frame": {
+        "position": [
+          32,
+          0,
+          3.2249150278191316
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 323,
+        "triangles": 6158216
+      }
+    },
+    {
+      "name": "farm1-foreground",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 31,
+          "y": 0,
+          "z": -67
+        }
+      },
+      "frame": {
+        "position": [
+          31,
+          0.05,
+          -69.23175327487155
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 167,
+        "triangles": 2355626
+      }
+    },
+    {
+      "name": "farm2-front",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 73,
+          "y": 0.05,
+          "z": -57.7
+        }
+      },
+      "frame": {
+        "position": [
+          73,
+          0,
+          -59.604271366354375
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 167,
+        "triangles": 4553852
+      }
+    },
+    {
+      "name": "farm3-front",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 98,
+          "y": 0,
+          "z": -42
+        }
+      },
+      "frame": {
+        "position": [
+          98,
+          0.05,
+          -44.253419116724686
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 183,
+        "triangles": 6941608
+      }
+    },
+    {
+      "name": "north-brook-bridge",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 54,
+          "y": 0.18504065309377943,
+          "z": -53
+        }
+      },
+      "frame": {
+        "position": [
+          56.253419035989666,
+          0.7593521506503224,
+          -53
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 219,
+        "triangles": 7416056
+      }
+    },
+    {
+      "name": "south-brook-bridge",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 54,
+          "y": 0.35500000000000004,
+          "z": 42
+        }
+      },
+      "frame": {
+        "position": [
+          56.253419116724686,
+          0.9655994124063587,
+          42
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 305,
+        "triangles": 2219562
+      }
+    },
+    {
+      "name": "race-meadow",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 112,
+          "y": 0.05,
+          "z": 20
+        }
+      },
+      "frame": {
+        "position": [
+          109.72491499879497,
+          0,
+          20
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 714,
+        "triangles": 4829234
+      }
+    },
+    {
+      "name": "stable-yard",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 85,
+          "y": 0.05,
+          "z": 36
+        }
+      },
+      "frame": {
+        "position": [
+          85,
+          0.05,
+          38.29675036740204
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 272,
+        "triangles": 1644452
+      }
+    },
+    {
+      "name": "pasture",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": -42,
+          "y": 0.9442,
+          "z": 48
+        }
+      },
+      "frame": {
+        "position": [
+          -42,
+          1.152621656160609,
+          50.29675070565584
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 242,
+        "triangles": 2223732
+      }
+    },
+    {
+      "name": "west-pond-bank",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": -51.5,
+          "y": 0.05,
+          "z": -16
+        }
+      },
+      "frame": {
+        "position": [
+          -51.5,
+          0.05,
+          -13.768246578049819
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 349,
+        "triangles": 3611222
+      }
+    },
+    {
+      "name": "brook-bend",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 65,
+          "y": 0,
+          "z": 58
+        }
+      },
+      "frame": {
+        "position": [
+          65,
+          0,
+          55.74658085419749
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 478,
+        "triangles": 6253860
+      }
+    },
+    {
+      "name": "whole-town-meadow",
+      "player": [
+        34,
+        -14
+      ],
+      "camera": [
+        105,
+        120,
+        117
+      ],
+      "target": [
+        23,
+        0,
+        -12
+      ],
+      "frame": {
+        "calls": 852,
+        "triangles": 10983538
+      }
+    },
+    {
+      "name": "farms-brook-meadow",
+      "player": [
+        73,
+        -60
+      ],
+      "camera": [
+        119,
+        60,
+        -12
+      ],
+      "target": [
+        65,
+        0,
+        -66
+      ],
+      "frame": {
+        "calls": 502,
+        "triangles": 9502070
+      }
+    },
+    {
+      "name": "laptop-bridge-meadow",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 54,
+          "y": 0.35500000000000004,
+          "z": 42
+        }
+      },
+      "frame": {
+        "position": [
+          56.29674925425796,
+          0.9753981907448621,
+          42
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 299,
+        "triangles": 2196396
+      }
+    }
+  ],
+  "errors": []
+}

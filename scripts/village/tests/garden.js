@@ -158,7 +158,7 @@ export async function checkGarden(engine, capture, save) {
   }
   checks(POND.rx * POND.rz > 2 * 7.7 * 7, 'Pond water area is more than twice the previous footprint');
   checks(!engine.world.colliders.some(c => c.x === -24 && c.z === -5), 'Pond-front cottage collision is removed');
-  checks(engine.garden.birds.length === 6 && engine.garden.fish.length === 4, 'The pond has a swan, a duck, four ducklings and four fish');
+  checks(engine.garden.birds.length === 15 && engine.garden.fish.length === 8, 'The pond has three swans, four ducks, eight ducklings and eight fish');
   checks(engine.garden.birds[0].wings.length === 2 && engine.garden.fish[0].tail, 'Blender wing and tail pivots are loaded');
   const m = engine.movement;
   checks(!m.clear(POND.x, POND.z), 'Deep pond water remains blocked');
@@ -225,7 +225,7 @@ export async function checkGarden(engine, capture, save) {
   }
   engine.travel('breathe'); engine.garden.act({ kind: 'feed' });
   for (let i = 0; i < 600; i++) engine.garden.update(1 / 60, engine.garden.time + 1 / 60, false);
-  checks(engine.garden.birds.slice(1).every(b => Math.hypot(b.root.position.x + 25, b.root.position.z + 7.8) < 1.65), 'Ducks swim to the thrown crumbs');
+  checks(engine.garden.birds.slice(3).every((b, i) => b.root.position.distanceTo(new T.Vector3(...engine.garden.pondSpace.meal(i + 3))) < .1), 'Duck families swim to distinct feeding places beside the authored dock');
   checks(engine.garden.birds.every(b => pondDistance(b.root.position.x, b.root.position.z) < 1), 'Feeding keeps all water birds inside the pond');
   const heights = [];
   for (let i = 0; i < 240; i++) { engine.garden.update(1 / 60, i / 60, false); heights.push(engine.garden.fish[0].root.position.y); }
@@ -319,12 +319,12 @@ export async function checkCosyFeedback(engine, capture, save) {
     check(garden.crumbs.visible && !garden.hearts.visible, 'Happy reaction waits until the crumbs are eaten');
     garden.update(.016, start + 8.2, false, engine.camera.quaternion);
     check(!garden.crumbs.visible && garden.hearts.visible && garden.feedCelebrated, 'Eating ends with hearts and a single happy duck call');
-    check(garden.birds.slice(1).every(b => b.root.rotation.z !== 0), 'Duck and ducklings wiggle and bob in celebration');
+    check(garden.birds.slice(3).every(b => b.root.rotation.z !== 0), 'Duck and ducklings wiggle and bob in celebration');
     garden.update(.016, start + 8.2, true, engine.camera.quaternion);
-    check(garden.hearts.visible && garden.birds.slice(1).every(b => b.root.rotation.z === 0 && b.wings.every(w => w.rotation.z === 0)), 'Reduced motion keeps static hearts without bouncing or wing flutter');
-    garden.update(.016, start + 11.2, false, engine.camera.quaternion);
-    check(!garden.hearts.visible && garden.birds.slice(1).every(b => b.root.rotation.z === 0), 'Happy reaction settles back into ordinary swimming');
-    garden.act({ kind: 'feed' }); garden.update(.016, start + 11.3, false, engine.camera.quaternion);
+    check(garden.hearts.visible && garden.birds.slice(3).every(b => b.root.rotation.z === 0 && b.wings.every(w => w.rotation.z === 0)), 'Reduced motion keeps static hearts without bouncing or wing flutter');
+    garden.update(.016, start + 13.2, false, engine.camera.quaternion);
+    check(!garden.hearts.visible && garden.birds.slice(3).every(b => b.root.rotation.z === 0), 'Happy reaction settles back into ordinary swimming');
+    garden.act({ kind: 'feed' }); garden.update(.016, start + 13.3, false, engine.camera.quaternion);
     check(!garden.hearts.visible && !garden.feedCelebrated, 'Feeding again starts a fresh sequence without piling up reactions');
     // Capture real elapsed-time feedback, preserving production camera-facing hearts.
     engine.setBlocked(true); engine.travel('breathe');

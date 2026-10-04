@@ -5,6 +5,8 @@ import { RecordedSoundtrack, soundtrackFor, type RadioTrack } from "./soundtrack
 import { withBasePath } from "@/lib/basePath";
 import type { GardenSound } from "./garden";
 import type { PuppyBreed } from "./worldLayout";
+import { HorseAudio, type HorseSoundEvent } from "./horseAudio";
+import { TownAnimalAudio, type AnimalSoundSource, type TownAnimalSoundEvent } from "./townAnimalAudio";
 
 type Voice = { source: AudioScheduledSourceNode; nodes: AudioNode[]; end: number; effect: boolean };
 
@@ -15,6 +17,8 @@ export class VillageAudio {
   private music?: GainNode;
   private ambience?: GainNode;
   private effects?: GainNode;
+  private horses?: HorseAudio;
+  private townAnimals?: TownAnimalAudio;
   private soundtrack?: RecordedSoundtrack;
   private radioTrack: RadioTrack | null = null;
   private radioSelection = 0;
@@ -42,7 +46,9 @@ export class VillageAudio {
   private nextDetail = 0;
   private steps = new Map<Surface, AudioBuffer[]>();
   private gardenSounds = new Map<GardenSound, AudioBuffer>();
-  private puppySounds = new Map<PuppyBreed, AudioBuffer>();
+  private duckUntil = 0;
+  private ducked = false;
+  private nextSplash = 0;
   private lastStep = -1;
   private onVisibility = () => this.apply();
 
@@ -58,6 +64,11 @@ export class VillageAudio {
     this.music = c.createGain(); this.music.connect(this.master);
     this.ambience = c.createGain(); this.ambience.connect(this.master);
     this.effects = c.createGain(); this.effects.connect(this.master);
+    this.horses = new HorseAudio(c, this.effects);
+    this.townAnimals = new TownAnimalAudio(c, this.effects, (duration, event) => {
+      if (!event.happy || Math.hypot(event.position[0] - this.environment.listener[0], event.position[2] - this.environment.listener[2]) > 5.5) return;
+      this.duckUntil = c.currentTime + duration; this.ducked = true; this.apply();
+    });
     this.shelter = c.createBiquadFilter(); this.shelter.type = "lowpass";
     this.shelter.connect(this.ambience);
     this.soundtrack = new RecordedSoundtrack(c, this.music, () => this.onIssue("music"), this.onRadioEnded);
@@ -109,20 +120,6 @@ export class VillageAudio {
     }
     return loop;
   }
-  private async loadPuppySounds() {
-    const breeds: PuppyBreed[] = ["corgi", "shiba", "beagle", "samoyed"];
-    await Promise.all(breeds.map(async (breed, index) => {
-      if (this.puppySounds.has(breed)) return;
-      const names = ["mochi", "kiko", "biscuit", "cloud"];
-      try {
-        const response = await fetch(withBasePath(`/village/audio/puppies/${names[index]}-yip.mp3`), { signal: this.loadAbort.signal });
-        if (!response.ok) return;
-        const buffer = await this.context!.decodeAudioData(await response.arrayBuffer());
-        if (!this.disposed) this.puppySounds.set(breed, buffer);
-      } catch { /* The village and other audio remain usable if an optional bark fails. */ }
-    }));
-    return this.puppySounds.size === 4;
-  }
   async start() {
     if (this.disposed) throw new Error("Audio was disposed.");
     if (!this.context) this.graph();
@@ -143,9 +140,9 @@ export class VillageAudio {
         await this.soundtrack!.leaveRadio(cue);
       }
     };
-    const [ambience, puppies] = await Promise.all([
+    const [ambience, animals] = await Promise.all([
       this.loadWorldRecordings(),
-      this.loadPuppySounds(),
+      this.townAnimals!.load(),
       startMusic(),
     ]);
     if (this.disposed) throw new Error("Audio was disposed.");
@@ -153,10 +150,13 @@ export class VillageAudio {
     if (this.mix.master === 0) await c.suspend();
     this.schedule();
     if (!this.timer) this.timer = setInterval(() => this.schedule(), 80);
-    return { recorded: true, ambience, puppies, radioFailed };
+    return { recorded: true, ambience, puppies: animals, animals, radioFailed };
   }
   stop() {
     this.enabled = false;
+    this.horses?.stop();
+    this.townAnimals?.stop();
+    this.ducked = false; this.duckUntil = 0;
     if (this.timer) clearInterval(this.timer); this.timer = undefined;
     if (!this.context) return;
     this.master?.gain.setTargetAtTime(0, this.context.currentTime, .06);
@@ -173,6 +173,7 @@ export class VillageAudio {
     const wasMasterSilent = this.mix.master === 0;
     const wasSilent = wasMasterSilent || this.mix.music === 0;
     this.mix = m; this.apply();
+    if (m.effects === 0 || m.master === 0) this.townAnimals?.stop();
     this.soundtrack?.request(soundtrackFor(m, this.place, this.environment), true);
     if (this.enabled && this.context) {
       if (m.master === 0) {
@@ -217,6 +218,8 @@ export class VillageAudio {
   }
   setPlace(place: PlaceId | null) {
     const previous = this.place; this.place = place;
+    if (previous !== place) this.townAnimals?.stop();
+    if (place === "focus") this.horses?.stop();
     if (previous !== place && (place === "focus" || previous === "focus")) this.interaction("door");
     if (previous !== place && place === "compliment") this.interaction("paper");
     const destination = PLACES.find(p => p.id === place);
@@ -230,9 +233,10 @@ export class VillageAudio {
   private apply() {
     const c = this.context; if (!c) return;
     this.master?.gain.setTargetAtTime(this.enabled ? this.mix.master * .65 : 0, c.currentTime, .12);
-    this.music?.gain.setTargetAtTime(this.musicPaused ? 0 : this.mix.music * 1.6, c.currentTime, .5);
-    this.effects?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.effects ?? .6), c.currentTime, .2);
-    this.ambience?.gain.setTargetAtTime(this.mix.ambience ?? .5, c.currentTime, .8);
+    this.music?.gain.setTargetAtTime(this.musicPaused ? 0 : this.mix.music * 1.2 * (this.ducked ? .78 : 1), c.currentTime, .2);
+    this.effects?.gain.setTargetAtTime(document.hidden ? 0 : (this.mix.effects ?? DEFAULT_MIX.effects!), c.currentTime, .2);
+    this.ambience?.gain.setTargetAtTime((this.mix.ambience ?? DEFAULT_MIX.ambience!) * (this.ducked ? .65 : 1), c.currentTime, .3);
+    if (document.hidden) this.townAnimals?.stop();
     this.applyWorld();
   }
   private applyWorld() {
@@ -276,11 +280,14 @@ export class VillageAudio {
     return true;
   }
   private clearVoices() {
+    this.horses?.stop();
+    this.townAnimals?.stop();
     for (const voice of this.voices) { try { voice.source.stop(); } catch {} voice.source.disconnect(); voice.nodes.forEach(n => n.disconnect()); }
     this.voices.clear();
   }
   private schedule() {
     const c = this.context; if (!c || !this.enabled || c.state !== "running" || this.mix.master === 0) return;
+    if (this.ducked && c.currentTime >= this.duckUntil) { this.ducked = false; this.apply(); }
     this.soundtrack?.request(soundtrackFor(this.mix, this.place, this.environment));
     this.soundtrack?.tick();
     for (const recording of this.recordings.values()) {
@@ -339,7 +346,7 @@ export class VillageAudio {
   }
   private bird() {
     const c = this.context!;
-    if ((this.mix.ambience ?? .5) === 0) return;
+    if ((this.mix.ambience ?? DEFAULT_MIX.ambience!) === 0) return;
     const source = c.createOscillator(), gain = c.createGain(), now = c.currentTime;
     const pitch = 1500 + Math.random() * 750;
     source.frequency.setValueAtTime(pitch, now); source.frequency.exponentialRampToValueAtTime(pitch * 1.4, now + .08);
@@ -355,24 +362,25 @@ export class VillageAudio {
     if (!this.enabled || !c || c.state !== "running" || document.hidden || this.mix.master === 0 || this.mix.effects === 0) return;
     const [x, y, z] = this.environment.listener;
     if (!centered && Math.hypot(position[0] - x, position[1] - y, position[2] - z) > 23) return;
+    if (kind === "duck" || kind === "coo") {
+      this.townAnimal({ species: kind === "duck" ? "duck" : "dove", position: centered ? this.environment.listener : position, happy: true });
+      return;
+    }
+    if (kind === "splash") {
+      if (c.currentTime < this.nextSplash) return;
+      this.nextSplash = c.currentTime + 3;
+    }
     let buffer = this.gardenSounds.get(kind);
     if (!buffer) {
-      const duration = kind === "water" || kind === "pour" ? 1.15 : kind === "splash" ? .6 : kind === "duck" ? .38 : kind === "coo" ? .95 : .25;
+      const duration = kind === "water" || kind === "pour" ? 1.15 : kind === "splash" ? .6 : .25;
       buffer = c.createBuffer(1, Math.ceil(c.sampleRate * duration), c.sampleRate);
-      const data = buffer.getChannelData(0); let filtered = 0, phase = 0;
+      const data = buffer.getChannelData(0); let filtered = 0;
       for (let i = 0; i < data.length; i++) {
         const t = i / c.sampleRate, u = t / duration, noise = Math.random() * 2 - 1;
         filtered = filtered * .78 + noise * .22;
         const envelope = Math.min(1, t * 60) * Math.pow(1 - u, kind === "water" || kind === "pour" ? .7 : 2);
         let sample: number;
-        if (kind === "coo") {
-          const syllable = t % .48, breath = Math.sin(Math.min(1, syllable / .4) * Math.PI) ** 2;
-          phase += (460 - syllable * 150 + Math.sin(t * 22) * 7) * Math.PI * 2 / c.sampleRate;
-          sample = (Math.sin(phase) * .8 + Math.sin(phase * 2) * .12) * breath;
-        } else if (kind === "duck") {
-          phase += (330 - u * 140 + Math.sin(t * 32) * 22) * Math.PI * 2 / c.sampleRate;
-          sample = (Math.sin(phase) + Math.sin(phase * 3) * .35 + filtered * .2) * (.55 + Math.sin(t * 43) * .28);
-        } else if (kind === "pluck") sample = Math.sin(t * (850 - u * 340) * Math.PI * 2) * .65 + filtered * .25;
+        if (kind === "pluck") sample = Math.sin(t * (850 - u * 340) * Math.PI * 2) * .65 + filtered * .25;
         else if (kind === "plant" || kind === "crumbs") sample = filtered * (kind === "plant" ? 1.1 : .8);
         else {
           const drip = Math.max(0, Math.sin(t * (kind === "pour" ? 91 : 63))) ** 12;
@@ -383,24 +391,36 @@ export class VillageAudio {
       this.gardenSounds.set(kind, buffer);
     }
     const source = c.createBufferSource(), gain = c.createGain(); source.buffer = buffer;
-    source.playbackRate.value = .96 + Math.random() * .08; gain.gain.value = kind === "duck" || kind === "coo" ? .19 : .34;
+    source.playbackRate.value = .96 + Math.random() * .08; gain.gain.value = .28;
     const pan = this.panner(centered ? this.environment.listener : position, 3);
     source.connect(gain).connect(pan).connect(this.effects!);
     if (this.track(source, [gain, pan], c.currentTime + buffer.duration / .96, true)) source.start();
   }
-  puppyEffect(breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") {
-    const c = this.context, buffer = this.puppySounds.get(breed === "collie" ? "shiba" : breed === "shepherd" ? "beagle" : breed);
-    if (!this.enabled || !c || !buffer || c.state !== "running" || document.hidden || this.mix.master === 0 || this.mix.effects === 0) return;
+  townAnimal(event: TownAnimalSoundEvent) {
+    const c = this.context;
+    if (!this.enabled || !c || c.state !== "running" || document.hidden || (this.place === "focus") !== (event.species === "cat") || this.mix.master === 0 || this.mix.effects === 0) return;
     const listener = this.environment.listener;
-    if (Math.hypot(position[0] - listener[0], position[1] - listener[1], position[2] - listener[2]) > 22) return;
-    for (let i = 0; i < (kind === "happy" ? 2 : 1); i++) {
-      const when = c.currentTime + i * .23;
-      const source = c.createBufferSource(), gain = c.createGain(), pan = this.panner(position, 2.5);
-      source.buffer = buffer; source.playbackRate.value = .97 + Math.random() * .07 + (kind === "happy" && i === 1 ? .07 : 0);
-      gain.gain.value = kind === "happy" ? (i ? .24 : .34) : .19;
-      source.connect(gain).connect(pan).connect(this.effects!);
-      if (this.track(source, [gain, pan], when + buffer.duration / source.playbackRate.value, true)) source.start(when);
-    }
+    if (Math.hypot(event.position[0] - listener[0], event.position[1] - listener[1], event.position[2] - listener[2]) > 12) return;
+    this.townAnimals?.play(event);
+  }
+  animalNearby(sources: AnimalSoundSource[], walking: boolean) {
+    if (!this.enabled || this.context?.state !== "running" || document.hidden || this.place || this.mix.master === 0 || this.mix.effects === 0) return;
+    this.townAnimals?.nearby(sources, this.environment.listener, walking);
+  }
+  horseEffect(event: HorseSoundEvent) {
+    if (!this.enabled || this.context?.state !== "running" || document.hidden || this.place === "focus" || this.mix.master === 0 || this.mix.effects === 0) return;
+    const listener = this.environment.listener;
+    if (Math.hypot(event.position[0] - listener[0], event.position[1] - listener[1], event.position[2] - listener[2]) > 28) return;
+    if (event.kind === "neigh") this.townAnimal({ species: "horse", position: event.position, happy: false });
+    else this.horses?.play(event);
+  }
+  puppyEffect(breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") {
+    const c = this.context;
+    if (!this.enabled || !c || c.state !== "running" || document.hidden || this.place === "focus" || this.mix.master === 0 || this.mix.effects === 0) return;
+    const listener = this.environment.listener;
+    if (Math.hypot(position[0] - listener[0], position[1] - listener[1], position[2] - listener[2]) > 12) return;
+    const clip = breed === "collie" ? "shiba" : breed === "shepherd" ? "beagle" : breed === "corgi" ? "dog" : breed;
+    this.townAnimals?.play({ species: "dog", position, happy: kind === "happy" }, clip);
   }
   chime() {
     if (!this.enabled || !this.context || document.hidden) return;
@@ -415,11 +435,13 @@ export class VillageAudio {
     });
   }
   dispose() {
+    this.horses?.dispose();
+    this.townAnimals?.dispose();
     if (this.disposed) return;
     this.disposed = true; this.stop(); clearTimeout(this.suspension); this.loadAbort.abort();
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.clearVoices(); this.loops.forEach(s => { s.stop(); s.disconnect(); }); this.recordings.clear(); this.steps.clear(); this.soundtrack?.dispose();
-    this.gardenSounds.clear(); this.puppySounds.clear();
+    this.gardenSounds.clear();
     void this.context?.close();
   }
 }

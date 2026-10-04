@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Hay uses one accepted twelve-second meal",
+    "The real shared horse lowers its head and chews",
+    "Competing feed does not restart the meal",
+    "Meal controls fit 1366x768, with keycaps and no decorative helper text",
+    "Meal controls fit 1280x720, with keycaps and no decorative helper text",
+    "Meal controls fit 1024x640, with keycaps and no decorative helper text",
+    "Chewing continues through feeder disconnection and reconnect",
+    "Late join receives the original meal clock",
+    "The horse returns to its standing pose when the accepted meal ends",
+    "No browser page errors: "
+  ],
+  "errors": []
+}

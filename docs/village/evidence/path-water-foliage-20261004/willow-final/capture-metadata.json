@@ -1,0 +1,902 @@
+{
+  "scope": "Fresh exported3051 actual shared village; native walking camera and real keyboard movement; read-only path/water foliage audit. No interactions, source/layout edits, Save or Apply.",
+  "before": {
+    "public/village/world-layout.json": "53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c"
+  },
+  "authoredPaths": 39,
+  "nativePaths": 9,
+  "specs": 5,
+  "captures": [
+    {
+      "name": "path-4-50",
+      "pathId": "path-4",
+      "original": true,
+      "width": 2,
+      "length": 11.165095633029477,
+      "fraction": 0.5,
+      "x": -18.2,
+      "z": -1,
+      "yaw": -0.19798687488043043,
+      "start": {
+        "clear": true,
+        "requested": [
+          -18.2,
+          -1
+        ],
+        "position": [
+          -18.2,
+          -1
+        ],
+        "offset": 0
+      },
+      "frame": {
+        "position": [
+          -18.104276045296515,
+          0,
+          -1.4771524333047927
+        ],
+        "clear": true,
+        "camera": [
+          -19.001591923574097,
+          3.3887333677371783,
+          3.002532888854683
+        ],
+        "calls": 561,
+        "triangles": 3957120
+      },
+      "nearby": [
+        {
+          "id": "path-2",
+          "asset": "path-2",
+          "name": "Village path 2",
+          "position": [
+            -23,
+            0,
+            3
+          ]
+        },
+        {
+          "id": "path-4",
+          "asset": "path-4",
+          "name": "Village path 4",
+          "position": [
+            -18.2,
+            0,
+            -1
+          ]
+        },
+        {
+          "id": "bridge",
+          "asset": "bridge",
+          "name": "Stone arch bridge",
+          "position": [
+            -10.533896,
+            0,
+            3
+          ]
+        },
+        {
+          "id": "bench-5",
+          "asset": "bench-5",
+          "name": "Oak bench 5",
+          "position": [
+            -17.8,
+            0,
+            -7.6
+          ]
+        },
+        {
+          "id": "dock",
+          "asset": "dock",
+          "name": "Willow fishing dock",
+          "position": [
+            -22.15,
+            0,
+            -6.6
+          ]
+        },
+        {
+          "id": "bushes-3",
+          "asset": "bushes-3",
+          "name": "Leafy shrub 3",
+          "position": [
+            -16.127552,
+            0,
+            -4.412429
+          ]
+        },
+        {
+          "id": "bushes-8",
+          "asset": "bushes-8",
+          "name": "Leafy shrub 8",
+          "position": [
+            -25.8,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "bushes-35",
+          "asset": "bushes-35",
+          "name": "Leafy shrub 35",
+          "position": [
+            -21.5,
+            0,
+            -2
+          ]
+        },
+        {
+          "id": "bushes-37",
+          "asset": "bushes-37",
+          "name": "Leafy shrub 37",
+          "position": [
+            -16.02235,
+            0,
+            -1.119651
+          ]
+        },
+        {
+          "id": "bushes-56",
+          "asset": "bushes-56",
+          "name": "Leafy shrub 56",
+          "position": [
+            -15.452136,
+            0,
+            6.977477
+          ]
+        },
+        {
+          "id": "willow-1",
+          "asset": "willow-1",
+          "name": "Weeping willow 1",
+          "position": [
+            -15.9,
+            0,
+            -3.5
+          ]
+        },
+        {
+          "id": "town-pond-walk",
+          "asset": "path-curved",
+          "name": "Willow pond walk",
+          "position": [
+            -24,
+            0,
+            3
+          ]
+        },
+        {
+          "id": "town-dock-approach",
+          "asset": "path-curved",
+          "name": "Pond dock approach",
+          "position": [
+            -18.4,
+            0,
+            -5.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "path-5-30",
+      "pathId": "path-5",
+      "original": true,
+      "width": 1.05,
+      "length": 26.40243689785898,
+      "fraction": 0.3,
+      "x": -16.475313217926207,
+      "z": -7.9727619037037325,
+      "yaw": 0.12097438030307356,
+      "start": {
+        "clear": true,
+        "requested": [
+          -16.475313217926207,
+          -7.9727619037037325
+        ],
+        "position": [
+          -16.475313217926207,
+          -7.9727619037037325
+        ],
+        "offset": 0
+      },
+      "frame": {
+        "position": [
+          -16.534042944223877,
+          0.05,
+          -8.455863755165748
+        ],
+        "clear": true,
+        "camera": [
+          -15.982944920081167,
+          3.4387987600708363,
+          -3.9203915255767945
+        ],
+        "calls": 484,
+        "triangles": 3716224
+      },
+      "nearby": [
+        {
+          "id": "path-4",
+          "asset": "path-4",
+          "name": "Village path 4",
+          "position": [
+            -18.2,
+            0,
+            -1
+          ]
+        },
+        {
+          "id": "path-5",
+          "asset": "path-5",
+          "name": "Bird clearing approach",
+          "position": [
+            -17.15,
+            0,
+            -13
+          ]
+        },
+        {
+          "id": "bench-5",
+          "asset": "bench-5",
+          "name": "Oak bench 5",
+          "position": [
+            -17.8,
+            0,
+            -7.6
+          ]
+        },
+        {
+          "id": "dock",
+          "asset": "dock",
+          "name": "Willow fishing dock",
+          "position": [
+            -22.15,
+            0,
+            -6.6
+          ]
+        },
+        {
+          "id": "bushes-3",
+          "asset": "bushes-3",
+          "name": "Leafy shrub 3",
+          "position": [
+            -16.127552,
+            0,
+            -4.412429
+          ]
+        },
+        {
+          "id": "bushes-6",
+          "asset": "bushes-6",
+          "name": "Leafy shrub 6",
+          "position": [
+            -7.969781,
+            0,
+            -8.455097
+          ]
+        },
+        {
+          "id": "bushes-35",
+          "asset": "bushes-35",
+          "name": "Leafy shrub 35",
+          "position": [
+            -21.5,
+            0,
+            -2
+          ]
+        },
+        {
+          "id": "bushes-36",
+          "asset": "bushes-36",
+          "name": "Leafy shrub 36",
+          "position": [
+            -7.905592,
+            0,
+            -7.545533
+          ]
+        },
+        {
+          "id": "bushes-37",
+          "asset": "bushes-37",
+          "name": "Leafy shrub 37",
+          "position": [
+            -16.02235,
+            0,
+            -1.119651
+          ]
+        },
+        {
+          "id": "willow-1",
+          "asset": "willow-1",
+          "name": "Weeping willow 1",
+          "position": [
+            -15.9,
+            0,
+            -3.5
+          ]
+        },
+        {
+          "id": "town-dock-approach",
+          "asset": "path-curved",
+          "name": "Pond dock approach",
+          "position": [
+            -18.4,
+            0,
+            -5.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "town-dock-approach-50",
+      "pathId": "town-dock-approach",
+      "original": false,
+      "width": 1.8,
+      "length": 1.5747467688270826,
+      "fraction": 0.5,
+      "x": -19,
+      "z": -5.8,
+      "yaw": 0.7795794052951949,
+      "start": {
+        "clear": true,
+        "requested": [
+          -19,
+          -5.8
+        ],
+        "position": [
+          -19,
+          -5.8
+        ],
+        "offset": 0
+      },
+      "frame": {
+        "position": [
+          -19.327487360331524,
+          0.05,
+          -6.131320849203368
+        ],
+        "clear": true,
+        "camera": [
+          -16.11668366427784,
+          3.438802265103344,
+          -2.88299732862441
+        ],
+        "calls": 469,
+        "triangles": 3451102
+      },
+      "nearby": [
+        {
+          "id": "path-4",
+          "asset": "path-4",
+          "name": "Village path 4",
+          "position": [
+            -18.2,
+            0,
+            -1
+          ]
+        },
+        {
+          "id": "path-5",
+          "asset": "path-5",
+          "name": "Bird clearing approach",
+          "position": [
+            -17.15,
+            0,
+            -13
+          ]
+        },
+        {
+          "id": "bench-5",
+          "asset": "bench-5",
+          "name": "Oak bench 5",
+          "position": [
+            -17.8,
+            0,
+            -7.6
+          ]
+        },
+        {
+          "id": "dock",
+          "asset": "dock",
+          "name": "Willow fishing dock",
+          "position": [
+            -22.15,
+            0,
+            -6.6
+          ]
+        },
+        {
+          "id": "bushes-3",
+          "asset": "bushes-3",
+          "name": "Leafy shrub 3",
+          "position": [
+            -16.127552,
+            0,
+            -4.412429
+          ]
+        },
+        {
+          "id": "bushes-8",
+          "asset": "bushes-8",
+          "name": "Leafy shrub 8",
+          "position": [
+            -25.8,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "bushes-35",
+          "asset": "bushes-35",
+          "name": "Leafy shrub 35",
+          "position": [
+            -21.5,
+            0,
+            -2
+          ]
+        },
+        {
+          "id": "bushes-37",
+          "asset": "bushes-37",
+          "name": "Leafy shrub 37",
+          "position": [
+            -16.02235,
+            0,
+            -1.119651
+          ]
+        },
+        {
+          "id": "willow-1",
+          "asset": "willow-1",
+          "name": "Weeping willow 1",
+          "position": [
+            -15.9,
+            0,
+            -3.5
+          ]
+        },
+        {
+          "id": "town-dock-approach",
+          "asset": "path-curved",
+          "name": "Pond dock approach",
+          "position": [
+            -18.4,
+            0,
+            -5.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pond-south",
+      "x": -35,
+      "z": 2,
+      "yaw": 0,
+      "extra": true,
+      "start": {
+        "clear": true,
+        "requested": [
+          -35,
+          2
+        ],
+        "position": [
+          -35,
+          2
+        ],
+        "offset": 0
+      },
+      "frame": {
+        "position": [
+          -35,
+          0.1,
+          1.4715295507566688
+        ],
+        "clear": true,
+        "camera": [
+          -34.99906776087224,
+          3.4887997968778053,
+          6.0387130921787495
+        ],
+        "calls": 560,
+        "triangles": 3739928
+      },
+      "nearby": [
+        {
+          "id": "bird-clearing-terrace",
+          "asset": "bird-clearing-terrace",
+          "name": "Bird clearing terrace",
+          "position": [
+            -37,
+            0,
+            4
+          ]
+        },
+        {
+          "id": "bird-feeding-dish",
+          "asset": "bird-feeding-dish",
+          "name": "Sourdough feeding dish",
+          "position": [
+            -37,
+            0,
+            4
+          ]
+        },
+        {
+          "id": "bird-clearing-bench",
+          "asset": "bird-clearing-bench",
+          "name": "Birdwatching bench",
+          "position": [
+            -37,
+            0,
+            6.5
+          ]
+        },
+        {
+          "id": "bird-crumb-pouch",
+          "asset": "bird-crumb-pouch",
+          "name": "Sourdough crumb pouch",
+          "position": [
+            -35.45,
+            0.1,
+            5.75
+          ]
+        },
+        {
+          "id": "bushes-40",
+          "asset": "bushes-40",
+          "name": "Leafy shrub 40",
+          "position": [
+            -41.173,
+            0,
+            0.001
+          ]
+        },
+        {
+          "id": "resident-wren",
+          "asset": "wren-caretaker",
+          "name": "Wren",
+          "position": [
+            -38,
+            0,
+            1.5
+          ]
+        },
+        {
+          "id": "object-5140395c-c4be-4aab-91c3-af3bc7f64418",
+          "asset": "bird-clearing-flowers",
+          "name": "Dove clearing flower border",
+          "position": [
+            -37,
+            -0.12,
+            3.993025
+          ]
+        },
+        {
+          "id": "object-ab27aaa3-b1e4-4f68-8765-a1926e7201b9",
+          "asset": "white-dove",
+          "name": "White dove 1",
+          "position": [
+            -35.95,
+            0.01,
+            3.993025
+          ]
+        },
+        {
+          "id": "object-3b250fe8-7fe0-4177-bd25-444f11a3a3ff",
+          "asset": "white-dove",
+          "name": "White dove 2",
+          "position": [
+            -35.441154,
+            0.01,
+            4.893025
+          ]
+        },
+        {
+          "id": "object-bd1ed549-c9a1-4ad5-9240-6a18f994eeb1",
+          "asset": "white-dove",
+          "name": "White dove 3",
+          "position": [
+            -36.475,
+            0.01,
+            4.902352
+          ]
+        },
+        {
+          "id": "object-3f9f136d-6072-470d-9589-114870fcae19",
+          "asset": "white-dove",
+          "name": "White dove 4",
+          "position": [
+            -36,
+            0,
+            2
+          ]
+        },
+        {
+          "id": "object-51dc5bc1-8eac-4d9e-b3fb-9f1700034d15",
+          "asset": "white-dove",
+          "name": "White dove 5",
+          "position": [
+            -37.525,
+            0.01,
+            4.993025
+          ]
+        },
+        {
+          "id": "object-e2de452c-043d-4415-a93e-c776cc4015ed",
+          "asset": "white-dove",
+          "name": "White dove 6",
+          "position": [
+            -38.558846,
+            0.01,
+            4.893025
+          ]
+        },
+        {
+          "id": "object-97f4400e-8d9e-4629-bd9c-009efbc40c92",
+          "asset": "white-dove",
+          "name": "White dove 7",
+          "position": [
+            -38.05,
+            0.01,
+            3.993025
+          ]
+        },
+        {
+          "id": "object-9c19292f-6e99-42a1-b70e-72e59aa630bb",
+          "asset": "white-dove",
+          "name": "White dove 8",
+          "position": [
+            -38.558846,
+            0.01,
+            3.093025
+          ]
+        },
+        {
+          "id": "object-e462248f-4bf5-4245-a3d0-a32bbc8642e5",
+          "asset": "white-dove",
+          "name": "White dove 9",
+          "position": [
+            -37.525,
+            0.01,
+            3.083698
+          ]
+        },
+        {
+          "id": "object-bc6d2af6-647f-4891-9897-b5672f9a66c8",
+          "asset": "white-dove",
+          "name": "White dove 10",
+          "position": [
+            -37,
+            0.01,
+            2.193025
+          ]
+        },
+        {
+          "id": "object-59a0fcd0-74f2-40f8-8f55-1a6240488922",
+          "asset": "white-dove",
+          "name": "White dove 11",
+          "position": [
+            -36.475,
+            0.01,
+            3.083698
+          ]
+        },
+        {
+          "id": "object-9369597e-8a0b-4a96-899c-5248fd4a058a",
+          "asset": "white-dove",
+          "name": "White dove 12",
+          "position": [
+            -35.441154,
+            0.01,
+            3.093025
+          ]
+        },
+        {
+          "id": "lamp-moon-birds",
+          "asset": "lamp-moon-birds",
+          "name": "Moonlit path lamppost",
+          "position": [
+            -31,
+            0,
+            9
+          ]
+        },
+        {
+          "id": "edge-lantern-pond-1",
+          "asset": "edge-lantern-pond-1",
+          "name": "Low stone lantern",
+          "position": [
+            -33,
+            0.1,
+            1
+          ]
+        },
+        {
+          "id": "puppy-biscuit",
+          "asset": "puppy-beagle",
+          "name": "Biscuit",
+          "position": [
+            -29,
+            0,
+            3
+          ]
+        },
+        {
+          "id": "town-lamp-8",
+          "asset": "lamp-20",
+          "name": "Willowbank lane lantern 8",
+          "position": [
+            -40,
+            0,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "river-south-bank",
+      "x": -14,
+      "z": 22,
+      "yaw": 3.141592653589793,
+      "extra": true,
+      "start": {
+        "clear": true,
+        "requested": [
+          -14,
+          22
+        ],
+        "position": [
+          -14,
+          22
+        ],
+        "offset": 0
+      },
+      "frame": {
+        "position": [
+          -14,
+          0,
+          22.52846694038295
+        ],
+        "clear": true,
+        "camera": [
+          -14.001856017982902,
+          3.3888111036529134,
+          17.958118575207248
+        ],
+        "calls": 379,
+        "triangles": 2935070
+      },
+      "nearby": [
+        {
+          "id": "bushes-11",
+          "asset": "bushes-11",
+          "name": "Leafy shrub 11",
+          "position": [
+            -13.928897,
+            0,
+            17.003428
+          ]
+        },
+        {
+          "id": "bushes-17",
+          "asset": "bushes-17",
+          "name": "Leafy shrub 17",
+          "position": [
+            -12.390627,
+            0,
+            24.037666
+          ]
+        },
+        {
+          "id": "bushes-30",
+          "asset": "bushes-30",
+          "name": "Leafy shrub 30",
+          "position": [
+            -13.216969,
+            0,
+            16.880312
+          ]
+        },
+        {
+          "id": "bushes-32",
+          "asset": "bushes-32",
+          "name": "Leafy shrub 32",
+          "position": [
+            -12.837944,
+            0,
+            16.713463
+          ]
+        },
+        {
+          "id": "bushes-44",
+          "asset": "bushes-44",
+          "name": "Leafy shrub 44",
+          "position": [
+            -14.074534,
+            0,
+            18.512684
+          ]
+        },
+        {
+          "id": "bushes-65",
+          "asset": "bushes-65",
+          "name": "Leafy shrub 65",
+          "position": [
+            -12.025642,
+            0,
+            29.780106
+          ]
+        },
+        {
+          "id": "bushes-67",
+          "asset": "bushes-67",
+          "name": "Leafy shrub 67",
+          "position": [
+            -13.10385,
+            0,
+            25.274124
+          ]
+        },
+        {
+          "id": "bushes-69",
+          "asset": "bushes-69",
+          "name": "Leafy shrub 69",
+          "position": [
+            -13.500771,
+            0,
+            23.348524
+          ]
+        }
+      ]
+    }
+  ],
+  "skipped": [],
+  "errors": [],
+  "scene": {
+    "objects": 591,
+    "authoredPaths": 39,
+    "quality": "high",
+    "tier": "detailed",
+    "willow": {
+      "id": "willow-1",
+      "asset": "willow-1",
+      "name": "Weeping willow 1",
+      "position": [
+        -15.9,
+        0,
+        -3.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ],
+      "visible": true,
+      "locked": false
+    }
+  },
+  "after": {
+    "public/village/world-layout.json": "53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c"
+  },
+  "preservation": true,
+  "status": "captured"
+}

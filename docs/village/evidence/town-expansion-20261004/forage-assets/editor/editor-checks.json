@@ -1,0 +1,314 @@
+{
+  "status": "passed",
+  "checks": [
+    "Town category exposes the horse circuit on the asset shelf",
+    "Town category exposes existing circuit, stable, roost and farm rows in the Scene list",
+    "cow-highland-girl retains its catalog identity",
+    "cow-highland-girl has a nonempty rendered preview",
+    "cow-highland-girl placement target is in the real canvas",
+    "cow-highland-girl can be placed and selected from its shelf card",
+    "cow-highland-girl supports real position, Y rotation and uniform scale controls",
+    "cow-highland-girl can be reselected from the Scene list",
+    "forage-apple retains its catalog identity",
+    "forage-apple has a nonempty rendered preview",
+    "forage-apple placement target is in the real canvas",
+    "forage-apple can be placed and selected from its shelf card",
+    "forage-apple supports real position, Y rotation and uniform scale controls",
+    "forage-apple can be reselected from the Scene list",
+    "forage-mushroom retains its catalog identity",
+    "forage-mushroom has a nonempty rendered preview",
+    "forage-mushroom placement target is in the real canvas",
+    "forage-mushroom can be placed and selected from its shelf card",
+    "forage-mushroom supports real position, Y rotation and uniform scale controls",
+    "forage-mushroom can be reselected from the Scene list",
+    "apple-tree retains its catalog identity",
+    "apple-tree has a nonempty rendered preview",
+    "apple-tree placement target is in the real canvas",
+    "apple-tree can be placed and selected from its shelf card",
+    "apple-tree supports real position, Y rotation and uniform scale controls",
+    "apple-tree can be reselected from the Scene list",
+    "mushroom-patch retains its catalog identity",
+    "mushroom-patch has a nonempty rendered preview",
+    "mushroom-patch placement target is in the real canvas",
+    "mushroom-patch can be placed and selected from its shelf card",
+    "mushroom-patch supports real position, Y rotation and uniform scale controls",
+    "mushroom-patch can be reselected from the Scene list",
+    "cow-highland-girl server save rejects unsupported tilt",
+    "apple-tree server save rejects unsupported tilt",
+    "mushroom-patch server save rejects unsupported tilt",
+    "Real GLTF loader exposes every animal root, head joint and bounded render mesh count",
+    "Lamb authoring template is 0.63 times the sheep height",
+    "Editable lamb pivot preserves authored size under rotation and scaling",
+    "Flower cow keeps the same native cow height and named joints",
+    "Original forage GLBs retain tiny native dimensions, floor pivots and one render draw each",
+    "Fruit tree and mushroom patch reuse Blender props in bounded instanced draws",
+    "Forage scenery keeps collection contacts clear with only a narrow tree-trunk collider",
+    "cow-highland-girl identity and transform survive named file save",
+    "forage-apple identity and transform survive named file save",
+    "forage-mushroom identity and transform survive named file save",
+    "apple-tree identity and transform survive named file save",
+    "mushroom-patch identity and transform survive named file save",
+    "The complete working-copy layout survives an actual browser reload",
+    "Apply accepts every tested town asset in the isolated playable file",
+    "Town shelf remains visible at 1280×800",
+    "Town shelf remains visible at 1024×700",
+    "Five named designs, both protected presets and active layout remain byte-identical",
+    "Editor reports no application page errors"
+  ],
+  "errors": [],
+  "assets": [
+    {
+      "id": "cow-highland-girl",
+      "name": "Flower Highland cow",
+      "previewPixels": 7634,
+      "position": [
+        120,
+        5,
+        120
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "forage-apple",
+      "name": "Rosy forage apple",
+      "previewPixels": 8516,
+      "position": [
+        126,
+        5,
+        123
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "forage-mushroom",
+      "name": "Chestnut forage mushroom",
+      "previewPixels": 7529,
+      "position": [
+        132,
+        5,
+        126
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "apple-tree",
+      "name": "Fruitful apple tree",
+      "previewPixels": 4864,
+      "position": [
+        138,
+        5,
+        129
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "mushroom-patch",
+      "name": "Little mushroom patch",
+      "previewPixels": 6774,
+      "position": [
+        144,
+        5,
+        132
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    }
+  ],
+  "placed": {
+    "cow-highland-girl": "object-e569e50c-87e3-4a33-a503-ba08c7e62799",
+    "forage-apple": "object-059f06a9-8c1c-4d41-95dc-ee5432f80a6d",
+    "forage-mushroom": "object-6868d03f-ff02-4553-89cf-746eaab78937",
+    "apple-tree": "object-10eddec4-f514-4f0f-a2ab-a2107324a410",
+    "mushroom-patch": "object-2887df62-c681-49bd-a8f9-d36510ced004"
+  },
+  "fileId": "layout-41111194-9bd6-4b71-8ff5-3a232bf366b4",
+  "protectedBefore": {
+    "public/village/world-layout.json": "fb54c0cd9fd4bef441d2df23dc237004a150b7e5960e592f02d9ba26b08777c0",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "protectedAfter": {
+    "public/village/world-layout.json": "fb54c0cd9fd4bef441d2df23dc237004a150b7e5960e592f02d9ba26b08777c0",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "models": {
+    "cow-highland": {
+      "root": "CowHighland",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 1.9810798254159891,
+      "transformedHeight": 2.3772957904991863,
+      "meshes": 8,
+      "head": true
+    },
+    "cow-highland-girl": {
+      "root": "CowHighlandGirl",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 1.9810798254159891,
+      "transformedHeight": 2.3772957904991863,
+      "meshes": 8,
+      "head": true
+    },
+    "sheep": {
+      "root": "Sheep",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 1.1450001195110389,
+      "transformedHeight": 1.3740001434132472,
+      "meshes": 8,
+      "head": true
+    },
+    "lamb": {
+      "root": "Lamb",
+      "sourceScale": [
+        0.6299999952316284,
+        0.6299999952316284,
+        0.6299999952316284
+      ],
+      "height": 0.7213500208657603,
+      "transformedHeight": 0.865620025038913,
+      "meshes": 8,
+      "head": true
+    },
+    "hedgehog": {
+      "root": "Hedgehog",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 0.47239118046802986,
+      "transformedHeight": 0.5668694165616364,
+      "meshes": 8,
+      "head": true
+    },
+    "owl-brown": {
+      "root": "OwlBrown",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 0.8837433248512401,
+      "transformedHeight": 1.0604919898214877,
+      "meshes": 5,
+      "head": true
+    }
+  },
+  "forage": {
+    "forage-apple": {
+      "dimensions": [
+        0.2328324019908905,
+        0.2487606257200241,
+        0.23600003123283386
+      ],
+      "bottom": 0,
+      "draws": 1,
+      "localColliders": []
+    },
+    "forage-mushroom": {
+      "dimensions": [
+        0.251999999477313,
+        0.2359999810059854,
+        0.25200000906304254
+      ],
+      "bottom": 0,
+      "draws": 1,
+      "localColliders": []
+    },
+    "apple-tree": {
+      "dimensions": [
+        3.6896186947822573,
+        4.558719544410707,
+        3.339857292175293
+      ],
+      "bottom": -5.245208818394076e-8,
+      "draws": 2,
+      "localColliders": [
+        {
+          "x": 0,
+          "z": 0,
+          "w": 0.42,
+          "d": 0.42,
+          "bottom": 0,
+          "top": 2.95
+        }
+      ]
+    },
+    "mushroom-patch": {
+      "dimensions": [
+        1.5279140853881836,
+        0.42613611429929565,
+        1.3320276641845703
+      ],
+      "bottom": -0.027136148452758795,
+      "draws": 2,
+      "localColliders": []
+    }
+  }
+}

@@ -154,6 +154,87 @@ if (process.env.SERVE_LOCAL_FIXTURE === '1') {
     await new Promise(resolve => setTimeout(resolve, 20));
   } while (true);
   check(fired.chat.hour === hour && fired.chat.entries.length === 0 && fired.alarm === (hour + 1) * HOUR, 'A real scheduled local-runtime alarm clears seeded prior-hour chat without visitors and schedules the next UTC hour');
+  const riders = await Promise.all([connect('192.0.2.41'), connect('192.0.2.42')]);
+  const horse = riders[0].welcome.world.actors.find(actor => actor.kind === 'horse');
+  check(!!horse, 'Actual Worker projects authored horse placements into the shared world');
+  let horseRequest = 0;
+  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const horseRequestFor = async (client, request, pose) => {
+    const requestId = `horse-${++horseRequest}`;
+    client.socket.send(JSON.stringify({ type: 'interaction', requestId, request, ...(pose ? { pose } : {}) }));
+    await client.until(() => client.messages.some(m => m.requestId === requestId));
+    return client.messages.find(m => m.requestId === requestId).result;
+  };
+  const results = await Promise.all(riders.map((client, index) => horseRequestFor(client,
+    { kind: 'horse', id: horse.id, action: 'mount' }, { x: horse.x + (index ? -2 : 2), z: horse.z, heading: 0, active: true })));
+  check(results.filter(result => result.ok).length === 1, 'Two actual WebSocket mount requests produce exactly one owner');
+  const owner = riders[results.findIndex(result => result.ok)], observer = riders[results.findIndex(result => !result.ok)];
+  const latestHorse = client => client.messages.findLast(m => m.type === 'actors')?.world.actors.find(actor => actor.id === horse.id && actor.kind === 'horse');
+  await observer.until(() => latestHorse(observer)?.owner === owner.welcome.selfId);
+  check(latestHorse(observer).mode === 'ride', 'The observing client receives the accepted mount and owner');
+  await pause(120);
+  check(!(await horseRequestFor(observer, { kind: 'horse', id: horse.id, action: 'dismount' })).ok,
+    'A competing real client cannot remove the rider');
+  const input = { type: 'horseInput', forward: 1, turn: 0, sprint: true, brake: false };
+  owner.socket.send(JSON.stringify({ type: 'heartbeat', active: true, horse: horse.id }));
+  for (let index = 0; index < 15; index++) { owner.socket.send(JSON.stringify(input)); await pause(110); }
+  await observer.until(() => latestHorse(observer)?.speed > 1);
+  const travelled = latestHorse(observer);
+  check(Math.hypot(travelled.x - horse.x, travelled.z - horse.z) > 1 && travelled.speed <= 9,
+    'Actual Worker input messages accelerate and broadcast one moving horse');
+  await pause(650);
+  owner.socket.send(JSON.stringify({ type: 'heartbeat', active: true, horse: horse.id }));
+  await observer.until(() => latestHorse(observer)?.speed === 0);
+  const stopped = latestHorse(observer);
+  check(stopped.x === travelled.x && stopped.z === travelled.z, 'Real missing-input timeout stops the horse at the last accepted pose');
+  const late = await connect('192.0.2.43');
+  const lateHorse = late.welcome.world.actors.find(actor => actor.id === horse.id && actor.kind === 'horse');
+  check(lateHorse.owner === owner.welcome.selfId && lateHorse.x === stopped.x && lateHorse.z === stopped.z,
+    'A late actual client receives the occupied horse at its current position');
+  await mf.unsafeEvictDurableObject('cosy-write-cleanup', 'InstrumentedWorld', { name: 'one-shared-village', webSockets: 'hibernate' });
+  owner.messages.length = 0;
+  owner.socket.send(JSON.stringify({ type: 'heartbeat', active: true, horse: horse.id }));
+  await owner.until(() => latestHorse(owner)?.owner === owner.welcome.selfId);
+  check(latestHorse(owner).speed === 0 && !owner.messages.some(m => m.type === 'welcome'),
+    'Real hibernation keeps ownership and restores no stale riding inputs');
+  const landed = await horseRequestFor(owner, { kind: 'horse', id: horse.id, action: 'dismount' });
+  check(landed.ok && Array.isArray(landed.position), 'Real dismount returns an accepted ground landing');
+  await pause(120);
+  check((await horseRequestFor(owner, { kind: 'horse', id: horse.id, action: 'mount' },
+    { x: landed.position[0], y: landed.position[1], z: landed.position[2], heading: 0, active: true })).ok,
+    'Real accepted dismount position can approach and remount the horse');
+  const releaseStart = owner.messages.length;
+  owner.socket.send(JSON.stringify({ type: 'heartbeat', active: false, horse: horse.id }));
+  owner.socket.send(JSON.stringify({ type: 'horseInput', forward: 0, turn: 0, sprint: false, brake: true }));
+  await owner.until(() => owner.messages.slice(releaseStart).some(m => m.type === 'move' && m.id === owner.welcome.selfId && m.horse === null));
+  const forcedLanding = owner.messages.slice(releaseStart).find(m => m.type === 'move' && m.id === owner.welcome.selfId && m.horse === null);
+  check(Number.isFinite(forcedLanding.y) && Math.hypot(forcedLanding.x - stopped.x, forcedLanding.z - stopped.z) > 1,
+    'Inactive heartbeat followed immediately by riding input broadcasts the real forced landing');
+  await pause(120); owner.socket.send(JSON.stringify({ type: 'heartbeat', active: false }));
+  const landingObserver = await connect('192.0.2.44');
+  const persistedLanding = landingObserver.welcome.visitors.find(visitor => visitor.id === owner.welcome.selfId);
+  check(persistedLanding.horse === null && persistedLanding.x === forcedLanding.x
+    && persistedLanding.y === forcedLanding.y && persistedLanding.z === forcedLanding.z,
+    'Subsequent publication and a real late join retain the forced landing in the socket attachment');
+  await pause(120);
+  check((await horseRequestFor(owner, { kind: 'horse', id: horse.id, action: 'mount' },
+    { x: forcedLanding.x, y: forcedLanding.y, z: forcedLanding.z, heading: 0, active: true })).ok,
+    'Returning from an inactive tab can remount from the preserved ground position');
+  owner.socket.close();
+  sockets.splice(sockets.indexOf(owner.socket), 1);
+  await observer.until(() => latestHorse(observer)?.owner === null);
+  const availableHorse = latestHorse(observer);
+  check(availableHorse.mode === 'idle', 'Closing the actual rider WebSocket releases the horse');
+  await pause(120);
+  check((await horseRequestFor(observer, { kind: 'horse', id: horse.id, action: 'mount' },
+    { x: availableHorse.x + 2, z: availableHorse.z, heading: 0, active: true })).ok,
+    'The competing client mounts after the real rider disconnects');
+  await pause(120);
+  check((await horseRequestFor(observer, { kind: 'activity', id: 'focus' })).ok
+    && (await horseRequestFor(late, { kind: 'activity', id: 'focus' })).ok,
+    'Riders can release horses into simultaneously private focus sessions');
+  await late.until(() => latestHorse(late)?.owner === null);
+  check(latestHorse(late).mode === 'idle', 'Private focus leaves the shared horse outdoors and unowned');
   console.log(JSON.stringify({ passed: checks.length, checks, runtime: tools('miniflare/package.json').version }, null, 2));
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   for (const socket of sockets) socket.close();

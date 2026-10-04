@@ -58,6 +58,22 @@ class StudioTests(unittest.TestCase):
             self.assertEqual(self.request(route, self.doc)[0],403)
         self.assertEqual(self.request('/api/layouts/does-not-exist')[0],404)
 
+    def test_animal_art_apply(self):
+        manifest = json.loads((STUDIO.parents[1] / 'docs/village/animals-v2-manifest.json').read_text())
+        self.doc['sceneVersion'] = 1
+        for index, animal in enumerate(manifest['animals']):
+            self.doc['objects'].append({'id': f'animal-review-{index}', 'asset': f"animal-{animal['id']}",
+                'name': animal['id'], 'position': [150 + index * 4, 3, 130], 'rotation': [10, 35, 5],
+                'scale': [1.2, 1.1, 1.3], 'visible': True, 'locked': False})
+        _, playable = self.request('/api/playable')
+        code, result = self.request('/api/apply', self.doc, revision=playable['revision'])
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(self.published.read_text()), self.doc)
+        accepted = self.published.read_bytes()
+        self.doc['objects'][-1]['asset'] = 'animal-unknown'
+        self.assertEqual(self.request('/api/apply', self.doc, revision=result['revision'])[0], 422)
+        self.assertEqual(self.published.read_bytes(), accepted)
+
     def test_same_origin_host_and_body_validation(self):
         self.assertEqual(self.request('/api/layouts/test', self.doc, origin=False)[0],403)
         self.assertEqual(self.request('/api/health', host='attacker.example')[0],403)
@@ -84,6 +100,39 @@ class StudioTests(unittest.TestCase):
         with self.assertRaises(ValueError): server_module.validate(self.doc)
         item['path'] = {'width':2,'points':[[0,0],[5,5]]}; server_module.validate(self.doc)
         item['path']['points'] = [[0,0]]
+        with self.assertRaises(ValueError): server_module.validate(self.doc)
+
+    def test_river_roundtrip_apply_and_invalid_data(self):
+        revision = self.request('/api/playable')[1]['revision']
+        river = {'id': 'drawn-river', 'asset': 'custom-river', 'name': 'River', 'position': [40, 0, 30], 'rotation': [0, 30, 0], 'scale': [1, 1, 1], 'visible': True, 'locked': False, 'path': {'width': 6, 'points': [[0, 0], [4, -6], [0, -12]]}}
+        self.doc['objects'].append(river)
+        self.assertEqual(self.request('/api/layouts/river', self.doc)[0], 200)
+        self.assertEqual(self.request('/api/layouts/river')[1]['layout'], self.doc)
+        self.assertEqual(self.request('/api/apply', self.doc, revision=revision)[0], 200)
+        revision = self.request('/api/playable')[1]['revision']
+        for scene_version in (None, 1):
+            if scene_version: self.doc['sceneVersion'] = scene_version
+            for rotation, scale in [([30, 0, 0], [1, 1, 1]), ([0, 0, 0], [2, 1, 1]), ([0, 0, 0], [1, 2, 1])]:
+                river['rotation'], river['scale'] = rotation, scale
+                self.assertEqual(self.request('/api/apply', self.doc, revision=revision)[0], 422)
+        for width in (0, 21, float('nan')):
+            river['path']['width'] = width
+            with self.assertRaises(ValueError): server_module.validate(self.doc)
+
+    def test_terrain_and_horses_roundtrip_apply_and_invalid_data(self):
+        revision = self.request('/api/playable')[1]['revision']
+        delta = 5 - server_module.base_terrain_height(70, 30)
+        self.doc['terrain'] = {'version': 1, 'cellSize': 2, 'samples': [[35, 15, delta]]}
+        self.doc['objects'].append({'id': 'riding-horse', 'asset': 'horse-bay', 'name': 'Bay horse', 'position': [70, 5, 30], 'rotation': [0, 90, 0], 'scale': [1, 1, 1], 'visible': True, 'locked': False})
+        self.assertEqual(self.request('/api/layouts/elevated', self.doc)[0], 200)
+        self.assertEqual(self.request('/api/layouts/elevated')[1]['layout'], self.doc)
+        self.assertEqual(self.request('/api/apply', self.doc, revision=revision)[0], 200)
+        self.assertEqual(json.loads(self.published.read_text()), self.doc)
+        for samples in [[[35, 15, float('nan')]], [[0, 0, 10]], [[161, 15, 1]], [[35.5, 15, 1]], [[35, 15, 60]], [[35, 15, delta], [35, 15, delta]]]:
+            self.doc['terrain']['samples'] = samples
+            with self.assertRaises(ValueError): server_module.validate(self.doc)
+        self.doc['terrain']['samples'] = [[35, 15, delta]]
+        self.doc['objects'][-1]['scale'] = [3, 3, 3]
         with self.assertRaises(ValueError): server_module.validate(self.doc)
 
     def test_fence_and_cottage_edits_apply_with_bounds(self):
@@ -135,5 +184,20 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertEqual(json.loads(self.published.read_text())['routes']['pip']['pauses'], [0,3])
         self.assertTrue(any(item['id'] == 'clear-road-edge' for item in json.loads(self.published.read_text())['objects']))
+
+    def test_complete_scene_changes_apply_and_unknown_assets_refuse(self):
+        revision = self.request('/api/playable')[1]['revision']
+        self.doc['sceneVersion'] = 1; self.doc['openWorld'] = True
+        self.doc['terrain'] = {'version': 1, 'cellSize': 2, 'base': 'flat', 'samples': []}
+        self.doc['objects'] = [item for item in self.doc['objects'] if item['asset'] not in ('forest', 'cottage-3') and not item['asset'].startswith('mountain-')]
+        self.doc['objects'].append({'id':'distant-tree','asset':'forest-1','name':'Distant tree','position':[120,0,90],
+            'rotation':[0,90,0],'scale':[1,1,1],'visible':True,'locked':False})
+        self.doc['objects'].append({'id':'ground-extension','asset':'land-tile-40','name':'Meadow ground','position':[100,0,90],
+            'rotation':[0,0,0],'scale':[1,1,1],'visible':True,'locked':False})
+        code, applied = self.request('/api/apply', self.doc, revision=revision)
+        self.assertEqual(code, 200); self.assertEqual(json.loads(self.published.read_text()), self.doc)
+        self.assertEqual(len(list((self.layouts / '.history').glob('playable-*.json'))), 1)
+        self.doc['objects'][-1]['asset'] = 'unregistered-hidden-prop'
+        self.assertEqual(self.request('/api/apply', self.doc, revision=applied['revision'])[0], 422)
 
 if __name__ == '__main__': unittest.main()

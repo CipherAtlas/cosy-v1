@@ -1,35 +1,37 @@
-import { useState, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { useCallback, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { SpeakerHigh, SpeakerSlash, X } from "@phosphor-icons/react";
 import { MixSliders, SoundtrackChoices } from "./Activities";
 import { VillageMap } from "./VillageMap";
-import { HarvestInventory } from "./GardenActivities";
+import { VillageInventory } from "./TownActivityHUD";
+import type { ForageInventory } from "./townShared";
 import { SoundPanel, PERSONAL_RADIO_ENABLED, type RadioPreferences } from "./RadioControls";
-import { localTimeWeather, type PlaceId, type Quality, type Weather } from "./places";
-import type { GardenState } from "./garden";
+import { type PlaceId } from "./places";
 import type { VillageEngine } from "./VillageEngine";
 import type { useVillagePreferences } from "./useVillagePreferences";
 import type { RadioStationId } from "./radioCatalog";
-import { withBasePath } from "@/lib/basePath";
+import { VillageSettings } from "./VillageSettings";
+import { Keycap } from "./KeybindingControls";
 
 export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | null;
 
-export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden, place, notice, entered, setEntered, enableSound, openPlace,
-  sound, soundLoading, toggleSound, openRadio, radioPrefs, radioLoading, radioError, selectStation, nextRadioTrack, playVillageMusic, showStats, setShowStats, stats }: {
+export function VillageMenus({ panel, setPanel, canvas, engine, settings, inventory, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
+  sound, soundLoading, toggleSound, radioPrefs, radioLoading, radioError, selectStation, nextRadioTrack, playVillageMusic, showStats, setShowStats, stats }: {
   panel: VillagePanel; setPanel: Dispatch<SetStateAction<VillagePanel>>;
   canvas: RefObject<HTMLDivElement | null>; engine: RefObject<VillageEngine | null>;
-  settings: ReturnType<typeof useVillagePreferences>; garden: GardenState;
+  settings: ReturnType<typeof useVillagePreferences>; inventory: ForageInventory;
   place: PlaceId | null; notice: string; entered: boolean; setEntered: (value: boolean) => void;
-  enableSound: () => Promise<void>; openPlace: (id: PlaceId) => void;
+  enableSound: () => Promise<void>; openPlace: (id: PlaceId) => void; travelOutdoor: (id: string) => void;
   sound: boolean; soundLoading: boolean; toggleSound: () => void; openRadio: () => void;
   radioPrefs: RadioPreferences; radioLoading: boolean; radioError: string;
   selectStation: (station: RadioStationId) => void; nextRadioTrack: () => void; playVillageMusic: () => Promise<void>;
   showStats: boolean; setShowStats: (value: boolean) => void; stats: { fps: number; draws: number; triangles: number };
 }) {
-  const { mix, setMix, quality, setQuality, weather, setWeather, weatherMode, setWeatherMode, language, setLanguage, mouseSensitivity, setMouseSensitivity } = settings;
+  const { mix, setMix, language } = settings;
   const t = (en: string, jp: string) => language === "ja" ? jp : en;
-  const [performanceReport, setPerformanceReport] = useState("");
+  const settingsWorkspace = panel === "settings" || panel === "sound" && !PERSONAL_RADIO_ENABLED;
   const readMapPose = () => engine.current?.getPlayerPose() ?? null;
+  const readMapActors = useCallback(() => engine.current?.getMapActors() ?? [], [engine]);
   return (
       <Dialog.Root
         open={panel !== null}
@@ -38,9 +40,9 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
+          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace ? " v-settings-overlay" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${panel === "places" ? " v-map-dialog" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${panel === "places" ? " v-map-dialog" : ""}${settingsWorkspace ? " v-settings-dialog" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
             onOpenAutoFocus={event => {
               if (panel === "places") {
                 event.preventDefault();
@@ -55,24 +57,24 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden
             <Dialog.Title>
               {panel === "places"
                 ? t("Hearthwillow", "ハースウィロー")
-                : panel === "sound"
-                  ? PERSONAL_RADIO_ENABLED ? t("Sound", "音") : t("A little atmosphere.", "心地よい音を。")
+                : panel === "sound" && PERSONAL_RADIO_ENABLED
+                  ? t("Sound", "音")
                   : panel === "basket"
                     ? t("Harvest basket", "収穫かご")
                   : panel === "controls"
                     ? t("Getting around", "移動と操作")
-                    : t("Make it yours.", "お好みに。")}
+                    : t("Settings", "設定")}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
               {panel === "places"
-                ? t("Village map. Use WASD or arrow keys to choose a destination, Enter to travel and Escape to close. You can also click a place on the map.", "村の地図。WASDか矢印キーで選び、Enterで移動、Escapeで閉じます。地図の場所をクリックしても移動できます。")
+                ? t("Village map. Use arrow keys to choose a destination, Enter to travel and Escape to close. You can also click a place on the map.", "村の地図。矢印キーで選び、Enterで移動、Escapeで閉じます。地図の場所をクリックしても移動できます。")
                 : panel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
                   : panel === "basket"
-                    ? t("Stored harvests from your garden.", "庭で収穫して保存したもの。")
+                    ? t("Your saved harvests and woodland treats.", "庭で収穫して保存したもの。")
                   : panel === "controls"
                     ? "Gliding, camera and interaction controls."
-                    : "Village appearance and accessibility settings."}
+                    : t("Village appearance, sound and personal keyboard settings.", "村の環境・音・個人のキー設定。")}
             </Dialog.Description>
             <Dialog.Close
               className="v-dialog-close"
@@ -80,10 +82,9 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden
             >
               <X size={22} />
             </Dialog.Close>
-            {panel === "basket" && <HarvestInventory garden={garden} language={language} />}
+            {panel === "basket" && <VillageInventory inventory={inventory} />}
             {panel === "controls" && (
               <div className="v-control-guide">
-                <p>{t("Wander at your own pace, or use the village map to settle into an activity.", "自分のペースでお散歩。村の地図から、好きな場所へすぐに移動できます。")}</p>
                 <dl>
                   {[
                     ["W A S D / ↑ ↓ ← →", t("Glide", "浮かんで移動")],
@@ -113,17 +114,18 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
                     ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
                     ["M", t("Village map (WASD / arrows to choose; Enter to go)", "村の地図（WASD / 矢印で選ぶ・Enterで移動）")],
+                    ["I", t("Your inventory", "持ち物")],
                     ["O / ,", t("Sound / settings", "音 / 設定")],
-                  ].map(([key, description]) => <div key={key}><dt><kbd>{key}</kbd></dt><dd>{description}</dd></div>)}
+                  ].map(([key, description]) => <div key={key}><dt><Keycap>{key}</Keycap></dt><dd>{description}</dd></div>)}
                 </dl>
               </div>
             )}
-            {panel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} language={language} notice={notice} travel={id => {
+            {panel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} readActors={readMapActors} language={language} notice={notice} travelOutdoor={travelOutdoor} travel={id => {
               if (!entered) void enableSound();
               setEntered(true);
               openPlace(id);
             }} />}
-            {panel === "sound" && (
+            {panel === "sound" && PERSONAL_RADIO_ENABLED && (
               <>
                 <button className="v-button v-primary" disabled={soundLoading} aria-busy={soundLoading} onClick={toggleSound}>
                   {sound ? (
@@ -145,115 +147,10 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, garden
                 </>}
               </>
             )}
-            {panel === "settings" && (
-              <div className="v-settings">
-                <button className="v-controls-button" onClick={openRadio}><SpeakerHigh size={18} />{t("Sound & music", "音と音楽")}</button>
-                <button className="v-controls-button" onClick={() => setPanel("controls")}>
-                  {t("Gliding & camera controls", "移動とカメラの操作")}
-                </button>
-                <label>
-                  {t("Time & weather", "時間と天気")}
-                  <select
-                    value={weatherMode === "auto" ? "auto" : weather}
-                    onChange={(e) => {
-                      if (e.target.value === "auto") {
-                        setWeatherMode("auto");
-                        setWeather(localTimeWeather(new Date()));
-                      } else {
-                        setWeatherMode("manual");
-                        setWeather(e.target.value as Weather);
-                      }
-                      if (e.target.value === "rain")
-                        setMix({ ...mix, rain: 0.5 });
-                    }}
-                  >
-                    <option value="auto">{t("Follow local time", "現地時間に合わせる")}</option>
-                    <option value="golden">{t("Golden hour", "夕暮れ")}</option>
-                    <option value="dusk">{t("Blue hour", "薄暮")}</option>
-                    <option value="night">{t("Starlit night", "星降る夜")}</option>
-                    <option value="rain">
-                      {t("Rainy afternoon", "雨の午後")}
-                    </option>
-                  </select>
-                </label>
-                <label>
-                  {t("Graphics", "画質")}
-                  <select
-                    value={quality}
-                    onChange={(e) => setQuality(e.target.value as Quality)}
-                  >
-                    <option value="low">
-                      {t("Gentle on battery", "省電力")}
-                    </option>
-                    <option value="high">{t("Detailed", "高画質")}</option>
-                    <option value="auto">{t("Automatic", "自動")}</option>
-                  </select>
-                </label>
-                <label className="v-sensitivity">
-                  <span>
-                    {t("Mouse sensitivity", "マウス感度")}
-                    <output>{Math.round(mouseSensitivity * 100)}%</output>
-                  </span>
-                  <input
-                    type="range"
-                    aria-label={t("Mouse sensitivity", "マウス感度")}
-                    aria-valuetext={`${Math.round(mouseSensitivity * 100)}%`}
-                    min=".25"
-                    max="2"
-                    step=".05"
-                    value={mouseSensitivity}
-                    onChange={(e) => setMouseSensitivity(Number(e.target.value))}
-                  />
-                </label>
-                <label>
-                  {t("Language", "言語")}
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as "en" | "ja")}
-                  >
-                    <option value="en">English</option>
-                    <option value="ja">日本語</option>
-                  </select>
-                </label>
-                <label className="v-check">
-                  <input
-                    type="checkbox"
-                    checked={showStats}
-                    onChange={(e) => setShowStats(e.target.checked)}
-                  />
-                  {t("Show performance", "パフォーマンス表示")}
-                </label>
-                {showStats && engine.current && (
-                  <div className="v-performance-report">
-                    <button type="button" onClick={() => setPerformanceReport(JSON.stringify({
-                      ...engine.current?.getPerformanceReport(), ...stats,
-                    }, null, 2))}>
-                      {t("Get performance report", "パフォーマンスレポートを表示")}
-                    </button>
-                    {performanceReport && (
-                      <label>
-                        {t("Share this report when something runs slowly. It stays on this device until you share it.", "動作が遅い場合は、このレポートを共有してください。共有するまで端末内に保存されます。")}
-                        <textarea readOnly value={performanceReport} onFocus={e => e.target.select()} />
-                      </label>
-                    )}
-                  </div>
-                )}
-                <p>
-                  {t(
-                    "Your device’s reduced-motion setting is respected. Notes stay in this browser.",
-                    "端末の視差効果設定に従います。メモはこのブラウザに保存されます。",
-                  )}
-                </p>
-                <a
-                  className="v-credits"
-                  href={withBasePath("/village/CREDITS.txt")}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("Art & music credits", "アートと音楽のクレジット")}
-                </a>
-              </div>
-            )}
+            {settingsWorkspace && <VillageSettings key={panel} settings={settings}
+              initial={panel === "sound" ? "sound" : "experience"} sound={sound} soundLoading={soundLoading} toggleSound={toggleSound}
+              engine={engine.current} showStats={showStats} setShowStats={setShowStats} stats={stats} />}
+
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

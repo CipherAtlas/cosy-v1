@@ -23,14 +23,14 @@ const shadowChunk = T.ShaderChunk.shadowmap_pars_fragment.replace(
   /\/\/ Hardware PCF[\s\S]*?\) \* 0\.2;/,
   `vec2 texelSize = vec2(1.0) / shadowMapSize;
    shadow = 0.0;
-   for (int y = 0; y < 4; y++) {
-     for (int x = 0; x < 4; x++) {
-       vec2 offset = vec2(float(x), float(y)) - 1.5;
-       float weight = (2.5 - abs(offset.x)) * (2.5 - abs(offset.y));
-       shadow += texture(shadowMap, vec3(shadowCoord.xy + offset * texelSize * shadowRadius / 1.5, shadowCoord.z)) * weight;
+   for (int y = 0; y < 3; y++) {
+     for (int x = 0; x < 3; x++) {
+       vec2 offset = vec2(float(x), float(y)) - 1.0;
+       float weight = (2.0 - abs(offset.x)) * (2.0 - abs(offset.y));
+       shadow += texture(shadowMap, vec3(shadowCoord.xy + offset * texelSize * shadowRadius, shadowCoord.z)) * weight;
      }
    }
-   shadow /= 36.0;`,
+   shadow /= 16.0;`,
 );
 
 export function softenShadowEdges(root: T.Object3D) {
@@ -45,7 +45,7 @@ export function softenShadowEdges(root: T.Object3D) {
       compile.call(this, shader, renderer);
       shader.fragmentShader = shader.fragmentShader.replace("#include <shadowmap_pars_fragment>", shadowChunk);
     };
-    material.customProgramCacheKey = () => `${cacheKey}|village-tent-shadow-16`;
+    material.customProgramCacheKey = () => `${cacheKey}|village-tent-shadow-9`;
     material.needsUpdate = true;
   });
 }

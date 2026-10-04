@@ -1,0 +1,12 @@
+{
+  "status": "partial",
+  "build": 63556,
+  "localUrl": "http://127.0.0.1:3051/?sharedTrial=1",
+  "workerPort": 2567,
+  "passed": ["Both new visitors initially have empty private inventories", "Accepted hedgehog apple and mushroom carry models render in both clients", "Actual E receives one apple and mushroom only for receiving visitor", "Actual F feeds one apple", "Normal and reduced-motion meals share the same accepted eight-second owner and clock", "Normal meal has distinct munch and tilt animation; reduced-motion head remains still", "Both clients have visible apple, heart and Moo sprite", "Observer meal controls are disabled", "Controls fit 1366x768, 1280x720 and 1024x640 with real keycaps and 44px targets", "Both eight-second meals finish and resume grazing"],
+  "failed": "Final mushroom inventory retention assertion",
+  "observed": "Visitor/observer names and colors change between captures in the same run. Layout/source was updated while the local Worker watcher ran.",
+  "inference": "A Worker restart/reconnect likely reset private session inventory; final run now records and checks stable identities to verify that inference.",
+  "visualFindings": ["Revised cow near eye and girl flower are clear", "Apple tree canopy/foreground fruit obscures the hedgehog mushroom in walking view", "Hedgehog apple face is too near the bottom key guide", "Owner Moo sprite clips above view", "Reduced meal can show the cow backside because it preserves its previous heading"],
+  "limits": "Model.visible assertions do not establish that the model is unoccluded inside the screenshot. Local headless Chrome only; not deployed proof."
+}

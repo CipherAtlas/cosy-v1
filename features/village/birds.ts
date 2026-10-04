@@ -1,3 +1,4 @@
+import type { AuthoredWorld } from "./worldLayout";
 import * as T from "three";
 import { BIRD_CLEARING } from "./environment";
 import type { SharedBirds } from "./sharedActors";
@@ -80,16 +81,19 @@ export class BirdFlock {
   }
 
   constructor(source: T.Object3D, host: HTMLElement, private changed: (status: BirdStatus) => void,
-    private fed: (byCaretaker: boolean) => void) {
+    private fed: (byCaretaker: boolean) => void, authored?: AuthoredWorld) {
     this.group.name = "White dove flock";
     const template = source.getObjectByName("Dove");
     if (!template) throw new Error("The dove asset is missing its named root.");
-    for (let i = 0; i < 12; i++) {
+    const placements = authored?.sceneVersion === 1 ? (authored.items ?? []).filter(item => item.visible && item.asset === "white-dove") : undefined;
+    const landings = placements ? placements.map(item => item.position) : BIRD_LANDING_SPOTS.map(([x, z]) => [x, .13, z]);
+    for (let i = 0; i < landings.length; i++) {
       const root = template.clone(true);
-      const [x, z] = BIRD_LANDING_SPOTS[i];
+      if (placements) root.scale.multiply(new T.Vector3(...placements[i].scale));
+      const [x, y, z] = landings[i];
       this.birds.push({ root, head: root.getObjectByName("DoveHead")!,
         wings: [root.getObjectByName("DoveWingLeft")!, root.getObjectByName("DoveWingRight")!],
-        landing: new T.Vector3(x, .13, z) });
+        landing: new T.Vector3(x, y, z) });
     }
     template.traverse(node => {
       if (!(node instanceof T.Mesh)) return;
@@ -101,7 +105,7 @@ export class BirdFlock {
     const heart = new T.Shape(); heart.moveTo(0, -.48);
     heart.bezierCurveTo(-.15, -.3, -.55, -.05, -.5, .23); heart.bezierCurveTo(-.45, .55, -.1, .56, 0, .3);
     heart.bezierCurveTo(.1, .56, .45, .55, .5, .23); heart.bezierCurveTo(.55, -.05, .15, -.3, 0, -.48);
-    this.hearts = new T.InstancedMesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#ff9aab", side: T.DoubleSide, depthWrite: false }), 12);
+    this.hearts = new T.InstancedMesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#ff9aab", side: T.DoubleSide, depthWrite: false }), this.birds.length);
     this.hearts.name = "Happy dove hearts";
     this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.047, 0), new T.MeshStandardMaterial({ color: "#edc693", roughness: 1 }), BIRD_FEEDING.servingCrumbs);
     this.crumbs.name = "Sourdough crumbs";

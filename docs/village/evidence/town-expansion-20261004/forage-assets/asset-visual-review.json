@@ -1,0 +1,87 @@
+{
+  "status": "asset and final rendered runtime visuals reviewed",
+  "runtimeReview": "runtime-confirmed/visual-review.json",
+  "source": "Original Blender source and actual local editor GLTF previews",
+  "glbSha256": "36abeebdb6261e565d69a5447e7f51880aba6887c10ac62be27f6adb0b43ee4d",
+  "questions": [
+    "Is this enjoyable for a user?",
+    "Is this pretty enough?",
+    "Is the town big and healthy looking?",
+    "Does it make a user want to stay?"
+  ],
+  "passes": [
+    {
+      "images": [
+        "../../cowhighland-front-blender.png",
+        "../../cowhighland-side-blender.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Kind round eyes and a friendly muzzle read from both front and side.",
+        "Is this pretty enough?": "Yes. The side-fringe opening exposes the eyes while keeping the original warm shaggy style.",
+        "Is the town big and healthy looking?": "The animal looks healthy; a portrait alone cannot establish the whole town's scale.",
+        "Does it make a user want to stay?": "Yes. The soft face and clear eye make it a more appealing little interaction target."
+      }
+    },
+    {
+      "images": [
+        "../../cowhighlandgirl-front-blender.png",
+        "../../cowhighlandgirl-side-blender.png",
+        "editor/editor-preview-cow-highland-girl.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. A small flower distinguishes the girl without covering her face.",
+        "Is this pretty enough?": "Yes. Pink petals and warm centre fit the painted cottage/animal palette.",
+        "Is the town big and healthy looking?": "The cow variant looks healthy and well cared for; town-scale review is separate.",
+        "Does it make a user want to stay?": "Yes. The sweet flower and readable expression invite petting and feeding."
+      }
+    },
+    {
+      "images": [
+        "../../forageapple-blender.png",
+        "editor/editor-preview-forage-apple.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. A tiny rosy apple, stem and leaf make the gift recognizable.",
+        "Is this pretty enough?": "Yes. The first leaf alignment issue was fixed; current sculpt is clean at its native size.",
+        "Is the town big and healthy looking?": "It supports a productive orchard; the prop alone does not prove world scale.",
+        "Does it make a user want to stay?": "Yes when incorporated into Bramble's shared gift loop."
+      }
+    },
+    {
+      "images": [
+        "../../foragemushroom-blender.png",
+        "editor/editor-preview-forage-mushroom.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. A plump cream stem and warm chestnut cap make a friendly woodland gift.",
+        "Is this pretty enough?": "Yes. First buried/raised flecks were corrected to sit on the cap surface.",
+        "Is the town big and healthy looking?": "It supports a lively garden-edge setting; the prop alone does not establish world scale.",
+        "Does it make a user want to stay?": "Yes when carried by the small garden friend."
+      }
+    },
+    {
+      "images": [
+        "editor/editor-preview-apple-tree.png",
+        "editor/editor-preview-mushroom-patch.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. The low branch fruit and small mushroom cluster identify the two gathering sources.",
+        "Is this pretty enough?": "Yes. Original fantasy tree geometry and moss palette fit the village, with real Blender props.",
+        "Is the town big and healthy looking?": "Yes for the reusable scenery: full green canopy, several fruits and six mushrooms look productive.",
+        "Does it make a user want to stay?": "Yes. They add quiet discoveries near the kitchen garden."
+      }
+    }
+  ],
+  "checks": {
+    "editorAssertions": 53,
+    "existingServerTests": 12,
+    "sourceTypecheck": "passed",
+    "blenderRecipeCompile": "passed",
+    "glbRootsAndVertexColors": "passed"
+  },
+  "limits": [
+    "Editor is still authoring view; the rendered shared gift/meals camera pass has separate evidence.",
+    "Local headless Chrome and Blender portraits are not deployed or physical-device evidence.",
+    "Earlier runtime camera occlusion was corrected; the final focused run passed 36 actual two-client checks with stable identity and inspected normal/reduced-motion frames."
+  ]
+}

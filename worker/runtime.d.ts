@@ -2,6 +2,7 @@ import type { SharedVisitor } from "../features/village/sharedWorld";
 import type { SharedChatEntry, SharedPuppyTrick } from "../features/village/sharedWorld";
 import type { GardenState } from "../features/village/garden";
 import type { VillageSimulation } from "./simulation";
+import type { ForageInventory } from "../features/village/townShared";
 
 export type StoredRecords = {
   garden: GardenState;
@@ -10,12 +11,15 @@ export type StoredRecords = {
   sharedActors: ReturnType<VillageSimulation["save"]>;
   ipKicks: [string | null, number][];
   nextSlot: number;
+  visitorInventories: [string, { inventory: ForageInventory; usedAt: number }][];
 };
 
 export type WorkerVisitor = SharedVisitor & {
   ipHash: string | null; lastMove: number; lastChat: number; lastSeen: number;
   reservationUntil?: number; lastInteraction?: number; lastTrick?: number;
   active?: boolean; crumbPouch: boolean; left?: boolean; kickedUntil?: number;
+  forageInventory?: ForageInventory;
+  inventoryToken?: string;
   holdingPuppy?: string | null; activityPosition?: [number, number, number] | null; requestingActivity?: boolean;
 };
 export type WorkerEnvironment = {
@@ -31,6 +35,7 @@ export type WorkerState = {
   getWebSockets(): WorkerSocket[];
   acceptWebSocket(socket: WorkerSocket): void;
   storage: {
+    transactionSync<T>(callback: () => T): T;
     kv: {
       get<K extends keyof StoredRecords>(key: K): StoredRecords[K] | undefined;
       put<K extends keyof StoredRecords>(key: K, value: StoredRecords[K]): void;

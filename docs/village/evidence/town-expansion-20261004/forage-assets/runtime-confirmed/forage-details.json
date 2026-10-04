@@ -1,0 +1,178 @@
+{
+  "status": "passed",
+  "gifts": [
+    {
+      "food": "apple",
+      "before": {
+        "apples": 0,
+        "mushrooms": 0
+      },
+      "after": {
+        "apples": 1,
+        "mushrooms": 0
+      }
+    },
+    {
+      "food": "mushroom",
+      "before": {
+        "apples": 0,
+        "mushrooms": 0
+      },
+      "after": {
+        "apples": 0,
+        "mushrooms": 1
+      }
+    },
+    {
+      "food": "apple",
+      "before": {
+        "apples": 0,
+        "mushrooms": 1
+      },
+      "after": {
+        "apples": 1,
+        "mushrooms": 1
+      }
+    }
+  ],
+  "meals": [
+    {
+      "reduced": false,
+      "clock": {
+        "id": "cow-highland-1",
+        "species": "cow",
+        "x": -43.85177490976472,
+        "y": 1.430965978336987,
+        "z": 55.40125074787699,
+        "heading": 0.015196227707641079,
+        "owner": "c754952a-84ff-45c4-a59b-e2151d6b461b",
+        "mode": "apple",
+        "startedAt": 1791066652407,
+        "until": 1791066660407,
+        "carry": null,
+        "forageSource": null,
+        "nextForageAt": 0
+      },
+      "poses": [
+        {
+          "x": -0.1729557319496859,
+          "z": 0.010365237488033922
+        },
+        {
+          "x": -0.13743057953143972,
+          "z": -0.018880423600422407
+        },
+        {
+          "x": -0.1257117741964101,
+          "z": -0.042614301296890096
+        },
+        {
+          "x": -0.14896432733567758,
+          "z": -0.05429408803683241
+        }
+      ],
+      "visitorPoses": [
+        {
+          "x": -43.81250257267813,
+          "y": 1.4774444135262443,
+          "z": 57.98539957763921,
+          "heading": 3.1432369592330875,
+          "swing": null,
+          "bench": null,
+          "horse": null,
+          "activity": null,
+          "active": true,
+          "holdingPuppy": null
+        },
+        {
+          "x": -42.86825629027846,
+          "y": 1.488420284861351,
+          "z": 57.930247773579495,
+          "heading": 3.141592653589793,
+          "swing": null,
+          "bench": null,
+          "horse": null,
+          "activity": null,
+          "active": true,
+          "holdingPuppy": null
+        }
+      ]
+    },
+    {
+      "reduced": true,
+      "clock": {
+        "id": "cow-highland-1",
+        "species": "cow",
+        "x": -48.946118220865884,
+        "y": 1.204863997027347,
+        "z": 57.41585876446616,
+        "heading": -0.011722771549077655,
+        "owner": "c754952a-84ff-45c4-a59b-e2151d6b461b",
+        "mode": "apple",
+        "startedAt": 1791066687630,
+        "until": 1791066695630,
+        "carry": null,
+        "forageSource": null,
+        "nextForageAt": 0
+      },
+      "poses": [
+        {
+          "x": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "z": 0
+        }
+      ],
+      "visitorPoses": [
+        {
+          "x": -48.97025202720026,
+          "y": 1.1935125304459795,
+          "z": 59.47447610652223,
+          "heading": 3.1324466223033864,
+          "swing": null,
+          "bench": null,
+          "horse": null,
+          "activity": null,
+          "active": true,
+          "holdingPuppy": null
+        },
+        {
+          "x": -48.008602670873096,
+          "y": 1.265552769944269,
+          "z": 59.65811878728838,
+          "heading": 3.141592653589793,
+          "swing": null,
+          "bench": null,
+          "horse": null,
+          "activity": null,
+          "active": true,
+          "holdingPuppy": null
+        }
+      ]
+    }
+  ],
+  "identities": [
+    "c754952a-84ff-45c4-a59b-e2151d6b461b",
+    "3fa7885a-e633-46b1-85ea-a4a9683c21a6"
+  ],
+  "finalInventories": [
+    {
+      "apples": 0,
+      "mushrooms": 1
+    },
+    {
+      "apples": 0,
+      "mushrooms": 0
+    }
+  ]
+}

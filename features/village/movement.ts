@@ -1,4 +1,4 @@
-import { BRIDGE_BARRIERS, floorHeight, inWalkableWorld, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
+import { bridgeBarriers, floorHeight, hasEditedTerrain, inWalkableWorld, inRiver, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
 import type { Collider, MovementStatus, WorldContact } from "./environment";
 
 const STEP = 1 / 120;
@@ -50,10 +50,10 @@ export class VillageMovement {
   }
   clear(x: number, z: number, y = floorHeight(x, z)) {
     if (!inWalkableWorld(x, z)) return false;
-    if (Math.abs(x - riverX(z)) < 3.6 && !onBridge(x, z)) return false;
+    if (inRiver(x, z) && !onBridge(x, z)) return false;
     if (pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
     // Rails stay solid during jumps; one rounded footprint also covers every stone seam.
-    if (BRIDGE_BARRIERS.some(c => this.overlaps(c, x, z))) return false;
+    if (bridgeBarriers().some(c => this.overlaps(c, x, z))) return false;
     return !this.colliders.some(c => {
       if (y >= (c.top ?? 8) || y + MOVEMENT.height <= (c.bottom ?? -1)) return false;
       return this.overlaps(c, x, z);
@@ -66,7 +66,7 @@ export class VillageMovement {
   }
   private resolveBridgeOverlap() {
     const { x, z } = this.position;
-    const barrier = BRIDGE_BARRIERS.find(c => this.overlaps(c, x, z));
+    const barrier = bridgeBarriers().find(c => this.overlaps(c, x, z));
     if (!barrier) return;
     const radius = MOVEMENT.radius + .001;
     const minX = barrier.x - barrier.w / 2, maxX = barrier.x + barrier.w / 2;
@@ -112,6 +112,13 @@ export class VillageMovement {
     const { x, y, z } = this.position;
     this.contact({ kind, position: [x, y, z], surface: surfaceAt(x, z), speed: this.speed, impact, foot: this.contactIndex++ % 2 ? "right" : "left" });
   }
+  private terrainAllows(x: number, z: number) {
+    if (!hasEditedTerrain(this.position.x, this.position.z) && !hasEditedTerrain(x, z)) return true;
+    const floor = floorHeight(x, z);
+    if (!this.grounded) return floor <= this.position.y + .18;
+    const distance = Math.hypot(x - this.position.x, z - this.position.z);
+    return floor - floorHeight(this.position.x, this.position.z) <= distance * .85 + .000001;
+  }
   update(delta: number, input: { x: number; z: number; run: boolean; sprint: boolean; blocked: boolean }) {
     if (input.blocked) { this.pause(); return; }
     this.accumulator += Math.min(delta, 0.1);
@@ -142,10 +149,10 @@ export class VillageMovement {
     this.velocity.z += (input.z * target - this.velocity.z) * damping;
     const { x: oldX, z: oldZ } = this.position;
     const nx = oldX + this.velocity.x * dt;
-    if (this.clear(nx, oldZ, this.position.y)) this.position.x = nx;
+    if (this.terrainAllows(nx, oldZ) && this.clear(nx, oldZ, this.position.y)) this.position.x = nx;
     else this.velocity.x = 0;
     const nz = oldZ + this.velocity.z * dt;
-    if (this.clear(this.position.x, nz, this.position.y)) this.position.z = nz;
+    if (this.terrainAllows(this.position.x, nz) && this.clear(this.position.x, nz, this.position.y)) this.position.z = nz;
     else this.velocity.z = 0;
     const travelled = Math.hypot(this.position.x - oldX, this.position.z - oldZ);
     this.speed = travelled / dt;

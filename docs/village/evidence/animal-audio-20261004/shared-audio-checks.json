@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "The Worker accepts one nearby cow pet",
+    "A real client hears exactly one accepted cow response",
+    "A real client hears exactly one accepted cow response",
+    "A competing cow pet is rejected",
+    "The rejected pet does not produce a second success call",
+    "Disconnect releases the pet claim",
+    "Reconnect does not replay the old cow response",
+    "The Worker accepts one stable hay meal (accepted)",
+    "A real client hears the horse hay response once",
+    "A real client hears the horse hay response once",
+    "A competing hay request cannot restart the meal or its response",
+    "Simultaneous private focus clears both outdoor animal channels"
+  ],
+  "pageErrors": []
+}

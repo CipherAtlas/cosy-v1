@@ -21,6 +21,8 @@ The village is for laptops and desktop PCs. Do not optimize the village game or 
 
 Strongly optimize the village scene and interface for 13-inch laptop screens. Keep the world and the current interaction clearly visible; use compact, contextual controls placed away from the main action. Buttons and control panels must have translucent or partially transparent backgrounds with readable text, visible boundaries and clear keyboard focus. Avoid large opaque overlays, unnecessary panels and controls that cover the player, interaction target or too much of the scene. Verify layouts at representative 13-inch laptop viewport sizes and in smaller desktop windows.
 
+Reserve the bottom-right corner for minor actions and UI options. Active gameplay progress belongs in a dedicated, readable HUD: racing countdown, remaining time and checkpoints at the top center, and visible farm growth timers beside the current farming interaction. Keep these displays clear of the player and preserve keyboard access and the translucent village styling.
+
 On phones, refuse to open the village and show a simple message asking the visitor to use a laptop or PC. Check device identity before mounting the village scene, loading world assets, initializing game audio or connecting to the shared village. Do not use viewport width alone to block entry: narrow windows on laptops and PCs must still work.
 
 # Village assets and the local layout editor

@@ -1,0 +1,11 @@
+{
+  "scope": "Failed readiness diagnostics against final production build without a local shared endpoint. This is not final rendering or shared-world proof.",
+  "observed": {
+    "pageErrors": 0,
+    "engineGardenLoaded": true,
+    "sharedConnected": false,
+    "openedSockets": 0
+  },
+  "rootCause": "Parent confirmed final production build omitted NEXT_PUBLIC_SHARED_WORLD_URL. Parent rebuilding the local export with explicit ws://127.0.0.1:2567; no source issue or source edit.",
+  "browser": "Closed in finally after45-second diagnostic timeout."
+}

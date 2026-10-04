@@ -1,0 +1,63 @@
+{
+  "scope": "Independent source-space reproduction of exact original willow TubeGeometry trunk below world y1.8; native/authored path ribbons use actual shoulder coefficient1.27 plus per-sample waviness. No layout mutation. Runtime actual bark mesh proof remains separate.",
+  "sourceTrunkVertices": 99,
+  "sourceTrunkTriangles": 160,
+  "results": [
+    {
+      "position": [
+        -18,
+        0,
+        -3.5
+      ],
+      "lowBarkPolygons": 48,
+      "lowBarkBounds": {
+        "minX": -18.3240890160203,
+        "maxX": -17.504835894423696,
+        "minZ": -3.8240943044424056,
+        "maxZ": -3.0146040080513243
+      },
+      "pavingContacts": [
+        "path-4"
+      ],
+      "waterVertices": 0,
+      "minPondDistance": 1.313399239496401,
+      "movementClear": true
+    },
+    {
+      "position": [
+        -15.9,
+        0,
+        -3.5
+      ],
+      "lowBarkPolygons": 48,
+      "lowBarkBounds": {
+        "minX": -16.224089016020297,
+        "maxX": -15.404835894423696,
+        "minZ": -3.8240943044424056,
+        "maxZ": -3.0146040080513243
+      },
+      "pavingContacts": [],
+      "waterVertices": 0,
+      "minPondDistance": 1.430205819806159,
+      "movementClear": true
+    },
+    {
+      "position": [
+        -15.5,
+        0,
+        -3.5
+      ],
+      "lowBarkPolygons": 48,
+      "lowBarkBounds": {
+        "minX": -15.824089016020299,
+        "maxX": -15.004835894423696,
+        "minZ": -3.8240943044424056,
+        "maxZ": -3.0146040080513243
+      },
+      "pavingContacts": [],
+      "waterVertices": 28,
+      "minPondDistance": 1.4530496677201505,
+      "movementClear": true
+    }
+  ]
+}

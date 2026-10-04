@@ -3,20 +3,26 @@ import type { PuppyBreed } from "./worldLayout";
 import type { PuppyCommand } from "./puppies";
 import type { Line } from "./villagers";
 import type { Crop } from "./garden";
+import type { SharedTown, TownAction } from "./townShared";
 
 export type SharedActor = {
-  id: string; kind: "puppy" | "resident"; x: number; y: number; z: number; heading: number; speed: number;
+  id: string; kind: "puppy" | "resident" | "horse"; x: number; y: number; z: number; heading: number; speed: number;
   owner: string | null; following: boolean;
-  mode: "roam" | "follow" | "hold" | "petApproach" | "pet" | "trick" | "talk" | "approach" | "visit" | "return" | "activity";
+  mode: "roam" | "follow" | "hold" | "petApproach" | "pet" | "trick" | "talk" | "approach" | "visit" | "return" | "activity" | "idle" | "ride";
   action: PuppyCommand | null; startedAt: number; until: number; speech: Line | null;
   activity?: PlaceId | null; gesture?: { kind: "water" | "tea"; at: number };
 };
+export type MapActor = { id: string; kind: "resident" | "puppy"; name: string; color: string; x: number; z: number };
+
 export type SharedBirds = {
   phase: "flight" | "ground"; since: number; mealAt: number | null; flightCount?: number;
   queued: boolean; served: boolean; throwAt: number | null; origin: [number, number, number];
 };
-export type SharedActors = { time: number; epoch: number; actors: SharedActor[]; birds: SharedBirds; pondFeedAt: number | null; gift: { crop: Crop; at: number } | null };
+export type SharedActors = { time: number; epoch: number; actors: SharedActor[]; birds: SharedBirds; pondFeedAt: number | null; gift: { crop: Crop; at: number } | null; town?: SharedTown };
 export type SharedInteraction =
+  | TownAction
+  | { kind: "mapTravel"; id: string }
+  | { kind: "horse"; id: string; action: "mount" | "dismount" }
   | { kind: "puppy"; id: string; action: "hold" | "release" | "pet" | "walk" | "home" | PuppyCommand }
   | { kind: "resident"; id: string; action: "talk" | "walk" | "home" }
   | { kind: "bench"; id: string; index?: 0 | 1 }
@@ -24,6 +30,7 @@ export type SharedInteraction =
   | { kind: "activity"; id: PlaceId }
   | { kind: "leave" };
 export type InteractionResult = { ok: boolean; reason?: string; index?: 0 | 1; position?: [number, number, number] };
+export type SharedHorseInput = { forward: number; turn: number; sprint: boolean; brake: boolean };
 export const PUPPY_TRICK_SECONDS: Record<PuppyCommand, number> = { sit: 7, dance: 5.2, spin: 3.2, bow: 3.8, wave: 4.2, roll: 4.6 };
 
 // Actor and camera are authored together so the interaction remains visible beside the DOM controls.

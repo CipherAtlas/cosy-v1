@@ -1,0 +1,94 @@
+{
+  "scope": "Compiled production VillageEngine direct fixture on3074, read-only page-response engine hook. Geometry-only source review; actual UI/shared-entry proof remains pending final3051.",
+  "passes": [
+    {
+      "image": "source-3074/pond-west.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: shoreline colonies and lively open water make the pond easier to enjoy.",
+        "Is this pretty enough?": "Lily placement is pretty and intentional; this source pass is not final path-mask approval.",
+        "Is the town big and healthy looking?": "Yes: the pond is substantial, with mature trees and full banks.",
+        "Does it make a user want to stay?": "Yes: the open center and grouped pads make a calm view worth lingering over."
+      }
+    },
+    {
+      "image": "source-3074/pond-north.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: shoreline colonies and lively open water make the pond easier to enjoy.",
+        "Is this pretty enough?": "Lily placement is pretty and intentional; this source pass is not final path-mask approval.",
+        "Is the town big and healthy looking?": "Yes: the pond is substantial, with mature trees and full banks.",
+        "Does it make a user want to stay?": "Yes: the open center and grouped pads make a calm view worth lingering over."
+      }
+    },
+    {
+      "image": "source-3074/pond-east.png",
+      "answers": {
+        "Is this enjoyable for a user?": "The large pond and bird life are enjoyable, but the bank path remains overgrown in this source build.",
+        "Is this pretty enough?": "Lily grouping is improved; stalks still visibly cross the limestone paving.",
+        "Is the town big and healthy looking?": "Yes: full banks and a large lively pond support the expanded town.",
+        "Does it make a user want to stay?": "The pond is inviting, but this path needs the pending mask fix."
+      }
+    },
+    {
+      "image": "source-3074/pond-south.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: shoreline colonies and lively open water make the pond easier to enjoy.",
+        "Is this pretty enough?": "Lily placement is pretty and intentional; this source pass is not final path-mask approval.",
+        "Is the town big and healthy looking?": "Yes: the pond is substantial, with mature trees and full banks.",
+        "Does it make a user want to stay?": "Yes: the open center and grouped pads make a calm view worth lingering over."
+      }
+    },
+    {
+      "image": "source-3074/pond-dock.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the lower framing clearly shows birds and the open dock.",
+        "Is this pretty enough?": "Yes: the pond center is uncluttered, with lily colonies at the shore; hanging willow leaves remain natural overhead framing.",
+        "Is the town big and healthy looking?": "Yes: a broad pond with many birds feels established and healthy.",
+        "Does it make a user want to stay?": "Yes: this clear dock view invites a longer pause."
+      }
+    },
+    {
+      "image": "source-3074/pond-north-overview.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: shoreline colonies and lively open water make the pond easier to enjoy.",
+        "Is this pretty enough?": "Lily placement is pretty and intentional; this source pass is not final path-mask approval.",
+        "Is the town big and healthy looking?": "Yes: the pond is substantial, with mature trees and full banks.",
+        "Does it make a user want to stay?": "Yes: the open center and grouped pads make a calm view worth lingering over."
+      }
+    },
+    {
+      "image": "source-3074/brook-bank.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the curved brook and bridge make a pleasant walking route.",
+        "Is this pretty enough?": "Water composition is clear; generic path foliage awaits the merged-surface mask repair.",
+        "Is the town big and healthy looking?": "Yes: the brook adds depth and a larger natural district.",
+        "Does it make a user want to stay?": "Yes: the bridge is a quiet scenic pause."
+      }
+    },
+    {
+      "image": "source-3074/main-river.png",
+      "answers": {
+        "Is this enjoyable for a user?": "The riverside scene has character, but accidental water trunks remain in this pre-placement-fix build.",
+        "Is this pretty enough?": "The water and houses are attractive; two trunks in water still need the coordinated relocation.",
+        "Is the town big and healthy looking?": "Yes: established trees and homes read as a healthy town.",
+        "Does it make a user want to stay?": "This will be a stronger walking stop once the water trunks are on dry banks."
+      }
+    }
+  ],
+  "checks": {
+    "photos": 8,
+    "lilies": 14,
+    "normalizedRadiusMin": 0.839999927529293,
+    "normalizedRadiusMax": 0.9100001065642074,
+    "birds": 15,
+    "fish": 8,
+    "pageErrors": 0,
+    "protectedFilesUnchanged": 8,
+    "bankMaskVisibleCounts": {
+      "reeds": 62,
+      "iris": 20,
+      "daisy": 13
+    }
+  },
+  "concreteRemainingIssue": "Paving tags were dropped by architecture merging, so the 3074 bank mask removed zero plants. Parent diagnosed and fixed batch separation/tag propagation; final review must use3075 or new3051. Canonical river/path tree and shrub moves were pending in this pass.",
+  "sourceChanges": "No additional GardenScene edits after approved lily grouping and bank tags."
+}

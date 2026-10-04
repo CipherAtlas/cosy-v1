@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "Both new visitors start with empty private gift inventories",
+    "apple: visitor renders exactly the accepted gift on the hedgehog's back",
+    "apple: observer renders exactly the accepted gift on the hedgehog's back",
+    "apple: real E grants one private gift only to the receiving visitor",
+    "Honey uses the original flower girl-cow model",
+    "Real F feeds exactly one received apple",
+    "Cow apple meal has the same accepted eight-second owner and clock in both clients",
+    "Apple meal has a distinct visible munch/tilt head animation",
+    "visitor sees the real apple, heart and cute Moo emote",
+    "observer sees the real apple, heart and cute Moo emote",
+    "apple-meal fits 1366x768 with 44px targets and real keycaps",
+    "apple-meal fits 1280x720 with 44px targets and real keycaps",
+    "apple-meal fits 1024x640 with 44px targets and real keycaps",
+    "Observer sees the occupied cow and cannot restart the meal",
+    "Eight-second apple meal ends and the cow resumes grazing",
+    "mushroom: visitor renders exactly the accepted gift on the hedgehog's back",
+    "mushroom: observer renders exactly the accepted gift on the hedgehog's back",
+    "mushroom: real E grants one private gift only to the receiving visitor",
+    "apple: visitor renders exactly the accepted gift on the hedgehog's back",
+    "apple: observer renders exactly the accepted gift on the hedgehog's back",
+    "apple: real E grants one private gift only to the receiving visitor"
+  ],
+  "errors": []
+}

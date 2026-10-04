@@ -1,0 +1,25 @@
+{
+  "pass": true,
+  "checks": [
+    "The map shows all fifteen actual farm rows",
+    "The map marks racetrack",
+    "The map marks stable",
+    "The map marks grazing-field",
+    "The map marks owl-grove",
+    "The map names all five shared villagers",
+    "The map marks all four shared dogs",
+    "The map shows both pasture swing placements",
+    "The map uses both authored river channels and all three bridges",
+    "Live actor markers follow accepted moving poses while the map stays open",
+    "The expanded authored map fits 1366x768",
+    "Map keyboard help stays visible at 1366x768",
+    "The expanded authored map fits 1280x720",
+    "Map keyboard help stays visible at 1280x720",
+    "The expanded authored map fits 1024x640",
+    "Map keyboard help stays visible at 1024x640",
+    "I opens one basket for farm/kitchen crops, woodland treats and tea",
+    "The visible basket matches this visitor’s accepted private inventory",
+    "No page errors in map/inventory flow (0)"
+  ],
+  "errors": []
+}

@@ -12,7 +12,7 @@ const path = require('node:path');
   const output = process.env.OUTPUT_DIR || '/tmp/cosy-cottage-cat'; fs.mkdirSync(output, { recursive: true });
   try {
     await page.goto(process.env.QA_URL || 'http://127.0.0.1:3083');
-    const results = await page.evaluate(async () => {
+    const results = await page.evaluate(async cueOnly => {
       const T = await import('three');
       const { VillageEngine } = await import('/modules/features/village/VillageEngine.js');
       document.body.innerHTML = '<div id="host" style="position:fixed;inset:0"></div>';
@@ -23,6 +23,39 @@ const path = require('node:path');
       await e.load(); e.setQuality('high'); e.setPlace('focus');
       await new Promise(r => setTimeout(r, 1200)); e.renderer.setAnimationLoop(null);
       const cat = e.cottageCat;
+      if (cueOnly) {
+        e.setBlocked(false); cat.root.position.copy(cat.desk); cat.begin('ask', 30); cat.update(0, 0, false);
+        const visible = () => cat.dialogueCues.filter(cue => cue.visible);
+        const anchored = model => {
+          const target = model.head.getWorldPosition(new T.Vector3()); target.y += .18;
+          return model.dialogueCues.filter(cue => cue.visible).every(cue => cue.position.distanceTo(target) < 1e-8);
+        };
+        check(visible().length === 1 && visible()[0].text.en === 'Mrrp~ (A little company~)' && visible()[0].text.ja.length > 0, 'Private cat invitation has one bilingual dialogue cue');
+        check(anchored(cat), 'Native cat cue anchors to the actual animated head plus18cm');
+        cat.update(2.99, 2.99, false); check(visible().length === 1, 'Invitation cue lasts through the first2.99seconds');
+        cat.update(.02, 3.01, false); check(visible().length === 0, 'Invitation cue hides after3seconds without ending its pet invitation');
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
+        check(cat.state === 'pet' && visible().length === 1 && visible()[0].text.en === 'Purr purr~ (That feels lovely~)', 'Real private E action shows the purr dialogue cue');
+        cat.update(3.19, 6.2, false); check(visible().length === 1 && anchored(cat), 'Pet dialogue follows the animated head through3.19seconds');
+        cat.update(.02, 6.22, false); check(cat.state === 'ask' && !cat.dialogueCues[0].visible, 'Purr cue ends with the existing3.2second pet state');
+        e.setPlace(null); const age = cat.age; cat.update(10, 16.22, false);
+        check(cat.dialogueCues.every(cue => !cue.visible) && cat.age === age && !e.petCottageCat(), 'Leaving the private room hides both cues and preserves the outdoor pet boundary');
+        e.setPlace('focus'); cat.begin('rest', 1); cat.update(.1, 16.32, true);
+        check(cat.state === 'ask' && visible().length === 1 && anchored(cat), 'Reduced motion refreshes the still invitation cue and head anchor');
+        check(e.petCottageCat(), 'Reduced private pet uses the same click action');
+        cat.update(.1, 16.42, true);
+        check(cat.dialogueCues[0].visible && anchored(cat), 'Reduced private pet keeps its purr cue at the still head');
+        const { CottageCat } = await import('/modules/features/village/cottageCat.js');
+        const legacyModel = new T.Group(), parent = new T.Group(); parent.position.set(5, 2, -3); parent.rotation.y = .4; parent.scale.setScalar(1.3); parent.add(legacyModel);
+        for (const name of ['CatBody', 'CatHead', 'CatTail', 'CatFrontLeft', 'CatFrontRight', 'CatBackLeft', 'CatBackRight', 'CatEyeLeft', 'CatEyeRight']) {
+          const part = new T.Group(); part.name = name; if (name === 'CatHead') part.position.set(0, .6, .25); legacyModel.add(part);
+        }
+        const legacy = new CottageCat(legacyModel, () => {}); legacy.enter(true); legacy.begin('ask', 30); legacy.update(.1, .1, false);
+        check(legacy.dialogueCues[1].visible && anchored(legacy), 'Legacy cat cue uses the actual head through parent rotation and scale');
+        legacy.dispose(); check(legacy.dialogueCues.every(cue => !cue.visible), 'Cat disposal hides retained dialogue cues');
+        cat.root.updateMatrixWorld(true); e.renderer.render(e.scene, e.camera);
+        return { checks, transformSamples: 0, states: ['ask', 'pet'], visits: cat.visits, naps: cat.naps };
+      }
       check(cat.state === 'nap', 'Cat starts with a nap on the cushion');
       check(e.indoor.children.filter(o => o.isMesh && o.geometry.attributes.position.count > 100).length > 10, 'Static room batches survive mixed rounded/indexed geometry');
       const box = new T.Box3().setFromObject(cat.root), corners = [];
@@ -65,7 +98,7 @@ const path = require('node:path');
       check(position.equals(cat.root.position) && rotation.equals(cat.root.quaternion), 'Reduced nap does not move the cat');
       cat.root.updateMatrixWorld(true); e.renderer.render(e.scene,e.camera);
       return { checks: checks.filter(label => label !== 'Finite cat transform'), transformSamples: 6000, states:[...seen], visits:cat.visits, naps:cat.naps, minY,maxY };
-    });
+    }, process.env.CAT_CUES_ONLY === '1');
     await page.screenshot({ path:path.join(output,'cottage-nap.png') });
     if (errors.length || warnings.length) throw Error(JSON.stringify({errors,warnings:warnings.slice(0,2)}));
     fs.writeFileSync(path.join(output,'checks.json'),JSON.stringify({...results,errors,warnings},null,2));

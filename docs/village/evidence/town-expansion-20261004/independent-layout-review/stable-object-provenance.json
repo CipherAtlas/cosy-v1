@@ -1,0 +1,293 @@
+{
+  "camera": [
+    84.99992012549954,
+    3.2546012645393843,
+    31.35667082421454
+  ],
+  "hits": [
+    {
+      "at": [
+        85.65200858993717,
+        2.0096774753425093,
+        37.10000015050173
+      ],
+      "distance": 5.9127731528066745,
+      "material": "Painted town green",
+      "chain": [
+        {
+          "name": "HorseRacetrack_green",
+          "type": "Mesh",
+          "position": [
+            21.549999237060547,
+            0.04399999976158142,
+            -0.11500000208616257
+          ],
+          "data": {
+            "name": "HorseRacetrack_green"
+          }
+        },
+        {
+          "name": "HorseRacetrack",
+          "type": "Object3D",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": "HorseRacetrack"
+          }
+        },
+        {
+          "name": "Willow circuit \u00b7 horse racetrack",
+          "type": "Group",
+          "position": [
+            85,
+            0,
+            20
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Group",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Scene",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        }
+      ]
+    },
+    {
+      "at": [
+        85.6533709520749,
+        2.007076544445458,
+        37.11199928075075
+      ],
+      "distance": 5.92512629001382,
+      "material": "Painted town green",
+      "chain": [
+        {
+          "name": "HorseRacetrack_green",
+          "type": "Mesh",
+          "position": [
+            21.549999237060547,
+            0.04399999976158142,
+            -0.11500000208616257
+          ],
+          "data": {
+            "name": "HorseRacetrack_green"
+          }
+        },
+        {
+          "name": "HorseRacetrack",
+          "type": "Object3D",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": "HorseRacetrack"
+          }
+        },
+        {
+          "name": "Willow circuit \u00b7 horse racetrack",
+          "type": "Group",
+          "position": [
+            85,
+            0,
+            20
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Group",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Scene",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        }
+      ]
+    },
+    {
+      "at": [
+        86.4797035673767,
+        0.4294974479256579,
+        44.39000004529953
+      ],
+      "distance": 13.417847860021633,
+      "material": "Painted town dark",
+      "chain": [
+        {
+          "name": "HorseStable_dark",
+          "type": "Mesh",
+          "position": [
+            -4.150000095367432,
+            0.800000011920929,
+            -2.0999999046325684
+          ],
+          "data": {
+            "name": "HorseStable_dark"
+          }
+        },
+        {
+          "name": "HorseStable",
+          "type": "Object3D",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": "HorseStable"
+          }
+        },
+        {
+          "name": "Horse stable \u00b7 two feeding bays",
+          "type": "Group",
+          "position": [
+            85,
+            0,
+            42
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Group",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Scene",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        }
+      ]
+    },
+    {
+      "at": [
+        86.49332817679684,
+        0.4034862526497536,
+        44.5100000500679
+      ],
+      "distance": 13.541388191112098,
+      "material": "Painted town dark",
+      "chain": [
+        {
+          "name": "HorseStable_dark",
+          "type": "Mesh",
+          "position": [
+            -4.150000095367432,
+            0.800000011920929,
+            -2.0999999046325684
+          ],
+          "data": {
+            "name": "HorseStable_dark"
+          }
+        },
+        {
+          "name": "HorseStable",
+          "type": "Object3D",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": "HorseStable"
+          }
+        },
+        {
+          "name": "Horse stable \u00b7 two feeding bays",
+          "type": "Group",
+          "position": [
+            85,
+            0,
+            42
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Group",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "name": "",
+          "type": "Scene",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "data": {
+            "name": null
+          }
+        }
+      ]
+    }
+  ]
+}

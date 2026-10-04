@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "Cottage uses the new cat skin",
+    "Native sleeping pose stays finite and bounded",
+    "Native cat completes its private nap, stretch and desk invitation",
+    "Native invitation reaches the existing desk",
+    "Another private cat keeps its independent skeleton",
+    "The native cat accepts the existing pet action",
+    "Accepted private pet deforms a bounded real skin",
+    "Pet completes and restores the invitation",
+    "The private routine pauses outside the cottage",
+    "Reduced motion keeps the native cat still"
+  ],
+  "bounds": {
+    "low": 0.4937891282076074,
+    "high": 0.5298691646676685
+  },
+  "errors": []
+}

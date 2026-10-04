@@ -1,0 +1,955 @@
+{
+  "checks": [
+    "Both visitors join the same local Worker",
+    "Observer sees the visitor attached to the moving seat in all samples",
+    "Remote rider follows the vertical arc",
+    "Occupied seat is visibly disabled for another visitor",
+    "Getting off releases the shared seat",
+    "Clicking Dance keeps the trick menu open",
+    "The Worker keeps the dancing dog owned by the requesting visitor",
+    "Both clients render the Worker-accepted dog position",
+    "Focused keyboard trick keeps the menu open",
+    "Reconnect resumes the active trick at its current clip time",
+    "Spin animates on the other client and keeps the menu open",
+    "Bow animates on the other client and keeps the menu open",
+    "Wave animates on the other client and keeps the menu open",
+    "Roll over animates on the other client and keeps the menu open",
+    "Dog stays beside the open controls after its trick finishes",
+    "Completed tricks keep the list open",
+    "1280×720 panel fits the desktop window",
+    "1280×720 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1366×768 panel fits the desktop window",
+    "1366×768 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1440×900 panel fits the desktop window",
+    "1440×900 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "1024×640 panel fits the desktop window",
+    "1024×640 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "844×390 panel fits the desktop window",
+    "844×390 translucent panel has readable keycaps and 44 px buttons without overflow",
+    "Escape closes the list explicitly",
+    "Closing Tricks releases patrol and follow movement",
+    "Leaving the interaction releases the dog",
+    "Both clients have no captured page errors"
+  ],
+  "swingSamples": [
+    {
+      "gap": 0,
+      "angle": 0.5832363624233747,
+      "height": 0.6180856288283861
+    },
+    {
+      "gap": 0,
+      "angle": 0.7377218243800507,
+      "height": 0.868992613586779
+    },
+    {
+      "gap": 0,
+      "angle": 0.8259450255432426,
+      "height": 1.0336643847793372
+    },
+    {
+      "gap": 0,
+      "angle": 0.874574016026967,
+      "height": 1.130492032752163
+    },
+    {
+      "gap": 0,
+      "angle": 0.4938668297263072,
+      "height": 0.49665794328959134
+    },
+    {
+      "gap": 0,
+      "angle": 0.27838404100883374,
+      "height": 0.2820229788491512
+    },
+    {
+      "gap": 0,
+      "angle": 0.12165955424500613,
+      "height": 0.19958721030108661
+    },
+    {
+      "gap": 0,
+      "angle": 0.08411718913259927,
+      "height": 0.18936977772985053
+    },
+    {
+      "gap": 0,
+      "angle": 0.6744034981874022,
+      "height": 0.7601391538124674
+    },
+    {
+      "gap": 0,
+      "angle": 0.7741988049208324,
+      "height": 0.9352992534986989
+    },
+    {
+      "gap": 0,
+      "angle": 0.5821035706093374,
+      "height": 0.6164338184389352
+    },
+    {
+      "gap": 0,
+      "angle": 0.3737341904418616,
+      "height": 0.36292815487909424
+    }
+  ],
+  "errors": [],
+  "frames": [
+    {
+      "client": 0,
+      "receivedAt": 1791048660621,
+      "message": {
+        "type": "welcome",
+        "selfId": "2ceae5b0-af9f-4e21-ba61-bf183f3a17eb",
+        "protocol": 2,
+        "world": {
+          "time": 1791048660371,
+          "epoch": 1791048273182,
+          "pondFeedAt": null,
+          "gift": null,
+          "actors": [
+            {
+              "id": "puppy-mochi",
+              "kind": "puppy",
+              "x": 44.08898033700086,
+              "y": -0.05,
+              "z": 24.153959535418206,
+              "heading": 1.1540156138402886,
+              "speed": 1.170090173491314,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-kiko",
+              "kind": "puppy",
+              "x": 17.51124518898421,
+              "y": 0,
+              "z": -14.487685215538324,
+              "heading": 1.5959872388028313,
+              "speed": 1.170090173491589,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-biscuit",
+              "kind": "puppy",
+              "x": -30.116810579635462,
+              "y": 0,
+              "z": 2.6767500997435714,
+              "heading": -1.8072675559167215,
+              "speed": 1.170090173491616,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-cloud",
+              "kind": "puppy",
+              "x": -2.7645152669156046,
+              "y": 0,
+              "z": -22.341788100549028,
+              "heading": -0.10345022946134902,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "pip",
+              "kind": "resident",
+              "x": 45.13832675013412,
+              "y": 0.05,
+              "z": 22.21002109770792,
+              "heading": 1.319367410853026,
+              "speed": 1.170090173491314,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 1791048364629,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "maple",
+              "kind": "resident",
+              "x": -6.556930616774741,
+              "y": 0.36076463577498785,
+              "z": 3.054566615967339,
+              "heading": -1.5756496444854189,
+              "speed": 1.1700901734915696,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "moss",
+              "kind": "resident",
+              "x": 0.08486565270692743,
+              "y": 0,
+              "z": -23.824978963044703,
+              "heading": 3.0553356278138786,
+              "speed": 0.9708204076343709,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "luma",
+              "kind": "resident",
+              "x": 9.509351234569243,
+              "y": 0,
+              "z": -7.753076793174772,
+              "heading": -1.6626605138170827,
+              "speed": 1.1700901734916995,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "wren",
+              "kind": "resident",
+              "x": -37.30263899864275,
+              "y": 0.1,
+              "z": 1.899521419695736,
+              "heading": 1.868389949808693,
+              "speed": 1.1700901734914535,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-juniper",
+              "kind": "horse",
+              "x": 41.31727469620516,
+              "y": 0,
+              "z": 19.975032781767016,
+              "heading": -0.6108652381980153,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 1791048376966,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-willow",
+              "kind": "horse",
+              "x": 49,
+              "y": 0.05,
+              "z": 23,
+              "heading": -1.1344640137963142,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            }
+          ],
+          "birds": {
+            "phase": "flight",
+            "since": 1791048660341,
+            "mealAt": null,
+            "queued": false,
+            "served": false,
+            "throwAt": null,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "flightCount": 2
+          }
+        },
+        "hasCrumbs": false,
+        "visitors": [
+          {
+            "id": "2ceae5b0-af9f-4e21-ba61-bf183f3a17eb",
+            "name": "Snuggly Bunny",
+            "color": "#e07ba1",
+            "slot": 5,
+            "x": 0,
+            "z": 0,
+            "heading": 0,
+            "horse": null,
+            "swing": null,
+            "bench": null,
+            "activity": null
+          }
+        ],
+        "garden": {
+          "beds": [
+            {
+              "crop": "carrot",
+              "stage": "grown"
+            },
+            {
+              "crop": "radish",
+              "stage": "grown"
+            },
+            {
+              "crop": "carrot",
+              "stage": "empty"
+            },
+            {
+              "crop": "radish",
+              "stage": "empty"
+            },
+            {
+              "crop": "mint",
+              "stage": "sprout"
+            },
+            {
+              "crop": "daisy",
+              "stage": "grown"
+            },
+            {
+              "crop": "sunflower",
+              "stage": "grown"
+            }
+          ],
+          "mint": 0,
+          "carrots": 0,
+          "radishes": 0,
+          "daisies": 0,
+          "sunflowers": 0,
+          "mintTea": 0,
+          "crumbPouch": false
+        },
+        "chatHour": 497513,
+        "chat": [],
+        "puppyTricks": []
+      }
+    },
+    {
+      "client": 1,
+      "receivedAt": 1791048670941,
+      "message": {
+        "type": "welcome",
+        "selfId": "b7014ae1-956c-4c5f-9673-097453e054e4",
+        "protocol": 2,
+        "world": {
+          "time": 1791048670851,
+          "epoch": 1791048273182,
+          "pondFeedAt": null,
+          "gift": null,
+          "actors": [
+            {
+              "id": "puppy-mochi",
+              "kind": "puppy",
+              "x": 40.224112483130625,
+              "y": -0.05,
+              "z": 27.88576220336595,
+              "heading": -1.0993917196171665,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-kiko",
+              "kind": "puppy",
+              "x": 18.96893945822086,
+              "y": 0,
+              "z": -9.149682563633812,
+              "heading": 0.20460561751536466,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-biscuit",
+              "kind": "puppy",
+              "x": -37.866999309098375,
+              "y": 0.05,
+              "z": 1.5008986607868542,
+              "heading": -1.5775530415580687,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-cloud",
+              "kind": "puppy",
+              "x": -3.1842364507666083,
+              "y": -0.05,
+              "z": -15.265755902312536,
+              "heading": -0.05924647642628764,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "pip",
+              "kind": "resident",
+              "x": 55.81887502839546,
+              "y": 0.05,
+              "z": 24.956237066411095,
+              "heading": 1.3337226547556922,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 1791048364629,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "maple",
+              "kind": "resident",
+              "x": -17.698275275797368,
+              "y": 0.05,
+              "z": 3.000493706279914,
+              "heading": -1.5756496444854566,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "moss",
+              "kind": "resident",
+              "x": -1.067912208739936,
+              "y": 0.05,
+              "z": -31.935246302537514,
+              "heading": -2.026599260480096,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "luma",
+              "kind": "resident",
+              "x": 3.499149241649662,
+              "y": 0,
+              "z": -2.446529363830204,
+              "heading": -0.9595842219244884,
+              "speed": 1.2294306667793433,
+              "owner": "b7014ae1-956c-4c5f-9673-097453e054e4",
+              "following": false,
+              "mode": "approach",
+              "action": null,
+              "startedAt": 0,
+              "until": 1791048680849,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "wren",
+              "kind": "resident",
+              "x": -38.592106914153256,
+              "y": 0.1,
+              "z": 1.8311260201483763,
+              "heading": 1.417380035767517,
+              "speed": 1.1555976943639912,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-juniper",
+              "kind": "horse",
+              "x": 41.31727469620516,
+              "y": 0,
+              "z": 19.975032781767016,
+              "heading": -0.6108652381980153,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 1791048376966,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-willow",
+              "kind": "horse",
+              "x": 49,
+              "y": 0.05,
+              "z": 23,
+              "heading": -1.1344640137963142,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            }
+          ],
+          "birds": {
+            "phase": "flight",
+            "since": 1791048660341,
+            "mealAt": null,
+            "queued": false,
+            "served": false,
+            "throwAt": null,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "flightCount": 2
+          }
+        },
+        "hasCrumbs": false,
+        "visitors": [
+          {
+            "id": "b7014ae1-956c-4c5f-9673-097453e054e4",
+            "name": "Drowsy Puffin",
+            "color": "#83e07b",
+            "slot": 6,
+            "x": 0,
+            "z": 0,
+            "heading": 0,
+            "horse": null,
+            "swing": null,
+            "bench": null,
+            "activity": null
+          },
+          {
+            "id": "2ceae5b0-af9f-4e21-ba61-bf183f3a17eb",
+            "name": "Snuggly Bunny",
+            "color": "#e07ba1",
+            "slot": 5,
+            "x": 1.7,
+            "y": 0.05,
+            "z": 18.5,
+            "heading": 3.141592653589793,
+            "horse": null,
+            "swing": null,
+            "bench": null,
+            "activity": null
+          }
+        ],
+        "garden": {
+          "beds": [
+            {
+              "crop": "carrot",
+              "stage": "grown"
+            },
+            {
+              "crop": "radish",
+              "stage": "grown"
+            },
+            {
+              "crop": "carrot",
+              "stage": "empty"
+            },
+            {
+              "crop": "radish",
+              "stage": "empty"
+            },
+            {
+              "crop": "mint",
+              "stage": "sprout"
+            },
+            {
+              "crop": "daisy",
+              "stage": "grown"
+            },
+            {
+              "crop": "sunflower",
+              "stage": "grown"
+            }
+          ],
+          "mint": 0,
+          "carrots": 0,
+          "radishes": 0,
+          "daisies": 0,
+          "sunflowers": 0,
+          "mintTea": 0,
+          "crumbPouch": false
+        },
+        "chatHour": 497513,
+        "chat": [],
+        "puppyTricks": []
+      }
+    },
+    {
+      "client": 1,
+      "receivedAt": 1791048711855,
+      "message": {
+        "type": "welcome",
+        "selfId": "f130472d-9b92-424a-aef8-c24bdd85e1ca",
+        "protocol": 2,
+        "world": {
+          "time": 1791048711750,
+          "epoch": 1791048273182,
+          "pondFeedAt": null,
+          "gift": null,
+          "actors": [
+            {
+              "id": "puppy-mochi",
+              "kind": "puppy",
+              "x": 26.669743380264805,
+              "y": -0.05,
+              "z": 22.332027300575813,
+              "heading": 0.4156852346502073,
+              "speed": 0,
+              "owner": "2ceae5b0-af9f-4e21-ba61-bf183f3a17eb",
+              "following": false,
+              "mode": "trick",
+              "action": "sit",
+              "startedAt": 1791048709021,
+              "until": 1791048716021,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-kiko",
+              "kind": "puppy",
+              "x": 12.527728723550574,
+              "y": 0,
+              "z": -14.360523579217636,
+              "heading": 1.596285841372476,
+              "speed": 1.2493056869774761,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-biscuit",
+              "kind": "puppy",
+              "x": -18.00730029274179,
+              "y": -0.05,
+              "z": 0.10303524877425425,
+              "heading": 3.070858447429476,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "puppy-cloud",
+              "kind": "puppy",
+              "x": -0.9080658913410611,
+              "y": 0,
+              "z": -31.83757932268252,
+              "heading": -2.078512429308337,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "pip",
+              "kind": "resident",
+              "x": 45.8560808672993,
+              "y": 0,
+              "z": 26.71670790596803,
+              "heading": -1.8559565843113857,
+              "speed": 1.2500000000000522,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 1791048683129,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "maple",
+              "kind": "resident",
+              "x": -2.4153833115674717,
+              "y": 0.05,
+              "z": 3.7436354308399618,
+              "heading": 2.5646628139929093,
+              "speed": 1.1239817714681242,
+              "owner": "f130472d-9b92-424a-aef8-c24bdd85e1ca",
+              "following": false,
+              "mode": "approach",
+              "action": null,
+              "startedAt": 0,
+              "until": 1791048721749,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "moss",
+              "kind": "resident",
+              "x": -0.9216857927406736,
+              "y": 0.05,
+              "z": -8.002181454799617,
+              "heading": 1.5609563439725243,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "luma",
+              "kind": "resident",
+              "x": 11.711800978765147,
+              "y": 0,
+              "z": -14.18269205018158,
+              "heading": 2.404231154848873,
+              "speed": 1.2500000000000462,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "wren",
+              "kind": "resident",
+              "x": -37.77371877764975,
+              "y": 0.1,
+              "z": 1.5016843019629365,
+              "heading": -1.578239590715172,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "roam",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-juniper",
+              "kind": "horse",
+              "x": 41.31727469620516,
+              "y": 0,
+              "z": 19.975032781767016,
+              "heading": -0.6108652381980153,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 1791048376966,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            },
+            {
+              "id": "horse-willow",
+              "kind": "horse",
+              "x": 49,
+              "y": 0.05,
+              "z": 23,
+              "heading": -1.1344640137963142,
+              "speed": 0,
+              "owner": null,
+              "following": false,
+              "mode": "idle",
+              "action": null,
+              "startedAt": 0,
+              "until": 0,
+              "speech": null,
+              "activity": null
+            }
+          ],
+          "birds": {
+            "phase": "flight",
+            "since": 1791048703993,
+            "mealAt": null,
+            "queued": false,
+            "served": false,
+            "throwAt": null,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "flightCount": 3
+          }
+        },
+        "hasCrumbs": false,
+        "visitors": [
+          {
+            "id": "f130472d-9b92-424a-aef8-c24bdd85e1ca",
+            "name": "Little Wren",
+            "color": "#907be0",
+            "slot": 7,
+            "x": 0,
+            "z": 0,
+            "heading": 0,
+            "horse": null,
+            "swing": null,
+            "bench": null,
+            "activity": null
+          },
+          {
+            "id": "2ceae5b0-af9f-4e21-ba61-bf183f3a17eb",
+            "name": "Snuggly Bunny",
+            "color": "#e07ba1",
+            "slot": 5,
+            "x": 27.518857422717627,
+            "y": 0,
+            "z": 24.255679661402084,
+            "heading": 1.5707963267948966,
+            "horse": null,
+            "swing": null,
+            "bench": null,
+            "activity": null
+          }
+        ],
+        "garden": {
+          "beds": [
+            {
+              "crop": "carrot",
+              "stage": "grown"
+            },
+            {
+              "crop": "radish",
+              "stage": "grown"
+            },
+            {
+              "crop": "carrot",
+              "stage": "empty"
+            },
+            {
+              "crop": "radish",
+              "stage": "empty"
+            },
+            {
+              "crop": "mint",
+              "stage": "sprout"
+            },
+            {
+              "crop": "daisy",
+              "stage": "grown"
+            },
+            {
+              "crop": "sunflower",
+              "stage": "grown"
+            }
+          ],
+          "mint": 0,
+          "carrots": 0,
+          "radishes": 0,
+          "daisies": 0,
+          "sunflowers": 0,
+          "mintTea": 0,
+          "crumbPouch": false
+        },
+        "chatHour": 497513,
+        "chat": [],
+        "puppyTricks": []
+      }
+    }
+  ]
+}

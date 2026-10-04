@@ -1,0 +1,29 @@
+Input #0, matroska,webm, from 'docs/village/evidence/animal-audio-20261004/defaults-boost/game-mix.webm':
+  Metadata:
+    encoder         : Chrome
+  Duration: 00:00:51.00, start: 0.000000, bitrate: 129 kb/s
+  Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp (default)
+Stream mapping:
+  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0(eng): Audio: pcm_s16le, 192000 Hz, stereo, s16, 6144 kb/s (default)
+    Metadata:
+      encoder         : Lavc62.28.100 pcm_s16le
+size=N/A time=00:00:07.90 bitrate=N/A speed=15.7x elapsed=0:00:00.50    size=N/A time=00:00:15.59 bitrate=N/A speed=15.5x elapsed=0:00:01.00    size=N/A time=00:00:20.19 bitrate=N/A speed=13.4x elapsed=0:00:01.50    size=N/A time=00:00:27.80 bitrate=N/A speed=13.8x elapsed=0:00:02.01    size=N/A time=00:00:36.49 bitrate=N/A speed=14.5x elapsed=0:00:02.51    size=N/A time=00:00:45.19 bitrate=N/A speed=  15x elapsed=0:00:03.01    [Parsed_loudnorm_0 @ 0xbd2c05080] 
+{
+	"input_i" : "-35.15",
+	"input_tp" : "-17.43",
+	"input_lra" : "4.80",
+	"input_thresh" : "-45.15",
+	"output_i" : "-22.43",
+	"output_tp" : "-6.00",
+	"output_lra" : "4.10",
+	"output_thresh" : "-32.43",
+	"normalization_type" : "dynamic",
+	"target_offset" : "0.43"
+}
+[out#0/null @ 0xbd2c04900] video:0KiB audio:38295KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+size=N/A time=00:00:51.10 bitrate=N/A speed=15.6x elapsed=0:00:03.26    

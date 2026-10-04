@@ -1,0 +1,17 @@
+{
+  "pose": {
+    "clear": true,
+    "position": {
+      "x": 0.3,
+      "y": 0.05,
+      "z": 18.5
+    },
+    "sharedConnected": true
+  },
+  "errors": [],
+  "viewports": [
+    "1366x768",
+    "1024x700"
+  ],
+  "url": "http://127.0.0.1:3051/"
+}

@@ -1,4 +1,5 @@
 import * as T from "three";
+import { mountainHorizonShader } from "./mountainHorizon";
 
 /** A sky in scene space: cloud detail survives looking up in every direction. */
 export function createAtmosphere() {
@@ -16,6 +17,7 @@ export function createAtmosphere() {
         return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
         mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
       float fbm(vec3 p){float f=0.,a=.55;for(int i=0;i<5;i++){f+=noise(p)*a;p=p*2.03+vec3(1.7,3.1,2.4);a*=.48;}return f;}
+      ${mountainHorizonShader}
       void main(){
         vec3 d=normalize(direction);float elevation=max(d.y,0.);
         vec3 horizon=mix(vec3(.28,.60,.84),vec3(.33,.30,.42),dusk);
@@ -61,6 +63,7 @@ export function createAtmosphere() {
         nightSky=mix(nightSky,vec3(.012,.014,.028),cloud*.08);
         sky=mix(sky,nightSky,night);
         }
+        if(d.y<.32) sky=mountainHorizon(sky,d,rain,dusk,night);
         gl_FragColor=vec4(sky,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>

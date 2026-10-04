@@ -1,0 +1,23 @@
+{
+  "errors": [],
+  "state": {
+    "body": "Hearthwillow\nMeadow swings\nSunrise meadow\nN\n↑\nM\nMap\n,\nW\nA\nS\nD\nMove\nShift\nHold to run\nE\nInteract\nR\nRecover\nTab\nChoose controls\nClick to look · Esc to release",
+    "sockets": [],
+    "engines": [
+      [
+        {
+          "garden": true,
+          "sharedConnected": false,
+          "blocked": false,
+          "disposed": false
+        },
+        {
+          "garden": true,
+          "sharedConnected": false,
+          "blocked": false,
+          "disposed": false
+        }
+      ]
+    ]
+  }
+}

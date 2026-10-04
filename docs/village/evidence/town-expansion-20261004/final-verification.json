@@ -1,0 +1,51 @@
+{
+  "scope": "Final local town application/source/asset/layout and actual-client evidence; no publication or physical-device measurement. Final editor-only thumbnail refinement has separate evidence.",
+  "recordedAt": "2026-10-03T22:46:21.372510+00:00",
+  "layoutHash": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "objects": 591,
+  "colliders": 1887,
+  "benches": 8,
+  "productionBuild": "22-page build passed, including lint/types; runtime source unchanged since that build",
+  "sourceChecks": "npm run check passed; final editor-only thumbnail refinement uses separate fresh typecheck",
+  "exportPrivacy": "npm run check:export passed",
+  "proofs": {
+    "browser-checks.json": {
+      "checks": 38,
+      "errors": []
+    },
+    "town-runtime.json": {
+      "checks": 60,
+      "errors": []
+    },
+    "town-shared-regression.json": {
+      "checks": 26,
+      "errors": []
+    },
+    "canonical-layout-apply-final/canonical-apply-checks.json": {
+      "checks": 13,
+      "errors": []
+    },
+    "forage-assets/editor/editor-checks.json": {
+      "checks": 53,
+      "errors": []
+    },
+    "forage-assets/runtime-confirmed/browser-checks.json": {
+      "checks": 36,
+      "errors": []
+    },
+    "pond-final/pond-checks.json": {
+      "checks": 12,
+      "errors": []
+    },
+    "layout-physics-final.json": {
+      "checks": 338,
+      "errors": []
+    },
+    "meadow-thumbnail-review/editor-checks.json": {
+      "checks": 8,
+      "errors": []
+    }
+  },
+  "limits": "Chrome local automation and local Worker; no hardware FPS/CPU/GPU, Safari/Firefox, long-session/crowded-world or deployed proof. Three-client core/fence proofs reused across documented rendering-only refinements.",
+  "editorThumbnail": "Preview-only cloned24-flower cluster; native48m dimensions/counts/matrices/colors/bounds unchanged. Fresh typecheck and read-only actual Chrome review passed; normal3040 editor restarted."
+}

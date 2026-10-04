@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Both authored horses arrive through Worker snapshots",
+    "Busy horse cannot be mounted by another visitor",
+    "Competing programmatic mount is also rejected",
+    "Actual W and Shift keys accelerate into canter",
+    "Space brakes the server-owned horse",
+    "A steers the horse without moving the walking character",
+    "Observer rider stays attached to the rendered saddle",
+    "Late join sees occupied horse without taking ownership",
+    "Riding controls fit 1366x768, with 44px targets and real keycaps",
+    "Riding controls fit 1280x720, with 44px targets and real keycaps",
+    "Riding controls fit 1024x640, with 44px targets and real keycaps",
+    "First Escape releases pointer lock and dismounts onto clear ground",
+    "Disconnect releases ownership; reconnect does not resume an old ride",
+    "Forced dismount applies the accepted clear landing beside the horse",
+    "Inactive visitor releases the shared horse",
+    "Space activates a focused Dismount button",
+    "Actual WebGL canvas contains rendered pixels",
+    "No browser page errors: "
+  ],
+  "errors": []
+}

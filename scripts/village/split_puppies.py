@@ -24,16 +24,18 @@ def read_glb(path):
 def subset(document, binary, name):
     # This kit has no texture images or extension-owned buffer references.
     assert not document.get("images") and not document.get("extensionsUsed")
-    root = next(i for i in document["scenes"][0]["nodes"] if document["nodes"][i]["name"] == name)
+    names = [name] if isinstance(name, str) else name
+    roots = [next(i for i in document["scenes"][0]["nodes"] if document["nodes"][i]["name"] == value) for value in names]
     retained = set()
     def visit(index):
         retained.add(index)
         for child in document["nodes"][index].get("children", []):
             visit(child)
-    visit(root)
+    for root in roots:
+        visit(root)
     indices = sorted(retained)
     nodes = {old: new for new, old in enumerate(indices)}
-    result = {"asset": copy.deepcopy(document["asset"]), "scene": 0, "scenes": [{"nodes": [nodes[root]]}],
+    result = {"asset": copy.deepcopy(document["asset"]), "scene": 0, "scenes": [{"nodes": [nodes[root] for root in roots]}],
               "nodes": [], "meshes": [], "skins": [], "animations": [], "accessors": [], "bufferViews": [],
               "materials": copy.deepcopy(document["materials"])}
     packed = bytearray()
@@ -91,8 +93,8 @@ def subset(document, binary, name):
                 result["skins"].append(skin)
             node["skin"] = skin_map[original]
         result["nodes"].append(node)
-    for animation in document["animations"]:
-        if not animation["name"].startswith(name + "_"):
+    for animation in document.get("animations", []):
+        if not isinstance(name, str) or not animation["name"].startswith(name + "_"):
             continue
         animation = copy.deepcopy(animation)
         for channel in animation["channels"]:
@@ -101,7 +103,10 @@ def subset(document, binary, name):
             sampler["input"] = accessor(sampler["input"])
             sampler["output"] = accessor(sampler["output"])
         result["animations"].append(animation)
-    assert len(result["animations"]) == 10 and len(result["skins"]) == 1
+    if isinstance(name, str):
+        assert len(result["animations"]) == 10 and len(result["skins"]) == 1
+    else:
+        assert not result["animations"] and not result["skins"]
     result["buffers"] = [{"byteLength": len(packed)}]
     encoded = json.dumps(result, separators=(",", ":"), ensure_ascii=False).encode()
     encoded += b" " * (-len(encoded) % 4)

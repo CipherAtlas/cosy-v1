@@ -1,0 +1,234 @@
+{
+  "result": {
+    "pasture": [
+      {
+        "id": "cow-highland-1",
+        "native": "highland-flower",
+        "skins": 2,
+        "floor": 1.37859,
+        "rootY": 1.37859,
+        "meshBottom": 1.3785900638117925,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "cow-highland-2",
+        "native": "highland-copper",
+        "skins": 2,
+        "floor": 1.37859,
+        "rootY": 1.37859,
+        "meshBottom": 1.3785900638117927,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "sheep-1",
+        "native": "sheep",
+        "skins": 2,
+        "floor": 1.1975600000000002,
+        "rootY": 1.19756,
+        "meshBottom": 1.1975600454711115,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "sheep-2",
+        "native": "sheep",
+        "skins": 2,
+        "floor": 1.3204500000000001,
+        "rootY": 1.32045,
+        "meshBottom": 1.320450045471112,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "lamb-1",
+        "native": "lamb",
+        "skins": 2,
+        "floor": 1.15371,
+        "rootY": 1.15371,
+        "meshBottom": 1.1537100452255373,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "lamb-2",
+        "native": "lamb",
+        "skins": 2,
+        "floor": 1.3434,
+        "rootY": 1.3434,
+        "meshBottom": 1.3434000452255368,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      },
+      {
+        "id": "hedgehog-1",
+        "skins": 0,
+        "floor": 0,
+        "rootY": 0,
+        "meshBottom": -0.011915046819881064,
+        "finite": true,
+        "hearts": true,
+        "foodVisible": false
+      }
+    ],
+    "birds": [
+      {
+        "native": "swan",
+        "skins": 2,
+        "root": [
+          -27.97883768731709,
+          -0.3067366957300429,
+          -10.825500606656263
+        ]
+      },
+      {
+        "native": "swan",
+        "skins": 2,
+        "root": [
+          -41.90872254137837,
+          -0.2875446752086192,
+          -16.455098374614813
+        ]
+      },
+      {
+        "native": "swan",
+        "skins": 2,
+        "root": [
+          -28.008542807632374,
+          -0.2646246995450284,
+          -28.781660551955717
+        ]
+      },
+      {
+        "native": "duck",
+        "skins": 2,
+        "root": [
+          -35.513205176511285,
+          -0.2715545867822229,
+          -12.521350075384719
+        ]
+      },
+      {
+        "native": "duck",
+        "skins": 2,
+        "root": [
+          -38.22582160285693,
+          -0.2981820358827138,
+          -21.84872444410489
+        ]
+      },
+      {
+        "native": "duck",
+        "skins": 2,
+        "root": [
+          -28.670379014496422,
+          -0.3054977715328035,
+          -24.732218959521134
+        ]
+      },
+      {
+        "native": "duck",
+        "skins": 2,
+        "root": [
+          -27.59344147485582,
+          -0.282784223866165,
+          -10.888140787892553
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -34.90901516133978,
+          -0.2633167934266061,
+          -11.710674666784843
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -33.98601750676165,
+          -0.2756153114154194,
+          -12.294063011259556
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -38.988142786966876,
+          -0.30166242016663025,
+          -20.992313983704985
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -38.5847358579554,
+          -0.3032990443378291,
+          -19.703846576889674
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -29.475662501768984,
+          -0.27812752568400717,
+          -25.884419092336223
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -30.76113764378646,
+          -0.2630241980036095,
+          -25.625331213809474
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -26.4175706876424,
+          -0.28011547173175233,
+          -11.788234821499238
+        ]
+      },
+      {
+        "native": "duckling",
+        "skins": 2,
+        "root": [
+          -26.33119843693347,
+          -0.30436259081611056,
+          -13.51538845123249
+        ]
+      }
+    ],
+    "owlNative": [
+      {
+        "native": "owl",
+        "skins": 2
+      },
+      {
+        "native": "owl",
+        "skins": 2
+      },
+      {
+        "native": "owl",
+        "skins": 2
+      }
+    ]
+  },
+  "errors": []
+}

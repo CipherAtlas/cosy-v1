@@ -1,0 +1,105 @@
+{
+  "checks": [
+    "All twelve species/purr recordings and four existing dog clips decode",
+    "Distant animals cannot start a response",
+    "Standing near a herd does not trigger walk-by sound",
+    "Walking into range starts one nearby greeting",
+    "Pet/feed response replaces a walk-by greeting",
+    "A burst of thirty calls cannot stack animal voices",
+    "Effects mute immediately stops animal playback",
+    "Private focus rejects outdoor dogs and calls",
+    "Private petting uses the recorded cat purr: {\"state\":\"running\",\"place\":\"focus\",\"time\":1.2364625850340136,\"last\":1.2364625850340136,\"voice\":true,\"purr\":true,\"buffer\":true}",
+    "Leaving the private room stops its cat",
+    "water: exactly one music recording plays after selection",
+    "hearth: exactly one music recording plays after selection",
+    "rest: exactly one music recording plays after selection",
+    "village: exactly one music recording plays after selection",
+    "Ten-millisecond observation sees no overlapping music recordings during changes",
+    "A hidden tab cannot play or retain animal calls",
+    "Sound off stops animals and suspends playback",
+    "Representative compressor output is audible and has clipping headroom"
+  ],
+  "timeline": [
+    {
+      "seconds": 2.008526077097506,
+      "species": "cow",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 5.8165986394557825,
+      "species": "sheep",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 9.618866213151927,
+      "species": "lamb",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 13.415328798185941,
+      "species": "hedgehog",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 17.22920634920635,
+      "species": "owl",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 21.037278911564627,
+      "species": "horse",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 24.845351473922904,
+      "species": "dog",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 28.64761904761905,
+      "species": "duck",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 32.45569160997732,
+      "species": "duckling",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 36.257959183673464,
+      "species": "swan",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 40.06603174603174,
+      "species": "dove",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 43.86829931972789,
+      "species": "cat",
+      "event": "pet/feed",
+      "distance": 2
+    },
+    {
+      "seconds": 47.676371882086165,
+      "species": "horse",
+      "event": "response",
+      "distance": 8
+    }
+  ],
+  "peak": 0.166547492146492,
+  "maxPlayingMusic": 1,
+  "pageErrors": []
+}

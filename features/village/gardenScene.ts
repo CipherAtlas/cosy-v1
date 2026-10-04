@@ -1,7 +1,13 @@
 import * as T from "three";
+import type { AnimalSoundSource } from "./townAnimalAudio";
+import { createAnimalDialogueCue, type AnimalDialogueCue } from "./animalDialogue";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { drawGardenGrowthClock } from "./gardenGrowthDisplay";
 import { floorHeight, POND, type Collider } from "./environment";
 import { BEDS, CROP_NAMES, CROP_MODELS, CROP_INVENTORY, HARVEST_BASKET, SUNFLOWER_BED, FEED_POSITION, FLOWER_POSITION, MINT_POSITION, MINT_BED, DAISY_BED, growthProgress, growthTimeLeft, freshGarden, type Crop, type GardenAction, type GardenSound, type GardenState } from "./garden";
+import type { AuthoredWorld } from "./worldLayout";
+import { PondLifeSpace, POND_BIRDS, pondBirdRoute } from "./pondLife";
+import { animateAnimalRig, disposeAnimalRig, isAnimalRigLoaded, makeAnimalRig, type AnimalRigSlug } from "./animalRig";
 
 /** Original Blender kit, instanced planting, and bounded pools for water/feeding effects. */
 export class GardenScene {
@@ -12,7 +18,12 @@ export class GardenScene {
   private wind = { value: 0 };
   private breeze = { value: 1 };
   private beds: { root: T.Group; sprout: T.InstancedMesh; carrot: T.InstancedMesh; radish: T.InstancedMesh; mint: T.InstancedMesh; daisy: T.InstancedMesh; sunflower: T.InstancedMesh | null; scale: number }[] = [];
-  private birds: { root: T.Object3D; head?: T.Object3D; wings: T.Object3D[]; phase: number; swan: boolean }[] = [];
+  readonly dialogueCues: AnimalDialogueCue[] = [];
+  private birds: { root: T.Object3D; head?: T.Object3D; wings: T.Object3D[]; phase: number; swan: boolean; immersion: number }[] = [];
+  get soundSources(): AnimalSoundSource[] {
+    return this.group.visible ? this.birds.map((bird, index) => ({ id: `pond-${index}`, species: index < 3 ? "swan" : index < 7 ? "duck" : "duckling",
+      position: [bird.root.position.x, bird.root.position.y + .3, bird.root.position.z] })) : [];
+  }
   private fish: { root: T.Object3D; tail?: T.Object3D; jumping: boolean }[] = [];
   private ripples: T.InstancedMesh;
   private drops: T.InstancedMesh;
@@ -24,6 +35,7 @@ export class GardenScene {
   private harvest: T.Object3D;
   private basketContents: { crop: Crop; root: T.Object3D }[] = [];
   private dummy = new T.Object3D();
+  private pondSpace: PondLifeSpace;
   private state = freshGarden();
   private time = 0;
   private action?: GardenAction;
@@ -41,12 +53,12 @@ export class GardenScene {
   private teaAt = -100;
   private splashAt = -100;
   private splashPosition = new T.Vector3();
-  private nextDuck = 8;
   private language: "en" | "ja" = "en";
   private labels: { canvas: HTMLCanvasElement; texture: T.CanvasTexture; bed?: number; en: string; ja: string; text: string }[] = [];
   private clocks: { canvas: HTMLCanvasElement; texture: T.CanvasTexture; sprite: T.Sprite; text: string }[] = [];
 
-  constructor(private source: T.Object3D, colliders: Collider[], private sound: (kind: GardenSound, position: [number, number, number]) => void, surfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial }, private sunDirection = new T.Vector3(35, 28, -48)) {
+  constructor(private source: T.Object3D, colliders: Collider[], private sound: (kind: GardenSound, position: [number, number, number]) => void, surfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial }, private sunDirection = new T.Vector3(35, 28, -48), layout?: AuthoredWorld) {
+    this.pondSpace = new PondLifeSpace(layout);
     this.group.name = "Kitchen garden and pond life";
     source.updateMatrixWorld(true);
     let material: T.MeshStandardMaterial | undefined;
@@ -150,7 +162,6 @@ export class GardenScene {
       this.basketContents.push({ crop, root });
     }
     this.can = this.model("WateringCan", [0, 0, 0]); this.can.visible = false;
-    this.model("BreadPouch", [-23.8, .25, -4.9], .75);
     this.teapot = this.model("Teapot", [15, 1.28, -10.3], 1);
     this.teaMint = this.model("Mint", [15.21, 1.49, -9.64], .13); this.teaMint.visible = false;
     this.harvest = this.model("Carrot", [0, 0, 0]); this.harvest.visible = false;
@@ -160,28 +171,36 @@ export class GardenScene {
       const a = i * Math.PI * 2 / 90, x = POND.x + Math.cos(a) * (POND.rx + .5), z = POND.z + Math.sin(a) * (POND.rz + .5);
       // Keep the dock and its approach fully open, and leave gaps between shoreline clumps.
       if (z > -7.6 && z < -3.1 && x > -26 || i % 8 > 5) continue;
-      reeds.push([x, floorHeight(x, z), z, .7 + (i % 4) * .17]);
-      if (i % 3 === 0) irises.push([x + .25, .02, z + .3, .75]);
-      if (i % 5 === 0) daisies.push([x - .32, .02, z - .15, .85]);
+      const world = this.pondSpace.point(x, 0, z);
+      reeds.push([world[0], floorHeight(world[0], world[2]), world[2], .7 + (i % 4) * .17]);
+      if (i % 3 === 0) irises.push([...this.pondSpace.point(x + .25, .02, z + .3), .75]);
+      if (i % 5 === 0) daisies.push([...this.pondSpace.point(x - .32, .02, z - .15), .85]);
     }
-    this.plant("Reeds", reeds); this.plant("Iris", irises); this.plant("Daisy", daisies);
-    this.plant("Lily", Array.from({ length: 14 }, (_, i) => {
-      const a = i * 2.4, r = .6 + (i % 3) * .085;
-      return [POND.x + Math.cos(a) * POND.rx * r, POND.y + .04, POND.z + Math.sin(a) * POND.rz * r, .65 + i % 2 * .22] as const;
-    }), this.group, false);
-    for (let i = 0; i < 6; i++) {
-      const species = i === 0 ? "Swan" : i === 1 ? "Duck" : "Duckling";
-      const root = this.model(species, [POND.x + (i - 3) * .8, POND.y, POND.z + 3]);
+    for (const [name, positions] of [["Reeds", reeds], ["Iris", irises], ["Daisy", daisies]] as const) {
+      const bank = this.plant(name, positions);
+      bank.userData.bankPlant = true; bank.userData.pondPlant = true; bank.geometry.userData.plantingSway = .06;
+    }
+    // Small, irregular shore colonies leave the swimming water and eastern dock open.
+    const lilies = [2.08, 3.47, 4.94].flatMap((angle, clump) => Array.from({ length: clump === 2 ? 4 : 5 }, (_, i) => {
+      const a = angle + [0, -.1, .08, -.045, .04][i], r = [.85, .89, .86, .91, .84][(i + clump) % 5];
+      return [...this.pondSpace.point(POND.x + Math.cos(a) * POND.rx * r, POND.y + .04, POND.z + Math.sin(a) * POND.rz * r), .65 + (i + clump) % 2 * .22] as const;
+    }));
+    this.plant("Lily", lilies, this.group, false).userData.pondPlant = true;
+    for (let i = 0; i < POND_BIRDS.length; i++) {
+      const species = POND_BIRDS[i];
+      const root = this.model(species, this.pondSpace.point(...pondBirdRoute(i, 0)));
       const wings: T.Object3D[] = [];
       root.traverse(o => { if (o.name === species + "WingL" || o.name === species + "WingR") wings.push(o); });
-      this.birds.push({ root, head: root.getObjectByName(species + "Head"), wings, phase: i * 1.3, swan: i === 0 });
+      const immersion = root.userData.animalRigSlug ? species === "Swan" ? .16 : species === "Duck" ? .1 : .06 : 0;
+      this.birds.push({ root, head: root.getObjectByName(root.userData.animalRigSlug ? "Head" : species + "Head"), wings, phase: i * 1.3, swan: species === "Swan", immersion });
+      this.dialogueCues.push(createAnimalDialogueCue(`pond-${species.toLowerCase()}-${i}`, species === "Swan" ? "Honk honk~ (Thank you~)" : "Quack quack~ (Thank you~)", species === "Swan" ? "ホンクホンク〜（ありがとう〜）" : "クワックワッ〜（ありがとう〜）"));
     }
-    for (let i = 0; i < 4; i++) {
-      const root = this.model("Fish", [0, 0, 0], .9 + i * .08);
+    for (let i = 0; i < 8; i++) {
+      const root = this.model("Fish", [0, 0, 0], .85 + i % 4 * .08);
       this.fish.push({ root, tail: root.getObjectByName("FishTail"), jumping: false });
     }
     const rippleGeometry = new T.RingGeometry(.92, 1, 40); rippleGeometry.rotateX(-Math.PI / 2);
-    this.ripples = new T.InstancedMesh(rippleGeometry, new T.MeshBasicMaterial({ color: "#d2eee2", transparent: true, opacity: .34, depthWrite: false }), 12);
+    this.ripples = new T.InstancedMesh(rippleGeometry, new T.MeshBasicMaterial({ color: "#d2eee2", transparent: true, opacity: .34, depthWrite: false }), POND_BIRDS.length + 6);
     this.drops = new T.InstancedMesh(new T.SphereGeometry(.024, 6, 4), new T.MeshBasicMaterial({ color: "#b9e9eb", transparent: true, opacity: .8 }), 40);
     this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.036, 0), new T.MeshStandardMaterial({ color: "#ecc88b", roughness: 1 }), 18);
     const heart = new T.Shape();
@@ -190,7 +209,7 @@ export class GardenScene {
     heart.bezierCurveTo(-.45, .55, -.1, .56, 0, .3);
     heart.bezierCurveTo(.1, .56, .45, .55, .5, .23);
     heart.bezierCurveTo(.55, -.05, .15, -.3, 0, -.48);
-    this.hearts = new T.InstancedMesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#ff9aab", side: T.DoubleSide, depthWrite: false }), 5);
+    this.hearts = new T.InstancedMesh(new T.ShapeGeometry(heart, 12), new T.MeshBasicMaterial({ color: "#ff9aab", side: T.DoubleSide, depthWrite: false }), POND_BIRDS.length - 3);
     this.hearts.name = "Happy duck hearts";
     this.hearts.instanceMatrix.setUsage(T.DynamicDrawUsage); this.hearts.frustumCulled = false; this.hearts.visible = false; this.group.add(this.hearts);
     for (const mesh of [this.ripples, this.drops, this.crumbs]) {
@@ -213,7 +232,8 @@ export class GardenScene {
   private model(name: string, position: readonly number[], scale = 1) {
     const template = this.source.getObjectByName(name);
     if (!template) throw new Error(`Garden model missing: ${name}`);
-    const root = template.clone(true); root.position.set(position[0], position[1], position[2]); root.scale.multiplyScalar(scale);
+    const slug = ({ Swan: "swan", Duck: "duck", Duckling: "duckling" } as Record<string, AnimalRigSlug>)[name];
+    const root = slug && isAnimalRigLoaded(slug) ? makeAnimalRig(slug) : template.clone(true); root.position.set(position[0], position[1], position[2]); root.scale.multiplyScalar(scale);
     root.traverse(o => { if (o instanceof T.Mesh) { o.castShadow = true; o.receiveShadow = true; } });
     this.group.add(root); return root;
   }
@@ -283,48 +303,44 @@ export class GardenScene {
     if (this.sharedClock !== null) time = (Date.now() + this.sharedClock - this.sharedEpoch) / 1000;
     this.time = time; this.wind.value = reduced ? 0 : time; this.breeze.value = reduced ? 0 : 1;
     const t = reduced ? 0 : time, feedAge = time - this.feedAt, feeding = feedAge < 11;
-    this.hearts.visible = feedAge >= 7 && feedAge < 10.7;
+    this.hearts.visible = feedAge >= 7 && feedAge < 13;
     if (!this.feedCelebrated && feedAge >= 7) {
       this.feedCelebrated = true;
-      if (feedAge < 11) { const duck = this.birds[2].root.position; this.sound("duck", [duck.x, duck.y, duck.z]); }
+      if (feedAge < 11) { const duck = this.birds[3].root.position; this.sound("duck", [duck.x, duck.y, duck.z]); }
     }
     this.birds.forEach((bird, i) => {
-      const a = t * (bird.swan ? .07 : .105) + bird.phase;
-      const targetX = feeding && !bird.swan ? -25 + Math.cos(i * 2.4) * 1.4 : POND.x + Math.cos(a) * (bird.swan ? 4.8 : 3.3);
-      const targetZ = feeding && !bird.swan ? -7.8 + Math.sin(i * 2.4) * 1.2 : POND.z + Math.sin(a) * (bird.swan ? 6 : 4.4);
+      const swim = this.pondSpace.swim(i, time, this.feedAt);
+      const targetX = swim[0], targetZ = swim[2];
       const dx = targetX - bird.root.position.x, dz = targetZ - bird.root.position.z;
       const blend = reduced ? 1 : 1 - Math.exp(-dt * .7);
       if (this.sharedClock !== null) {
-        // Derive the swimming path from world time so late arrivals see the same ducks.
-        const speed = bird.swan ? .07 : .105, radiusX = bird.swan ? 4.8 : 3.3, radiusZ = bird.swan ? 6 : 4.4;
-        const orbitX = POND.x + Math.cos(time * speed + bird.phase) * radiusX;
-        const orbitZ = POND.z + Math.sin(time * speed + bird.phase) * radiusZ;
-        const startX = POND.x + Math.cos(this.feedAt * speed + bird.phase) * radiusX;
-        const startZ = POND.z + Math.sin(this.feedAt * speed + bird.phase) * radiusZ;
-        const mealX = -25 + Math.cos(i * 2.4) * 1.4, mealZ = -7.8 + Math.sin(i * 2.4) * 1.2;
-        const arrival = 1 - Math.exp(-Math.max(0, feedAge) * .7);
-        const departure = 1 - Math.exp(-Math.max(0, feedAge - 11) * .7);
-        const fedX = T.MathUtils.lerp(startX, mealX, arrival), fedZ = T.MathUtils.lerp(startZ, mealZ, arrival);
-        bird.root.position.x = bird.swan || feedAge < 0 || feedAge > 24 ? orbitX : feedAge < 11 ? fedX : T.MathUtils.lerp(fedX, orbitX, departure);
-        bird.root.position.z = bird.swan || feedAge < 0 || feedAge > 24 ? orbitZ : feedAge < 11 ? fedZ : T.MathUtils.lerp(fedZ, orbitZ, departure);
+        bird.root.position.x = targetX; bird.root.position.z = targetZ;
       } else { bird.root.position.x += dx * blend; bird.root.position.z += dz * blend; }
-      bird.root.position.y = POND.y + .015 + Math.sin(t * 2 + bird.phase) * (reduced ? 0 : .022);
-      const happyAge = feedAge - 7 - (i - 1) * .16;
+      bird.root.position.y = swim[1] + .015 - bird.immersion + Math.sin(t * 2 + bird.phase) * (reduced ? 0 : .022);
+      const happyAge = feedAge - 7 - (i - 3) * .16;
       const happy = !bird.swan && happyAge >= 0 && happyAge < 3.1;
       const joy = happy && !reduced ? Math.sin(Math.min(1, happyAge / 3.1) * Math.PI) : 0;
       bird.root.position.y += Math.abs(Math.sin(happyAge * 5)) * joy * .13;
       bird.root.rotation.z = Math.sin(happyAge * 7) * joy * .09;
-      if (Math.hypot(dx, dz) > .03) {
-        const turn = T.MathUtils.euclideanModulo(Math.atan2(dx, dz) - bird.root.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
-        bird.root.rotation.y += turn * (reduced ? 1 : 1 - Math.exp(-dt * 2));
+      const heading = this.sharedClock !== null ? this.pondSpace.heading(i, time, this.feedAt) : Math.atan2(dx, dz);
+      const turn = Math.atan2(Math.sin(heading - bird.root.rotation.y), Math.cos(heading - bird.root.rotation.y));
+      bird.root.rotation.y += turn * (this.sharedClock !== null || reduced ? 1 : 1 - Math.exp(-dt * 5));
+      const native = animateAnimalRig(bird.root, { action: "swim", time: t + bird.phase, reduced });
+      const cue = this.dialogueCues[i]; cue.visible = feedAge >= 7 && feedAge < 11; cue.priority = 3;
+      (bird.head ?? bird.root).getWorldPosition(cue.position); cue.position.y += .2;
+      const stretchAge = (t + bird.phase * 2) % 29, dipAge = (t + bird.phase * 3) % 17;
+      const stretch = !reduced && stretchAge < 2.8 ? Math.sin(stretchAge / 2.8 * Math.PI) : 0;
+      const dip = !reduced && dipAge < 2.4 ? Math.sin(dipAge / 2.4 * Math.PI) : 0;
+      if (!native) bird.wings.forEach((wing, side) => { wing.rotation.z = reduced ? 0 : (Math.sin(t * (happy ? 13 : feeding ? 8 : 1.7) + bird.phase) * (happy ? .48 : feeding ? .24 : .04) + joy * .18 + stretch * .48) * (side ? 1 : -1); });
+      if (!native && bird.head) {
+        bird.head.rotation.x = reduced ? 0 : happy ? -joy * .13 : feeding && !bird.swan ? .16 + Math.sin(t * 3 + i) * .16 : dip * (bird.swan ? .24 : .32);
+        bird.head.rotation.y = reduced ? 0 : stretch * .24 * Math.sin(bird.phase);
       }
-      bird.wings.forEach((wing, side) => { wing.rotation.z = reduced ? 0 : (Math.sin(t * (happy ? 13 : feeding ? 8 : 1.7) + bird.phase) * (happy ? .48 : feeding ? .24 : .04) + joy * .18) * (side ? 1 : -1); });
-      if (bird.head) bird.head.rotation.x = happy ? -joy * .13 : feeding && !reduced && !bird.swan ? .16 + Math.sin(t * 3 + i) * .16 : 0;
-      if (i > 0) {
+      if (!bird.swan) {
         const scale = happy ? reduced ? .3 : Math.min(1, happyAge * 5, (3.1 - happyAge) * 3) * .4 : 0;
         this.dummy.position.copy(bird.root.position).y += .85 + (reduced ? 0 : Math.max(0, happyAge) * .2);
         this.dummy.quaternion.copy(cameraRotation ?? bird.root.quaternion);
-        this.dummy.scale.setScalar(scale); this.dummy.updateMatrix(); this.hearts.setMatrixAt(i - 1, this.dummy.matrix);
+        this.dummy.scale.setScalar(scale); this.dummy.updateMatrix(); this.hearts.setMatrixAt(i - 3, this.dummy.matrix);
       }
       this.dummy.position.set(bird.root.position.x, POND.y + .032, bird.root.position.z);
       this.dummy.rotation.set(0, bird.root.rotation.y, 0); this.dummy.scale.set(bird.swan ? .8 : .48, 1, bird.swan ? 1.1 : .65);
@@ -334,25 +350,26 @@ export class GardenScene {
     this.fish.forEach((fish, i) => {
       const a = t * .15 + i * 1.57, cycle = (t + i * 4.8) % 22;
       const leap = !reduced && cycle < 1.7 ? Math.sin(cycle / 1.7 * Math.PI) : 0;
-      fish.root.position.set(POND.x + Math.cos(a) * (3.6 + i * .48), POND.y - .095 + leap * 1.25, POND.z + Math.sin(a) * (5.5 + i * .38));
-      fish.root.rotation.set(leap > 0 ? -Math.cos(cycle / 1.7 * Math.PI) * .72 : 0, Math.atan2(-Math.sin(a), Math.cos(a) * 1.45), 0);
+      const radius = .35 + i % 4 * .11;
+      fish.root.position.fromArray(this.pondSpace.point(POND.x + Math.cos(a) * POND.rx * radius, POND.y - .075 + leap * 1.25, POND.z + Math.sin(a) * POND.rz * radius));
+      fish.root.rotation.set(leap > 0 ? -Math.cos(cycle / 1.7 * Math.PI) * .72 : 0, Math.atan2(-Math.sin(a), Math.cos(a) * 1.45) + this.pondSpace.yaw, 0);
       if (fish.tail) fish.tail.rotation.y = Math.sin(t * 9 + i) * (reduced ? 0 : .35);
       if (fish.jumping && leap === 0) {
         this.splashAt = time; this.splashPosition.copy(fish.root.position); this.sound("splash", [fish.root.position.x, POND.y, fish.root.position.z]);
       }
       fish.jumping = leap > 0;
     });
-    for (let i = 6; i < 12; i++) {
-      const age = time - this.splashAt, pulse = age + (i - 6) * .14;
+    for (let i = this.birds.length; i < this.birds.length + 6; i++) {
+      const age = time - this.splashAt, pulse = age + (i - this.birds.length) * .14;
       const scale = age < 2 && !reduced ? pulse * .65 : 0;
       this.dummy.position.set(this.splashPosition.x, POND.y + .035, this.splashPosition.z); this.dummy.scale.set(scale, 1, scale); this.dummy.updateMatrix(); this.ripples.setMatrixAt(i, this.dummy.matrix);
     }
     this.ripples.instanceMatrix.needsUpdate = true;
-    if (time > this.nextDuck) { this.nextDuck = time + 14 + Math.sin(time) * 4; const duck = this.birds[2].root.position; this.sound("duck", [duck.x, duck.y, duck.z]); }
     this.crumbs.visible = feedAge < 7;
     if (this.crumbs.visible) for (let i = 0; i < 18; i++) {
-      const f = reduced ? 1 : Math.min(1, Math.max(0, feedAge / 1.2 - i * .016)), x = -25 + Math.cos(i * 2.4) * .6, z = -7.8 + Math.sin(i * 2.4) * 1.2;
-      this.dummy.position.set(T.MathUtils.lerp(FEED_POSITION[0], x, f), T.MathUtils.lerp(1.1, POND.y + .04, f) + Math.sin(f * Math.PI) * .65, T.MathUtils.lerp(FEED_POSITION[2], z, f));
+      const f = reduced ? 1 : Math.min(1, Math.max(0, feedAge / 1.2 - i * .016));
+      const from = this.pondSpace.dockPoint(FEED_POSITION), to = this.pondSpace.meal(3 + i % 12);
+      this.dummy.position.set(T.MathUtils.lerp(from[0], to[0], f), T.MathUtils.lerp(1.1, POND.y + .04, f) + Math.sin(f * Math.PI) * .65, T.MathUtils.lerp(from[2], to[2], f));
       this.dummy.rotation.set(i, i, i); this.dummy.scale.setScalar(feedAge > 4 ? Math.max(0, 1 - (feedAge - 4) / 3) : 1); this.dummy.updateMatrix(); this.crumbs.setMatrixAt(i, this.dummy.matrix);
     }
     this.crumbs.instanceMatrix.needsUpdate = true;
@@ -366,12 +383,7 @@ export class GardenScene {
       const text = growthTimeLeft(value, now);
       if (clock.sprite.visible && clock.text !== text) {
         clock.text = text;
-        const c = clock.canvas.getContext("2d")!;
-        c.clearRect(0, 0, 192, 192); c.fillStyle = "#faf3de";
-        c.beginPath(); c.arc(96, 96, 84, 0, Math.PI * 2); c.fill();
-        c.lineWidth = 9; c.strokeStyle = "#d7dfc6"; c.beginPath(); c.arc(96, 96, 69, 0, Math.PI * 2); c.stroke();
-        c.strokeStyle = "#537850"; c.lineCap = "round"; c.beginPath(); c.arc(96, 96, 69, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress); c.stroke();
-        c.fillStyle = "#36573d"; c.font = "43px sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(text, 96, 99);
+        drawGardenGrowthClock(clock.canvas, text, progress);
         clock.texture.needsUpdate = true;
       }
     });
@@ -403,6 +415,7 @@ export class GardenScene {
   }
 
   dispose() {
+    this.birds.forEach(bird => disposeAnimalRig(bird.root));
     for (const clock of this.clocks) { clock.texture.dispose(); clock.sprite.material.dispose(); }
     // Original template geometry also includes unused alternatives; release those on teardown.
     this.source.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); });

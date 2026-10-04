@@ -2,6 +2,7 @@ import * as T from "three";
 import type { PuppyCommand } from "./puppies";
 
 const LOOPS = new Set(["idle", "walk", "run"]);
+const ACTIONS = ["idle", "walk", "run", "pet", "sit", "dance", "spin", "bow", "wave", "roll"];
 const STILL_TIME: Record<PuppyCommand | "pet", number> = {
   sit: 1.2, dance: 1.1, spin: .75, bow: 1.2, wave: 1.25, roll: 1.8, pet: 1.2,
 };
@@ -13,11 +14,13 @@ export class PuppyAnimation {
   private weights: Record<string, number> = {};
   private performance: PuppyCommand | "pet" | null = null;
   private reduced = false;
+  private readonly native: boolean;
 
   constructor(model: T.Object3D, clips: T.AnimationClip[], name: string, phase: number) {
     this.mixer = new T.AnimationMixer(model);
-    for (const clip of clips.filter(value => value.name.startsWith(name + "_"))) {
-      const key = clip.name.slice(name.length + 1);
+    this.native = clips.some(clip => clip.name === "idle");
+    for (const clip of clips.filter(value => this.native ? ACTIONS.includes(value.name) : value.name.startsWith(name + "_"))) {
+      const key = this.native ? clip.name : clip.name.slice(name.length + 1);
       const action = this.mixer.clipAction(clip);
       action.setLoop(LOOPS.has(key) ? T.LoopRepeat : T.LoopOnce, Infinity);
       action.clampWhenFinished = !LOOPS.has(key);
@@ -26,7 +29,7 @@ export class PuppyAnimation {
       this.actions[key] = action;
       this.weights[key] = key === "idle" ? 1 : 0;
     }
-    for (const key of ["idle", "walk", "run", "pet", "sit", "dance", "spin", "bow", "wave", "roll"])
+    for (const key of ACTIONS)
       if (!this.actions[key]) throw Error(`Missing ${name} puppy animation: ${key}`);
     this.actions.idle.setEffectiveWeight(1);
     this.mixer.update(0);
@@ -49,9 +52,9 @@ export class PuppyAnimation {
     const run = T.MathUtils.smoothstep(speed, 1.9, 3.3);
     const moving = T.MathUtils.smoothstep(speed, .05, .55);
     const cycleDistance = T.MathUtils.lerp(.46, .76, run);
-    this.actions.run.time = this.actions.walk.time * this.actions.run.getClip().duration;
+    this.actions.run.time = this.actions.walk.time / this.actions.walk.getClip().duration * this.actions.run.getClip().duration;
     const targets: Record<string, number> = reduced
-      ? { [performance ?? "idle"]: 1 }
+      ? { [this.native ? "idle" : performance ?? "idle"]: 1 }
       : performance ? { [performance]: 1 }
       : { idle: 1 - moving, walk: moving * (1 - run), run: moving * run };
     // All outgoing actions keep their present weights: rapid commands cannot snap
@@ -64,11 +67,12 @@ export class PuppyAnimation {
       action.setEffectiveWeight(this.weights[key]);
       if (reduced) {
         action.paused = true;
-        action.time = key === performance ? STILL_TIME[performance] : 0;
+        action.time = !this.native && key === performance ? STILL_TIME[performance] : 0;
       } else {
         if (this.reduced && key === performance) {
+          const currentTime = action.time;
           action.reset().play();
-          action.time = STILL_TIME[performance];
+          action.time = this.native ? currentTime : STILL_TIME[performance];
         }
         action.paused = !LOOPS.has(key) && action.time >= action.getClip().duration;
         // Authored foot stance is driven by travelled metres, including slow starts.

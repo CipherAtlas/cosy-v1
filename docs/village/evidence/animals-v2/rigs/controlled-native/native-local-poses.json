@@ -1,0 +1,9 @@
+{
+  "petHeadDeforms": true,
+  "eachSwimBodyDeforms": false,
+  "owlNativeWingsDeform": true,
+  "reducedPetStill": true,
+  "reducedSwimStill": true,
+  "reducedOwlStill": true,
+  "errors": []
+}

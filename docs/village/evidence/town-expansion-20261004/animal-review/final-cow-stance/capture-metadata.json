@@ -1,0 +1,188 @@
+{
+  "checkedAt": "2026-10-03T21:30:04.761Z",
+  "url": "http://127.0.0.1:3051/?sharedTrial=1",
+  "captures": [
+    {
+      "name": "cow-highland-2-grazing",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.097690545091034,
+        "y": 1.459211951738701,
+        "z": 59.41235353090556,
+        "heading": 2.6229089563714565,
+        "owner": null,
+        "mode": "graze",
+        "startedAt": 1791062833134,
+        "until": 0
+      },
+      "bodyScreen": {
+        "x": 387.02073065592356,
+        "y": 723.2222483631074
+      },
+      "headScreen": {
+        "x": 501.6646084411086,
+        "y": 439.88161780787266
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": null,
+      "player": {
+        "x": -39.38152441950164,
+        "y": 1.4481841543277636,
+        "z": 57.61465954518544,
+        "bodyY": 0.6025267237915999,
+        "bodyPitch": 0,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": 0,
+            "z": -0.08881403134291534
+          },
+          {
+            "name": "SpiritFinR",
+            "x": 0,
+            "z": 0.08881403134291531
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 376,
+      "triangles": 3124406
+    },
+    {
+      "name": "cow-highland-2-pet-1366",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.02174010081618,
+        "y": 1.4597573722727075,
+        "z": 59.29186078087272,
+        "heading": 2.7769464326094586,
+        "owner": "8a3b1025-c436-4e3e-9ba3-745d99676932",
+        "mode": "pet",
+        "startedAt": 1791063011144,
+        "until": 1791063017144
+      },
+      "bodyScreen": {
+        "x": 843.0527560450307,
+        "y": 516.1779515809793
+      },
+      "headScreen": {
+        "x": 713.7150994893942,
+        "y": 289.53150452951564
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": 1.127,
+      "player": {
+        "x": -39.38152441950164,
+        "y": 1.4481841543277636,
+        "z": 57.61465954518544,
+        "bodyY": 0.62,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.1773672264710336
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.1773672264710336
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 259,
+      "triangles": 2193006
+    },
+    {
+      "name": "cow-highland-2-pet-1024",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.02174010081618,
+        "y": 1.4597573722727075,
+        "z": 59.29186078087272,
+        "heading": 2.7769464326094586,
+        "owner": "8a3b1025-c436-4e3e-9ba3-745d99676932",
+        "mode": "pet",
+        "startedAt": 1791063011144,
+        "until": 1791063017144
+      },
+      "bodyScreen": {
+        "x": 645.2361186505991,
+        "y": 430.0511318077326
+      },
+      "headScreen": {
+        "x": 537.5150425942535,
+        "y": 241.29328616282618
+      },
+      "viewport": [
+        1024,
+        640
+      ],
+      "petAge": 1.686,
+      "player": {
+        "x": -39.38152441950164,
+        "y": 1.4481841543277636,
+        "z": 57.61465954518544,
+        "bodyY": 0.62,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.22963498054295128
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.22963498054295128
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 248,
+      "triangles": 2023394
+    }
+  ],
+  "errors": [],
+  "owner": "8a3b1025-c436-4e3e-9ba3-745d99676932",
+  "hedgehogHomeSamples": [
+    {
+      "x": 30.3,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 31,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 32,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 31,
+      "z": -1,
+      "clear": true,
+      "roamRingClear": false
+    }
+  ],
+  "status": "captured"
+}

@@ -222,8 +222,8 @@ document.querySelector('#lifecycle').onclick=async()=>{
   check('Recorded mix produces a non-silent signal',peak>.0001);a.master.disconnect(analyser);
   for(const [place,cue] of [['breathe','water'],['music','hearth'],['focus','rest']]){
    a.setPlace(place);await wait(()=>a.soundtrack.current===cue,place+' selects '+cue);
-   check('Crossfade has at most two streaming decks',a.soundtrack.decks.filter(d=>!d.audio.paused).length<=2);
-   await delay(4400);check('Old deck stops after '+place+' fade',a.soundtrack.decks.filter(d=>!d.audio.paused).length===1);
+   check('Only one recording plays during the transition',a.soundtrack.decks.filter(d=>!d.audio.paused).length===1);
+   await delay(700);check('Single deck remains after '+place+' change',a.soundtrack.decks.filter(d=>!d.audio.paused).length===1);
   }
   a.setMix({...mix,soundtrack:'village'});await wait(()=>a.soundtrack.current==='village','Manual soundtrack overrides the cottage cue');await delay(4500);
   const original=RECORDINGS.rest.file;RECORDINGS.rest.file='missing-test-track.mp3';a.setMix({...mix,soundtrack:'rest'});

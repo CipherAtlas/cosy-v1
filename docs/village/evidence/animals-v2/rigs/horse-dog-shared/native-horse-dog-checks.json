@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "All four placed dogs use native skins, head contact bones and ten independent clips",
+    "Both shared horses use the native skin and exported saddle bone",
+    "Native dog petting uses the same accepted owner and clock in both clients",
+    "Pet contact follows the actual native head bone",
+    "The real Wave button plays the accepted native wave clip for observers",
+    "Actual W movement retains the observer rider on the native saddle bone",
+    "No native horse/dog browser page errors (0)"
+  ],
+  "errors": []
+}

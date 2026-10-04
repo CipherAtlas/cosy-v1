@@ -1,0 +1,160 @@
+{
+  "scope": "Fresh compiled production-engine QA; fixed shared visual snapshot; real keyboard movement and native walking camera",
+  "captures": [
+    {
+      "name": "stable-final",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 85,
+          "y": 0.05,
+          "z": 36
+        }
+      },
+      "frame": {
+        "position": [
+          85,
+          0.05,
+          38.491746129693965
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 325,
+        "triangles": 1427524
+      }
+    },
+    {
+      "name": "brook-auto",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 65,
+          "y": 0,
+          "z": 58
+        }
+      },
+      "frame": {
+        "position": [
+          65,
+          0,
+          55.638251098391045
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 670,
+        "triangles": 6126396
+      }
+    },
+    {
+      "name": "pasture-auto",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": -42,
+          "y": 0.9442,
+          "z": 48
+        }
+      },
+      "frame": {
+        "position": [
+          -42,
+          1.1492498151306363,
+          50.25341920106196
+        ],
+        "clear": true,
+        "tier": "detailed",
+        "calls": 280,
+        "triangles": 1989332
+      }
+    },
+    {
+      "name": "brook-battery",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 65,
+          "y": 0,
+          "z": 58
+        }
+      },
+      "frame": {
+        "position": [
+          65,
+          0,
+          55.70324909750978
+        ],
+        "clear": true,
+        "tier": "battery",
+        "calls": 670,
+        "triangles": 5477956
+      }
+    },
+    {
+      "name": "pasture-battery",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": -42,
+          "y": 0.9442,
+          "z": 48
+        }
+      },
+      "frame": {
+        "position": [
+          -42,
+          1.1509357371102533,
+          50.275084972180856
+        ],
+        "clear": true,
+        "tier": "battery",
+        "calls": 153,
+        "triangles": 871826
+      }
+    },
+    {
+      "name": "brook-minimal",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": 65,
+          "y": 0,
+          "z": 58
+        }
+      },
+      "frame": {
+        "position": [
+          65,
+          0,
+          55.70324909782372
+        ],
+        "clear": true,
+        "tier": "minimal",
+        "calls": 547,
+        "triangles": 4643908
+      }
+    },
+    {
+      "name": "pasture-minimal",
+      "start": {
+        "clear": true,
+        "position": {
+          "x": -42,
+          "y": 0.9442,
+          "z": 48
+        }
+      },
+      "frame": {
+        "position": [
+          -42,
+          1.1492498146940284,
+          50.253419195451116
+        ],
+        "clear": true,
+        "tier": "minimal",
+        "calls": 148,
+        "triangles": 816556
+      }
+    }
+  ],
+  "errors": []
+}

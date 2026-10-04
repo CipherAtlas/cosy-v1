@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "Private cat invitation has one bilingual dialogue cue",
+    "Native cat cue anchors to the actual animated head plus18cm",
+    "Invitation cue lasts through the first2.99seconds",
+    "Invitation cue hides after3seconds without ending its pet invitation",
+    "Real private E action shows the purr dialogue cue",
+    "Pet dialogue follows the animated head through3.19seconds",
+    "Purr cue ends with the existing3.2second pet state",
+    "Leaving the private room hides both cues and preserves the outdoor pet boundary",
+    "Reduced motion refreshes the still invitation cue and head anchor",
+    "Reduced private pet uses the same click action",
+    "Reduced private pet keeps its purr cue at the still head",
+    "Legacy cat cue uses the actual head through parent rotation and scale",
+    "Cat disposal hides retained dialogue cues"
+  ],
+  "transformSamples": 0,
+  "states": [
+    "ask",
+    "pet"
+  ],
+  "visits": 0,
+  "naps": 1,
+  "errors": [],
+  "warnings": []
+}

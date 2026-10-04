@@ -1,0 +1,2161 @@
+{
+  "browser": "chrome",
+  "version": "154.0.8037.93",
+  "env": {
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+    "antialias": true,
+    "timer": true
+  },
+  "loading": {
+    "engineMs": 3452.7000000476837,
+    "resources": [
+      {
+        "url": "/modules/features/village/audio.js",
+        "bytes": 27716,
+        "ms": 4.800000190734863
+      },
+      {
+        "url": "/modules/features/village/VillageEngine.js",
+        "bytes": 107596,
+        "ms": 4.1000001430511475
+      },
+      {
+        "url": "/modules/features/village/environment.js",
+        "bytes": 8140,
+        "ms": 11.099999904632568
+      },
+      {
+        "url": "/modules/features/village/activityScene.js",
+        "bytes": 15963,
+        "ms": 13.5
+      },
+      {
+        "url": "/modules/features/village/movement.js",
+        "bytes": 10300,
+        "ms": 14.099999904632568
+      },
+      {
+        "url": "/modules/features/village/places.js",
+        "bytes": 2480,
+        "ms": 16
+      },
+      {
+        "url": "/modules/features/village/soundtrack.js",
+        "bytes": 8544,
+        "ms": 16.299999952316284
+      },
+      {
+        "url": "/modules/features/village/horseAudio.js",
+        "bytes": 4093,
+        "ms": 12.199999809265137
+      },
+      {
+        "url": "/modules/features/village/townAnimalAudio.js",
+        "bytes": 4038,
+        "ms": 13.399999856948853
+      },
+      {
+        "url": "/modules/features/village/layoutInteractions.js",
+        "bytes": 3779,
+        "ms": 12.599999904632568
+      },
+      {
+        "url": "/modules/features/village/placeableAssets.js",
+        "bytes": 10846,
+        "ms": 14
+      },
+      {
+        "url": "/modules/features/village/sceneLayout.js",
+        "bytes": 7529,
+        "ms": 14.200000047683716
+      },
+      {
+        "url": "/modules/features/village/villageVisitors.js",
+        "bytes": 9801,
+        "ms": 14.900000095367432
+      },
+      {
+        "url": "/modules/features/village/world.js",
+        "bytes": 57663,
+        "ms": 16.200000047683716
+      },
+      {
+        "url": "/modules/features/village/atmosphere.js",
+        "bytes": 4751,
+        "ms": 16.90000009536743
+      },
+      {
+        "url": "/modules/features/village/birds.js",
+        "bytes": 15027,
+        "ms": 17.09999990463257
+      },
+      {
+        "url": "/modules/features/village/animalDialogue.js",
+        "bytes": 3165,
+        "ms": 17.700000047683716
+      },
+      {
+        "url": "/modules/features/village/puppies.js",
+        "bytes": 31677,
+        "ms": 18.700000047683716
+      },
+      {
+        "url": "/modules/features/village/companionWalk.js",
+        "bytes": 7291,
+        "ms": 19.399999856948853
+      },
+      {
+        "url": "/modules/features/village/life.js",
+        "bytes": 30468,
+        "ms": 19.299999952316284
+      },
+      {
+        "url": "/modules/features/village/dialogue.js",
+        "bytes": 20952,
+        "ms": 20.09999990463257
+      },
+      {
+        "url": "/modules/features/village/gardenScene.js",
+        "bytes": 31107,
+        "ms": 20.899999856948853
+      },
+      {
+        "url": "/modules/features/village/plantingClearance.js",
+        "bytes": 5680,
+        "ms": 21
+      },
+      {
+        "url": "/modules/features/village/shadows.js",
+        "bytes": 2577,
+        "ms": 22
+      },
+      {
+        "url": "/modules/features/village/graphics.js",
+        "bytes": 851,
+        "ms": 22.700000047683716
+      },
+      {
+        "url": "/modules/features/village/garden.js",
+        "bytes": 8422,
+        "ms": 23.100000143051147
+      },
+      {
+        "url": "/modules/features/village/villageAssets.js",
+        "bytes": 1440,
+        "ms": 23.40000009536743
+      },
+      {
+        "url": "/modules/features/village/focusCottageScene.js",
+        "bytes": 8838,
+        "ms": 24.5
+      },
+      {
+        "url": "/modules/features/village/villageCamera.js",
+        "bytes": 9155,
+        "ms": 25
+      },
+      {
+        "url": "/modules/features/village/cottageCat.js",
+        "bytes": 11328,
+        "ms": 25.299999952316284
+      },
+      {
+        "url": "/modules/features/village/animalRig.js",
+        "bytes": 5502,
+        "ms": 26.299999952316284
+      },
+      {
+        "url": "/modules/features/village/horseRiding.js",
+        "bytes": 1436,
+        "ms": 25.799999952316284
+      },
+      {
+        "url": "/modules/features/village/townInteractions.js",
+        "bytes": 7961,
+        "ms": 26.699999809265137
+      },
+      {
+        "url": "/modules/features/village/horses.js",
+        "bytes": 7933,
+        "ms": 26.5
+      },
+      {
+        "url": "/modules/features/village/townAssets.js",
+        "bytes": 7242,
+        "ms": 26.899999856948853
+      },
+      {
+        "url": "/modules/features/village/townScene.js",
+        "bytes": 14634,
+        "ms": 27.299999952316284
+      },
+      {
+        "url": "/modules/features/village/townAnimals.js",
+        "bytes": 17571,
+        "ms": 27.90000009536743
+      },
+      {
+        "url": "/modules/features/village/villagers.js",
+        "bytes": 8793,
+        "ms": 28.299999952316284
+      },
+      {
+        "url": "/modules/features/village/raceGuide.js",
+        "bytes": 2204,
+        "ms": 28.90000009536743
+      },
+      {
+        "url": "/modules/features/village/townProgress.js",
+        "bytes": 1232,
+        "ms": 29.299999952316284
+      },
+      {
+        "url": "/modules/features/village/navigation.js",
+        "bytes": 6752,
+        "ms": 29.09999990463257
+      },
+      {
+        "url": "/modules/features/village/layoutTransforms.js",
+        "bytes": 693,
+        "ms": 24.899999856948853
+      },
+      {
+        "url": "/modules/features/village/terrain.js",
+        "bytes": 6231,
+        "ms": 25.399999856948853
+      },
+      {
+        "url": "/modules/features/village/worldLayout.js",
+        "bytes": 9167,
+        "ms": 25.699999809265137
+      },
+      {
+        "url": "/modules/features/village/focusCottageProps.js",
+        "bytes": 23881,
+        "ms": 24.199999809265137
+      },
+      {
+        "url": "/modules/features/village/sharedActors.js",
+        "bytes": 3407,
+        "ms": 24.699999809265137
+      },
+      {
+        "url": "/modules/features/village/animalArt.js",
+        "bytes": 1343,
+        "ms": 20.299999952316284
+      },
+      {
+        "url": "/modules/features/village/fenceGeometry.js",
+        "bytes": 5368,
+        "ms": 22.59999990463257
+      },
+      {
+        "url": "/modules/features/village/swings.js",
+        "bytes": 8672,
+        "ms": 23.600000143051147
+      },
+      {
+        "url": "/modules/features/village/flame.js",
+        "bytes": 4227,
+        "ms": 18.899999856948853
+      },
+      {
+        "url": "/modules/features/village/water.js",
+        "bytes": 3227,
+        "ms": 23.899999856948853
+      },
+      {
+        "url": "/modules/features/village/riverGeometry.js",
+        "bytes": 2723,
+        "ms": 25.90000009536743
+      },
+      {
+        "url": "/modules/features/village/bridge.js",
+        "bytes": 4265,
+        "ms": 27.700000047683716
+      },
+      {
+        "url": "/modules/features/village/architecture.js",
+        "bytes": 8496,
+        "ms": 27.40000009536743
+      },
+      {
+        "url": "/modules/features/village/paintedTextures.js",
+        "bytes": 5400,
+        "ms": 28.800000190734863
+      },
+      {
+        "url": "/modules/features/village/worldLandscape.js",
+        "bytes": 28846,
+        "ms": 29.799999952316284
+      },
+      {
+        "url": "/modules/features/village/wayfinding.js",
+        "bytes": 5135,
+        "ms": 30.200000047683716
+      },
+      {
+        "url": "/modules/features/village/mountainHorizon.js",
+        "bytes": 3319,
+        "ms": 29.59999990463257
+      },
+      {
+        "url": "/modules/features/village/puppyAnimation.js",
+        "bytes": 4304,
+        "ms": 27.90000009536743
+      },
+      {
+        "url": "/modules/features/village/residentMotion.js",
+        "bytes": 3033,
+        "ms": 29.40000009536743
+      },
+      {
+        "url": "/modules/features/village/gardenGrowthDisplay.js",
+        "bytes": 754,
+        "ms": 27.899999856948853
+      },
+      {
+        "url": "/modules/features/village/pondLife.js",
+        "bytes": 3020,
+        "ms": 29.59999990463257
+      },
+      {
+        "url": "/modules/features/village/townShared.js",
+        "bytes": 2167,
+        "ms": 22.799999952316284
+      },
+      {
+        "url": "/modules/features/village/horseModel.js",
+        "bytes": 15125,
+        "ms": 23.09999990463257
+      },
+      {
+        "url": "/modules/features/village/fantasyTrees.js",
+        "bytes": 3036,
+        "ms": 23.100000143051147
+      },
+      {
+        "url": "/modules/features/village/animalEmotes.js",
+        "bytes": 372,
+        "ms": 24.200000047683716
+      },
+      {
+        "url": "/modules/features/village/owlFlight.js",
+        "bytes": 1758,
+        "ms": 24.600000143051147
+      },
+      {
+        "url": "/modules/features/village/meadowVegetation.js",
+        "bytes": 3407,
+        "ms": 5.200000047683716
+      },
+      {
+        "url": "/village/world-layout.json",
+        "bytes": 254066,
+        "ms": 1.3999998569488525
+      },
+      {
+        "url": "/village/models/spirit.glb",
+        "bytes": 437768,
+        "ms": 3
+      },
+      {
+        "url": "/village/models/dove.glb",
+        "bytes": 240928,
+        "ms": 5.8999998569488525
+      },
+      {
+        "url": "/village/models/garden-pond.glb",
+        "bytes": 3239548,
+        "ms": 7.599999904632568
+      },
+      {
+        "url": "/village/models/animals-v2/swan.glb",
+        "bytes": 351624,
+        "ms": 8.5
+      },
+      {
+        "url": "/village/models/animals-v2/duck.glb",
+        "bytes": 344932,
+        "ms": 10.399999856948853
+      },
+      {
+        "url": "/village/models/animals-v2/duckling.glb",
+        "bytes": 344816,
+        "ms": 9.5
+      },
+      {
+        "url": "/village/models/animals-v2/horse-grey.glb",
+        "bytes": 615924,
+        "ms": 13
+      },
+      {
+        "url": "/village/models/animals-v2/highland-flower.glb",
+        "bytes": 672684,
+        "ms": 17.300000190734863
+      },
+      {
+        "url": "/village/models/animals-v2/owl.glb",
+        "bytes": 349092,
+        "ms": 16.600000143051147
+      },
+      {
+        "url": "/village/models/animals-v2/highland-copper.glb",
+        "bytes": 627084,
+        "ms": 19.200000047683716
+      },
+      {
+        "url": "/village/models/animals-v2/sheep.glb",
+        "bytes": 524912,
+        "ms": 19.100000143051147
+      },
+      {
+        "url": "/village/models/animals-v2/lamb.glb",
+        "bytes": 366640,
+        "ms": 17.300000190734863
+      },
+      {
+        "url": "/village/models/animals-v2/horse-bay.glb",
+        "bytes": 751120,
+        "ms": 22.40000009536743
+      },
+      {
+        "url": "/village/models/animals-v2/dog-shiba.glb",
+        "bytes": 489172,
+        "ms": 29.799999952316284
+      },
+      {
+        "url": "/village/models/animals-v2/dog-corgi.glb",
+        "bytes": 495216,
+        "ms": 26.700000047683716
+      },
+      {
+        "url": "/village/models/animals-v2/dog-beagle.glb",
+        "bytes": 462600,
+        "ms": 29.600000143051147
+      },
+      {
+        "url": "/village/models/animals-v2/dog-samoyed.glb",
+        "bytes": 515880,
+        "ms": 28.399999856948853
+      },
+      {
+        "url": "/village/models/town-kit.glb",
+        "bytes": 5881396,
+        "ms": 17.200000047683716
+      },
+      {
+        "url": "/village/models/farm-animals.glb",
+        "bytes": 3474608,
+        "ms": 19.399999856948853
+      },
+      {
+        "url": "/village/textures/sunset.hdr",
+        "bytes": 1061624,
+        "ms": 5
+      }
+    ]
+  },
+  "results": [
+    {
+      "view": "entry",
+      "variant": "high",
+      "frame": {
+        "mean": 16.66611111111111,
+        "p95": 16.799999999999272,
+        "min": 16.5,
+        "max": 16.80000000000109
+      },
+      "cpu": {
+        "mean": 3.3548476445047477,
+        "p95": 3.9000000953674316,
+        "min": 2.1999998092651367,
+        "max": 4.799999952316284
+      },
+      "gpu": {
+        "mean": 6.596987400552487,
+        "p95": 7.68475,
+        "min": 5.557624,
+        "max": 9.201625
+      },
+      "draws": {
+        "mean": 554.9305555555555,
+        "p95": 555,
+        "min": 553,
+        "max": 555
+      },
+      "triangles": {
+        "mean": 3944870,
+        "p95": 3944910,
+        "min": 3943758,
+        "max": 3944910
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 2986540,
+        "shadow": 958370,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 180048,
+            "instances": 62
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Garden bed 7",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 111696,
+            "instances": 13
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 70000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 58000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 50880,
+            "instances": 20
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 48048,
+            "instances": 13
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 36288,
+            "instances": 14
+          },
+          {
+            "name": "Meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 34164,
+            "instances": 1898
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 31914,
+            "instances": 1773
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 30528,
+            "instances": 12
+          }
+        ]
+      }
+    },
+    {
+      "view": "pond",
+      "variant": "high",
+      "frame": {
+        "mean": 16.66583333333333,
+        "p95": 16.799999999999272,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 2.998337951063119,
+        "p95": 3.700000047683716,
+        "min": 1.8999998569488525,
+        "max": 4.299999952316284
+      },
+      "gpu": {
+        "mean": 6.465118512465375,
+        "p95": 8.109541,
+        "min": 4.997125,
+        "max": 9.059374
+      },
+      "draws": {
+        "mean": 424.39444444444445,
+        "p95": 427,
+        "min": 420,
+        "max": 427
+      },
+      "triangles": {
+        "mean": 3208552,
+        "p95": 3211672,
+        "min": 3204472,
+        "max": 3211672
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 2162472,
+        "shadow": 1042000,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 180048,
+            "instances": 62
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 70000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 58000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 50880,
+            "instances": 20
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 48048,
+            "instances": 13
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 36288,
+            "instances": 14
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass 0,-4",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 28350,
+            "instances": 1575
+          },
+          {
+            "name": "Meadow grass -2,0",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 26640,
+            "instances": 1480
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village limestone",
+            "pass": "color",
+            "triangles": 26544,
+            "instances": 1
+          }
+        ]
+      }
+    },
+    {
+      "view": "pasture",
+      "variant": "high",
+      "frame": {
+        "mean": 16.66611111111111,
+        "p95": 16.799999999999272,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 2.155955677877833,
+        "p95": 2.5,
+        "min": 1.2000000476837158,
+        "max": 3.0999999046325684
+      },
+      "gpu": {
+        "mean": 6.69364155124654,
+        "p95": 8.406125,
+        "min": 3.918,
+        "max": 9.986249
+      },
+      "draws": {
+        "mean": 159.79444444444445,
+        "p95": 164,
+        "min": 157,
+        "max": 164
+      },
+      "triangles": {
+        "mean": 1785460.3111111112,
+        "p95": 1791116,
+        "min": 1779660,
+        "max": 1791116
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 960538,
+        "shadow": 819122,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village limestone",
+            "pass": "color",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass -3,-3",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 26334,
+            "instances": 1463
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass -2,-3",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 19044,
+            "instances": 1058
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveWingLeftMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingRightMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingLeftMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingRightMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass -4,-3",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 14022,
+            "instances": 779
+          }
+        ]
+      }
+    },
+    {
+      "view": "stable",
+      "variant": "high",
+      "frame": {
+        "mean": 16.666388888888893,
+        "p95": 16.700000000004366,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 2.9847645416154096,
+        "p95": 3.5,
+        "min": 2.0999999046325684,
+        "max": 4.700000047683716
+      },
+      "gpu": {
+        "mean": 7.072305000000003,
+        "p95": 8.651541,
+        "min": 4.453041,
+        "max": 9.217833
+      },
+      "draws": {
+        "mean": 188.7277777777778,
+        "p95": 193,
+        "min": 186,
+        "max": 193
+      },
+      "triangles": {
+        "mean": 1921709.3777777778,
+        "p95": 1932576,
+        "min": 1909564,
+        "max": 1932576
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 1068878,
+        "shadow": 863698,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass 0,-4",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 28350,
+            "instances": 1575
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village limestone",
+            "pass": "color",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Moss/Moss spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Luma/Luma spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 16902,
+            "instances": 9
+          }
+        ]
+      }
+    },
+    {
+      "view": "orchard",
+      "variant": "high",
+      "frame": {
+        "mean": 16.6661111111111,
+        "p95": 16.799999999995634,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 2.9349030444496558,
+        "p95": 3.4000000953674316,
+        "min": 2.1000001430511475,
+        "max": 5.099999904632568
+      },
+      "gpu": {
+        "mean": 6.426090470914129,
+        "p95": 8.716166,
+        "min": 4.170125,
+        "max": 10.131749
+      },
+      "draws": {
+        "mean": 331,
+        "p95": 331,
+        "min": 331,
+        "max": 331
+      },
+      "triangles": {
+        "mean": 2598092,
+        "p95": 2598092,
+        "min": 2598092,
+        "max": 2598092
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 1654220,
+        "shadow": 943872,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 70000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 58000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Meadow grass 0,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 29340,
+            "instances": 1630
+          },
+          {
+            "name": "Painted meadow grass 0,-4",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 28350,
+            "instances": 1575
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village limestone",
+            "pass": "color",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass 2,-4",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 25110,
+            "instances": 1395
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 23904,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass 4,-5",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 22086,
+            "instances": 1227
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          }
+        ]
+      }
+    },
+    {
+      "view": "overhead",
+      "variant": "high",
+      "frame": {
+        "mean": 16.666111111111118,
+        "p95": 16.700000000004366,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 2.340720235475873,
+        "p95": 3.299999952316284,
+        "min": 1.4000000953674316,
+        "max": 3.700000047683716
+      },
+      "gpu": {
+        "mean": 7.629465836565102,
+        "p95": 9.647333,
+        "min": 4.017499,
+        "max": 11.023458
+      },
+      "draws": {
+        "mean": 160.42777777777778,
+        "p95": 164,
+        "min": 154,
+        "max": 164
+      },
+      "triangles": {
+        "mean": 2591133.644444444,
+        "p95": 2597744,
+        "min": 2574348,
+        "max": 2597744
+      },
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 1662962,
+        "shadow": 934782,
+        "largest": [
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 204800,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 180048,
+            "instances": 62
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 122656,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 99360,
+            "instances": 138
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 97616,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 71040,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 70000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 58000,
+            "instances": 500
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 56912,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 56160,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 55272,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 50880,
+            "instances": 20
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 48048,
+            "instances": 13
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38440,
+            "instances": 1
+          },
+          {
+            "name": "Meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 34164,
+            "instances": 1898
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33728,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 31914,
+            "instances": 1773
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "Village limestone",
+            "pass": "color",
+            "triangles": 26544,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 23904,
+            "instances": 1
+          }
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 204800,
+      "instances": 1,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 180048,
+      "instances": 62,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 122656,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 111696,
+      "instances": 13,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 99360,
+      "instances": 138,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 97616,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 73920,
+      "instances": 20,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 71040,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 70000,
+      "instances": 500,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 58000,
+      "instances": 500,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 56912,
+      "instances": 1,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 56160,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 55272,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 50880,
+      "instances": 20,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 48048,
+      "instances": 13,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Painted meadow grass -3,3",
+      "type": "Mesh",
+      "triangles": 40698,
+      "instances": 2261,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 38440,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 36288,
+      "instances": 14,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Meadow grass 0,1",
+      "type": "Mesh",
+      "triangles": 34164,
+      "instances": 1898,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 33728,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    }
+  ],
+  "errors": []
+}

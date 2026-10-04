@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "scope": "Fresh ephemeral normal3040 context, library filtering only; no asset placement or save/apply",
+  "layoutUnchanged": true,
+  "apiWrites": [],
+  "errors": []
+}

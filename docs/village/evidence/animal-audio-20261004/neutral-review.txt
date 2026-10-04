@@ -1,0 +1,16 @@
+Independent signal/design review — final,2026-10-04
+
+Method and limits
+I tried emitting a local MP3 through functions.exec audio; the runtime returned “audio content omitted because you do not support audio input.” This is a read-only PCM/FFmpeg signal and source-design review. It is not listening, and it cannot establish animal recognizability, warmth, harshness, speaker/headphone balance or subjective suitability. Only this /tmp review file was written.
+
+Final measured result
+- Fresh browser compressor-output game-mix.webm:51.18 s decoded duration, -27.72 LUFS, -14.06 dBTP, sample peak0.198154, DC0.000000481, zero samples >=0.99. The maximum occurs at32.349 s, before the duckling event at32.456 s. No clipping, excessive DC or blocking output-level fault.
+- Browser harness reports18 passing assertions, maximum one music deck, no page errors. Its sampled analyser peak0.166547 is lower than the continuous decoded-file maximum; the file measurement is the better exact peak figure.
+- All twelve final delivered animal/purr clips pass the stated -6 dBTP ceiling. Hottest: hedgehog -7.83 dBTP; cat -7.96; purr -8.13. Mono conversion before measurement/limiting fixes the prior hedgehog peak failure.
+- Current integrated short-clip readings range from -24.70 LUFS (hedgehog) to -19.92 LUFS (duckling); most are close to -22. No exact integrated-loudness target is inferred for short gated clips.
+- Swan's earlier hot burst and duckling's weak excerpt are corrected. Final swan: -22.40 LUFS/-10.43 dBTP. Duckling: -19.92 LUFS/-8.91 dBTP. Cow is1.59 s after0.6 s leading trim. No strong file-edge discontinuity found.
+- Near response windows remain separated by roughly3.8 s. Strongest20 ms combined-output RMS during responses ranges from -24.22 dBFS (dove at40.066 s) to -31.32 (dog at24.845 s); duckling is -25.22 at32.456 s. These measurements include music/ambience and cannot establish isolated call audibility. No response creates a large mixed-output spike.
+- Source design enforces one active animal voice, sparse walking greetings, one owl call per group feeding, mute/hidden/private-room guards. Only nearby happy calls duck music about2.2 dB. The distant horse event at47.676 s/8 m uses the no-duck branch and inverse attenuation roughly17 dB below a2 m call.
+
+Conclusion and remaining acceptance
+No blocking numerical concern remains in the revised delivered clips, fresh representative mix or reviewed sparse-call design. This does not mean the sounds are recognizable, cosy, pleasant or non-fatiguing by ear. The harness invokes production audio methods directly; it is not a natural shared traversal or proof of actual pet/feed synchronization. Human listening on speakers/headphones, animal identity, quiet background contamination and long-session repetition remain unverified.

@@ -1,0 +1,49 @@
+[
+  {
+    "name": "path-4-50",
+    "pathId": "path-4",
+    "original": true,
+    "width": 2,
+    "length": 11.165095633029477,
+    "fraction": 0.5,
+    "x": -18.2,
+    "z": -1,
+    "yaw": -0.19798687488043043
+  },
+  {
+    "name": "path-5-30",
+    "pathId": "path-5",
+    "original": true,
+    "width": 1.05,
+    "length": 26.40243689785898,
+    "fraction": 0.3,
+    "x": -16.475313217926207,
+    "z": -7.9727619037037325,
+    "yaw": 0.12097438030307356
+  },
+  {
+    "name": "town-dock-approach-50",
+    "pathId": "town-dock-approach",
+    "original": false,
+    "width": 1.8,
+    "length": 1.5747467688270826,
+    "fraction": 0.5,
+    "x": -19,
+    "z": -5.8,
+    "yaw": 0.7795794052951949
+  },
+  {
+    "name": "pond-south",
+    "x": -35,
+    "z": 2,
+    "yaw": 0,
+    "extra": true
+  },
+  {
+    "name": "river-south-bank",
+    "x": -14,
+    "z": 22,
+    "yaw": 3.141592653589793,
+    "extra": true
+  }
+]

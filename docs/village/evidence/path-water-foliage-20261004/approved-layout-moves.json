@@ -1,0 +1,337 @@
+{
+  "scope": "Parent-authorized eight verified tree trunk moves plus two path-5 shrub moves; only canonical position fields changed. Original nine changes retained; willow-1 correction appended as tenth. No presets, drafts, asset IDs, rotations, scales, visibility, routes or object counts changed.",
+  "beforeHash": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "afterHash": "53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736",
+  "objects": 591,
+  "changes": [
+    {
+      "id": "town-tree-7",
+      "asset": "tree-1",
+      "before": [
+        19,
+        0,
+        0
+      ],
+      "after": [
+        16.5,
+        0,
+        0.5
+      ],
+      "obstruction": "path-8",
+      "picture": "path-8-50.png",
+      "rootFootprintRadius": 0.301,
+      "nearestPaving": [
+        {
+          "id": "town-core-link",
+          "edgeGap": 0.8745693458206634
+        },
+        {
+          "id": "path-8",
+          "edgeGap": 1.4463060953316422
+        },
+        {
+          "id": "path-7",
+          "edgeGap": 7.482631508571394
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "tree-12",
+      "asset": "tree-12",
+      "before": [
+        13,
+        0,
+        -41
+      ],
+      "after": [
+        13,
+        0,
+        -45
+      ],
+      "obstruction": "town-north-loop",
+      "picture": "town-north-loop-18.png",
+      "rootFootprintRadius": 0.385,
+      "nearestPaving": [
+        {
+          "id": "town-north-loop",
+          "edgeGap": 0.4544925037163916
+        },
+        {
+          "id": "path-1",
+          "edgeGap": 8.656043802376718
+        },
+        {
+          "id": "town-east-lane",
+          "edgeGap": 8.737072564589493
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "town-tree-3",
+      "asset": "tree-1",
+      "before": [
+        26,
+        0,
+        -56
+      ],
+      "after": [
+        26,
+        0,
+        -61
+      ],
+      "obstruction": "town-east-lane",
+      "picture": "town-east-lane-82.png",
+      "rootFootprintRadius": 0.308,
+      "nearestPaving": [
+        {
+          "id": "town-east-lane",
+          "edgeGap": 2.0630290659342867
+        },
+        {
+          "id": "town-farm-lane",
+          "edgeGap": 2.8987967291812633
+        },
+        {
+          "id": "farm-1-front-path",
+          "edgeGap": 6.953500000000003
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "tree-6",
+      "asset": "tree-6",
+      "before": [
+        -49,
+        0,
+        -4
+      ],
+      "after": [
+        -46,
+        0,
+        -4
+      ],
+      "obstruction": "town-pond-walk",
+      "picture": "town-pond-walk-50.png",
+      "rootFootprintRadius": 0.385,
+      "nearestPaving": [
+        {
+          "id": "town-pond-walk",
+          "edgeGap": 2.6185284104443216
+        },
+        {
+          "id": "path-2",
+          "edgeGap": 12.11920510185596
+        },
+        {
+          "id": "town-owl-loop",
+          "edgeGap": 21.23169936189206
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "tree-1",
+      "asset": "tree-1",
+      "before": [
+        -5,
+        0,
+        22
+      ],
+      "after": [
+        -3.8,
+        0,
+        22
+      ],
+      "obstruction": "native river trunk footprint",
+      "picture": "water-plants/before/main-river.png",
+      "rootFootprintRadius": 0.27299999999999996,
+      "nearestPaving": [
+        {
+          "id": "path-1",
+          "edgeGap": 2.637065219034901
+        },
+        {
+          "id": "sunrise-meadow-path",
+          "edgeGap": 7.6497316801140345
+        },
+        {
+          "id": "path-9",
+          "edgeGap": 7.783839793455851
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "tree-3",
+      "asset": "tree-3",
+      "before": [
+        -7,
+        0,
+        15
+      ],
+      "after": [
+        -3.7,
+        0,
+        15
+      ],
+      "obstruction": "native river trunk center",
+      "picture": "water-plants/before/main-river.png",
+      "rootFootprintRadius": 0.40249999999999997,
+      "nearestPaving": [
+        {
+          "id": "path-9",
+          "edgeGap": 2.090948168962618
+        },
+        {
+          "id": "path-1",
+          "edgeGap": 2.361673535527436
+        },
+        {
+          "id": "sunrise-meadow-path",
+          "edgeGap": 5.444163547121665
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "tree-24",
+      "asset": "tree-24",
+      "before": [
+        -14.214782,
+        0,
+        -54.601768
+      ],
+      "after": [
+        -17.8,
+        0,
+        -54.6
+      ],
+      "obstruction": "native river trunk center",
+      "picture": "numeric native river footprint confirmation",
+      "rootFootprintRadius": 0.2493806,
+      "nearestPaving": [
+        {
+          "id": "town-owl-loop",
+          "edgeGap": 15.746163909962183
+        },
+        {
+          "id": "path-1",
+          "edgeGap": 17.99830523615934
+        },
+        {
+          "id": "town-north-loop",
+          "edgeGap": 19.762152544922902
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "bushes-35",
+      "asset": "bushes-35",
+      "before": [
+        -16.4608,
+        0,
+        -8.532767
+      ],
+      "after": [
+        -21.5,
+        0,
+        -2
+      ],
+      "obstruction": "path-5",
+      "picture": "path-5-30.png",
+      "rootFootprintRadius": 1.1809073999999997,
+      "nearestPaving": [
+        {
+          "id": "path-4",
+          "edgeGap": 0.8542773504891681
+        },
+        {
+          "id": "path-2",
+          "edgeGap": 1.8567755242633748
+        },
+        {
+          "id": "town-dock-approach",
+          "edgeGap": 2.1244250995594514
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "bushes-8",
+      "asset": "bushes-8",
+      "before": [
+        -17.462669,
+        0,
+        -7.551164
+      ],
+      "after": [
+        -25.8,
+        0,
+        0
+      ],
+      "obstruction": "path-5 foliage footprint",
+      "picture": "path-5-30.png",
+      "rootFootprintRadius": 0.76013965,
+      "nearestPaving": [
+        {
+          "id": "path-2",
+          "edgeGap": 0.5023129261350752
+        },
+        {
+          "id": "town-pond-walk",
+          "edgeGap": 0.9156845705344656
+        },
+        {
+          "id": "town-meadow-door",
+          "edgeGap": 2.1105172557366387
+        }
+      ],
+      "dryFootprintSamples": 9,
+      "existingCollidersClear": true
+    },
+    {
+      "id": "willow-1",
+      "asset": "willow-1",
+      "before": [
+        -18,
+        0,
+        -3.5
+      ],
+      "after": [
+        -15.9,
+        0,
+        -3.5
+      ],
+      "obstruction": "Actual lower bark crosses native path-4 core paving",
+      "picture": "after/path-4-50.png",
+      "actualGeometryProof": "editor-pond/willow-clearance-before.json",
+      "sourceGeometryProof": "willow-source-footprint-proof.json",
+      "actualBarkVertices": 1275,
+      "clippedBarkPolygonsBelowHalfMetre": 16,
+      "oldCorePavingTrianglesContacted": 16,
+      "newPavingContacts": 0,
+      "newWaterContacts": 0,
+      "pavingClearanceMetres": 0.61046,
+      "waterClearanceMetres": 0.78002,
+      "solidOBBOrCurrentColliderOverlaps": 0,
+      "willowLeafPolygonsBelowHalfMetre": 0,
+      "conservativeSourcePolygonsBelow1Point8Metres": 48,
+      "conservativeWaterVertices": 0,
+      "existingCollidersClear": true
+    }
+  ],
+  "checks": "Every conservative root/shrub footprint has>0.1m clearance beyond the largest1.37\u00d7path strip; nine footprint samples per object are outside all river/pond cuts; proposed roots clear current real colliders. Original tree collision behavior preserved; root will recapture moved town-tree colliders.",
+  "previousAfterHash": "866d18102ae76f8b74cc53bc6ef5799444c7968ca47ac9a8cc9d820d14237128"
+}

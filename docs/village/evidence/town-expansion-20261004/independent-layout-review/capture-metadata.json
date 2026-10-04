@@ -1,0 +1,255 @@
+{
+  "scope": "Fresh local production Chrome; independent visual camera inspections, no gameplay actions",
+  "original": {
+    "layout": 491,
+    "rows": 15,
+    "animals": 7,
+    "quality": "high"
+  },
+  "captures": [
+    {
+      "name": "town-overview",
+      "player": [
+        34,
+        -14
+      ],
+      "camera": [
+        105,
+        120,
+        117
+      ],
+      "target": [
+        23,
+        0,
+        -12
+      ],
+      "frame": {
+        "position": [
+          34,
+          0.05,
+          -14
+        ],
+        "tier": "detailed",
+        "calls": 715,
+        "triangles": 9352712
+      }
+    },
+    {
+      "name": "farms-overview",
+      "player": [
+        73,
+        -60
+      ],
+      "camera": [
+        119,
+        60,
+        -12
+      ],
+      "target": [
+        65,
+        0,
+        -66
+      ],
+      "frame": {
+        "position": [
+          73,
+          0,
+          -60
+        ],
+        "tier": "detailed",
+        "calls": 400,
+        "triangles": 8468668
+      }
+    },
+    {
+      "name": "race-and-brook",
+      "player": [
+        85,
+        36
+      ],
+      "camera": [
+        125,
+        50,
+        75
+      ],
+      "target": [
+        83,
+        0,
+        20
+      ],
+      "frame": {
+        "position": [
+          85,
+          0.05,
+          36
+        ],
+        "tier": "detailed",
+        "calls": 702,
+        "triangles": 6253600
+      }
+    },
+    {
+      "name": "pasture-overview",
+      "player": [
+        -42,
+        48
+      ],
+      "camera": [
+        -73,
+        24,
+        81
+      ],
+      "target": [
+        -42,
+        1.5,
+        58
+      ],
+      "frame": {
+        "position": [
+          -42,
+          0.9442,
+          48
+        ],
+        "tier": "detailed",
+        "calls": 727,
+        "triangles": 6868828
+      }
+    },
+    {
+      "name": "pond-and-owls",
+      "player": [
+        -48,
+        -26.9
+      ],
+      "camera": [
+        -71,
+        24,
+        12
+      ],
+      "target": [
+        -35,
+        0,
+        -19
+      ],
+      "frame": {
+        "position": [
+          -48,
+          0.05,
+          -26.9
+        ],
+        "tier": "detailed",
+        "calls": 481,
+        "triangles": 6352428
+      }
+    },
+    {
+      "name": "cottage-street",
+      "player": [
+        34,
+        7
+      ],
+      "camera": [
+        38,
+        4.5,
+        19
+      ],
+      "target": [
+        34,
+        1,
+        -20
+      ],
+      "frame": {
+        "position": [
+          34,
+          0.05,
+          7
+        ],
+        "tier": "detailed",
+        "calls": 308,
+        "triangles": 5781378
+      }
+    },
+    {
+      "name": "farm-walking",
+      "player": [
+        73,
+        -57.7
+      ],
+      "camera": [
+        84,
+        4.5,
+        -54
+      ],
+      "target": [
+        72,
+        0.8,
+        -68
+      ],
+      "frame": {
+        "position": [
+          73,
+          0.05,
+          -57.7
+        ],
+        "tier": "detailed",
+        "calls": 191,
+        "triangles": 4520172
+      }
+    },
+    {
+      "name": "pasture-walking",
+      "player": [
+        -42,
+        48
+      ],
+      "camera": [
+        -43,
+        3.8,
+        48
+      ],
+      "target": [
+        -43,
+        1.8,
+        59
+      ],
+      "frame": {
+        "position": [
+          -42,
+          0.9442,
+          48
+        ],
+        "tier": "detailed",
+        "calls": 219,
+        "triangles": 1664612
+      }
+    },
+    {
+      "name": "race-walking-1024",
+      "player": [
+        110,
+        24
+      ],
+      "camera": [
+        118,
+        4.2,
+        24
+      ],
+      "target": [
+        92,
+        1,
+        20
+      ],
+      "frame": {
+        "position": [
+          110,
+          0,
+          24
+        ],
+        "tier": "detailed",
+        "calls": 675,
+        "triangles": 3612650
+      }
+    }
+  ],
+  "errors": []
+}

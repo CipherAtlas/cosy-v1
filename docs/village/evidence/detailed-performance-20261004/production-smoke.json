@@ -1,0 +1,123 @@
+{
+  "sample": {
+    "report": {
+      "graphicsVersion": "spatial-batches-v2",
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+      "viewport": [
+        1366,
+        768
+      ],
+      "devicePixelRatio": 1,
+      "drawingBuffer": [
+        1366,
+        768
+      ],
+      "preference": "high",
+      "tier": "detailed",
+      "detailedRenderScale": 1,
+      "shadows": true,
+      "antialias": true,
+      "contextLost": false,
+      "weather": "golden",
+      "lowestFps": 60,
+      "longestFrameMs": 17,
+      "longestRenderSubmitMs": 12,
+      "lastSceneryPrepareMs": 0,
+      "shaderPrograms": 59
+    },
+    "fps": 60.003000150007495,
+    "calls": 516,
+    "triangles": 2839647,
+    "place": null,
+    "animals": 29,
+    "layout": 595,
+    "connected": true
+  },
+  "smaller": {
+    "buffer": [
+      1024,
+      640
+    ],
+    "triangles": 2752445
+  },
+  "assets": [
+    {
+      "url": "http://127.0.0.1:3051/village/models/spirit.glb?v=3",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/garden-pond.glb?v=2",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/dove.glb?v=1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/swan.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/duckling.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/owl.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/horse-grey.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/duck.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/highland-flower.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/highland-copper.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/sheep.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/lamb.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/dog-shiba.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/horse-bay.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/dog-beagle.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/dog-corgi.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/animals-v2/dog-samoyed.glb?v=rig1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/town-kit.glb?v=2",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3051/village/models/farm-props.glb?v=2",
+      "status": 200
+    }
+  ],
+  "errors": []
+}

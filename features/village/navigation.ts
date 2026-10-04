@@ -1,6 +1,7 @@
 import { floorHeight, surfaceAt, type Collider } from "./environment";
 import { VillageMovement } from "./movement";
 import type { AuthoredWorld } from "./worldLayout";
+import { TERRAIN_LIMIT } from "./terrain";
 
 type Point = [number, number];
 const CELL = .75;
@@ -16,14 +17,20 @@ export class VillageNavigation {
   constructor(colliders: Collider[], authored?: AuthoredWorld) {
     this.probe = new VillageMovement(colliders, () => {});
     const areas = authored?.walkable ?? [];
-    const extents = areas.map(area => ({ x: Math.hypot(area.radiusX * Math.cos(area.yaw), area.radiusZ * Math.sin(area.yaw)),
-      z: Math.hypot(area.radiusX * Math.sin(area.yaw), area.radiusZ * Math.cos(area.yaw)), area }));
-    this.minX = Math.min(-39, ...extents.map(({ area, x }) => area.x - x));
-    this.minZ = Math.min(-47.25, ...extents.map(({ area, z }) => area.z - z));
-    const maxX = Math.max(39, ...extents.map(({ area, x }) => area.x + x));
-    const maxZ = Math.max(41.25, ...extents.map(({ area, z }) => area.z + z));
-    this.width = Math.min(400, Math.ceil((maxX - this.minX) / CELL) + 1);
-    this.height = Math.min(400, Math.ceil((maxZ - this.minZ) / CELL) + 1);
+    this.minX = -39; this.minZ = -47.25;
+    let maxX = 39, maxZ = 41.25;
+    if (authored?.openWorld) { this.minX = -TERRAIN_LIMIT; this.minZ = -TERRAIN_LIMIT; maxX = TERRAIN_LIMIT; maxZ = TERRAIN_LIMIT; }
+    for (const area of areas) {
+      const x = Math.hypot(area.radiusX * Math.cos(area.yaw), area.radiusZ * Math.sin(area.yaw));
+      const z = Math.hypot(area.radiusX * Math.sin(area.yaw), area.radiusZ * Math.cos(area.yaw));
+      this.minX = Math.max(-TERRAIN_LIMIT, Math.min(this.minX, area.x - x));
+      this.minZ = Math.max(-TERRAIN_LIMIT, Math.min(this.minZ, area.z - z));
+      maxX = Math.min(TERRAIN_LIMIT, Math.max(maxX, area.x + x));
+      maxZ = Math.min(TERRAIN_LIMIT, Math.max(maxZ, area.z + z));
+    }
+    const maxCells = Math.ceil(TERRAIN_LIMIT * 2 / CELL) + 1;
+    this.width = Math.min(maxCells, Math.ceil((maxX - this.minX) / CELL) + 1);
+    this.height = Math.min(maxCells, Math.ceil((maxZ - this.minZ) / CELL) + 1);
     this.walkable = new Int8Array(this.width * this.height);
   }
   private point(id: number): Point { return [this.minX + id % this.width * CELL, this.minZ + Math.floor(id / this.width) * CELL]; }
@@ -46,6 +53,14 @@ export class VillageNavigation {
       if (d < distance && (!connect || this.visible(point, p))) { best = id; distance = d; }
     }
     return best;
+  }
+  safePoint(point: Point): Point | null {
+    if (this.probe.clear(...point)) return [...point];
+    const id = this.closest(point, false);
+    return id < 0 ? null : this.point(id);
+  }
+  safeRoute(points: Point[]): Point[] {
+    return points.flatMap(point => { const safe = this.safePoint(point); return safe ? [safe] : []; });
   }
   path(from: Point, to: Point): Point[] {
     if (this.probe.clear(...to) && this.visible(from, to)) return [to];

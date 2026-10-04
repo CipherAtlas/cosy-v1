@@ -1,0 +1,13 @@
+{
+  "creator": "Original Blender artwork",
+  "blender": "5.2.1 LTS",
+  "roots": [
+    "HorseRacetrack",
+    "HorseStable",
+    "FarmRow",
+    "HayBale"
+  ],
+  "sha256": "eeda33de1ddb38242c35d49283eb29b353ded74ff9241ee3a2b76d77c600b9a8",
+  "bytes": 5881396,
+  "meshes": 24
+}

@@ -1478,3 +1478,36 @@ dialog h3 span {
 #land-settings h3 { margin-top:20px; }
 #path-settings button { margin:4px 4px 4px 0; }
 .collision-toggle { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; }
+/* The elevation controls share the existing scrolling inspector. */
+.terrain-settings{margin-top:0}.terrain-settings .field-label{display:block;margin:8px 0}.terrain-settings input[type=range]{width:100%;height:22px;padding:0;accent-color:#46745d}.terrain-settings output{float:right;font-variant-numeric:tabular-nums}.terrain-settings input[type=number]{width:80px}.terrain-settings button[aria-pressed=true]{background:#375d4c;color:#fff9e5}.terrain-settings button{min-height:36px}.terrain-settings .section-title{margin:0}
+
+.terrain-settings #flatten-world{width:100%;margin:10px 0 8px}.terrain-settings .inline-check{display:flex;gap:8px;margin-bottom:10px}
+
+/* Contextual authoring tools and readable controls over the world. */
+:root { --muted:#59675a; }
+.placement { color:#fffbed; background:#244d3eeF; border-color:#a5bea6; white-space:normal; }
+.placement button { color:#203e2e; background:#f5f7e9; border-color:#bacbb0; min-height:40px; font-size:12px; }
+.placement button:hover { color:#172e22; background:#e1ecd2; }
+.placement kbd, .toolbar button kbd { color:#304632; background:#fffef1; border:1px solid #859878; border-radius:2px; padding:2px 4px; font-size:10px; }
+.toolbar { flex-wrap:wrap; justify-content:center; width:max-content; max-width:calc(100% - 24px); background:#f9faf0f2; border-color:#9aab87; }
+.toolbar button { min-width:54px; min-height:44px; padding:6px 7px; color:#273f2e; }
+.toolbar button span { font-size:11px; }
+.toolbar button[aria-pressed=true] { background:#d5e3c6; border-color:#819975; color:#203d2b; }
+button:not(:disabled):active, button.is-pressed { box-shadow:inset 0 0 0 2px #7c9c73; filter:brightness(.93); }
+.terrain-tool { position:absolute; z-index:4; left:14px; top:70px; width:236px; max-width:calc(100% - 28px); max-height:calc(100% - 235px); overflow:auto; padding:14px; color:#263f2d; background:#f8f9eef2; border:1px solid #95a586; border-radius:10px; box-shadow:var(--shadow); }
+.terrain-tool .section-title { margin:0 0 8px; }
+.terrain-tool .field-label { margin:9px 0; }
+.terrain-tool #flatten-world { width:100%; margin:9px 0; }
+.terrain-tool input[type=range] { width:100%; accent-color:var(--primary); }
+.preview-hint { position:absolute; z-index:4; left:50%; bottom:22px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:8px 14px; width:max-content; max-width:calc(100% - 32px); padding:10px 16px; color:#fffbed; background:#244d3ee8; border:1px solid #a5bea6; border-radius:9px; text-align:center; }
+.preview-hint kbd { display:inline-block; color:#25452f; background:#fffdeb; border-color:#9caf90; border-radius:2px; margin-right:3px; }
+.preview-mode .terrain-tool { display:none; }
+@media (max-width:1300px) { .toolbar button { min-width:48px; padding:6px; gap:3px; } .toolbar button span { font-size:10px; } .toolbar svg { width:16px; } }
+@media (prefers-reduced-motion:reduce) { button:not(:disabled):active, button.is-pressed { filter:none; box-shadow:inset 0 0 0 2px #7c9c73; } }
+.toolbar button kbd { display:block; }
+.terrain-tool .field-label { display:grid; grid-template-columns:1fr auto; gap:4px; margin:7px 0; }
+.terrain-tool .field-label input { grid-column:1 / -1; }
+.terrain-tool input[type=range] { padding:0; min-height:18px; }
+.terrain-tool .help-note { font-size:11px; line-height:1.5; }
+@media (max-width:1100px) { .toolbar button { grid-template-columns:1fr; min-width:46px; } .toolbar svg { display:none; } .toolbar button kbd { justify-self:center; } }
+.terrain-tool { max-height:calc(100% - 190px); }

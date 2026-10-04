@@ -5,6 +5,12 @@ import { VillageSimulation } from "./simulation.ts";
 import { ACTIVITY_STAGES } from "../features/village/sharedActors.ts";
 
 const MAX_VISITORS = 64;
+const PRIVATE_CROP_KEYS = ["carrots", "radishes", "mint", "daisies", "sunflowers", "mintTea"];
+const INVENTORY_KEYS = ["apples", "mushrooms", ...PRIVATE_CROP_KEYS];
+/** @param {import("../features/village/townShared").ForageInventory} [value] @returns {Required<import("../features/village/townShared").ForageInventory>} */
+function inventoryValue(value) {
+  return /** @type {Required<import("../features/village/townShared").ForageInventory>} */ (Object.fromEntries(INVENTORY_KEYS.map(key => [key, Number.isFinite(value?.[key]) ? Math.max(0, Math.min(9999, Math.floor(value?.[key] ?? 0))) : 0])));
+}
 const KICK_DURATION_MS = 5 * 60_000;
 const MAX_SWING_ANGLE = 78 * Math.PI / 180;
 const PUPPY_TRICK_SECONDS = { sit: 7, dance: 5.2, spin: 3.2, bow: 3.8, wave: 4.2, roll: 4.6 };
@@ -84,6 +90,10 @@ export class VillageWorld extends DurableObject {
       Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000).map(trick => [trick.id, trick]));
     this.simulation = new VillageSimulation(ctx.storage.kv.get("sharedActors"));
     this.lastWorldTick = 0;
+    /** @type {Map<string, { inventory: import("../features/village/townShared").ForageInventory; usedAt: number }>} */
+    this.inventories = new Map((ctx.storage.kv.get("visitorInventories") || []).filter(([token, record]) =>
+      /^[0-9a-f-]{36}$/.test(token) && Date.now() - record.usedAt < 90 * 24 * 60 * 60_000).map(([token, record]) =>
+      [token, { inventory: inventoryValue(record.inventory), usedAt: record.usedAt }]));
     /** @type {Map<string | null, number>} */
     this.ipKicks = new Map(ctx.storage.kv.get("ipKicks") || []);
     this.pruneKicks();
@@ -100,6 +110,66 @@ export class VillageWorld extends DurableObject {
     // A failed write must not advance the comparison baseline. Async durability failures
     // still use the storage output gate and reset this instance (no allowUnconfirmed).
     this.persistedValues.set(key, serialized);
+  }
+
+  /** @param {import("./runtime").WorkerVisitor} visitor */
+  restoreInventory(visitor) {
+    const token = visitor.inventoryToken && this.inventories.has(visitor.inventoryToken) ? visitor.inventoryToken : crypto.randomUUID();
+    let record = this.inventories.get(token);
+    if (!record) {
+      record = { inventory: inventoryValue(visitor.forageInventory), usedAt: Date.now() };
+      this.inventories.set(token, record);
+    }
+    visitor.inventoryToken = token;
+    visitor.forageInventory = { ...record.inventory };
+    return token;
+  }
+
+  /** @param {import("./runtime").WorkerVisitor} visitor @param {boolean} [publish] */
+  saveInventory(visitor, publish = true) {
+    const token = visitor.inventoryToken ?? this.restoreInventory(visitor);
+    const inventory = inventoryValue(visitor.forageInventory);
+    visitor.forageInventory = inventory;
+    this.inventories.set(token, { inventory, usedAt: Date.now() });
+    const activeTokens = new Set(this.visitors().map(value => value.inventoryToken));
+    if (this.inventories.size > 2048) {
+      for (const [token] of [...this.inventories].sort((a, b) => a[1].usedAt - b[1].usedAt)) {
+        if (!activeTokens.has(token)) this.inventories.delete(token);
+        if (this.inventories.size <= 2048) break;
+      }
+    }
+    this.ctx.storage.kv.put("visitorInventories", [...this.inventories]);
+    if (publish) this.publishInventory(visitor);
+  }
+
+  /** @param {import("./runtime").WorkerVisitor} visitor */
+  publishInventory(visitor) {
+    const inventory = inventoryValue(visitor.forageInventory);
+    for (const socket of this.sockets()) {
+      const current = socket.deserializeAttachment();
+      if (current.id === visitor.id) current.inventoryToken = visitor.inventoryToken;
+      if (current.inventoryToken !== visitor.inventoryToken) continue;
+      current.forageInventory = { ...inventory }; socket.serializeAttachment(current);
+      send(socket, { type: "forageInventory", inventory, token: visitor.inventoryToken });
+    }
+  }
+
+  /** Resource consumption and its private grant commit together before sending either result.
+   * @param {import("./runtime").WorkerVisitor} visitor @param {() => void} publicWrite */
+  persistResources(visitor, publicWrite) {
+    const inventories = new Map(this.inventories), baselines = new Map(this.persistedValues);
+    const previous = inventoryValue(visitor.inventoryToken ? inventories.get(visitor.inventoryToken)?.inventory : undefined);
+    try {
+      this.ctx.storage.transactionSync(() => { publicWrite(); this.saveInventory(visitor, false); });
+    } catch (error) {
+      this.inventories = inventories; this.persistedValues = baselines; visitor.forageInventory = previous;
+      for (const socket of this.sockets()) {
+        const current = socket.deserializeAttachment();
+        if (current.inventoryToken === visitor.inventoryToken) { current.forageInventory = { ...previous }; socket.serializeAttachment(current); }
+      }
+      throw error;
+    }
+    this.publishInventory(visitor);
   }
 
   sockets() { return this.ctx.getWebSockets().filter(socket => { const visitor = socket.deserializeAttachment(); return !visitor?.kickedUntil && !visitor?.left; }); }
@@ -123,7 +193,8 @@ export class VillageWorld extends DurableObject {
     for (const socket of this.sockets()) if (socket !== except) send(socket, message);
   }
 
-  publishWorld(now = Date.now()) {
+  /** @param {number} [now] @param {import("./runtime").WorkerVisitor} [inventoryVisitor] */
+  publishWorld(now = Date.now(), inventoryVisitor) {
     for (const socket of this.sockets()) {
       const visitor = socket.deserializeAttachment();
       if (visitor && now - (visitor.lastSeen ?? now) > 15000) {
@@ -133,15 +204,49 @@ export class VillageWorld extends DurableObject {
         socket.close(1001, "Connection timed out");
       }
     }
-    this.simulation.step(now, this.visitors());
-    this.ctx.storage.kv.put("sharedActors", this.simulation.save());
+    this.advanceWorld(now, true);
+    const persist = () => this.ctx.storage.kv.put("sharedActors", this.simulation.save());
+    if (inventoryVisitor) this.persistResources(inventoryVisitor, persist);
+    else persist();
     this.broadcast({ type: "actors", world: this.simulation.snapshot(now) });
     this.lastWorldTick = now;
+  }
+
+  /** @param {number} now @param {boolean} [broadcastRiders] */
+  advanceWorld(now, broadcastRiders = false) {
+    const entries = this.sockets().map(socket => {
+      const visitor = socket.deserializeAttachment();
+      return { socket, visitor, previousHorse: visitor.horse };
+    });
+    this.simulation.step(now, entries.map(entry => entry.visitor));
+    let released = false;
+    for (const { socket, visitor, previousHorse } of entries) {
+      const horse = this.simulation.mountedHorse(visitor.id);
+      if (horse) this.simulation.syncRider(visitor, horse);
+      else if (visitor.horse) { visitor.horse = null; visitor.y = undefined; }
+      if (horse || previousHorse) socket.serializeAttachment(visitor);
+      const dismounted = !!previousHorse && !horse;
+      released ||= dismounted;
+      if (dismounted || broadcastRiders && horse) {
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+          horse: visitor.horse ?? null, swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
+      }
+    }
+    return released;
   }
 
   /** @param {import("./runtime").WorkerVisitor} visitor @param {import("../features/village/sharedActors").SharedInteraction} request @param {number} now */
   interaction(visitor, request, now) {
     if (!request || typeof request !== "object") return { ok: false, reason: "That action is unavailable." };
+    if (request.kind === "mapTravel") return this.simulation.mapTravel(visitor, request.id, now, this.visitors());
+    if (request.kind === "town") return this.simulation.townInteraction(visitor, request, now, this.visitors());
+    if (request.kind === "horse") return this.simulation.horseInteraction(visitor, request, now, this.visitors());
+    if (this.simulation.mountedHorse(visitor.id)) {
+      if (request.kind !== "leave" && !(request.kind === "activity" && request.id === "focus"))
+        return { ok: false, reason: "Dismount before joining another activity." };
+      const dismount = this.simulation.dismount(visitor, now, this.visitors(), request.kind === "activity");
+      if (!dismount.ok || request.kind === "leave") return dismount;
+    }
     if ((request.kind === "puppy" || request.kind === "resident")) {
       const result = this.simulation.interact(visitor, request, now);
       if (result.ok && request.kind === "puppy") {
@@ -151,13 +256,14 @@ export class VillageWorld extends DurableObject {
       return result;
     }
     if (request.kind === "leave") {
+      this.simulation.town.releaseVisitor(visitor.id, now);
       visitor.bench = visitor.swing = visitor.activity = null;
       visitor.activityPosition = null;
       visitor.holdingPuppy = null;
       return { ok: true };
     }
     if (request.kind === "activity") {
-      if (!Object.hasOwn(ACTIVITY_STAGES, request.id)) return { ok: false, reason: "That place is unavailable." };
+      if (!Object.hasOwn(ACTIVITY_STAGES, request.id) || !this.simulation.activityEnabled(request.id)) return { ok: false, reason: "That place is unavailable." };
       // Focus is a deliberately private room. Outdoor seated activities use real shared seats.
       const seats = { music: "bench-1", mood: "bench-4", birds: "bird-clearing-bench" };
       if (seats[request.id]) {
@@ -283,15 +389,17 @@ export class VillageWorld extends DurableObject {
     while (used.has(name)) name = names[Math.floor(Math.random() * names.length)];
     const slot = (this.ctx.storage.kv.get("nextSlot") || 0) + 1;
     this.ctx.storage.kv.put("nextSlot", slot);
-    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, ipHash, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0, crumbPouch: false, lastSeen: Date.now() };
+    const visitor = { id: crypto.randomUUID(), name, color: colorForSlot(slot), slot, ipHash, x: 0, z: 0, heading: 0, lastMove: 0, lastChat: 0, crumbPouch: false, forageInventory: { apples: 0, mushrooms: 0 }, lastSeen: Date.now() };
+    this.restoreInventory(visitor);
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment(visitor);
-    this.simulation.step(Date.now(), this.visitors());
+    this.advanceWorld(Date.now());
     send(server, {
       type: "welcome", selfId: visitor.id,
       protocol: 2, world: this.simulation.snapshot(Date.now()), hasCrumbs: visitor.crumbPouch,
-      visitors: this.visitors().map(({ id, name, color, slot, x, y, z, heading, swing, bench, activity }) => ({ id, name, color, slot, x, y, z, heading, swing: swing ?? null, bench: bench ?? null, activity: activity ?? null })),
+      forageInventory: visitor.forageInventory, inventoryToken: visitor.inventoryToken,
+      visitors: this.visitors().map(({ id, name, color, slot, x, y, z, heading, horse, swing, bench, activity }) => ({ id, name, color, slot, x, y, z, heading, horse: horse ?? null, swing: swing ?? null, bench: bench ?? null, activity: activity ?? null })),
       garden: this.garden, chatHour: this.chatHour, chat: this.chat,
       puppyTricks: [...this.puppyTricks.values()].filter(trick => Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000),
     });
@@ -306,14 +414,28 @@ export class VillageWorld extends DurableObject {
     try { message = JSON.parse(raw); }
     catch { return; }
     if (!message || typeof message !== "object") return;
-    const visitor = socket.deserializeAttachment();
+    let visitor = socket.deserializeAttachment();
     if (!visitor || visitor.kickedUntil || visitor.left) return;
     const now = Date.now();
     visitor.lastSeen = now;
+    if (message.type === "inventory_resume") {
+      if (typeof message.token === "string" && /^[0-9a-f-]{36}$/.test(message.token) && this.inventories.has(message.token)) {
+        const unusedToken = visitor.inventoryToken;
+        visitor.inventoryToken = message.token;
+        if (unusedToken !== message.token && unusedToken && !this.visitors().some(value => value.id !== visitor.id && value.inventoryToken === unusedToken)) this.inventories.delete(unusedToken);
+      }
+      this.restoreInventory(visitor); socket.serializeAttachment(visitor); this.saveInventory(visitor);
+      return;
+    }
     if (message.type === "heartbeat") {
       visitor.active = message.active === true;
+      if (visitor.horse && message.horse !== visitor.horse && now >= (visitor.reservationUntil ?? 0)) {
+        this.simulation.dismount(visitor, now, this.visitors(), true);
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+          horse: null, swing: null, bench: null, activity: null });
+      }
       visitor.holdingPuppy = validObjectId(message.holdingPuppy) ? message.holdingPuppy : null;
-      const seated = visitor.activity ? visitor.activity === message.activity
+      const seated = visitor.horse ? visitor.horse === message.horse : visitor.activity ? visitor.activity === message.activity
         : visitor.bench ? visitor.bench.id === message.bench?.id && visitor.bench.index === message.bench.index
         : visitor.swing ? visitor.swing.id === message.swing?.id && visitor.swing.index === message.swing.index : true;
       if (seated) visitor.reservationUntil = 0;
@@ -327,38 +449,64 @@ export class VillageWorld extends DurableObject {
       return;
     }
     if (message.type === "interaction" && typeof message.requestId === "string" && message.requestId.length <= 100) {
-      if (now - (visitor.lastInteraction || 0) < 80 && message.request?.kind !== "leave" && !["release", "home"].includes(message.request?.action)) {
+      if (now - (visitor.lastInteraction || 0) < 80 && message.request?.kind !== "leave" && !["release", "home", "dismount", "raceCancel"].includes(message.request?.action)) {
         send(socket, { type: "interaction_result", requestId: message.requestId, result: { ok: false, reason: "Give them a moment, then try again." } }); return;
       }
       visitor.lastInteraction = now;
       const pose = message.pose;
-      if (pose && [pose.x, pose.z, pose.heading].every(Number.isFinite) && (pose.y === undefined || Number.isFinite(pose.y))) {
-        visitor.x = Math.max(-160, Math.min(160, pose.x)); visitor.z = Math.max(-160, Math.min(160, pose.z));
+      if (!this.simulation.mountedHorse(visitor.id) && pose && [pose.x, pose.z, pose.heading].every(Number.isFinite) && (pose.y === undefined || Number.isFinite(pose.y))) {
+        visitor.x = Math.max(-320, Math.min(320, pose.x)); visitor.z = Math.max(-320, Math.min(320, pose.z));
         visitor.y = pose.y === undefined ? undefined : Math.max(-20, Math.min(40, pose.y));
         visitor.heading = Math.atan2(Math.sin(pose.heading), Math.cos(pose.heading)); visitor.active = pose.active !== false;
       }
-      this.simulation.step(now, this.visitors());
+      socket.serializeAttachment(visitor);
+      const released = this.advanceWorld(now);
+      visitor = socket.deserializeAttachment();
+      this.restoreInventory(visitor);
+      const privateTownAction = message.request?.kind === "town" && ["animalGift", "animalApple", "animalMushroom", "applePick", "gardenHarvest"].includes(message.request.action);
+      const beforeTown = privateTownAction ? this.simulation.town.snapshot() : null;
       visitor.requestingActivity = message.request?.kind === "activity";
       const result = this.interaction(visitor, message.request, now);
       delete visitor.requestingActivity;
-      if (result.ok && ["activity", "bench", "swing"].includes(message.request.kind)) visitor.reservationUntil = now + 4500;
+      if (result.ok && (["activity", "bench", "swing"].includes(message.request.kind) || message.request.kind === "horse" && message.request.action === "mount")) visitor.reservationUntil = now + 4500;
       socket.serializeAttachment(visitor);
       if (result.ok) {
+        if (message.request.kind === "town" && ["owlFood", "owlFeed"].includes(message.request.action))
+          send(socket, { type: "crumbs", hasCrumbs: visitor.crumbPouch });
+        try { this.publishWorld(now, privateTownAction ? visitor : undefined); }
+        catch (error) { if (beforeTown) Object.assign(this.simulation.town.state, beforeTown); throw error; }
         this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
-          swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
-        this.publishWorld(now);
-      }
+          horse: visitor.horse ?? null, swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
+      } else if (released) this.publishWorld(now);
       send(socket, { type: "interaction_result", requestId: message.requestId, result });
+      return;
+    }
+    if (message.type === "horseInput") {
+      // Advance with the previous accepted input before replacing it; new keys cannot affect past time.
+      socket.serializeAttachment(visitor);
+      const released = this.advanceWorld(now);
+      visitor = socket.deserializeAttachment();
+      if (this.simulation.horseInput(visitor, message, now)) {
+        const horse = this.simulation.mountedHorse(visitor.id);
+        if (horse) this.simulation.syncRider(visitor, horse);
+        visitor.reservationUntil = 0;
+        socket.serializeAttachment(visitor);
+        if (now - this.lastWorldTick >= 100) this.publishWorld(now);
+      } else if (released) this.publishWorld(now);
       return;
     }
     if (message.type === "move") {
       const now = Date.now();
+      if (this.simulation.mountedHorse(visitor.id)) {
+        if (message.activity !== "focus") return;
+        this.simulation.dismount(visitor, now, this.visitors(), true);
+      }
       if (now - visitor.lastMove < 80 || ![message.x, message.z, message.heading].every(Number.isFinite)
         || (message.y !== undefined && !Number.isFinite(message.y))) return;
       visitor.lastMove = now;
-      visitor.x = Math.max(-160, Math.min(160, message.x));
+      visitor.x = Math.max(-320, Math.min(320, message.x));
       visitor.y = message.y === undefined ? undefined : Math.max(-20, Math.min(40, message.y));
-      visitor.z = Math.max(-160, Math.min(160, message.z));
+      visitor.z = Math.max(-320, Math.min(320, message.z));
       visitor.heading = Math.atan2(Math.sin(message.heading), Math.cos(message.heading));
       if (message.activity === "focus") { visitor.activity = "focus"; visitor.bench = visitor.swing = null; }
       else if (!message.activity && visitor.activity === "focus") visitor.activity = null;
@@ -378,7 +526,7 @@ export class VillageWorld extends DurableObject {
       if (!message.bench && visitor.bench && !visitor.activity && now >= (visitor.reservationUntil ?? 0)) visitor.bench = null;
       socket.serializeAttachment(visitor);
       this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, swing: visitor.swing,
-        bench: visitor.bench ?? null, activity: visitor.activity ?? null }, socket);
+        horse: visitor.horse ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null }, socket);
     } else if (message.type === "puppy_trick") {
       const trick = message.trick, now = Date.now();
       if (!trick || !validObjectId(trick.id) || !Object.hasOwn(PUPPY_TRICK_SECONDS, trick.command)
@@ -426,7 +574,10 @@ export class VillageWorld extends DurableObject {
       if (!allowed) { send(socket, { type: "action_rejected", message: "Come closer, or wait until this interaction is free." }); return; }
       if ((action.kind === "feed" || action.kind === "feedBirds") && !visitor.crumbPouch) return;
       this.garden = growGarden(this.garden);
-      const availableGarden = { ...this.garden, crumbPouch: visitor.crumbPouch };
+      this.restoreInventory(visitor);
+      const privateInventory = inventoryValue(visitor.forageInventory);
+      const privateCrops = Object.fromEntries(PRIVATE_CROP_KEYS.map(key => [key, privateInventory[key]]));
+      const availableGarden = { ...this.garden, ...privateCrops, crumbPouch: visitor.crumbPouch };
       if (action.kind !== "feedBirds" && !gardenActionAllowed(availableGarden, action)) {
         send(socket, { type: "action_rejected", message: "That garden task has already changed. Try its current action." }); return;
       }
@@ -439,11 +590,17 @@ export class VillageWorld extends DurableObject {
         socket.serializeAttachment(visitor);
         send(socket, { type: "crumbs", hasCrumbs: true });
       }
-      this.garden = { ...gardenAction({ ...this.garden, crumbPouch: visitor.crumbPouch }, action), crumbPouch: false };
+      const nextGarden = gardenAction({ ...this.garden, ...privateCrops, crumbPouch: visitor.crumbPouch }, action);
+      // Beds are public; harvest and tea counters belong only to this browser's basket.
+      const sharedGarden = { ...nextGarden, ...Object.fromEntries(PRIVATE_CROP_KEYS.map(key => [key, this.garden[key]])), crumbPouch: false };
+      if (["harvest", "gift", "drink"].includes(action.kind)) {
+        visitor.forageInventory = inventoryValue({ ...privateInventory, ...Object.fromEntries(PRIVATE_CROP_KEYS.map(key => [key, nextGarden[key]])) });
+        this.persistResources(visitor, () => this.putIfChanged("garden", sharedGarden));
+      } else this.putIfChanged("garden", sharedGarden);
+      this.garden = sharedGarden;
       if (action.kind === "feed") this.simulation.pondFeedAt = now;
       if (action.kind === "gift") this.simulation.gift = { crop: action.crop, at: now };
       this.simulation.gardenMoment(visitor, action, now);
-      this.putIfChanged("garden", this.garden);
       this.broadcast({ type: "garden", garden: this.garden, event: { action, actor: visitor.id, x: visitor.x, z: visitor.z } });
       if (["feedBirds", "feed", "gift", "crumbs", "birdCrumbs", "water", "flowers", "drink"].includes(action.kind)) this.publishWorld(now);
     } else if (message.type === "chat" && typeof message.message === "string") {

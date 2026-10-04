@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "All four placed dogs use native skins, head contact bones and ten independent clips",
+    "Both shared horses use the native skin and exported saddle bone"
+  ],
+  "errors": []
+}

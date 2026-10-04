@@ -1,0 +1,470 @@
+{
+  "status": "passed",
+  "checks": [
+    "Town category exposes the horse circuit on the asset shelf",
+    "Town category exposes existing circuit, stable, roost and farm rows in the Scene list",
+    "horse-racetrack retains its catalog identity",
+    "horse-racetrack has a nonempty rendered preview",
+    "horse-racetrack placement target is in the real canvas",
+    "horse-racetrack can be placed and selected from its shelf card",
+    "horse-racetrack supports real position, Y rotation and uniform scale controls",
+    "horse-racetrack can be reselected from the Scene list",
+    "horse-stable retains its catalog identity",
+    "horse-stable has a nonempty rendered preview",
+    "horse-stable placement target is in the real canvas",
+    "horse-stable can be placed and selected from its shelf card",
+    "horse-stable supports real position, Y rotation and uniform scale controls",
+    "horse-stable can be reselected from the Scene list",
+    "farm-row retains its catalog identity",
+    "farm-row has a nonempty rendered preview",
+    "farm-row placement target is in the real canvas",
+    "farm-row can be placed and selected from its shelf card",
+    "farm-row supports real position, Y rotation and uniform scale controls",
+    "farm-row can be reselected from the Scene list",
+    "owl-feeding-perch retains its catalog identity",
+    "owl-feeding-perch has a nonempty rendered preview",
+    "owl-feeding-perch placement target is in the real canvas",
+    "owl-feeding-perch can be placed and selected from its shelf card",
+    "owl-feeding-perch supports real position, Y rotation and uniform scale controls",
+    "owl-feeding-perch can be reselected from the Scene list",
+    "hay-bale retains its catalog identity",
+    "hay-bale has a nonempty rendered preview",
+    "hay-bale placement target is in the real canvas",
+    "hay-bale can be placed and selected from its shelf card",
+    "hay-bale supports real position, Y rotation and uniform scale controls",
+    "hay-bale can be reselected from the Scene list",
+    "owl-brown retains its catalog identity",
+    "owl-brown has a nonempty rendered preview",
+    "owl-brown placement target is in the real canvas",
+    "owl-brown can be placed and selected from its shelf card",
+    "owl-brown supports real position, Y rotation and uniform scale controls",
+    "owl-brown can be reselected from the Scene list",
+    "cow-highland retains its catalog identity",
+    "cow-highland has a nonempty rendered preview",
+    "cow-highland placement target is in the real canvas",
+    "cow-highland can be placed and selected from its shelf card",
+    "cow-highland supports real position, Y rotation and uniform scale controls",
+    "cow-highland can be reselected from the Scene list",
+    "sheep retains its catalog identity",
+    "sheep has a nonempty rendered preview",
+    "sheep placement target is in the real canvas",
+    "sheep can be placed and selected from its shelf card",
+    "sheep supports real position, Y rotation and uniform scale controls",
+    "sheep can be reselected from the Scene list",
+    "lamb retains its catalog identity",
+    "lamb has a nonempty rendered preview",
+    "lamb placement target is in the real canvas",
+    "lamb can be placed and selected from its shelf card",
+    "lamb supports real position, Y rotation and uniform scale controls",
+    "lamb can be reselected from the Scene list",
+    "hedgehog retains its catalog identity",
+    "hedgehog has a nonempty rendered preview",
+    "hedgehog placement target is in the real canvas",
+    "hedgehog can be placed and selected from its shelf card",
+    "hedgehog supports real position, Y rotation and uniform scale controls",
+    "hedgehog can be reselected from the Scene list",
+    "garden-fish retains its catalog identity",
+    "garden-fish has a nonempty rendered preview",
+    "garden-fish placement target is in the real canvas",
+    "garden-fish can be placed and selected from its shelf card",
+    "garden-fish supports real position, Y rotation and uniform scale controls",
+    "garden-fish can be reselected from the Scene list",
+    "Real GLTF loader exposes every animal root, head joint and bounded render mesh count",
+    "Lamb authoring template is 0.63 times the sheep height",
+    "Editable lamb pivot preserves authored size under rotation and scaling",
+    "horse-racetrack identity and transform survive named file save",
+    "horse-stable identity and transform survive named file save",
+    "farm-row identity and transform survive named file save",
+    "owl-feeding-perch identity and transform survive named file save",
+    "hay-bale identity and transform survive named file save",
+    "owl-brown identity and transform survive named file save",
+    "cow-highland identity and transform survive named file save",
+    "sheep identity and transform survive named file save",
+    "lamb identity and transform survive named file save",
+    "hedgehog identity and transform survive named file save",
+    "garden-fish identity and transform survive named file save",
+    "The complete working-copy layout survives an actual browser reload",
+    "Interactive farms refuse tilt with visible upright guidance",
+    "Unsupported tilt shows clear guidance",
+    "Decorative hay keeps full rotation controls",
+    "horse-racetrack server save rejects unsupported tilt",
+    "horse-stable server save rejects unsupported tilt",
+    "farm-row server save rejects unsupported tilt",
+    "owl-feeding-perch server save rejects unsupported tilt",
+    "owl-brown server save rejects unsupported tilt",
+    "cow-highland server save rejects unsupported tilt",
+    "sheep server save rejects unsupported tilt",
+    "lamb server save rejects unsupported tilt",
+    "hedgehog server save rejects unsupported tilt",
+    "Asset-only working copy saves exact layout data after upright guidance",
+    "Asset-only working copy survives actual browser reload",
+    "Apply accepts all eleven new assets in the isolated playable file",
+    "Town shelf remains visible at 1280\u00d7800",
+    "Town shelf remains visible at 1024\u00d7700",
+    "Five named designs and both protected presets remain byte-identical",
+    "No application page errors in remaining browser checks"
+  ],
+  "errors": [],
+  "assets": [
+    {
+      "id": "horse-racetrack",
+      "name": "Willow circuit \u00b7 horse racetrack",
+      "previewPixels": 2365,
+      "position": [
+        120,
+        5,
+        120
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "horse-stable",
+      "name": "Horse stable \u00b7 two feeding bays",
+      "previewPixels": 10589,
+      "position": [
+        126,
+        5,
+        123
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "farm-row",
+      "name": "Farm planting row \u00b7 16 m",
+      "previewPixels": 817,
+      "position": [
+        132,
+        5,
+        126
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "owl-feeding-perch",
+      "name": "Owl roost & feeding tray",
+      "previewPixels": 3617,
+      "position": [
+        138,
+        5,
+        129
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "hay-bale",
+      "name": "Golden hay bale",
+      "previewPixels": 17738,
+      "position": [
+        144,
+        5,
+        132
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "owl-brown",
+      "name": "Tawny woodland owl",
+      "previewPixels": 6144,
+      "position": [
+        150,
+        5,
+        135
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "cow-highland",
+      "name": "Soft Highland cow",
+      "previewPixels": 7726,
+      "position": [
+        156,
+        5,
+        138
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "sheep",
+      "name": "Cloud-soft sheep",
+      "previewPixels": 7502,
+      "position": [
+        160,
+        5,
+        130
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "lamb",
+      "name": "Little meadow lamb",
+      "previewPixels": 7439,
+      "position": [
+        162,
+        5,
+        130
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "hedgehog",
+      "name": "Little garden hedgehog",
+      "previewPixels": 5994,
+      "position": [
+        174,
+        5,
+        147
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "id": "garden-fish",
+      "name": "Fish",
+      "previewPixels": 3819,
+      "position": [
+        180,
+        5,
+        150
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    }
+  ],
+  "placed": {
+    "horse-racetrack": "object-011d199d-023c-4119-ad70-7944a341168c",
+    "horse-stable": "object-37438da8-e769-4086-8db1-5856fe6ee055",
+    "farm-row": "object-cc441de7-42c1-4439-8322-791f56aef7b8",
+    "owl-feeding-perch": "object-5af85637-cc7f-4a37-bf17-a27c96944fe1",
+    "hay-bale": "object-cbf460f9-4381-4d55-bca6-6f173250de73",
+    "owl-brown": "object-33fcdba9-5beb-4833-81ac-c0e7a320c04e",
+    "cow-highland": "object-0cb99379-556b-42a3-a918-d646fd47e0c4",
+    "sheep": "object-8e0dd389-b88c-4e89-abe5-75a993a181b4",
+    "lamb": "object-58be8afe-bf0e-4413-86c7-a3ba06386034",
+    "hedgehog": "object-e29b6c23-161f-4379-941b-59e4d33d7451",
+    "garden-fish": "object-034565f5-8f03-4593-9d6b-7ee0f2f1b73a"
+  },
+  "fileId": "layout-e42f5231-2b49-461b-bfe0-b8fdb5983e5c",
+  "protectedBefore": {
+    "public/village/world-layout.json": "016eb657d8f4c483354e07fb1f202f3ffd3d2f02dd8b06de8b9d49501240e38c",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "protectedAfter": {
+    "public/village/world-layout.json": "016eb657d8f4c483354e07fb1f202f3ffd3d2f02dd8b06de8b9d49501240e38c",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "reusedChecks": 98,
+  "baselineApplyRefusal": "pip waypoint 10 is blocked. Move it to clear ground or enlarge the walkable area.",
+  "fixtureScope": "Isolated working copy omits resident routes; canonical route correction and Apply are verified separately by the parent task.",
+  "serverTests": {
+    "status": "passed",
+    "count": 12
+  },
+  "browser": "Chrome headless",
+  "editorUrl": "http://127.0.0.1:3049",
+  "checkedAt": "2026-10-03T20:58:48.915Z",
+  "models": {
+    "cow-highland": {
+      "root": "CowHighland",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 1.9810798254159891,
+      "transformedHeight": 2.3772957904991863,
+      "meshes": 8,
+      "head": true
+    },
+    "sheep": {
+      "root": "Sheep",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 1.1450001195110389,
+      "transformedHeight": 1.3740001434132472,
+      "meshes": 8,
+      "head": true
+    },
+    "lamb": {
+      "root": "Lamb",
+      "sourceScale": [
+        0.6299999952316284,
+        0.6299999952316284,
+        0.6299999952316284
+      ],
+      "height": 0.7213500208657603,
+      "transformedHeight": 0.865620025038913,
+      "meshes": 8,
+      "head": true
+    },
+    "hedgehog": {
+      "root": "Hedgehog",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 0.47239118046802986,
+      "transformedHeight": 0.5668694165616364,
+      "meshes": 8,
+      "head": true
+    },
+    "owl-brown": {
+      "root": "OwlBrown",
+      "sourceScale": [
+        1,
+        1,
+        1
+      ],
+      "height": 0.8837433248512401,
+      "transformedHeight": 1.0604919898214877,
+      "meshes": 5,
+      "head": true
+    }
+  },
+  "namedLayoutHashes": {
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "sourceActiveHashAtCompletion": "ae0d8da0fd334ed1f9fcb5e8768d9bfd8e675c1d231807cc2fb17831742d9f9a",
+  "sourceActiveChange": "Parent layout agent corrected Pip route after the initial asset checks; this QA never writes the source playable file.",
+  "viewportRenderedPreviews": true,
+  "stages": [
+    {
+      "name": "shelf, actual transforms, model identity and named save/reload",
+      "checks": 83,
+      "status": "passed"
+    },
+    {
+      "name": "upright UI/server validation, exact asset-only save/reload/Apply",
+      "checks": 15,
+      "status": "passed"
+    },
+    {
+      "name": "rendered Town shelf at two laptop sizes and protected files/page errors",
+      "checks": 4,
+      "status": "passed"
+    }
+  ],
+  "limits": [
+    "Canonical route Apply is verified separately by the parent task after Pip route correction.",
+    "The isolated asset Apply fixture omits resident routes.",
+    "No physical laptop, Safari/Firefox, shared Worker or deployment verification in this check."
+  ]
+}

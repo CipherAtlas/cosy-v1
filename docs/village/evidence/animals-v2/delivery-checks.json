@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-04",
+  "scope": "local static unrigged animal art",
+  "models": 17,
+  "totalGLBBytes": 4927260,
+  "glbAssertions": 358,
+  "chromeEditorAssertions": 44,
+  "serverTests": 13,
+  "checks": [
+    "npm test",
+    "npm run build (22 static pages, lint/type validation)",
+    "npm run typecheck",
+    "npm run check:export",
+    "python3 -m py_compile scripts/village/animal_art.py"
+  ],
+  "productionExportGLBsMatchSource": true,
+  "protectedFileCount": 8,
+  "protectedFilesUnchanged": true,
+  "blenderSourceSha256": "68bb9eb0567d2c99dcfdf5cb450fa8af1e0319192240156f0c5425745cb89205",
+  "limits": [
+    "No deformation rig or animation clips",
+    "Existing gameplay skins unchanged",
+    "No Safari/Firefox or physical-device review",
+    "No Git writes or deployment"
+  ],
+  "reusedAcrossFinalGeometryReduction": [
+    "Application typecheck",
+    "Existing village contracts",
+    "13 Python server API tests"
+  ],
+  "finalGeometryChecksRerun": [
+    "358 GLB binary assertions",
+    "44 Chrome editor assertions",
+    "Production build",
+    "17 exported GLB byte comparisons",
+    "Export privacy",
+    "Python authoring syntax"
+  ]
+}

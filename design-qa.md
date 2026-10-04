@@ -4,6 +4,40 @@ final result: blocked
 
 This verdict concerns the approved art and full-experience acceptance. Publishing the current release does not close those findings.
 
+## 2026-10-04 local path and water planting polish
+
+The focused [path/water evidence](docs/village/evidence/path-water-foliage-20261004/README.md) retains the complete initial walk, intermediate failures, corrections and final local views. The historical full-art verdict above remains separate.
+
+| Visual pass | Enjoyable? | Pretty enough? | Big and healthy? | Inviting to stay? | Corrections and result |
+| --- | --- | --- | --- | --- | --- |
+| Initial complete path/water walk | Routes connect, but planting obscured some paving | Grass, shrubs, reeds and trunks interrupted several edges | The town is green; clear routes/water needed polish | Pond and bridge approaches needed clearer footing | Reviewed 109 pictures across all 39 authored paths/nine native ribbons; relocated seven trunks/two shrubs, cleared whole plant and wind footprints, border flowers and bank stones |
+| Intermediate actual geometry and water views | Clearances improved but some batched paving was missed | Lost surface tags still allowed grass through old lanes | Water plants needed deliberate near-bank colonies | Pond walkway needed free space | Preserved paving markers through batching, retained shore growth with paving-only masks and clustered fourteen original lilies; fixed the local shared build endpoint |
+| Final normal shared-game walks and water views | Readable paths; six real bridge crossings passed | Clear paving, dry bank trunks and three natural lily colonies | Continuous green verges, planted farms and lively clear water | Benches, garden, stable and shore remain calm connected destinations | 58 walking/bridge/default-camera pictures plus eight water pictures verified the plant masks; a later close-up caught a willow base on path 4. A 2.1 m verge move and seven supplemental views confirm its base is clear of paving/water; all four questions pass. 122,177 actual plant locations have zero paving/water footprint contacts |
+| Final normal editor pond views | The enlarged pond and route are easy to read | Original reeds/irises/daisies and near-bank lilies complement water | Fourteen lilies and 78 shore plants follow the saved pond | Open dock and visible benches invite pauses | Corrected editor pond mapping; sixteen transformed planting/undo regressions and nine canonical read-only comparisons pass, with no draft/Save/Apply writes |
+
+These are local visual judgments at laptop dimensions. Game and editor have 77 and 78 surviving shoreline plants respectively; both clear their actual paving. Hanging willow canopy can enter the frame. Physical GPU cost, Safari/Firefox, crowded/long sessions and deployed appearance remain unverified.
+
+## 2026-10-04 local town expansion
+
+The expanded town is reviewed separately from the historical full-art verdict above. Original Blender portraits, native walking/district views, laptop-sized controls and actual shared interactions are retained in [town evidence](docs/village/evidence/town-expansion-20261004/README.md). Each pass asks the user’s four questions; the judgments below describe the inspected local pictures.
+
+| Visual pass | Enjoyable? | Pretty enough? | Big and healthy? | Inviting to stay? | Corrections and result |
+| --- | --- | --- | --- | --- | --- |
+| Blender animal portraits | Friendly readable faces | Initial cow fringe/quills needed polish | Soft cow/fleece silhouettes | Expressions needed gentler appeal | Refined tapered locks, visible front/side eyes, closed quills and small ear flower; inspected every final animal and forage portrait |
+| First town walk | Connected quiet/active destinations | Pond/pasture appealed; stable flag looked detached | Fourteen homes and three planted fields read as expansion | Variety encourages exploration | Moved flag beside stable entrance and improved the petting reach |
+| Real petting/farm/owl/hay/race controls | Accepted ownership, feeding and full keyboard lap work | Small animals initially hid behind the spirit | Crops, grazing and stable stay legible | Activities give reasons to revisit | Side/diagonal framing and restored poses; compact controls checked at 1366×768, 1280×720 and 1024×640 with real keycaps/44px targets |
+| Continuous meadow district walks | All 39 lanes connect usable destinations | Bare farm aisles/infield spoiled the green town | Larger town needed continuous planting | Brook bridges/garden/pasture provide quiet stops | Hid five redundant broad erasers, preserved exact soil/tread masks, verified 22 district/overview/quality captures with clear walking endpoints |
+| Detailed/battery/minimal meadow views | Routes readable at every tier | Whole southern flower districts initially vanished when thinned | North/south/pasture now all retain flowers | Lower quality still feels planted | Split flower parts into 18 m cells; actual populations and brook/pasture/stable screenshots confirm distributed thinning |
+| Enlarged pond families and supper | Families swim together and feeding is clear | Swans/ducklings/fish, willows and flower banks complement the water | Fifteen birds/eight fish fill the larger pond | Gentle loops, head dips and happy hearts invite lingering | Spaced meal targets remain in water; 12 actual two-client checks cover shared motion/feeding/reduced motion; narrowed bank grass margin |
+| Blender forage props and flower cow | Gifts connect garden and grazing field | Side eyes, flower, apple leaf and mushroom flecks needed fine polish | Orchard and mushroom patch fit the kitchen garden | Carry-and-return behavior adds a small surprise | Final portraits and 53 editor checks verify original roots, proportions, previews and placement support |
+| Hedgehog gift and cow-meal camera follow-up | Shared collection and meals work | Early camera hit canopy/cottage; close feeder could hide the apple | Green garden/pasture remain visible | Face, gift and happy Moo reaction must be visible | Camera tests both sides/diagonals against solids/canopy; final natural 2.2 m feeding stance shows the apple/flower/eye/full Moo clearly in normal and reduced motion; 36 real two-client checks passed |
+
+The final flower-library pass found the full 48 m thumbnail almost blank. A closer cloned 24-flower cluster now shows original colored heads/stems at 1280/1024 widths; actual template matrices/counts/colors/bounds and placement stay exact. All four questions remain positive because this makes the editor understandable while preserving the healthy world planting. Eight read-only checks and fresh typecheck passed.
+
+Final read-only normal-editor and exported-game shore views show grass/flowers reaching the pond/brook margins with clear water, and visible meadow library previews. No API writes or protected-file changes occurred. The close-up gift/cow views answer all four questions positively: readable actions, clear friendly faces/props, planted garden/pasture, and a pleasant visible reaction. At an unusually close 1.55 m cow stance the feeder can cover the apple; nearby observer avatars can cover part of the lower body. Final natural feeding and smaller-window views remain readable.
+
+These are local visual judgments, separate from user approval, physical GPU measurements or deployed results. Final fences, route geometry, real race controls and canonical editor Apply passed. [The build ledger](VILLAGE_BUILD.md#2026-10-04--town-expansion-local) records exact passing checks, reused evidence and physical-device/browser/live limits.
+
 ## 2026-09-27 local layout studio
 
 The private studio uses the village's actual 3D assets in an ivory/green workspace with rendered library thumbnails, a large canvas, compact transform toolbar and precise inspector. Inspected the village overview, cottage gizmo, four-preset chooser, new bird clearing, tablet and phone layouts. Forty browser assertions pass, including real pointer manipulation, local saving/reload, copy-only presets and visible preview exits. [Images and scope](docs/village/evidence/layout-studio/README.md).

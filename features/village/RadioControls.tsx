@@ -56,6 +56,6 @@ export function SoundPanel({ track, station, mode, loading, error, selectStation
       <h3>{ja ? "音量" : "Volume"}</h3>
       <MixSliders mix={mix} setMix={setMix} language={language} extended />
     </section>
-    <p className="v-radio-source">{ja ? "ラジオの曲は Audius のアーティストから配信されています。選択と音量は、このブラウザだけに保存されます。" : "Radio music streams from artists on Audius. Your station and volumes stay in this browser."}</p>
+    <p className="v-radio-source">{ja ? "音楽：Audius のアーティスト。" : "Music: Audius artists."}</p>
   </div>;
 }

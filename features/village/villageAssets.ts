@@ -1,7 +1,7 @@
 import * as T from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { withBasePath } from "@/lib/basePath";
 import { projectWorldLayout, type AuthoredWorld } from "./worldLayout";
+import { loadAnimalRigs, type AnimalRigSlug } from "./animalRig";
 
 export async function loadVillageLayout(): Promise<AuthoredWorld> {
   const response = await fetch(withBasePath("/village/world-layout.json"));
@@ -12,12 +12,10 @@ export async function loadVillageLayout(): Promise<AuthoredWorld> {
 /** Only placed breeds join the entry barrier; the editor retains the complete source kit. */
 export async function loadPlacedPuppies(layout: AuthoredWorld) {
   const breeds = [...new Set(layout.puppies.map(puppy => puppy.breed))];
-  const kits = await Promise.all(breeds.map(breed => new GLTFLoader().loadAsync(
-    withBasePath(`/village/models/puppies/${breed}.glb?v=1`),
-  )));
-  const scene = new T.Group();
-  for (const kit of kits) scene.add(...kit.scene.children);
-  return { scene, animations: kits.flatMap(kit => kit.animations) };
+  await loadAnimalRigs(breeds.map(breed => `dog-${breed}` as AnimalRigSlug));
+  // PuppyPack creates independent cached skeletons per placement. Keep the
+  // existing kit shape for source-only previews that supply their own models.
+  return { scene: new T.Group(), animations: [] as T.AnimationClip[] };
 }
 
 export function disposeModel(root: T.Object3D) {

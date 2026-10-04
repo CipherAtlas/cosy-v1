@@ -1,0 +1,9 @@
+{
+  "sky": {
+    "visible": true,
+    "shader": true
+  },
+  "errors": [],
+  "exportSmoke": true,
+  "sharedInteractionTest": false
+}

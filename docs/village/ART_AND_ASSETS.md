@@ -1,5 +1,31 @@
 # Art direction, lighting, and asset production
 
+## Detailed rendering budgets — 2026-10-04 local
+
+Runtime architecture keeps its original triangles/materials in independently culled material batches. Ground and garden meshes receive bounded simplification using Three's bundled meshoptimizer; original vertex normals, UVs/colors and borders are retained. Nearby grass stays fully curved; distant cells retain their three blade silhouettes, density, color and wind with fewer segments. Detailed keeps 2048 px moving shadows with a nine-sample weighted PCF filter at the same radius. The local editor still edits the full authored geometry and saved transforms. [Measurements and limits](../../VILLAGE_BUILD.md#2026-10-04--detailed-rendering-budgets-local).
+
+Native runtime/editor catalogs use the four original non-replaced roots in `farm-props.glb` (763,128 bytes), with byte-identical buffers extracted from `farm-animals.glb`. Regenerate/check with `python3 scripts/village/split_farm_props.py` / `--check` after changing that source. Existing asset IDs, previews, skeletons, colliders and placements remain compatible; the original kit serves layouts lacking native replacements.
+
+
+## Cohesive animal art set — 2026-10-04 local
+
+[Animal art catalog](ANIMAL_ART.md) contains seventeen original skinned GLBs across horses, Highland cows, six dogs, sheep/lamb, cat, swan, owl and duck/duckling. Separate editable art and rig studios preserve the approved geometry, colors, UV charts and native bounds. Each model has two opaque PBR skin draws, metre scale and a ground origin (+Z forward/Y-up in glTF). Native clips now drive the active actors, while accepted Worker poses, ownership and action clocks stay authoritative. The local **Animals** and **Puppies** shelves use independent skeletal clones with previews and saved placement. [Manifest](animals-v2-manifest.json) records bones, clip durations, skin/deformation probes, budgets and hashes. No purchased assets, new dependencies or publication.
+
+## 2026-10-04 animal and town revision (local)
+
+The original farm/pond models now have distance-driven leg cadence, damped heading/body movement, fuller pet nuzzles/hand strokes, three rising hearts and species speech sprites. Original synthesized spatial moo, bleat, snuffle and hoot calls use the activated effects bus with distance/voice limits. Owls have staggered woodland flights and accepted tray-meal hearts with “Hoot Hoot <3”; reduced motion keeps still visible feedback. Pond birds face the shared route tangent, including feeding approach/departure. The unwanted fixed dock bread pouch is removed from the scene; its reusable source remains.
+
+The original Blender circuit stripe/posts/colliders move to the stable-side southern start. The current playable working layout keeps its protected defaults/named designs, adds a second pasture swing and moves lamp bases, Bramble and mushrooms onto measured grass. Transformed pond banks conform below the original river at overlaps in both runtime/editor, restoring the visible blue channel. Editor asset registrations/transforms and save compatibility remain shared with the runtime; owl flight/animal actions are live game state rather than editor-preview simulation. [Checks and limits](../../VILLAGE_BUILD.md#2026-10-04--town-interaction-and-layout-revision-local).
+
+
+## Town animals and equestrian kit — 2026-10-04 local
+
+The [path/water polish](../../VILLAGE_BUILD.md#2026-10-04--path-and-water-planting-polish-local) reuses the existing original grass, flowers, shrubs and pond kit. Fourteen lilies form three irregular near-bank colonies; shore plants avoid paving and follow saved pond transforms in the editor. Flower-border/source assets and saved identities remain compatible; no new model, texture or dependency is introduced by this pass.
+
+`create_farm_animals.py` authors the original Highland cow, sheep, smaller lamb, hedgehog, tawny owl and owl feeding perch in Blender 5.2.1 LTS. Rounded shag/fleece/quills, expressive glossy eyes and named articulated joints are exported as painted vertex-color GLB meshes. `create_town_kit.py` authors the oval circuit, two-bay sage-roofed stable, sixteen-metre soil row and golden hay bale. Editable `.blend` sources live in `assets/village`; runtime GLBs in `public/village/models`; [animal manifest](farm-animals-manifest.json) and [town manifest](town-kit-manifest.json) record roots, hashes and budgets. The lamb retains its 0.63 native scale inside an editable neutral pivot. Both Highland variants, the rosy forage apple and chestnut mushroom also have original Blender roots. Honey’s small pink flower sits behind one ear; the boy keeps his shag, and both front and side portraits expose glossy eyes. Orchard/mushroom scenery instances those Blender props. Every addition and the existing fish model have local editor previews and saved placement support. The shared meadow grass/wildflower templates use native 48 m footprints; runtime cells distribute quality thinning across all districts.
+
+Blender portraits were inspected and the cow fringe/hedgehog quills refined before integration. Runtime scene review then moved the south circuit flag beside the stable approach to remove an apparent floating panel. [Animal lineup](evidence/farm-animals-blender.png), individual portraits and [town asset/in-game captures](evidence/town-expansion-20261004/) retain evidence. The wider town reuses existing original cottages, trees, grass, fencing, bridges, crop and pond-life artwork. No purchased/downloaded assets or new dependencies. [Behavior, checks and limits](../../VILLAGE_BUILD.md#2026-10-04--town-expansion-local).
+
 The cottage cat/furnishings, four-dog layout and larger bird bowl/circuits are published in the [2026-10-01 integrated release](../../VILLAGE_BUILD.md#2026-10-01--integrated-village-release-published). The earlier local evidence below describes asset production; the release record separates current source, editor and live verification.
 
 ## Kind note and envelope (published)
@@ -171,7 +197,7 @@ Current implementation: procedural cloud sky, HDR-derived indirect lighting, a d
 6. **Tune subtle effects last.** Bloom, contact shadows, ambient occlusion, volumetric-looking shafts and depth of field are optional tools, not substitutes for good assets. Keep navigation sharp; avoid permanent heavy blur and washed-out highlights.
 7. **Treat weather as authored lighting states.** Golden, dusk and rain need coordinated sky, sun, exposure, fog, practicals, water and audio. Transitions should be smooth. Rain must not be only falling lines over unchanged sunny lighting.
 
-Shadow refresh is bounded to 10 Hz in detailed mode and about 5.6 Hz in low mode; foliage depth shaders use the shared gust deformation. Profile the refresh frames as well as ordinary frames when refining dynamic shadows. Separate static/dynamic casters or another measured approach may help; do not leave frozen shadows on visibly moving trees or redraw every expensive light without measuring.
+Detailed sun shadows refresh every rendered frame. Gentle on battery retains a 32 ms idle refresh interval but refreshes every moving, airborne or riding frame to avoid stale shading on the blob. Its shadow map remains 1024 square; the adaptive minimum tier disables live shadows. Foliage depth shaders use the shared gust deformation. Profile the refresh frames as well as ordinary frames when refining dynamic shadows. Separate static/dynamic casters or another measured approach may help; do not leave frozen shadows on visibly moving trees or redraw every expensive light without measuring.
 
 ### Lighting evidence
 

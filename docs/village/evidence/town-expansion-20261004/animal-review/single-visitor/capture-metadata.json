@@ -1,0 +1,392 @@
+{
+  "checkedAt": "2026-10-03T21:20:04.328Z",
+  "url": "http://127.0.0.1:3051/?sharedTrial=1",
+  "captures": [
+    {
+      "name": "hedgehog-1-grazing",
+      "id": "hedgehog-1",
+      "state": {
+        "id": "hedgehog-1",
+        "species": "hedgehog",
+        "x": 29.08708917910251,
+        "y": 0,
+        "z": -4.7763065144708055,
+        "heading": 1.6714478566829605,
+        "owner": null,
+        "mode": "graze",
+        "startedAt": 1791062308192,
+        "until": 0
+      },
+      "bodyScreen": {
+        "x": 735.5223757847266,
+        "y": 495.7294121861322
+      },
+      "headScreen": {
+        "x": 755.4106960606706,
+        "y": 473.45063935479646
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": null,
+      "player": {
+        "x": 29.071389187031855,
+        "y": 0,
+        "z": -3.5084866344168395,
+        "bodyY": 0.5885134231884611,
+        "bodyPitch": 0,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": 0,
+            "z": -0.12481334136017681
+          },
+          {
+            "name": "SpiritFinR",
+            "x": 0,
+            "z": 0.12481334136017679
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 168,
+      "triangles": 2135712
+    },
+    {
+      "name": "hedgehog-1-pet-1366",
+      "id": "hedgehog-1",
+      "state": {
+        "id": "hedgehog-1",
+        "species": "hedgehog",
+        "x": 29.145049243194613,
+        "y": 0,
+        "z": -4.752931509243418,
+        "heading": -0.05912211401233943,
+        "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+        "mode": "pet",
+        "startedAt": 1791062411024,
+        "until": 1791062417024
+      },
+      "bodyScreen": {
+        "x": 777.1342642943208,
+        "y": 499.96128624978394
+      },
+      "headScreen": {
+        "x": 753.8442768523494,
+        "y": 473.42231179120324
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": 1.134,
+      "player": {
+        "x": 29.071389187031855,
+        "y": 0,
+        "z": -3.5084866344168395,
+        "bodyY": 0.32,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.17914913844983518
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.17914913844983518
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 370,
+      "triangles": 3280150
+    },
+    {
+      "name": "hedgehog-1-pet-1024",
+      "id": "hedgehog-1",
+      "state": {
+        "id": "hedgehog-1",
+        "species": "hedgehog",
+        "x": 29.145049243194613,
+        "y": 0,
+        "z": -4.752931509243418,
+        "heading": -0.05912211401233943,
+        "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+        "mode": "pet",
+        "startedAt": 1791062411024,
+        "until": 1791062417024
+      },
+      "bodyScreen": {
+        "x": 590.4364313109808,
+        "y": 416.6316674876438
+      },
+      "headScreen": {
+        "x": 571.0218409042844,
+        "y": 394.5109091632521
+      },
+      "viewport": [
+        1024,
+        640
+      ],
+      "petAge": 1.939,
+      "player": {
+        "x": 29.071389187031855,
+        "y": 0,
+        "z": -3.5084866344168395,
+        "bodyY": 0.32,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.19167285965041486
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.19167285965041486
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 246,
+      "triangles": 2174684
+    },
+    {
+      "name": "hedgehog-1-pet-reduced",
+      "id": "hedgehog-1",
+      "state": {
+        "id": "hedgehog-1",
+        "species": "hedgehog",
+        "x": 29.14526562645631,
+        "y": 0,
+        "z": -4.752722015385618,
+        "heading": -0.059305344771729517,
+        "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+        "mode": "pet",
+        "startedAt": 1791062417104,
+        "until": 1791062423104
+      },
+      "bodyScreen": {
+        "x": 733.0105147013919,
+        "y": 500.3163272342371
+      },
+      "headScreen": {
+        "x": 727.5948962996501,
+        "y": 483.7451639118482
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": 0.77,
+      "player": {
+        "x": 29.071389187031855,
+        "y": 0,
+        "z": -3.5084866344168395,
+        "bodyY": 0.32,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.2
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.2
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 171,
+      "triangles": 2132596
+    },
+    {
+      "name": "cow-highland-2-grazing",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.505469931310074,
+        "y": 1.377579683696931,
+        "z": 62.12011980705671,
+        "heading": -2.791244567852675,
+        "owner": null,
+        "mode": "graze",
+        "startedAt": 0,
+        "until": 0
+      },
+      "bodyScreen": {
+        "x": 633.3333147971888,
+        "y": 728.2323943347104
+      },
+      "headScreen": {
+        "x": 630.4297485067193,
+        "y": 436.3229897439218
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": null,
+      "player": {
+        "x": -41.061112478452465,
+        "y": 1.433939002520863,
+        "z": 60.820272371713,
+        "bodyY": 0.68491260391452,
+        "bodyPitch": 0,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": 0,
+            "z": -0.06879437703003696
+          },
+          {
+            "name": "SpiritFinR",
+            "x": 0,
+            "z": 0.06879437703003695
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 266,
+      "triangles": 2183998
+    },
+    {
+      "name": "cow-highland-2-pet-1366",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.54615023108408,
+        "y": 1.385001946183583,
+        "z": 62.0018598171607,
+        "heading": -2.7305911835268306,
+        "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+        "mode": "pet",
+        "startedAt": 1791062419457,
+        "until": 1791062425457
+      },
+      "bodyScreen": {
+        "x": 779.8230918514254,
+        "y": 506.3748888390503
+      },
+      "headScreen": {
+        "x": 663.5895386934534,
+        "y": 306.7016959843297
+      },
+      "viewport": [
+        1366,
+        768
+      ],
+      "petAge": 1.118,
+      "player": {
+        "x": -41.061112478452465,
+        "y": 1.433939002520863,
+        "z": 60.820272371713,
+        "bodyY": 0.62,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.17683783807524373
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.17683783807524373
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 282,
+      "triangles": 4066292
+    },
+    {
+      "name": "cow-highland-2-pet-1024",
+      "id": "cow-highland-2",
+      "state": {
+        "id": "cow-highland-2",
+        "species": "cow",
+        "x": -40.54615023108408,
+        "y": 1.385001946183583,
+        "z": 62.0018598171607,
+        "heading": -2.7305911835268306,
+        "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+        "mode": "pet",
+        "startedAt": 1791062419457,
+        "until": 1791062425457
+      },
+      "bodyScreen": {
+        "x": 592.5955947409416,
+        "y": 421.91426960456107
+      },
+      "headScreen": {
+        "x": 495.7949439918312,
+        "y": 255.58768674678998
+      },
+      "viewport": [
+        1024,
+        640
+      ],
+      "petAge": 1.766,
+      "player": {
+        "x": -41.061112478452465,
+        "y": 1.433939002520863,
+        "z": 60.820272371713,
+        "bodyY": 0.62,
+        "bodyPitch": 0.13,
+        "fins": [
+          {
+            "name": "SpiritFinL",
+            "x": -0.24,
+            "z": 0.2200439908187794
+          },
+          {
+            "name": "SpiritFinR",
+            "x": -0.24,
+            "z": -0.2200439908187794
+          }
+        ]
+      },
+      "localWorker": "ws://127.0.0.1:2567/",
+      "draws": 257,
+      "triangles": 1618868
+    }
+  ],
+  "errors": [],
+  "owner": "aba819f0-8618-497b-9fc2-8ad2aa9c11be",
+  "hedgehogHomeSamples": [
+    {
+      "x": 30.3,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 31,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 32,
+      "z": 1,
+      "clear": true,
+      "roamRingClear": true
+    },
+    {
+      "x": 31,
+      "z": -1,
+      "clear": true,
+      "roamRingClear": false
+    }
+  ],
+  "status": "captured"
+}

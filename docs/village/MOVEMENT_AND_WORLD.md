@@ -1,5 +1,43 @@
 # Movement, camera, and a living world
 
+## Personal settings and keybindings — 2026-10-04 local
+
+Settings now groups Experience, Sound and Controls in a compact forest-green panel. Preferences save on this device, including graphics choice, mouse sensitivity and custom keys. Sound keeps the requested 15%/54%/75% defaults, a scoped reset and optional river/wind sliders. Changing weather leaves the sound mix intact. Graphics still defaults to Gentle on battery when no preference exists.
+
+Controls lets visitors replace or explicitly swap twenty-nine bindings across movement, contextual interactions/presets, dogs and menus. One key can have only one assignment; malformed or duplicate saved bindings fall back to defaults. Escape cancels capture first; Reset keys restores only bindings. Arrow keys remain navigation/movement alternatives, and Escape/Tab/Enter keep their browser/navigation roles. Ctrl/Meta/Alt combinations and browser function keys are not assignable. Contextual reuse (for example interact/pet/sit or jump/brake/pause) is one action slot. Keycaps, accessible shortcuts, native resident controls, horse/swing input and map directions follow the saved assignment. Native button Enter/Space activation and journal Ctrl/Meta+Enter stay standard. Worker ownership and accepted interaction clocks are unchanged.
+
+
+## Map travel and named farms (2026-10-04, local)
+
+Expanded-map destinations include each swing set, the grazing field, circuit, three farms and owl grove. Click, Tab/Enter/Space and the existing directional map navigation use the same destination buttons. The Worker derives travel points from editable placements and chooses clear, unoccupied ground within four metres; unknown, disconnected or blocked requests cannot teleport locally. Accepted travel releases seats, private focus and current shared engagements, dismounts a ridden horse safely, and publishes one shared visitor position. Travel does not reserve or start the destination activity. Opening the map pauses movement; that inactive pose must not reject an otherwise valid travel request. The main preview now includes all eight outdoor destinations. [Main-preview checks](../../VILLAGE_BUILD.md#2026-10-04--map-destinations-active-on-the-main-preview-local) and [verified Firefox reconnection](../../VILLAGE_BUILD.md#2026-10-04--local-connection-build-isolation) distinguish current behavior from earlier isolated previews.
+
+The three named farms are crop-specific (carrot/radish/mint), including accepted planting, fresh rows, restored growing rows and map labels. Existing harvest inventory and growth clocks are preserved. Generic garden beds retain crop selection. [Verification and current preview limits](../../VILLAGE_BUILD.md#2026-10-04--map-travel-and-named-farm-crops-local-side-change).
+
+## Horse meals and interface copy — 2026-10-04 local
+
+Native horses lower their neck/head and chew using the accepted shared hay clock. Feeding continues if its visitor disconnects and ends at the original deadline; reduced motion shows a still feeding pose. Controls use concise names, status and timers without decorative helper paragraphs or narrator success toasts. Animal/NPC speech and personal notes remain. [Checks and preview limits](../../VILLAGE_BUILD.md#2026-10-04--horse-eating-and-decorative-helper-text-removal-local).
+
+## 2026-10-04 town revision (local)
+
+Patrol endpoints use the same collision/water rules as movement. Blocked authored endpoints resolve to nearby clear ground; a layout hash change discards obsolete saved actor poses, and an arrived waypoint no longer issues another step toward its old target. The Worker owns NPC/dog/animal routes, .72 m/s pasture motion, 1.2 m/s hedgehog foraging and held pet/meal positions. Shared rendered animal gait follows distance traveled, with accepted timestamp interpolation and eased pet/heading transitions.
+
+The circuit starts at the stable-side southern ribbon, not across the limestone lane. Its accepted three-second countdown and 90-second race deadline appear at the top center, along with elapsed time, eight ordered gates, Rowan’s progress and distance to the highlighted next gate. Gates allow 6.2 m approach tolerance; horses step over shallow paving edges and slide along legal collision edges while still refusing water, solids and steep ground. Bottom-right controls are minor options; farm actions sit lower center, with nearby top-center progress and world-space row growth timers.
+
+I opens one private browser basket for kitchen and farm crops, apples, mushrooms, flowers and mint tea. Accepted shared harvesting/picking/gifts add items only to that basket; feeding/gifting consumes them in the Worker. Apple trees have a shared 30-second regrowth clock, including hedgehog reservations. The browser stores a resume token and accepted counters; it never sends resource counts. Existing public beds, food availability and clocks remain shared. See [current verification](../../VILLAGE_BUILD.md#2026-10-04--town-interaction-and-layout-revision-local).
+
+
+## Path and water planting — 2026-10-04 local
+
+Land grass/flowers/shrubs now clear actual transformed paving, all bridge decks and water with their full geometry/wind footprint. The marker survives architecture batching; the editor uses the same mask and restores source instances after path moves/undo. Shore plants avoid stone while retaining water-edge planting. Fourteen lilies grow in three near-bank colonies; the centre/eastern dock stays open. Eight trunks/two shrubs moved onto clear verges, with regenerated matching Worker physics. Pond planting follows the saved transform in both runtime and editor. [Verification and limits](../../VILLAGE_BUILD.md#2026-10-04--path-and-water-planting-polish-local).
+
+## Town farms, pasture, owls and horse circuit — 2026-10-04 local
+
+The town routes link fourteen homes, three five-row farms, an enlarged pond/owl grove, a raised cow/sheep/lamb meadow and the stable/circuit through curved paths and brook crossings. The original kitchen garden retains its own tending and adds a pettable hedgehog. Every outdoor task and animal uses accepted Worker state. E pets a nearby cow/sheep/lamb/hedgehog for six seconds; nuzzles, reaching gestures, hearts and species calls use the shared clock. Empty farm rows offer E carrots, 2 radishes or 3 mint, followed by E watering and E harvest after three minutes. Harvest enters the visitor's private basket; public totals retain historical harvest counts. Row-end interaction uses the whole sixteen-metre footprint.
+
+At the owl roost E takes treats, then E feeds the three owls; they leave their woodland loops, peck together and return over a twelve-second shared meal. F at a nearby stable horse offers twelve seconds of hay and prevents mounting or restarting the occupied meal. Ride Juniper/Willow with the existing W/S/A/D, Shift canter and Space brake controls. At the southern stable-side circuit ribbon F starts a three-second countdown, then one clockwise lap through eight ordered gates against Rowan. F cancels the race while retaining the ride; E/Escape dismounts safely. Claims release on leaving, distance, inactivity, disconnection and presence expiry. Panels use compact translucent green/cream buttons, square shortcut keycaps and press feedback. [Local verification and limits](../../VILLAGE_BUILD.md#2026-10-04--town-interaction-and-layout-revision-local); no publication is claimed.
+
+The garden hedgehog follows clear routes from its grassy mushroom patch to the apple tree and mushroom patch, picks up for 1.4 seconds, carries one item home and waits for a visitor. E receives the offered gift; 2 pets it while preserving that gift. Accepted inventory is private and resumes through the browser's saved token after disconnect/reload. F feeds a nearby Highland cow one accepted apple; 3 feeds one mushroom. The cow faces its feeder and enjoys an exclusive eight-second munch with hearts and a Moo emote. Gift, pet and meal cameras try both sides and diagonal views against actual solids and the orchard canopy, keeping the creature and its carried prop/emote visible. Pond families swim forward on shared world time; quiet head dips/wing stretches and staggered supper hearts respect reduced motion. Continuous meadow planting clears river/pond water, paving, bridge approaches, farm soil and the race tread while retaining green aisles and infield.
+
 Updated: 2026-10-01. Production specification and remaining acceptance for `MOVE-01`, `WIND-01`, and movement-linked `AUDIO-02`. Read the [canonical handoff](../../VILLAGE_HANDOFF.md) and [sound specification](MUSIC_AND_SOUND.md).
 
 ## Minimap and keyboard controls — 2026-10-01 published
@@ -21,6 +59,8 @@ The 320 px lower-right panel and its buttons are translucent, following the stro
 ## Dialogue and animal action keycaps — 2026-09-30 local
 
 Nearby NPC dialogue buttons, including Wren's crumb action, display their actual F/C/B/E keys in clear square keycaps inside the bordered buttons. Puppy Pet, Walk with and Send home show E/P/H the same way. These keycaps remain visible in touch layouts, where the buttons are at least 44 px tall; tapping and keyboard shortcuts invoke the same actions. The corresponding rule is in the local `AGENTS.md`. See [checks and limits](../../VILLAGE_BUILD.md#2026-09-30-dialogue-and-animal-action-keycaps-local).
+
+Animal responses use the original flock’s cream rounded bubble, projected near native/legacy heads. One nearby active response takes priority over idle calls; offscreen/distant responses disappear. Cow/sheep/lamb/Bramble/owl/pond/dog/horse replies follow accepted outdoor clocks; the cottage cat is private. English/Japanese and reduced motion are supported. [Local checks](evidence/animal-dialogue-20261004/README.md).
 
 ## Bench side selection — 2026-09-29 local
 

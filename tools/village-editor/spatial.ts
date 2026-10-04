@@ -1,32 +1,57 @@
 import * as T from "three";
 import { OBB } from "three/addons/math/OBB.js";
-import { landscapeHeight } from "../../features/village/environment";
+import { landscapeHeight, inRiver, inWalkableWorld, pondDistance, onBridge, onPondDock, bridgeBarriers } from "../../features/village/environment";
 import { type Layout, type LayoutItem, type LayoutScene } from "./model";
+import { fenceCollisionBoxes } from "../../features/village/fenceGeometry";
 
 /** Editor-only support surfaces and solid volumes; never changes the playable map. */
 export class StudioCollision {
   private localBounds = new Map<string, T.Box3>();
   private surfaces: { id: string; bounds: T.Box3; meshes: T.Mesh[] }[] = [];
   private solids: OBB[] = [];
+  private playerSolids: OBB[] = [];
   private ray = new T.Raycaster();
   private defaultTerrain = true;
+  private terrainMeshes: T.Mesh[] = [];
 
   constructor(private model: LayoutScene) {}
 
   refresh(layout: Layout) {
-    this.surfaces = []; this.solids = []; this.defaultTerrain = false;
+    this.surfaces = []; this.solids = []; this.playerSolids = []; this.defaultTerrain = false; this.terrainMeshes = [];
     for (const item of layout.objects) {
       if (!item.visible) continue;
       const asset = this.model.assets.get(item.asset)!, root = this.model.roots.get(item.id)!;
       if (asset.surface) {
-        if (item.asset === "terrain" && item.position.every(n => n === 0) && item.rotation.every(n => n === 0) && item.scale.every(n => n === 1)) this.defaultTerrain = true;
+        if (item.asset === "terrain" && item.position.every(n => n === 0) && item.rotation.every(n => n === 0) && item.scale.every(n => n === 1)) {
+          this.defaultTerrain = true;
+          root.traverse(object => { if (object instanceof T.Mesh) this.terrainMeshes.push(object); });
+        }
         else {
           const meshes: T.Mesh[] = [];
           root.traverse(object => { if (object instanceof T.Mesh) meshes.push(object); });
           this.surfaces.push({ id: item.id, bounds: new T.Box3().setFromObject(root), meshes });
         }
       }
-      const solid = this.solid(item); if (solid) this.solids.push(solid);
+      if (asset.localColliders) {
+        const matrix = this.matrix(item);
+        for (const collider of asset.localColliders) {
+          const box = new T.Box3(new T.Vector3(collider.x - collider.w / 2, collider.bottom ?? 0, collider.z - collider.d / 2), new T.Vector3(collider.x + collider.w / 2, collider.top ?? 4, collider.z + collider.d / 2));
+          const obb = new OBB().fromBox3(box).applyMatrix4(matrix);
+          obb.center.copy(box.getCenter(new T.Vector3()).applyMatrix4(matrix));
+          this.solids.push(obb); this.playerSolids.push(obb);
+        }
+      }
+      const physicalFence = item.asset === "fence-line" || /^fence-/.test(item.asset);
+      const solid = physicalFence ? null : this.solid(item);
+      if (solid) this.solids.push(solid);
+      if (physicalFence) {
+        root.traverse(object => {
+          if (!(object instanceof T.Mesh)) return;
+          for (const box of fenceCollisionBoxes(object.geometry, object.matrixWorld)) {
+            const obb = new OBB().fromBox3(box); this.playerSolids.push(obb); this.solids.push(obb);
+          }
+        });
+      } else if (solid && item.asset !== "bridge") this.playerSolids.push(solid);
     }
   }
   private bounds(asset: string) {
@@ -66,14 +91,9 @@ export class StudioCollision {
     return height;
   }
   pickGround(ray: T.Ray) {
-    let closest = ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), 0), new T.Vector3());
-    if (closest && this.defaultTerrain) {
-      for (let i = 0; i < 5; i++) {
-        const y = Math.abs(closest.x) <= 325 && Math.abs(closest.z) <= 325 ? Math.max(0, landscapeHeight(closest.x, closest.z)) : 0;
-        if (!ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), -y), closest)) { closest = null; break; }
-      }
-    }
     this.ray.ray.copy(ray);
+    let closest = this.defaultTerrain ? this.ray.intersectObjects(this.terrainMeshes, false)[0]?.point ?? null
+      : ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), 0), new T.Vector3());
     for (const surface of this.surfaces) {
       const hit = this.ray.intersectObjects(surface.meshes, false)[0];
       if (hit && (!closest || hit.distance < ray.origin.distanceTo(closest))) closest = hit.point;
@@ -117,6 +137,13 @@ export class StudioCollision {
     }
   }
   blocksGrass(point: T.Vector3) { return this.solids.some(box => box.containsPoint(point)); }
+  playerClear(x: number, z: number, y: number) {
+    if (!inWalkableWorld(x, z) || inRiver(x, z) && !onBridge(x, z) || pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
+    const feet = y + .05, head = y + 1.8;
+    const body = new OBB(new T.Vector3(x, (feet + head) / 2, z), new T.Vector3(.32, (head - feet) / 2, .32));
+    if (bridgeBarriers().some(barrier => Math.hypot(Math.max(Math.abs(x - barrier.x) - barrier.w / 2, 0), Math.max(Math.abs(z - barrier.z) - barrier.d / 2, 0)) < .32)) return false;
+    return !this.playerSolids.some(solid => solid.intersectsOBB(body));
+  }
   moveCamera(from: T.Vector3, desired: T.Vector3) {
     const result = desired.clone(), delta = desired.clone().sub(from), distance = delta.length();
     if (distance > .0001) {

@@ -1,0 +1,31 @@
+{
+  "scope": "Accepted shared animal cream bubbles",
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "cow-highland-1: observer sees exclusive petting and cannot restart it",
+    "cow-highland-1: petter visibly reaches toward the animal",
+    "cow-highland-1: observer sees the same accepted reaching gesture",
+    "cow-highland-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "cow-highland-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "petting fits 1366x768 with 44px targets and real keycaps",
+    "petting fits 1280x720 with 44px targets and real keycaps",
+    "petting fits 1024x640 with 44px targets and real keycaps",
+    "cow-highland-1: accepted six-second pet completes and resumes grazing",
+    "sheep-1: observer sees exclusive petting and cannot restart it",
+    "sheep-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "sheep-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "sheep-1: accepted six-second pet completes and resumes grazing",
+    "lamb-1: observer sees exclusive petting and cannot restart it",
+    "lamb-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "lamb-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "lamb-1: accepted six-second pet completes and resumes grazing",
+    "hedgehog-1: observer sees exclusive petting and cannot restart it",
+    "hedgehog-1: petter visibly reaches toward the animal",
+    "hedgehog-1: observer sees the same accepted reaching gesture",
+    "hedgehog-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "hedgehog-1: both clients show the original bird-style cream speech bubble near the accepted animal",
+    "hedgehog-1: accepted six-second pet completes and resumes grazing",
+    "No browser page errors (0)"
+  ],
+  "errors": []
+}

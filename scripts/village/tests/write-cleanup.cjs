@@ -33,6 +33,11 @@ function fixture({ savedGarden = garden.freshGarden(), savedChat = { hour: Math.
   const writes = [], alarmWrites = [], sockets = [];
   const storage = {
     alarmAt: alarm, failKey: null, failAlarm: false, failRead: false,
+    transactionSync(callback) {
+      const previous = new Map(records), writeCount = writes.length;
+      try { return callback(); }
+      catch (error) { records.clear(); for (const [key, value] of previous) records.set(key, value); writes.splice(writeCount); throw error; }
+    },
     kv: {
       get: key => clone(records.get(key)),
       put: (key, value) => {
@@ -146,9 +151,9 @@ function fixture({ savedGarden = garden.freshGarden(), savedChat = { hour: Math.
   gardener.visitor.activity = 'garden';
   const initialWrites = g.count('garden');
   now += 120; await g.action(gardener, { kind: 'harvest', bed: 0 });
-  check(g.count('garden') === initialWrites + 1 && g.records.get('garden').carrots === 1, 'Harvest inventory and nested bed changes still persist');
+  check(g.count('garden') === initialWrites + 1 && g.records.get('garden').carrots === 0 && gardener.visitor.forageInventory.carrots === 1, 'Harvest persists public bed changes and the accepted private crop together');
   await g.action(gardener, { kind: 'harvest', bed: 0 });
-  check(g.count('garden') === initialWrites + 1 && g.records.get('garden').carrots === 1, 'Duplicate harvest cannot create another crop or redundant garden write');
+  check(g.count('garden') === initialWrites + 1 && g.records.get('garden').carrots === 0 && gardener.visitor.forageInventory.carrots === 1, 'Duplicate harvest cannot create another crop or redundant garden write');
   await g.action(gardener, { kind: 'plant', bed: 0, crop: 'carrot' });
   await g.action(gardener, { kind: 'water', bed: 0 });
   check(g.count('garden') === initialWrites + 3 && g.records.get('garden').beds[0].wateredAt === now, 'Plant/water transitions and watering timestamp persist');
@@ -170,7 +175,33 @@ function fixture({ savedGarden = garden.freshGarden(), savedChat = { hour: Math.
   await assert.rejects(failure.action(subject, { kind: 'harvest', bed: 0 }), /failed put: garden/);
   check(!subject.messages.some(m => m.type === 'garden') && failure.records.get('garden').carrots === 0, 'A synchronous garden-write failure emits no garden acceptance and preserves durable inventory');
   failure.reopen(); await failure.action(subject, { kind: 'harvest', bed: 0 });
-  check(failure.records.get('garden').carrots === 1, 'Reconstruction after a failed garden write permits one durable harvest');
+  check(failure.records.get('garden').carrots === 0 && subject.visitor.forageInventory.carrots === 1, 'Reconstruction after a failed garden write permits one durable harvest');
+  const privateFailure = fixture(), privateSubject = privateFailure.socket(); privateSubject.visitor.activity = 'garden';
+  privateFailure.storage.failKey = 'visitorInventories';
+  await assert.rejects(privateFailure.action(privateSubject, { kind: 'harvest', bed: 0 }), /failed put: visitorInventories/);
+  check(privateFailure.records.get('garden').beds[0].stage === 'grown' && !privateFailure.records.has('visitorInventories')
+    && !privateSubject.messages.some(m => m.type === 'garden' || m.type === 'forageInventory'),
+    'Private inventory failure rolls back the public bed and emits neither acceptance');
+  await privateFailure.action(privateSubject, { kind: 'harvest', bed: 0 });
+  check(privateSubject.visitor.forageInventory.carrots === 1 && privateFailure.count('garden') === 1,
+    'The same Worker can retry a rolled-back garden grant once without a stale write baseline');
+  for (const failedKey of ['sharedActors', 'visitorInventories']) {
+    const townFailure = fixture(), farmer = townFailure.socket();
+    const row = townFailure.world.simulation.authored.items.find(item => item.visible && item.asset === 'farm-row');
+    const rowBed = townFailure.world.simulation.town.state.beds.find(bed => bed.id === row.id);
+    Object.assign(rowBed, { crop: 'mint', plantedAt: now - 180000, wateredAt: now - 180000, growAt: now - 1 });
+    townFailure.records.set('sharedActors', clone(townFailure.world.simulation.save()));
+    farmer.visitor.x = row.position[0] + 7.6; farmer.visitor.z = row.position[2] + 1.8;
+    townFailure.storage.failKey = failedKey;
+    const request = { type: 'interaction', requestId: `rollback-${failedKey}`, request: { kind: 'town', action: 'gardenHarvest', id: row.id } };
+    now += 120; await assert.rejects(townFailure.send(farmer, request), new RegExp(`failed put: ${failedKey}`));
+    check(townFailure.records.get('sharedActors').town.beds.find(bed => bed.id === row.id).crop === 'mint'
+      && !townFailure.records.has('visitorInventories') && !farmer.messages.some(m => m.type === 'forageInventory' || m.type === 'interaction_result'),
+      `Town ${failedKey} failure preserves the shared crop and cannot grant a private item`);
+    now += 120; await townFailure.send(farmer, { ...request, requestId: `${request.requestId}-retry` });
+    check(farmer.visitor.forageInventory.mint === 1 && townFailure.world.simulation.town.state.beds.find(bed => bed.id === row.id).crop === null,
+      `Town ${failedKey} rollback permits one accepted retry without reconstructing the Worker`);
+  }
   const changed = { hour: Math.floor(now / HOUR), entries: [{ messageId: webcrypto.randomUUID(), message: 'Synthetic retry' }] };
   failure.storage.failKey = 'chat';
   assert.throws(() => failure.world.putIfChanged('chat', changed), /failed put: chat/);

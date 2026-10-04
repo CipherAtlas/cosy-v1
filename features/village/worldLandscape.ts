@@ -3,8 +3,12 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { fantasyTreeGeometry } from "./fantasyTrees";
 import { BIRD_CLEARING, pondDistance, groundY, landscapeHeight, riverX, roadX } from "./environment";
 import type { World, WorldLayoutCapture } from "./world";
+import { meadowFlowers } from "./meadowVegetation";
+import { clearSurfacePlanting } from "./plantingClearance";
+import { instanceCells } from "./spatialRendering";
+import { registerGrassDetail } from "./vegetationDetail";
 
-export function buildWorldLandscape({ group, colliders, vegetation, wind, authored, mat, dummy, rnd, add, clearPlanting, erasedPlanting, onAuthoredPath, capture, onProgress }: {
+export function buildWorldLandscape({ group, colliders, vegetation, wind, authored, mat, dummy, rnd, add, clearPlanting, erasedPlanting, onAuthoredPath, capture, record, applyLayout, onProgress }: {
   group: T.Group;
   colliders: World["colliders"];
   vegetation: T.InstancedMesh[];
@@ -18,9 +22,12 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   erasedPlanting: (x: number, z: number) => boolean;
   onAuthoredPath: (x: number, z: number) => boolean;
   capture?: WorldLayoutCapture;
+  record: WorldLayoutCapture;
+  applyLayout: () => void;
   onProgress: (value: number) => void;
 }) {
   let layoutStart: number;
+  const meadowFlowerMeshes: T.InstancedMesh[] = [];
   // Wind-deformed instanced meadow: one geometry and one material for thousands of blades.
   function windMaterial(material: T.MeshStandardMaterial, scale: number, tree = false) {
     const deform = (shader: { uniforms: Record<string, unknown>; vertexShader: string }) => {
@@ -64,6 +71,8 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   grassGeo.setAttribute("position",new T.Float32BufferAttribute(bladeVertices,3));
   grassGeo.setAttribute("color",new T.Float32BufferAttribute(bladeColors,3));
   grassGeo.setIndex(bladeIndices);grassGeo.computeVertexNormals();grassMat.vertexColors=true;
+  if (!capture) registerGrassDetail(grassGeo);
+  grassGeo.userData.groundPlant = true; grassGeo.userData.plantingSway = .16;
   const grassCount = 23000;
   const grass = new T.InstancedMesh(grassGeo, grassMat, grassCount);
   let gi = 0;
@@ -105,7 +114,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   vegetation.push(grass);
   grass.receiveShadow = true;
   group.add(grass);
-  capture?.("meadow-grass", "Meadow grass", "Landscape", [grass]);
+  record("meadow-grass", "Meadow grass", "Landscape", [grass]);
   const authoredGrassCount = authored.grass.reduce((sum, zone) => sum + zone.count, 0);
   if (authoredGrassCount) {
     const addedGrass = new T.InstancedMesh(grassGeo, grassMat, authoredGrassCount);
@@ -131,7 +140,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     }
     addedGrass.count = filled; addedGrass.customDepthMaterial = grass.customDepthMaterial;
     addedGrass.receiveShadow = true; vegetation.push(addedGrass); group.add(addedGrass);
-    capture?.("authored-grass", "Painted meadow grass", "Landscape", [addedGrass]);
+    record("authored-grass", "Painted meadow grass", "Landscape", [addedGrass]);
   }
   // Bushes use a shared, irregular leaf canopy rather than solid green volumes.
   const leafGeo = new T.BufferGeometry();
@@ -163,6 +172,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     foliageParts.push(leafGeo.clone().applyMatrix4(dummy.matrix));
   }
   const bushGeo = mergeGeometries(foliageParts)!;
+  bushGeo.userData.groundPlant = true; bushGeo.userData.plantingSway = .23;
   foliageParts.forEach((g) => g.dispose());
   leafGeo.dispose();
   const bushes = new T.InstancedMesh(
@@ -205,7 +215,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   bushes.receiveShadow = true;
   bushes.castShadow = true;
   group.add(bushes);
-  capture?.("bushes", "Leafy shrub", "Nature", [bushes]);
+  record("bushes", "Leafy shrub", "Nature", [bushes]);
   // Daisies and lavender have stems, leaves, and petal silhouettes at walking distance.
   const plantParts: T.BufferGeometry[] = [];
   const stem = new T.CylinderGeometry(0.012, 0.016, 0.68, 4);
@@ -267,11 +277,18 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     );
   }
   stems.count = blossoms.count = flowerCount;
+  for (const mesh of [stems, blossoms]) { mesh.geometry.userData.groundPlant = true; mesh.geometry.userData.plantingRadius = .36; }
   vegetation.push(stems, blossoms);
   stems.receiveShadow = true;
   blossoms.receiveShadow = true;
   group.add(stems, blossoms);
-  capture?.("wildflowers", "Lane wildflowers", "Landscape", [stems, blossoms]);
+  record("wildflowers", "Lane wildflowers", "Landscape", [stems, blossoms]);
+  const flowerZones = (authored.items ?? []).filter(item => item.visible && item.asset === "flower-meadow");
+  if (flowerZones.length) {
+    const flowers = meadowFlowers(flowerZones, landscapeHeight, (x, z) => onAuthoredPath(x, z) || clearPlanting(x, z) || erasedPlanting(x, z)
+      || colliders.some(c => Math.abs(x - c.x) < c.w / 2 + .45 && Math.abs(z - c.z) < c.d / 2 + .45));
+    group.add(flowers); flowers.traverse(part => { if (part instanceof T.InstancedMesh) { vegetation.push(part); meadowFlowerMeshes.push(part); } });
+  }
   // A complete valley surrounds the playable space, including side and rear views.
   for (let band = 0; band < 3; band++) {
     const ring = new T.PlaneGeometry(1, 1, 440, 36);
@@ -303,7 +320,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     ring.setAttribute("color",new T.Float32BufferAttribute(mountainColors,3));
     const material = new T.MeshStandardMaterial({ vertexColors:true, roughness:1, side:T.DoubleSide });
     const mountain = add(ring, material, 0, 0, 0); mountain.castShadow = false;
-    capture?.(`mountain-${band}`, ["Near mountain ridge", "Blue mountain ridge", "Distant mountain ridge"][band], "Landscape", [mountain]);
+    record(`mountain-${band}`, ["Near mountain ridge", "Blue mountain ridge", "Distant mountain ridge"][band], "Landscape", [mountain]);
   }
   const forestPlacements: { matrix: T.Matrix4; color: T.Color }[] = [];
   for (let i = 0; i < 360; i++) {
@@ -321,7 +338,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     add(new T.CylinderGeometry(.8, 1.15, h, 6), castleMaterial, x, y + h / 2, -158).castShadow = false;
     add(new T.ConeGeometry(1.05, h * .5, 6), mat.roof, x, y + h * 1.25, -158).castShadow = false;
   }
-  capture?.("castle", "Distant castle", "Buildings", group.children.slice(layoutStart), [-18, 10, -158]);
+  record("castle", "Distant castle", "Buildings", group.children.slice(layoutStart), [-18, 10, -158]);
   // Distant suspended gardens are scenery, beyond the walkable village boundary.
   const islandRock = new T.MeshStandardMaterial({ color:"#a6b7c0", roughness:1 });
   const islandGrass = new T.MeshStandardMaterial({ color:"#91c89b", roughness:1 });
@@ -340,7 +357,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     add(new T.CylinderGeometry(1.2,1.5,4.8,10),castleMaterial,0,2.7,0,1,1,1,island).castShadow=false;
     add(new T.ConeGeometry(1.9,3.5,16),mat.lilac,0,6.7,0,1,1,1,island).castShadow=false;
     add(new T.OctahedronGeometry(.7),mat.trim,0,9.5,0,1,1.7,1,island).castShadow=false;
-    capture?.(`island-${x}`, "Floating garden", "Landscape", [island], [x,y,z]);
+    record(`island-${x}`, "Floating garden", "Landscape", [island], [x,y,z]);
   }
   // Authored weeping silhouettes: curved branches with narrow leaves, shared by two trees.
   const willowBarkParts: T.BufferGeometry[] = [], willowLeafParts: T.BufferGeometry[] = [];
@@ -385,7 +402,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     if (material === willowLeafMaterial) mesh.customDepthMaterial = windMaterial(material, .48, true);
     mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
   }
-  capture?.("willow", "Weeping willow", "Nature", group.children.slice(layoutStart));
+  record("willow", "Weeping willow", "Nature", group.children.slice(layoutStart));
   // Ivy climbs the two visible cottage faces with gaps around the entrance.
   const ivy = new T.InstancedMesh(bushGeo, bushes.material, 18);
   for (let i = 0; i < 18; i++) {
@@ -395,14 +412,14 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   }
   ivy.customDepthMaterial = windMaterial(bushes.material as T.MeshStandardMaterial, .17);
   ivy.receiveShadow = true; group.add(ivy);
-  capture?.("ivy", "Cottage ivy", "Nature", [ivy]);
+  record("ivy", "Cottage ivy", "Nature", [ivy]);
   onProgress(60);
   const nearGeometry = fantasyTreeGeometry(true), forestGeometry = fantasyTreeGeometry(false);
   const forestMaterial = new T.MeshStandardMaterial({ color: "#ffffff", vertexColors: true, roughness: .95 });
   const forest = new T.InstancedMesh(forestGeometry, forestMaterial, forestPlacements.length);
   forestPlacements.forEach((p, i) => { forest.setMatrixAt(i, p.matrix); forest.setColorAt(i, p.color); });
   group.add(forest); vegetation.push(forest);
-  capture?.("forest", "Distant forest", "Landscape", [forest]);
+  record("forest", "Distant forest", "Landscape", [forest]);
 
   const treePositions: [number, number, number][] = [
     [-5, 22, 0.78],
@@ -426,7 +443,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
       0.65 + rnd() * 0.7,
     ]);
   }
-  const treeRecords = authored.trees.length ? authored.trees : treePositions.map(([x, z, scale], i) => ({
+  const treeRecords = !capture && authored.items ? authored.trees : treePositions.map(([x, z, scale], i) => ({
     id: `tree-${i + 1}`, x, y: i === 4 ? -.005309 : landscapeHeight(x, z), z, rotation: [0, rnd() * Math.PI * 2, 0] as [number, number, number], scale: [scale, scale, scale] as [number, number, number],
   }));
   const treeTransforms = treeRecords.map(tree => {
@@ -455,7 +472,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
   // Crown colors carry their soft occlusion; self-shadowing intersecting lobes produces striping.
   inst.castShadow = true; inst.receiveShadow = false; group.add(inst);
   for (const tree of treeRecords) if (!/^tree-\d+$/.test(tree.id)) colliders.push({ x: tree.x, z: tree.z, w: .7 * tree.scale[0], d: .7 * tree.scale[2], bottom: tree.y, top: tree.y + 5 * tree.scale[1] });
-  capture?.("tree", "Round canopy tree", "Nature", [inst]);
+  record("tree", "Round canopy tree", "Nature", [inst]);
   const restShrubs: [number, number, number][] = [
     [-30.5, 0.0021889620241282728, -26.5],
     [-28, 0.04870400533322876, -32],
@@ -472,7 +489,7 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     shrub.setMatrixAt(0, new T.Matrix4()); shrub.setColorAt(0, shrubColor);
     shrub.position.fromArray(position); shrub.customDepthMaterial = bushes.customDepthMaterial;
     shrub.castShadow = shrub.receiveShadow = true; group.add(shrub); vegetation.push(shrub);
-    capture?.(`pond-rest-shrub-${i + 1}`, `Pond rest shrub ${i + 1}`, "Nature", [shrub], position);
+    record(`pond-rest-shrub-${i + 1}`, `Pond rest shrub ${i + 1}`, "Nature", [shrub], position);
   });
   // Clear only the added paving footprints, leaving the seeded rest of the meadow unchanged.
   const plantingMatrix = new T.Matrix4(), plantingPosition = new T.Vector3();
@@ -487,47 +504,24 @@ export function buildWorldLandscape({ group, colliders, vegetation, wind, author
     }
     plants.instanceMatrix.needsUpdate = true;
   }
+  if (!capture) applyLayout();
   // Keep editor captures whole; only the public renderer needs cullable cells.
   if (!capture) {
-    const splitIntoCells = (mesh: T.InstancedMesh, cellSize: number, name: string, windMargin = 0) => {
-      const cells = new Map<string, number[]>();
-      const matrix = new T.Matrix4(), color = new T.Color();
-      for (let i = 0; i < mesh.count; i++) {
-        mesh.getMatrixAt(i, matrix);
-        const key = `${Math.floor(matrix.elements[12] / cellSize)},${Math.floor(matrix.elements[14] / cellSize)}`;
-        let indices = cells.get(key);
-        if (!indices) {
-          indices = [];
-          cells.set(key, indices);
-        }
-        indices.push(i);
-      }
-      const chunks: T.InstancedMesh[] = [];
-      for (const [key, indices] of cells) {
-        const chunk = new T.InstancedMesh(mesh.geometry, mesh.material, indices.length);
-        chunk.name = `${name} ${key}`;
-        chunk.castShadow = mesh.castShadow;
-        chunk.receiveShadow = mesh.receiveShadow;
-        chunk.customDepthMaterial = mesh.customDepthMaterial;
-        indices.forEach((index, i) => {
-          mesh.getMatrixAt(index, matrix);
-          chunk.setMatrixAt(i, matrix);
-          if (mesh.instanceColor) {
-            mesh.getColorAt(index, color);
-            chunk.setColorAt(i, color);
-          }
-        });
-        chunk.computeBoundingSphere();
-        if (chunk.boundingSphere) chunk.boundingSphere.radius += windMargin;
-        group.add(chunk);
-        chunks.push(chunk);
-      }
-      group.remove(mesh);
-      vegetation.splice(vegetation.indexOf(mesh), 1, ...chunks);
+    group.updateMatrixWorld(true);
+    clearSurfacePlanting(group, vegetation);
+    const splitIntoCells = (mesh: T.InstancedMesh, cellSize: number, name: string, windMargin = .5) => {
+      const index = vegetation.indexOf(mesh);
+      const chunks = instanceCells(mesh, cellSize, name, windMargin);
+      vegetation.splice(index, 1, ...chunks);
     };
     for (const meadow of vegetation.filter(mesh => mesh.geometry === grassGeo))
       splitIntoCells(meadow, 18, meadow === grass ? "Meadow grass" : "Painted meadow grass", .5);
+    for (const flowers of meadowFlowerMeshes) splitIntoCells(flowers, 36, "Meadow wildflowers");
     splitIntoCells(forest, 48, "Distant forest");
+    for (const plants of vegetation.filter(mesh => mesh.geometry === bushGeo))
+      splitIntoCells(plants, 18, "Meadow shrubs", .5);
+    for (const plants of vegetation.filter(mesh => !mesh.name && mesh.count >= 100))
+      splitIntoCells(plants, 18, "Meadow planting", .5);
   }
   return { trees, treeLod, treeRecords };
 }

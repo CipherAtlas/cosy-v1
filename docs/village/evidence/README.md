@@ -1,4 +1,42 @@
-# Village implementation evidence — updated 2026-10-01
+# Village implementation evidence — updated 2026-10-04
+
+## Settings and personal keybindings — 2026-10-04 local
+
+[Settings evidence](settings-20261004/README.md) contains 39 actual settings/rebinding/two-client assertions, 26 three-client regressions, 44 binding data-boundary checks and four desktop sizes. The main preview has the compact forest-green workspace and saved keybindings; native browser/device review remains open. No deployment.
+
+## Recorded animal audio — 2026-10-04 local
+
+[Playable mix and review](animal-audio-20261004/README.md) cover short species recordings, one animal channel, one music deck, 19 Web Audio checks, 12 actual two-client action/audio checks and a passing 26-check three-client regression. The neutral reviewer could not receive audio input; signal/design revisions pass, while subjective listening remains unverified. No deployment.
+
+## 2026-10-04 — Detailed rendering budgets
+
+[Matched before/after profiles, visual captures, production preview and checks](detailed-performance-20261004/README.md) record 35–68% fewer submitted triangles, the lossless farm-prop payload reduction and local Chrome/M4 timing limits. The main 3051 preview serves the isolated current export; native Firefox/Safari, physical thermal performance and user-machine acceptance remain open.
+
+
+## Current local map and connection verification — 2026-10-04
+
+[Main-preview map checks](../../../VILLAGE_BUILD.md#2026-10-04--map-destinations-active-on-the-main-preview-local): 20 two-client checks against the served preview covered eight clicked arrivals, observer broadcasts, Enter, disconnected refusal and separated 44 px markers at four desktop sizes. [Connection repair](../../../VILLAGE_BUILD.md#2026-10-04--local-connection-build-isolation): a fresh isolated build uses only Worker2567; Firefox visibly joined with an assigned visitor, “1 blob here” and enabled chat input. The map checks preceded the final clean connection rebuild; Firefox evidence establishes reconnection, not a repeated full map suite. No production deployment or broad device acceptance.
+
+
+## Native animal rig integration — 2026-10-04 local
+
+[Native evidence](animals-v2/rigs/README.md) records seventeen weighted skins, 110 clips, actual vertex deformation, independent clones, editor preview/save/reload, shared pet/tricks/riding and private cat integration. [Ledger](../../../VILLAGE_BUILD.md#2026-10-04--native-animal-rigs-and-active-integration-local) distinguishes current checks, reused unchanged scopes and local limits.
+
+## Town interaction and layout revision — 2026-10-04 local
+
+[Focused evidence](town-revision-20261004/README.md) covers all twelve requested repairs, private resource acceptance and scene Retry, the actual eight-gate mounted lap, final laptop HUD/map/basket views, restored blue river, animal/owls, full shared seats and ownership/reconnect/private focus. The [ledger](../../../VILLAGE_BUILD.md#2026-10-04--town-interaction-and-layout-revision-local) separates local proof from live/hardware limits.
+
+## Animal art set — 2026-10-04 local
+
+[Animal evidence index](animals-v2/README.md) links the final representative contact sheet, native-scale seventeen-model cohort, per-model portraits, staged critiques and Three.js/editor results. [Catalog](../ANIMAL_ART.md) records the current native rig delivery and preserved static authoring source. [Ledger](../../../VILLAGE_BUILD.md#2026-10-04--animal-art-delivery-local) records local checks and limits; no publication is claimed.
+
+## Path and water planting — 2026-10-04 local
+
+[Visual/geometry evidence](path-water-foliage-20261004/README.md) records the complete native route sweep, precise ten-position working-layout correction, near-bank lilies, actual paving/water masks and editor restore/pond-transform behavior. The final independent audit reports zero contacts across 122,177 plant locations and 58 rendered surfaces. Current layout/physics hash is `53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736`; protected saved designs are unchanged. [Ledger](../../../VILLAGE_BUILD.md#2026-10-04--path-and-water-planting-polish-local).
+
+## Town expansion — 2026-10-04 local
+
+[Town evidence index](town-expansion-20261004/README.md) distinguishes the final 591-object layout/physics/preservation proof, 38 real town UI checks, 60 actual Worker checks, 26 reused three-client regressions, 13 canonical editor Apply checks, 53 forage-asset editor checks, 12 pond checks, 36 focused gift/cow checks, 22 district/quality views and final shore/editor pictures. Individual original Blender portraits and the [animal lineup](farm-animals-blender.png) sit beside this directory. [Design QA](../../../design-qa.md#2026-10-04-local-town-expansion) answers the user's four questions and records visual corrections. [The build ledger](../../../VILLAGE_BUILD.md#2026-10-04--town-expansion-local) records final verification and limits; no deployment is claimed.
 
 ## Minimap and keyboard interactions — 2026-10-01 local
 

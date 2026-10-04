@@ -1,0 +1,62 @@
+{
+  "status": "passed; final source visuals reviewed",
+  "build": 15659,
+  "sourceLayoutSha256": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "browserAssertions": 36,
+  "browserPageErrors": [],
+  "stableVisitorIdentities": true,
+  "finalInventories": [{"apples": 0, "mushrooms": 1}, {"apples": 0, "mushrooms": 0}],
+  "passes": [
+    {
+      "test": "Actual shared apple gift",
+      "images": ["hedgehog-apple-visitor.png", "hedgehog-apple-observer.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Bramble's clear face and rosy apple make the real E gift easy to understand; only the receiving visitor gains the apple.",
+        "Is this pretty enough?": "Yes. The original tiny Blender apple sits visibly on his spiny back; the owner sees his face while the observer sees the natural back view. Both views avoid the cottage wall and canopy.",
+        "Is the town big and healthy looking?": "The visible orchard, grass, paths, cottage and distant farm fence look productive and lived in. This close view complements the separate town-wide review.",
+        "Does it make a user want to stay?": "Yes. A small garden friend returning with a useful present gives the garden a reason to revisit."
+      }
+    },
+    {
+      "test": "Actual shared mushroom gift",
+      "images": ["hedgehog-mushroom-visitor.png", "hedgehog-mushroom-observer.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. The carried mushroom is recognizable and the real Receive mushroom button has its E keycap.",
+        "Is this pretty enough?": "Yes. Bramble's side eye and muzzle remain visible, the warm chestnut mushroom is distinct, and the camera keeps nearby buildings in the background.",
+        "Is the town big and healthy looking?": "Yes within this garden frame: leafy trees, a full mushroom patch, meadow grass and connected paths surround the tiny friend.",
+        "Does it make a user want to stay?": "Yes. The alternating gifts add a gentle surprise and the mushroom remains in the recipient's private inventory."
+      }
+    },
+    {
+      "test": "Normal-motion accepted cow apple meal",
+      "images": ["cow-apple-normal-visitor.png", "cow-apple-normal-observer.png", "apple-meal-1024.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Real F feeding consumes one received apple and produces a distinct eight-second munch, heart and Moo; the observing visitor cannot restart it.",
+        "Is this pretty enough?": "Yes. The natural 2.2m approach keeps the owner's apple, muzzle, glossy eye and flower clear. The observer sees the apple and face above ordinary foreground visitors.",
+        "Is the town big and healthy looking?": "Yes within the pasture view: broad green ground, rustic fences, neighboring sheep and the distant town feel open and healthy.",
+        "Does it make a user want to stay?": "Yes. The happy expression and readable little reward make sharing the gift worthwhile."
+      }
+    },
+    {
+      "test": "Reduced-motion accepted cow apple meal and 1024x640 framing",
+      "images": ["cow-apple-reduced-visitor.png", "cow-apple-reduced-observer.png", "apple-reduced-1024.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Feeding retains the same accepted clock, ownership, apple, heart and Moo while using a still head pose.",
+        "Is this pretty enough?": "Yes. The owner's apple and face remain clear in the 1024x640 view; the compact panel stays below the head and the full Moo stays beside the minimap. The observer's foreground visitors cover some lower body and part of the apple, while the apple, eyes and flower remain recognizable.",
+        "Is the town big and healthy looking?": "Yes within this view: a full pasture and orderly rustic boundary surround a healthy-looking cow.",
+        "Does it make a user want to stay?": "Yes. Reduced motion keeps the same warm feeding response without requiring animated movement."
+      }
+    }
+  ],
+  "closeRangeObservation": {
+    "image": "../runtime-approved/cow-apple-reduced-visitor.png",
+    "stance": "Earlier fixture approached at 1.55m; the natural final feeding approach prefers 2.2m.",
+    "playerPointFromStationaryFailureState": [-48.34444838835439, 1.2443696635745276, 59.24595955582415],
+    "finding": "At the close 1.55m stance the feeder and extended cow muzzle overlap, hiding the apple in the owner's reduced-motion frame. This is model contact at an unusually close stance; the final natural stance is clear. Root owns any further game behavior decision."
+  },
+  "limits": [
+    "These are local headless Chrome and original Blender asset checks, not a deployment or physical laptop performance result.",
+    "Whole-town layout, routes, pond life and horse race verification have separate evidence.",
+    "Foreground multiplayer visitors naturally occlude some lower-body pixels; mesh.visible assertions alone do not establish visual clarity. Saved frames were inspected separately."
+  ]
+}

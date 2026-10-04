@@ -1,0 +1,21 @@
+{
+  "status": "aborted preflight to correct pose evidence method name; corrected final evidence is ../runtime-confirmed",
+  "gifts": [
+    {
+      "food": "mushroom",
+      "before": {
+        "apples": 0,
+        "mushrooms": 0
+      },
+      "after": {
+        "apples": 0,
+        "mushrooms": 1
+      }
+    }
+  ],
+  "meals": [],
+  "identities": [
+    "95ccfa2e-18b5-4e48-8904-d082c0595150",
+    "4f279294-1669-412d-8e6c-66a6d9667cd1"
+  ]
+}

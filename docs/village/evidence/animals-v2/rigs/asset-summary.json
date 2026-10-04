@@ -1,0 +1,10 @@
+{
+  "animals": 17,
+  "clips": 110,
+  "bytes": 8301980,
+  "staticSourceSha256": "68bb9eb0567d2c99dcfdf5cb450fa8af1e0319192240156f0c5425745cb89205",
+  "rigSourceSha256": "ba8bc5a75d0ecd81eb5c43b10e78c6f8ce49e873f4b114ffca8a74f8eda8c5e2",
+  "zipSha256": "a76280585f5d30f92f682baf9f35a5d7c215689ab29faa6f589f8a3fcb8f108f",
+  "zipFiles": 47,
+  "checks": 9746
+}

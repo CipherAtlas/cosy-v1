@@ -1,0 +1,33 @@
+{
+  "status": "camera correction required; functional pass interrupted by one background visitor expiry",
+  "build": 80168,
+  "sourceLayoutSha256": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "checksCompleted": 22,
+  "browserPageErrors": [],
+  "passes": [
+    {
+      "images": ["hedgehog-apple-visitor.png", "hedgehog-apple-observer.png", "hedgehog-mushroom-visitor.png", "hedgehog-mushroom-observer.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "The actual E gift interaction works, but the automatic camera enters the kitchen cottage and obscures Bramble. This view needs correction.",
+        "Is this pretty enough?": "No. A close cottage wall fills much of the owner frame and nearly the entire observer frame.",
+        "Is the town big and healthy looking?": "The visible garden props look healthy, but this obstructed interaction frame cannot show the town's scale.",
+        "Does it make a user want to stay?": "The little gift loop has appeal, but the current wall obstruction interrupts it."
+      },
+      "fixRequested": "Choose a gift camera side with actual solid clearance; also consider canopy obstruction. Do not infer unoccluded pixels from mesh.visible."
+    },
+    {
+      "images": ["cow-apple-normal-visitor.png", "cow-apple-normal-observer.png", "apple-meal-1024.png"],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. The real F apple feed produces a distinct accepted eight-second munch, heart and Moo; the observer cannot restart it.",
+        "Is this pretty enough?": "Yes. The flower, glossy near eye, rosy apple, heart and full Moo are readable. The close visitor partly overlaps the muzzle silhouette, but does not hide the expression.",
+        "Is the town big and healthy looking?": "Yes within the pasture frame: meadow grass, rustic fence and broad green landscape surround a healthy-looking cow.",
+        "Does it make a user want to stay?": "Yes. The warm expression and rewarding feeding response invite another visit."
+      }
+    }
+  ],
+  "remaining": [
+    "Reduced-motion apple meal and final private mushroom retention were not completed after the receiving visitor reconnected.",
+    "Fixture now disables Chrome background timer/renderer/occlusion throttling and foregrounds the gift recipient; production presence expiry is unchanged.",
+    "Root owns the camera correction and will provide a fresh exported build for the targeted rerun."
+  ]
+}

@@ -930,7 +930,14 @@ kbd {
 }
 .v-world-feedback:empty { display: none; }
 .v-swing-controls h2 { margin: 0; font-size: 16px; line-height: 1.3; font-weight: 600; }
+.v-horse-directions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.v-world-feedback .v-horse-directions .v-interact { min-width: 0; padding: 8px 5px; justify-content: center; gap: 5px; }
+.v-horse-controls .v-swing-secondary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.v-world-feedback .v-swing-controls.v-horse-controls .v-interact kbd { width: auto; min-width: 24px; flex: 0 0 auto; padding-inline: 4px; }
 .v-swing-controls p { margin: 0; font-size: 12px; line-height: 1.4; color: #e6ddc8; }
+.v-town-actions { display: flex; flex-direction: column; gap: 7px; }
+.v-horse-controls .v-town-actions { padding-top: 9px; border-top: 1px solid #fff2d033; }
+.v-horse-controls .v-town-actions h2 { font-size: 14px; }
 .v-swing-pump, .v-swing-secondary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .v-world-feedback .v-swing-controls .v-interact { touch-action: none; user-select: none; }
 .v-world-feedback.has-swing-actions { left: auto; right: 24px; bottom: 26px; transform: none; align-items: stretch; }
@@ -1458,8 +1465,9 @@ kbd {
 }
 .v-map-dialog h2 { max-width: none; margin: 0 54px 16px 0; font-size: 30px; }
 .v-map-dialog .v-dialog-close { color: var(--map-ink); }
-.v-map-canvas { position: relative; width: min(100%,calc((100dvh - 238px) * var(--map-ratio))); margin-inline: auto; overflow: hidden; border-radius: 20px; border: 1px solid #9db28a; box-shadow: 0 4px 16px #31564612; }
+.v-map-canvas { position: relative; width: min(100%,calc((100dvh - 268px) * var(--map-ratio))); margin-inline: auto; overflow: hidden; border-radius: 20px; border: 1px solid #9db28a; box-shadow: 0 4px 16px #31564612; }
 .v-map-art { display: block; width: 100%; height: 100%; }
+.v-map-actors { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
 .v-map-pin { position: absolute; z-index: 1; }
 .v-map-pin:has(.is-selected), .v-map-pin:focus-within, .v-map-pin:hover { z-index: 2; }
 .v-map-leader { position: absolute; height: 1px; background: #688666; transform-origin: left center; pointer-events: none; }
@@ -1505,7 +1513,7 @@ kbd {
 @media (max-height: 700px) {
   .v-dialog.v-map-dialog { padding: 18px 24px 14px; }
   .v-map-dialog h2 { font-size: 26px; margin-bottom: 10px; }
-  .v-map-canvas { width: min(100%,calc((100dvh - 220px) * var(--map-ratio))); }
+  .v-map-canvas { width: min(100%,calc((100dvh - 250px) * var(--map-ratio))); }
   .v-map-footer { margin-top: 12px; }
   .v-map-help { margin-top: 10px; padding-top: 9px; }
 }
@@ -1536,4 +1544,101 @@ kbd {
 @media (max-width: 1000px), (max-height: 700px) {
   .village { --minimap-height: 125px; }
   .v-header nav .v-minimap { width: 158px; }
+}
+
+.v-map-legend { margin: 9px 0 0; color: #4b7159; font-size: 12px; line-height: 1.4; }
+
+.v-town-progress {
+  position: absolute; z-index: 5; top: 24px; left: 50%; transform: translateX(-50%);
+  display: grid; justify-items: center; gap: 5px; width: min(320px, calc(100vw - 420px));
+  box-sizing: border-box; padding: 10px 16px; color: #fff8e8; background: #17392bb3;
+  border: 1px solid #fff2d059; border-radius: 15px; backdrop-filter: blur(10px); pointer-events: none;
+  box-shadow: 0 4px 18px #0f241f22; font-variant-numeric: tabular-nums;
+}
+.v-town-progress strong { font-size: 15px; font-weight: 600; }
+.v-race-countdown { font-size: 52px; line-height: 1.05; font-weight: 600; color: #ffe2a7; }
+.v-race-clock { font-size: 32px; line-height: 1.1; font-weight: 600; }
+.v-race-statistics { display: flex; width: 100%; justify-content: space-between; gap: 12px; font-size: 12px; }
+.v-town-progress progress { height: 5px; width: 100%; appearance: none; border: 0; border-radius: 3px; background: #fff2d025; overflow: hidden; }
+.v-town-progress progress::-webkit-progress-bar { background: #fff2d025; }
+.v-town-progress progress::-webkit-progress-value { background: #e2c68e; border-radius: 3px; }
+.v-town-progress progress::-moz-progress-bar { background: #e2c68e; border-radius: 3px; }
+.v-race-positions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 16px; }
+.v-race-positions label { display: grid; gap: 4px; font-size: 11px; }
+.v-town-progress p { margin: 2px 0 0; font-size: 11px; line-height: 1.35; }
+.v-farm-progress { width: 240px; grid-template-columns: 1fr auto; justify-items: stretch; }
+.v-farm-progress progress { grid-column: 1 / -1; }
+.v-world-feedback:has(.v-town-controls[data-activity="farm"]) { left: 50%; right: auto; bottom: 76px; transform: translateX(-50%); max-width: min(380px,calc(100vw - 40px)); }
+.v-world-feedback .v-town-controls[data-activity="farm"] { width: 380px; padding: 10px 12px; }
+.v-town-controls[data-activity="farm"] .v-town-actions { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.v-town-controls[data-activity="farm"] h2, .v-town-controls[data-activity="farm"] p { grid-column: 1 / -1; }
+.v-world-feedback .v-town-controls[data-activity="farm"] .v-interact { font-size: 12px; }
+.v-local-inventory dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+.v-local-inventory dl > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #38584026; padding-bottom: 8px; }
+.v-local-inventory dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+@media (max-width: 1100px) {
+  .v-race-progress { width: min(260px, calc(100vw - 420px)); }
+}
+@media (max-height: 680px) {
+  .v-town-progress { top: 15px; padding: 8px 12px; gap: 4px; }
+  .v-race-clock { font-size: 28px; }
+  .v-race-progress p { display: none; }
+  .v-world-feedback:has(.v-town-controls[data-activity="farm"]) { bottom: 58px; }
+}
+
+/* Settings retain the village's forest surfaces while leaving the world visible. */
+.v-dialog-overlay.v-settings-overlay { background: #132b2333; backdrop-filter: blur(2px); }
+.v-dialog.v-settings-dialog {
+  display: flex; flex-direction: column; width: min(420px, calc(100vw - 40px));
+  top: 20px; right: 20px; bottom: auto; max-height: calc(100dvh - 40px); box-sizing: border-box; padding: 22px; overflow: hidden;
+  background: #203d34eb; color: #f6eed9; border: 1px solid #e9dcbc42;
+  backdrop-filter: blur(16px); color-scheme: dark; box-shadow: 0 16px 60px #09261d40;
+}
+.v-settings-dialog h2 { flex-shrink: 0; margin: 0 44px 20px 0; color: #f6eed9; font-size: 28px; }
+.v-settings-dialog .v-dialog-close { top: 13px; right: 13px; color: #f6eed9; border-radius: 8px; }
+.v-settings-dialog .v-dialog-close:hover { background: #ffffff12; }
+.v-settings-workspace { display: flex; flex-direction: column; gap: 16px; min-height: 0; flex: 1; }
+.v-settings-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; flex-shrink: 0; padding: 4px; border: 1px solid #f6eed928; border-radius: 12px; background: #092a232b; }
+.v-settings-tabs button { display: flex; justify-content: center; align-items: center; gap: 6px; min-height: 44px; padding: 8px 6px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #e3e5cc; font: 500 13px var(--font-outfit), sans-serif; cursor: pointer; }
+.v-settings-tabs button[aria-pressed='true'] { background: #e5d7b0; color: #24483b; border-color: #f3e7c7; }
+.v-settings-tabs button:hover:not([aria-pressed='true']) { background: #ffffff0d; }
+.v-settings-content { min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 3px 3px; scrollbar-width: thin; scrollbar-color: #b6c3a76b transparent; }
+.v-settings-fields { display: grid; gap: 18px; }
+.v-settings-fields > label, .v-settings-report { display: grid; gap: 8px; font-size: 14px; }
+.v-settings-dialog select { width: 100%; min-height: 44px; padding: 10px 12px; background: #15372ee0; color: #f6eed9; border: 1px solid #dddac149; border-radius: 8px; font: 14px var(--font-outfit), sans-serif; }
+.v-settings-dialog select option { background: #203d34; color: #f6eed9; }
+.v-settings-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+.v-settings-section-heading h3 { font: 500 16px var(--font-outfit), sans-serif; margin: 0; color: #f6eed9; }
+.v-settings-reset, .v-binding-status button { min-height: 44px; padding: 8px 10px; font: 13px var(--font-outfit), sans-serif; color: #f1e6c8; border: 1px solid #dddac13b; border-radius: 8px; background: #f6eed909; cursor: pointer; }
+.v-settings-reset:hover, .v-binding-status button:hover { background: #f6eed914; }
+.v-settings-reset:disabled { opacity: .45; cursor: default; }
+.v-settings-dialog .v-primary { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 18px; min-height: 44px; background: #c6d4b8; border-color: #dde6c9; color: #214535; }
+.v-settings-dialog .v-soundtrack { display: grid; gap: 8px; color: #f6eed9; font-size: 14px; }
+.v-settings-dialog .v-soundtrack small { color: #c1ceba; }
+.v-settings-dialog .v-mix { gap: 14px; margin: 20px 0; }
+.v-settings-dialog .v-mix label { grid-template-columns: 114px minmax(0,1fr) 38px; gap: 10px; color: #f6eed9; font-size: 13px; }
+.v-settings-dialog .v-mix output, .v-settings-range output { color: #ead8ad; font-variant-numeric: tabular-nums; }
+.v-settings-dialog input[type='range'] { width: 100%; min-width: 0; min-height: 32px; accent-color: #dfd1a4; cursor: pointer; }
+.v-settings-dialog input[type='checkbox'] { accent-color: #dfd1a4; }
+.v-settings-range { display: grid; gap: 6px; margin-bottom: 16px; font-size: 14px; }
+.v-settings-range > span { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.v-settings-advanced { border-top: 1px solid #f6eed922; padding-top: 6px; font-size: 14px; }
+.v-settings-advanced summary, .v-binding-group summary { display: list-item; padding: 12px 0; min-height: 44px; box-sizing: border-box; cursor: pointer; color: #dfdfc7; }
+.v-settings-advanced .v-check { min-height: 44px; font-size: 14px; }
+.v-settings-report { margin-top: 12px; }
+.v-settings-report textarea { width: 100%; box-sizing: border-box; min-height: 110px; border: 1px solid #dddac13b; border-radius: 8px; padding: 10px; background: #112d24; color: #f6eed9; font: 12px monospace; }
+.v-settings-help { margin: 0 0 14px; font-size: 13px; line-height: 1.55; color: #c5d2c0; }
+.v-binding-group { border-top: 1px solid #f6eed922; }
+.v-binding-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 4px 0; font-size: 13px; }
+.v-binding-row > button { display: flex; align-items: center; justify-content: center; min-width: 64px; min-height: 44px; padding: 5px 10px; border: 1px solid #dddac149; border-radius: 8px; background: #112d2466; color: #f6eed9; cursor: pointer; }
+.v-binding-row > button:hover { background: #f6eed90f; }
+.v-binding-row > button.is-capturing { border-color: #edd59e; background: #eddaaa20; }
+.v-binding-row kbd { font: 500 13px var(--font-outfit), sans-serif; }
+.v-binding-status { padding: 12px; margin-bottom: 12px; border: 1px solid #e6d3a35e; border-radius: 8px; background: #e6d3a314; color: #fff0ca; font-size: 13px; line-height: 1.5; }
+.v-binding-status > div { display: flex; gap: 8px; margin-top: 8px; }
+.v-settings-footer { display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid #f6eed922; flex-shrink: 0; font-size: 12px; color: #bdcbbb; }
+.v-settings-footer a { color: #e9d8ad; text-underline-offset: 3px; }
+.v-settings-dialog button:focus-visible, .v-settings-dialog input:focus-visible, .v-settings-dialog select:focus-visible, .v-settings-dialog summary:focus-visible, .v-settings-dialog a:focus-visible, .v-settings-dialog textarea:focus-visible { outline: 2px solid #f0dca5; outline-offset: 2px; }
+@media (max-width: 900px) {
+  .v-dialog.v-settings-dialog { top: 12px; bottom: auto; max-height: calc(100dvh - 24px); right: 12px; width: min(390px, calc(100vw - 24px)); padding: 18px; }
 }

@@ -1,0 +1,23 @@
+{
+  "scope": "Accepted race controls, lap and farm transition",
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "Real F accepts the mounted horse in the stable-side start zone and aligns it to the actual ribbon for Rowan\u2019s countdown",
+    "Race countdown occupies the top center without obscuring the horse",
+    "The accepted next checkpoint has a visible course marker",
+    "racing fits 1366x768 with 44px targets and real keycaps",
+    "racing activity HUD remains centered and clear at 1366x768",
+    "racing fits 1280x720 with 44px targets and real keycaps",
+    "racing activity HUD remains centered and clear at 1280x720",
+    "racing fits 1024x640 with 44px targets and real keycaps",
+    "racing activity HUD remains centered and clear at 1024x640",
+    "F leaves the race while retaining the accepted horse ride",
+    "Actual horse keys complete every ordered checkpoint and one full lap",
+    "Rider and observer receive the same completed race result",
+    "Escape safely dismounts after a race",
+    "A completed race yields to the current farm timer when the rider returns to the fields",
+    "Disconnect releases petting; reconnect receives accepted town state",
+    "No browser page errors (0)"
+  ],
+  "errors": []
+}

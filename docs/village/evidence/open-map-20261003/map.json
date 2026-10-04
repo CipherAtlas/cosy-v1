@@ -1,0 +1,18 @@
+{
+  "layoutSha256": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0",
+  "objects": 352,
+  "distantTrees": 0,
+  "nearbyTrees": 42,
+  "willows": 2,
+  "flatBase": "flat",
+  "openWorld": true,
+  "water": [
+    "river",
+    "pond"
+  ],
+  "physics": {
+    "colliders": 113,
+    "benches": 7
+  },
+  "scope": "local only; no deployment"
+}

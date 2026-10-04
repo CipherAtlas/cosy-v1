@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "scope": "Real local editor controls and Apply endpoint; isolated working files and browser origin",
+  "checks": [
+    "The complete canonical town imports without changing objects, transforms, terrain or routes",
+    "The real editor validates pip's canonical resident route: pip can reach all 16 waypoints using the playable movement rules.",
+    "The real editor validates maple's canonical resident route: maple can reach all 13 waypoints using the playable movement rules.",
+    "The real editor validates moss's canonical resident route: moss can reach all 10 waypoints using the playable movement rules.",
+    "The real editor validates luma's canonical resident route: luma can reach all 14 waypoints using the playable movement rules.",
+    "The real editor validates wren's canonical resident route: wren can reach all 4 waypoints using the playable movement rules.",
+    "Named working-copy save preserves the entire canonical town",
+    "The canonical working copy and resident routes survive a real browser reload",
+    "The real Apply endpoint accepts the complete canonical town: 200",
+    "Apply writes exactly the canonical objects, terrain and resident routes to the isolated playable file",
+    "Real Apply retains the previous isolated playable bytes in its history",
+    "The active source layout and every original preset/named design remain byte-identical",
+    "Canonical editor Apply produces no page errors"
+  ],
+  "errors": [],
+  "routes": [
+    {
+      "id": "pip",
+      "result": "pip can reach all 16 waypoints using the playable movement rules."
+    },
+    {
+      "id": "maple",
+      "result": "maple can reach all 13 waypoints using the playable movement rules."
+    },
+    {
+      "id": "moss",
+      "result": "moss can reach all 10 waypoints using the playable movement rules."
+    },
+    {
+      "id": "luma",
+      "result": "luma can reach all 14 waypoints using the playable movement rules."
+    },
+    {
+      "id": "wren",
+      "result": "wren can reach all 4 waypoints using the playable movement rules."
+    }
+  ],
+  "fileId": "layout-11d54fe7-cf66-4a5b-9d14-a9578901f061",
+  "applyRevision": "7c8175cad8a4e6e4d656cca5f8b5068a3d59c80173ee8423d9605ba1c97ea4c1",
+  "canonicalHash": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "protectedBefore": {
+    "/Users/sabar/Documents/cosy-v1/public/village/world-layout.json": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "protectedAfter": {
+    "/Users/sabar/Documents/cosy-v1/public/village/world-layout.json": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "/Users/sabar/Documents/cosy-v1/tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0"
+  },
+  "isolatedPlayable": "/private/var/folders/kx/_0rmrf3144x8vw1kylhvtw2w0000gn/T/cosy-town-final-meadow-apply-_mzvvgw8/world-layout.json"
+}

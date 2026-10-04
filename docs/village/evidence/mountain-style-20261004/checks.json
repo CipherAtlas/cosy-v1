@@ -1,0 +1,19 @@
+{
+  "shaderErrors": [],
+  "translationPixelError": 0,
+  "seamPixelError": 0.0003837528935185185,
+  "skyDraws": 1,
+  "skyMeshes": 1,
+  "viewports": [
+    [
+      1280,
+      800
+    ],
+    [
+      1024,
+      700
+    ]
+  ],
+  "unchangedLayout": true,
+  "pageErrors": []
+}

@@ -1,0 +1,83 @@
+{
+  "status": "reviewed before final pet framing fixes",
+  "questions": [
+    "Is this enjoyable for a user?",
+    "Is this pretty enough?",
+    "Is the town big and healthy looking?",
+    "Does it make a user want to stay?"
+  ],
+  "passes": [
+    {
+      "image": "pasture-fences.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Clear paths, benches and a mixed grazing group invite a relaxed visit.",
+        "Is this pretty enough?": "Yes. Rounded rustic rails match the cottage timber and soft painted landscape.",
+        "Is the town big and healthy looking?": "Yes. Broad grass paddock, six animals and houses beyond look maintained and occupied.",
+        "Does it make a user want to stay?": "Yes. The bench and moving animals create a natural place to linger."
+      }
+    },
+    {
+      "image": "pond-life.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Ducks, swan, lily pads, dock and sitting affordance provide gentle activity.",
+        "Is this pretty enough?": "Yes. Teal water, reeds, stone banks and willows form a coherent sheltered pond.",
+        "Is the town big and healthy looking?": "Yes. The pond is generous and visibly alive; eight fish exist, though this wide capture does not establish close-up fish readability.",
+        "Does it make a user want to stay?": "Yes. A waterside bench and moving wildlife are good quiet destinations."
+      }
+    },
+    {
+      "image": "cow-highland-2-pet-1366.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Partly. Accepted pet feedback is warm, but the visitor obscures the muzzle.",
+        "Is this pretty enough?": "The cow and field fit the town style; pet framing still needs the face exposed.",
+        "Is the town big and healthy looking?": "Yes. Grass, fences, other animals and surrounding cottages look healthy and settled.",
+        "Does it make a user want to stay?": "Yes for the field atmosphere; clearer face contact would strengthen the pet moment."
+      }
+    },
+    {
+      "image": "sheep-2-pet-1366.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Partly. The pet is shared and responsive, but the blob covers much of the sheep face.",
+        "Is this pretty enough?": "Fleece, proportions and field styling are attractive; face framing needs refinement.",
+        "Is the town big and healthy looking?": "Yes. The herd and grass are lively without crowding the entire paddock.",
+        "Does it make a user want to stay?": "Yes. Soft animal company is inviting, with room to improve this camera angle."
+      }
+    },
+    {
+      "image": "lamb-2-pet-1366.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. The tiny face, small scale and nearby sheep are readable.",
+        "Is this pretty enough?": "Yes. Round eyes, ears and fleece make a distinct cute lamb.",
+        "Is the town big and healthy looking?": "Yes. The lamb and surrounding herd give the pasture a cared-for feeling.",
+        "Does it make a user want to stay?": "Yes. This little friend gives a reason to stop and interact again."
+      }
+    },
+    {
+      "image": "hedgehog-1-pet-1366.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Not consistently yet. The accepted pet is clear in the UI, but iris flowers partly cover the face.",
+        "Is this pretty enough?": "The original hedgehog asset is cute; its placement compromises the rendered interaction.",
+        "Is the town big and healthy looking?": "Yes. Beds, flowers, paving and cottages look maintained and inhabited.",
+        "Does it make a user want to stay?": "The garden invites lingering, but a visible tiny face is needed for the strongest pet moment."
+      }
+    },
+    {
+      "image": "hedgehog-1-pet-reduced.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Not yet. The visitor hides the hedgehog, making the pet difficult to see.",
+        "Is this pretty enough?": "The garden is attractive; the pet view fails face readability.",
+        "Is the town big and healthy looking?": "Yes for the surrounding garden and houses.",
+        "Does it make a user want to stay?": "Less than the normal view because the interaction target disappears."
+      }
+    }
+  ],
+  "recommendations": [
+    "Move hedgehog home from [29,0,-4] to [30.3,0,1], where actual movement and all 24 points on an .85m roam ring are clear.",
+    "Use static side framing under reduced motion.",
+    "Reduce camera back offset and increase lateral offset so visitor does not obscure cow/sheep muzzles."
+  ],
+  "limits": [
+    "This is a qualitative review of local Chrome rendering, not user research or measured physical laptop performance.",
+    "Final revised export will be reviewed separately."
+  ]
+}

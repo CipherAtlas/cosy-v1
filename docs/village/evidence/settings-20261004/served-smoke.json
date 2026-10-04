@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:3051/",
+  "checks": [
+    "Actual served O shortcut opens the unified Settings workspace",
+    "Sound is initially selected",
+    "Experience switches without leaving the workspace",
+    "No page errors"
+  ],
+  "pageErrors": []
+}

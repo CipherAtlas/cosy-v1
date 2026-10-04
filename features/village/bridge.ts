@@ -40,6 +40,7 @@ export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, c
   geometry.setAttribute("position", new T.Float32BufferAttribute(vertices, 3));
   geometry.setAttribute("uv", new T.Float32BufferAttribute(uv, 2));
   geometry.setIndex(indices); geometry.computeVertexNormals();
+  geometry.userData.plantingSurface = "paving";
   const surface = new T.Mesh(geometry, paving); surface.name = "Continuous paved crossing";
   surface.receiveShadow = true; bridge.add(surface);
   const blockGeometry = new T.BoxGeometry(1, 1, 1);

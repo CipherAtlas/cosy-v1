@@ -4,7 +4,7 @@ const path = require('node:path');
 const build = process.argv[2];
 if (!build) throw new Error('Pass the absolute directory containing compiled movement.js, environment.js and composition.js.');
 const { VillageMovement, MOVEMENT } = require(path.join(build, 'movement.js'));
-const { BRIDGE, bridgeHeight } = require(path.join(build, 'environment.js'));
+const { BRIDGE, bridgeHeight, setAuthoredWorld, floorHeight } = require(path.join(build, 'environment.js'));
 const { VillageScore } = require(path.join(build, 'composition.js'));
 const input = { x: 0, z: -1, run: false, sprint: false, blocked: false };
 const simulate = (m, seconds, fps, controls = input) => { for (let i = 0; i < Math.round(seconds * fps); i++) m.update(1 / fps, controls); };
@@ -68,6 +68,26 @@ test('a low ceiling stops ascending motion',()=>{
  const m=new VillageMovement([{x:0,z:20,w:3,d:3,bottom:2.3,top:2.6}],()=>{});m.jump();let high=0;
  for(let i=0;i<60;i++){m.update(1/60,{...input,x:0,z:0});high=Math.max(high,m.position.y);}
  assert(high<=.501);assert(m.grounded);
+});
+test('sculpted cliffs refuse slow and fast climbing while gentle terrain and jumps remain usable',()=>{
+ const authored = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], swings: [], crumbPouches: [], puppies: [], routes: {} };
+ try {
+  for (const fps of [30, 60, 120]) {
+   setAuthoredWorld({ ...authored, terrain: { version: 1, cellSize: 2, samples: [[10,11,30],[11,11,30]] } });
+   for (const sprint of [false,true]) {
+    const m = new VillageMovement([],()=>{}); m.settle(20,20); const start = m.position.y;
+    simulate(m,2,fps,{...input,z:1,sprint});
+    assert(m.position.z<20.01); assert(Math.abs(m.position.y-start)<.02);
+   }
+   const jumping = new VillageMovement([],()=>{}); jumping.settle(20,20); jumping.jump(); let apex = jumping.position.y;
+   for (let i=0;i<fps*2;i++) { jumping.update(1/fps,{...input,z:1,sprint:true}); apex=Math.max(apex,jumping.position.y); }
+   assert(apex<1.5); assert(jumping.position.z<20.2);
+   setAuthoredWorld({ ...authored, terrain: { version: 1, cellSize: 2, samples: [[10,11,1],[11,11,1],[10,12,1],[11,12,1]] } });
+   const slope = new VillageMovement([],()=>{}); slope.settle(20,20);
+   simulate(slope,1,fps,{...input,z:1});
+   assert(slope.position.z>22); assert(Math.abs(slope.position.y-floorHeight(slope.position.x,slope.position.z))<.01);
+  }
+ } finally { setAuthoredWorld(authored); }
 });
 test('score is seed-reproducible, evolves over long sessions and keeps distinct orchestration',()=>{
  for(const vibe of ['piano','lofi','jazz']){

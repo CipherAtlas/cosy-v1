@@ -1,4 +1,5 @@
 import * as T from "three";
+import type { AnimalSoundSource } from "./townAnimalAudio";
 import { PUPPY_PATROLS, type SharedActor } from "./sharedActors";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { PuppyAnimation } from "./puppyAnimation";
@@ -7,6 +8,8 @@ import { VillageMovement } from "./movement";
 import { VillageNavigation } from "./navigation";
 import type { AuthoredWorld, PuppyBreed, PuppyPlacement } from "./worldLayout";
 import type { SharedPuppyTrick } from "./sharedWorld";
+import { disposeAnimalRig, hasAnimalRig, makeAnimalRig, type AnimalRigSlug } from "./animalRig";
+import { createAnimalDialogueCue, type AnimalDialogueCue } from "./animalDialogue";
 
 export const PUPPY_INFO: Record<PuppyBreed, { model: string; name: string; breed: string; japanese: string }> = {
   corgi: { model: "Mochi", name: "Mochi", breed: "corgi", japanese: "モチ" },
@@ -35,7 +38,7 @@ type Puppy = {
   nextFollowPath: number; followGoal: [number, number] | null; stuckAge: number;
   command: PuppyCommand | null; commandAge: number; animation: PuppyAnimation;
   petTarget: [number, number] | null; petApproachAge: number;
-  sharedStartedAt: number | null;
+  sharedStartedAt: number | null; native: boolean; dialogue: AnimalDialogueCue;
 };
 
 const FOLLOW_DISTANCE = 1.55;
@@ -52,6 +55,11 @@ function heartGeometry() {
 export class PuppyPack {
   readonly group = new T.Group();
   readonly puppies: Puppy[] = [];
+  get soundSources(): AnimalSoundSource[] {
+    return this.group.visible ? this.puppies.filter(puppy => puppy.actor.visible && !puppy.petting && !puppy.command)
+      .map(puppy => ({ id: puppy.info.id, species: "dog", position: [puppy.actor.position.x, puppy.actor.position.y + .6, puppy.actor.position.z] })) : [];
+  }
+  private readonly cues: AnimalDialogueCue[] = [];
   private navigation: VillageNavigation;
   private probe: VillageMovement;
   private nextBark = 5;
@@ -88,15 +96,17 @@ export class PuppyPack {
     }
   }
   get sharedFollowers() { return this.followers; }
+  get dialogueCues(): readonly AnimalDialogueCue[] { return this.cues; }
 
   constructor(source: T.Object3D, clips: T.AnimationClip[], placements: PuppyPlacement[], colliders: Collider[], authored: AuthoredWorld,
     private onSound: (breed: PuppyBreed, position: [number, number, number], kind: "bark" | "happy") => void) {
     this.navigation = new VillageNavigation(colliders, authored);
     this.probe = new VillageMovement(colliders, () => {});
     for (const [index, placement] of placements.entries()) {
+      const slug = `dog-${placement.breed}` as AnimalRigSlug, native = hasAnimalRig(slug);
       const prototype = source.getObjectByName(PUPPY_INFO[placement.breed].model);
-      if (!prototype) continue;
-      const model = cloneSkeleton(prototype), actor = new T.Group();
+      if (!native && !prototype) continue;
+      const model = native ? makeAnimalRig(slug) : cloneSkeleton(prototype!), actor = new T.Group();
       model.position.set(0, 0, 0); model.rotation.set(0, 0, 0);
       model.traverse(node => {
         if (node instanceof T.Mesh) { node.castShadow = true; node.receiveShadow = true; }
@@ -114,24 +124,27 @@ export class PuppyPack {
         placement.x + dx * Math.cos(placement.yaw) + dz * Math.sin(placement.yaw),
         placement.z - dx * Math.sin(placement.yaw) + dz * Math.cos(placement.yaw),
       ];
-      const route = PUPPY_PATROLS[placement.breed].map(point).filter(([x, z]) => movement.clear(x, z));
-      if (!route.length) route.push([placement.x, placement.z]);
+      const route = this.navigation.safeRoute(PUPPY_PATROLS[placement.breed].map(point));
+      if (!route.length) continue;
+      movement.settle(...route[0]); actor.position.set(route[0][0], movement.position.y + heightOffset, route[0][1]);
       const hearts = [0, 1].map(i => {
         const mesh = new T.Mesh(heartGeometry(), new T.MeshBasicMaterial({ color: i ? "#ffd9a4" : "#f2a9b3", transparent: true, opacity: 0, side: T.DoubleSide, depthWrite: false }));
         mesh.visible = false; actor.add(mesh); return mesh;
       });
       const name = placement.name || PUPPY_INFO[placement.breed].name;
+      const dialogue = createAnimalDialogueCue(placement.id, "Woof woof~ (That feels lovely~)", "ワンワン〜（きもちいいな〜）");
+      this.cues.push(dialogue);
+      const part = (nativeName: string, oldName: string) => model.getObjectByName(native ? nativeName : PUPPY_INFO[placement.breed].model + oldName)!;
       this.puppies.push({ info: { id: placement.id, name, breed: placement.breed }, actor, model,
-        body: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Body")!,
-        head: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Head")!,
-        ears: ["EarLeft", "EarRight"].map(part => model.getObjectByName(PUPPY_INFO[placement.breed].model + part)!),
-        legs: ["FrontLeft", "FrontRight", "BackLeft", "BackRight"].map(part => model.getObjectByName(PUPPY_INFO[placement.breed].model + "Leg" + part)!),
-        tail: model.getObjectByName(PUPPY_INFO[placement.breed].model + "Tail")!, movement, route,
+        body: part("Body", "Body"), head: part("Head", "Head"),
+        ears: ["EarLeft", "EarRight"].map(name => part(name, name)),
+        legs: ["FrontLeft", "FrontRight", "BackLeft", "BackRight"].map(name => part("Leg" + name, "Leg" + name)),
+        tail: part("Tail", "Tail"), movement, route,
         waypoint: route.length > 1 ? 1 : 0, path: [], pause: 2 + index * 1.5,
         petAge: 100, petting: false, heading: placement.yaw, hearts, heightOffset,
         nextFollowPath: 0, followGoal: null, stuckAge: 0,
-        command: null, commandAge: 0, petTarget: null, petApproachAge: 0, sharedStartedAt: null,
-        animation: new PuppyAnimation(model, clips, PUPPY_INFO[placement.breed].model, index * 1.9) });
+        command: null, commandAge: 0, petTarget: null, petApproachAge: 0, sharedStartedAt: null, native, dialogue,
+        animation: new PuppyAnimation(model, native ? model.animations : clips, PUPPY_INFO[placement.breed].model, index * 1.9) });
     }
   }
 
@@ -304,6 +317,7 @@ export class PuppyPack {
       const now = Date.now() + this.sharedClock;
       for (const puppy of this.puppies) {
         const state = this.sharedStates.get(puppy.info.id);
+        puppy.dialogue.visible = false;
         if (!state) continue;
         const blend = 1 - Math.exp(-delta * 18);
         puppy.actor.position.lerp(new T.Vector3(state.x, state.y, state.z), blend);
@@ -315,6 +329,20 @@ export class PuppyPack {
         const action = puppy.command ?? (puppy.petting ? "pet" : null);
         if (action) puppy.animation.actions[action].time = age;
         puppy.animation.update(action ? 0 : delta, state.speed, puppy.command, puppy.petting, reduced, true, delta);
+        puppy.head.getWorldPosition(puppy.dialogue.position); puppy.dialogue.position.y += .18;
+        const response = state.mode === "pet" ? 3 : state.mode === "trick" ? 3.2 : ["follow", "hold"].includes(state.mode) ? 2.8 : 0;
+        puppy.dialogue.visible = this.group.visible && active && Boolean(state.owner) && age < response
+          && puppy.dialogue.position.distanceToSquared(player) < 100;
+        puppy.dialogue.priority = state.mode === "pet" ? 3 : state.mode === "trick" ? 2 : 1;
+        if (state.mode === "pet") {
+          puppy.dialogue.text.en = "Woof woof~ (That feels lovely~)"; puppy.dialogue.text.ja = "ワンワン〜（きもちいいな〜）";
+        } else if (state.mode === "trick") {
+          puppy.dialogue.text.en = "Woof~ (Look what I can do~)"; puppy.dialogue.text.ja = "ワン〜（こんなこともできるよ〜）";
+        } else if (state.mode === "follow") {
+          puppy.dialogue.text.en = "Woof~ (I’ll walk with you~)"; puppy.dialogue.text.ja = "ワン〜（いっしょにおさんぽしよう〜）";
+        } else {
+          puppy.dialogue.text.en = "Woof~ (Shall we play~)"; puppy.dialogue.text.ja = "ワン〜（いっしょにあそぼう〜）";
+        }
         puppy.hearts.forEach((heart, index) => {
           const heartAge = age - .35 - index * .28;
           heart.visible = puppy.petting && !reduced && heartAge > 0 && heartAge < 1.45;
@@ -326,6 +354,7 @@ export class PuppyPack {
       }
       return;
     }
+    this.cues.forEach(cue => { cue.visible = false; });
     if (active && this.followingIds.length) {
       const last = this.playerTrail.at(-1)!;
       const travel = Math.hypot(player.x - last[0], player.z - last[1]);
@@ -459,5 +488,12 @@ export class PuppyPack {
     }
   }
 
-  dispose() { this.puppies.forEach(puppy => puppy.animation.dispose()); }
+  dispose() {
+    this.puppies.forEach(puppy => {
+      puppy.animation.dispose();
+      if (puppy.native) disposeAnimalRig(puppy.model as T.Group);
+      puppy.hearts.forEach(heart => { heart.geometry.dispose(); (heart.material as T.Material).dispose(); });
+    });
+    this.cues.forEach(cue => { cue.visible = false; });
+  }
 }

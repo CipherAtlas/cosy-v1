@@ -1,0 +1,306 @@
+{
+  "file": "farm-animals.glb",
+  "sha256": "36abeebdb6261e565d69a5447e7f51880aba6887c10ac62be27f6adb0b43ee4d",
+  "bytes": 3474608,
+  "forward": "+Z",
+  "pivot": "floor",
+  "models": [
+    {
+      "root": "CowHighland",
+      "meshes": 8,
+      "triangles": 27636,
+      "blenderBounds": [
+        [
+          -0.731067419052124,
+          -1.3299999237060547,
+          -5.21540641784668e-08
+        ],
+        [
+          0.731067419052124,
+          1.1469099521636963,
+          1.9810798168182373
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        1.462134838104248,
+        2.476909875869751,
+        1.9810798689723015
+      ],
+      "joints": [
+        "CowHighlandBody",
+        "CowHighlandHead",
+        "CowHighlandLegBackLeft",
+        "CowHighlandLegBackRight",
+        "CowHighlandLegFrontLeft",
+        "CowHighlandLegFrontRight",
+        "CowHighlandTail"
+      ]
+    },
+    {
+      "root": "CowHighlandGirl",
+      "meshes": 8,
+      "triangles": 29148,
+      "blenderBounds": [
+        [
+          -0.731067419052124,
+          -1.3299999237060547,
+          -5.21540641784668e-08
+        ],
+        [
+          0.731067419052124,
+          1.1469099521636963,
+          1.9810798168182373
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        1.462134838104248,
+        2.476909875869751,
+        1.9810798689723015
+      ],
+      "joints": [
+        "CowHighlandGirlBody",
+        "CowHighlandGirlHead",
+        "CowHighlandGirlLegBackLeft",
+        "CowHighlandGirlLegBackRight",
+        "CowHighlandGirlLegFrontLeft",
+        "CowHighlandGirlLegFrontRight",
+        "CowHighlandGirlTail"
+      ]
+    },
+    {
+      "root": "Sheep",
+      "meshes": 8,
+      "triangles": 8424,
+      "blenderBounds": [
+        [
+          -0.4471190869808197,
+          -0.8549999594688416,
+          7.450580596923828e-09
+        ],
+        [
+          0.4471190869808197,
+          0.8100000023841858,
+          1.1450001001358032
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.8942381739616394,
+        1.6649999618530273,
+        1.1450000926852226
+      ],
+      "joints": [
+        "SheepBody",
+        "SheepHead",
+        "SheepLegBackLeft",
+        "SheepLegBackRight",
+        "SheepLegFrontLeft",
+        "SheepLegFrontRight",
+        "SheepTail"
+      ]
+    },
+    {
+      "root": "Lamb",
+      "meshes": 8,
+      "triangles": 8004,
+      "blenderBounds": [
+        [
+          -0.4471190273761749,
+          -0.8550000786781311,
+          2.2351741790771484e-08
+        ],
+        [
+          0.4471190571784973,
+          0.8100000619888306,
+          1.1449999809265137
+        ]
+      ],
+      "rootScale": [
+        0.6299999952316284,
+        0.6299999952316284,
+        0.6299999952316284
+      ],
+      "dimensions": [
+        0.563369989005384,
+        1.0489500806808465,
+        0.721349968442321
+      ],
+      "joints": [
+        "LambBody",
+        "LambHead",
+        "LambLegBackLeft",
+        "LambLegBackRight",
+        "LambLegFrontLeft",
+        "LambLegFrontRight",
+        "LambTail"
+      ]
+    },
+    {
+      "root": "Hedgehog",
+      "meshes": 8,
+      "triangles": 20192,
+      "blenderBounds": [
+        [
+          -0.2699182331562042,
+          -0.4789999723434448,
+          3.725290298461914e-09
+        ],
+        [
+          0.2696879804134369,
+          0.43290138244628906,
+          0.47239118814468384
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.5396062135696411,
+        0.9119013547897339,
+        0.47239118441939354
+      ],
+      "joints": [
+        "HedgehogBody",
+        "HedgehogHead",
+        "HedgehogLegBackLeft",
+        "HedgehogLegBackRight",
+        "HedgehogLegFrontLeft",
+        "HedgehogLegFrontRight",
+        "HedgehogTail"
+      ]
+    },
+    {
+      "root": "OwlBrown",
+      "meshes": 5,
+      "triangles": 7972,
+      "blenderBounds": [
+        [
+          -0.3019999861717224,
+          -0.2889999747276306,
+          0.0162946879863739
+        ],
+        [
+          0.3019999861717224,
+          0.26215583086013794,
+          0.9000380039215088
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.6039999723434448,
+        0.5511558055877686,
+        0.8837433159351349
+      ],
+      "joints": [
+        "OwlBody",
+        "OwlHead",
+        "OwlWingLeft",
+        "OwlWingRight"
+      ]
+    },
+    {
+      "root": "OwlFeedingPerch",
+      "meshes": 1,
+      "triangles": 2080,
+      "blenderBounds": [
+        [
+          -2.1500000953674316,
+          -1.6100000143051147,
+          -0.04999999701976776
+        ],
+        [
+          2.4200000762939453,
+          0.23999999463558197,
+          2.2625834941864014
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        4.570000171661377,
+        1.8500000089406967,
+        2.312583491206169
+      ],
+      "joints": []
+    },
+    {
+      "root": "ForageApple",
+      "meshes": 1,
+      "triangles": 1048,
+      "blenderBounds": [
+        [
+          -0.11045239865779877,
+          -0.11800001561641693,
+          0.0
+        ],
+        [
+          0.12238000333309174,
+          0.11800001561641693,
+          0.2487606257200241
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.2328324019908905,
+        0.23600003123283386,
+        0.2487606257200241
+      ],
+      "joints": []
+    },
+    {
+      "root": "ForageMushroom",
+      "meshes": 1,
+      "triangles": 1148,
+      "blenderBounds": [
+        [
+          -0.12600000202655792,
+          -0.12600000202655792,
+          0.0
+        ],
+        [
+          0.12600000202655792,
+          0.12600000202655792,
+          0.23599998652935028
+        ]
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.25200000405311584,
+        0.25200000405311584,
+        0.23599998652935028
+      ],
+      "joints": []
+    }
+  ]
+}

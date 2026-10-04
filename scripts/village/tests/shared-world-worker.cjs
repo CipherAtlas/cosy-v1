@@ -7,6 +7,9 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
 }).outputText, filename);
 const { VillageSimulation } = require('../../../worker/simulation.ts');
+const { HorseRiding } = require('../../../worker/horseRiding.ts');
+const { VillageMovement } = require('../../../features/village/movement.ts');
+const environment = require('../../../features/village/environment.ts');
 const garden = require('../../../features/village/garden.ts');
 const { ACTIVITY_STAGES } = require('../../../features/village/sharedActors.ts');
 const physics = require('../../../worker/world-physics.json');
@@ -23,7 +26,7 @@ const makeSocket = id => {
 };
 const a = makeSocket('a'), b = makeSocket('b'), c = makeSocket('c');
 const ctx = { getWebSockets: () => sockets, acceptWebSocket: socket => sockets.push(socket),
-  storage: { kv: { get: key => records.get(key), put: (key, value) => records.set(key, JSON.parse(JSON.stringify(value))) }, getAlarm: async () => null, setAlarm: async () => {} } };
+  storage: { transactionSync: callback => callback(), kv: { get: key => records.get(key), put: (key, value) => records.set(key, JSON.parse(JSON.stringify(value))) }, getAlarm: async () => null, setAlarm: async () => {} } };
 const mod = { exports: {} };
 const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n/gm, '')
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');
@@ -137,14 +140,14 @@ const puppy = () => world.simulation.actors.find(actor => actor.state.kind === '
   const luma = world.simulation.actor('luma', 'resident');
   const lumaTea = [luma.state.x, luma.state.z];
   check(luma.state.owner === a.visitor.id && luma.state.mode === 'activity', 'Tea holds the same shared Luma for the accepted visitor');
-  world.garden.mintTea = 1;
+  world.inventories.get(a.visitor.inventoryToken).inventory.mintTea = 1;
   await move(a, 15, -10); await send(a, { type: 'garden', action: { kind: 'drink' } });
   check(luma.state.gesture?.kind === 'tea' && luma.state.gesture.at === now,
     'Accepted tea actions give the owned companion one shared gesture clock');
   const teaGesture = luma.state.gesture.at;
   world.simulation.gardenMoment(d.visitor, { kind: 'drink' }, now + 1);
   check(luma.state.gesture.at === teaGesture, 'Another visitor cannot restart an owned companion gesture');
-  world.garden.mint = 1;
+  world.inventories.get(a.visitor.inventoryToken).inventory.mint = 1;
   await move(a, 13.9, -10); await send(a, { type: 'garden', action: { kind: 'gift', crop: 'mint' } });
   check(world.simulation.gift?.crop === 'mint', 'Accepted gifts enter the shared animation snapshot');
   await interact(a, { kind: 'leave' });
@@ -220,6 +223,110 @@ const puppy = () => world.simulation.actors.find(actor => actor.state.kind === '
     Array.from({ length: 180 }, (_, step) => [Math.sin(step + visitor) * 150, Math.cos(step + visitor) * 150]));
   check(Buffer.byteLength(JSON.stringify(capacity.save())) < 128 * 1024,
     'A 64-visitor world persists only needed follower trails within the shared-state storage limit');
-  console.log(`${checks.length} shared-world Worker checks passed.`);
+  const rider = makeSocket('rider'), contender = makeSocket('contender');
+  const horse = world.simulation.actors.find(actor => actor.state.kind === 'horse');
+  check(!!horse, 'Authored horse placements create shared horse actors');
+  const mount = socket => interact(socket, { kind: 'horse', id: horse.state.id, action: 'mount' });
+  const horsePose = () => ({ ...horse.state });
+  await move(rider, horse.state.x + 2, horse.state.z); await move(contender, horse.state.x - 2, horse.state.z);
+  check((await mount(rider)).ok, 'The first nearby visitor atomically mounts the authored horse');
+  check(!(await mount(contender)).ok && horse.state.owner === rider.visitor.id, 'Competing mounts cannot replace the accepted rider');
+  check(!(await interact(contender, { kind: 'horse', id: horse.state.id, action: 'dismount' })).ok, 'Other visitors cannot dismount the rider');
+  const mountPose = horsePose();
+  await move(rider, -80, -80);
+  check(horse.state.x === mountPose.x && rider.visitor.x === mountPose.x, 'Mounted move packets cannot teleport either horse or rider');
+  await send(contender, { type: 'horseInput', forward: 1, turn: 1, sprint: true, brake: false });
+  await tick(rider, { horse: horse.state.id });
+  check(horse.state.speed === 0, 'Non-owners cannot steer the mounted horse');
+  await send(rider, { type: 'horseInput', forward: 1, turn: 0, sprint: true, brake: false });
+  for (let index = 0; index < 12; index++) {
+    now += 100; await send(rider, { type: 'horseInput', forward: 1, turn: 0, sprint: true, brake: false });
+  }
+  check(Math.hypot(horse.state.x - mountPose.x, horse.state.z - mountPose.z) > 1 && horse.state.speed <= 9,
+    'Worker time and bounded acceleration control accepted riding movement');
+  check(rider.visitor.x === horse.state.x && rider.visitor.z === horse.state.z && rider.visitor.y > horse.state.y,
+    'Accepted horse movement attaches the shared rider to its saddle');
+  const movingPose = horsePose();
+  now += 600; await tick(rider, { horse: horse.state.id });
+  check(horse.state.x === movingPose.x && horse.state.z === movingPose.z && horse.state.speed === 0,
+    'Missing riding inputs stop motion without requiring a dismount');
+  const dismounted = await interact(rider, { kind: 'horse', id: horse.state.id, action: 'dismount' });
+  check(dismounted.ok && dismounted.position && horse.state.owner === null && horse.movement.clear(dismounted.position[0], dismounted.position[2]),
+    'Dismount lands on collision-clear nearby ground and frees the horse');
+  check((await mount(rider)).ok, 'A safely dismounted visitor can mount again');
+  const beforeForced = horsePose();
+  now += 10; await send(rider, { type: 'heartbeat', horse: horse.state.id, active: false });
+  check(horse.state.owner === rider.visitor.id, 'Inactive heartbeat inside publication interval reproduces the pending forced-exit race');
+  await send(rider, { type: 'horseInput', forward: 0, turn: 0, sprint: false, brake: true });
+  check(horse.state.owner === null && !rider.visitor.horse, 'Losing active presence releases the horse immediately');
+  const forcedLanding = [rider.visitor.x, rider.visitor.y, rider.visitor.z];
+  const forcedMove = contender.messages.findLast(message => message.type === 'move' && message.id === rider.visitor.id);
+  check(forcedLanding.every(Number.isFinite) && Math.hypot(forcedLanding[0] - beforeForced.x, forcedLanding[2] - beforeForced.z) > 1
+    && JSON.stringify([forcedMove.x, forcedMove.y, forcedMove.z]) === JSON.stringify(forcedLanding),
+    'A rejected input preserves and broadcasts the forced dismount ground position');
+  await tick(rider, { active: false });
+  check(JSON.stringify([rider.visitor.x, rider.visitor.y, rider.visitor.z]) === JSON.stringify(forcedLanding),
+    'A later heartbeat cannot overwrite the forced landing with the old saddle position');
+  await tick(rider); check((await mount(rider)).ok, 'Returning active visitors can rejoin the horse');
+  await interact(rider, { kind: 'activity', id: 'focus' });
+  check(horse.state.owner === null && rider.visitor.activity === 'focus', 'Entering private focus releases the outdoor horse');
+  await interact(rider, { kind: 'leave' }); await move(rider, horse.state.x + 2, horse.state.z); await mount(rider);
+  const savedRide = new VillageSimulation(world.simulation.save());
+  check(savedRide.actor(horse.state.id, 'horse').state.owner === rider.visitor.id, 'Worker reconstruction preserves the accepted rider in snapshots');
+  await world.webSocketClose(rider);
+  check(horse.state.owner === null && horse.state.mode === 'idle', 'Disconnect frees the horse at its actual final position');
+  await move(contender, horse.state.x + 2, horse.state.z); check((await mount(contender)).ok, 'Another visitor can mount after rider disconnect');
+  await tick(contender); await tick(contender);
+  check(horse.state.owner === contender.visitor.id && contender.visitor.reservationUntil > now,
+    'Heartbeats before a mount reply preserve the full confirmation grace period');
+  now += 4600; await tick(contender);
+  check(horse.state.owner === null, 'A mount reply that never reaches its client cannot reserve the horse forever');
+  const ridingPhysics = new HorseRiding();
+  const obstacleHorse = { state: { ...horse.state, x: 42, z: 19, heading: 0, speed: 0 },
+    movement: new VillageMovement([{ x: 42, z: 23, w: 6, d: 1, top: 5 }], () => {}) };
+  for (let index = 0; index < 70; index++) {
+    now += 100; ridingPhysics.input(obstacleHorse, { forward: 1, turn: 0, sprint: true, brake: false }, now);
+    ridingPhysics.step(obstacleHorse, 1, .1, now, () => false);
+  }
+  check(obstacleHorse.state.z < 21.6 && ridingPhysics.clear(obstacleHorse, obstacleHorse.state.x, obstacleHorse.state.z, 0, 1),
+    'Galloping substeps stop the full horse footprint before a solid obstacle');
+  check(!ridingPhysics.clear(obstacleHorse, environment.riverX(20), 20, 0, 1), 'Horse footprint cannot ride through unbridged river water');
+  check(!ridingPhysics.input(obstacleHorse, { forward: 100, turn: 0, sprint: true, brake: false }, now)
+    && !ridingPhysics.input(obstacleHorse, { forward: 1, turn: NaN, sprint: true, brake: false }, now),
+    'Out-of-range and non-finite riding inputs are rejected');
+  const expanded = { ...world.simulation.authored, walkable: [...world.simulation.authored.walkable,
+    { id: 'test-expansion', x: 190, z: 20, radiusX: 15, radiusZ: 15, yaw: 0 }] };
+  environment.setAuthoredWorld(expanded);
+  check(ridingPhysics.clear(obstacleHorse, 190, 20, 0, 1) && !ridingPhysics.clear(obstacleHorse, 322, 20, 0, 1),
+    'Horse movement supports authored expansion beyond the old map while respecting ground bounds');
+  environment.setAuthoredWorld({ ...expanded, terrain: { version: 1, cellSize: 2,
+    samples: [[94, 10, 0], [95, 10, 0], [96, 10, 0], [94, 11, 5], [95, 11, 5], [96, 11, 5]] } });
+  check(!ridingPhysics.clear(obstacleHorse, 190, 21, 0, 1), 'Horses refuse steep edited terrain under their footprint');
+  environment.setAuthoredWorld(world.simulation.authored);
+    const privateToken = a.visitor.inventoryToken;
+  const personalRecord = world.inventories.get(privateToken);
+  personalRecord.inventory.apples = 2; personalRecord.inventory.mushrooms = 1; personalRecord.inventory.mint = 1;
+  world.restoreInventory(a.visitor); world.saveInventory(a.visitor);
+  const privateSnapshot = JSON.stringify(personalRecord.inventory);
+  const otherBasket = makeSocket('another-basket');
+  await send(otherBasket, { type: 'inventory_resume', token: '00000000-0000-0000-0000-000000000000', inventory: { apples: 9999, mint: 9999 } });
+  check(otherBasket.visitor.forageInventory.apples === 0 && otherBasket.visitor.forageInventory.mint === 0,
+    'Invented resume tokens and client counters cannot create personal resources');
+  check(!otherBasket.messages.some(message => message.type === 'forageInventory' && message.token === privateToken),
+    'Personal inventory tokens and updates are not broadcast to other visitors');
+  world = new World(ctx);
+  const resumedBasket = makeSocket('resumed-basket');
+  await send(resumedBasket, { type: 'inventory_resume', token: privateToken, inventory: { apples: 9999 } });
+  check(JSON.stringify(resumedBasket.visitor.forageInventory) === privateSnapshot,
+    'Worker reconstruction and a fresh socket restore only the accepted private basket');
+  const sameBrowser = makeSocket('same-browser-tab');
+  await send(sameBrowser, { type: 'inventory_resume', token: privateToken });
+  const accepted = resumedBasket.deserializeAttachment(); accepted.forageInventory.apples--;
+  resumedBasket.serializeAttachment(accepted); world.saveInventory(accepted);
+  check(sameBrowser.visitor.forageInventory.apples === 1 && resumedBasket.visitor.forageInventory.apples === 1,
+    'Two tabs for the same local user receive the same accepted resource deduction');
+  check(otherBasket.visitor.forageInventory.apples === 0,
+    'Updating one local basket never changes a different visitor basket');
+console.log(`${checks.length} shared-world Worker checks passed.`);
   if (process.env.OUTPUT_FILE) fs.writeFileSync(process.env.OUTPUT_FILE, JSON.stringify({ checks }, null, 2) + '\n');
 })().catch(error => { console.error(error); process.exitCode = 1; });

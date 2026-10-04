@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "Both new visitors start with empty private gift inventories",
+    "mushroom: visitor renders exactly the accepted gift on the hedgehog's back",
+    "mushroom: observer renders exactly the accepted gift on the hedgehog's back",
+    "mushroom: real E grants one private gift only to the receiving visitor"
+  ],
+  "errors": []
+}

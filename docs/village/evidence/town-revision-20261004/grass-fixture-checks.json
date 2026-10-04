@@ -1,0 +1,292 @@
+[
+  {
+    "id": "lamp-20",
+    "p": [
+      -3.1,
+      0,
+      20
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp-0",
+    "p": [
+      -3.1,
+      0,
+      0
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp--27",
+    "p": [
+      -4.8,
+      0,
+      -27
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "sunrise-meadow-swings",
+    "p": [
+      -46,
+      0.015,
+      36.5
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp-moon-bridge",
+    "p": [
+      -4.5,
+      0,
+      8.5
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp-moon-garden",
+    "p": [
+      16,
+      0,
+      1.5
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp-moon-birds",
+    "p": [
+      -31,
+      0,
+      9
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "lamp-moon-pond",
+    "p": [
+      -20,
+      0,
+      -41
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-garden-1",
+    "p": [
+      17,
+      0.1,
+      -2.3
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-garden-2",
+    "p": [
+      31.2,
+      0.1,
+      -16
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-garden-3",
+    "p": [
+      37.1,
+      0.1,
+      -2.3
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-pond-1",
+    "p": [
+      -33,
+      0.1,
+      1
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-pond-2",
+    "p": [
+      -50,
+      0.1,
+      -16
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "edge-lantern-pond-3",
+    "p": [
+      -32,
+      0.1,
+      -42.7
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-1",
+    "p": [
+      30.8,
+      0,
+      -33.2
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-2",
+    "p": [
+      37,
+      0,
+      -9
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-3",
+    "p": [
+      31,
+      0,
+      15
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-4",
+    "p": [
+      44,
+      0,
+      44.5
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-5",
+    "p": [
+      68,
+      0,
+      45
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-6",
+    "p": [
+      112,
+      0,
+      34
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-7",
+    "p": [
+      -56,
+      0,
+      -30
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-8",
+    "p": [
+      -40,
+      0,
+      7
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-9",
+    "p": [
+      28,
+      0,
+      -58.5
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-10",
+    "p": [
+      65,
+      0,
+      -49
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "town-lamp-11",
+    "p": [
+      91,
+      0,
+      -41
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "hedgehog-1",
+    "p": [
+      29.3,
+      0,
+      2.8
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "apple-tree-1",
+    "p": [
+      31.25,
+      0,
+      2.6
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "mushroom-patch-1",
+    "p": [
+      28.5,
+      0,
+      2.8
+    ],
+    "clear": true,
+    "dry": true
+  },
+  {
+    "id": "pasture-meadow-swings-2",
+    "p": [
+      -55,
+      0,
+      36
+    ],
+    "clear": true,
+    "dry": true
+  }
+]

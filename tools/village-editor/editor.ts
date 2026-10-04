@@ -1,3 +1,5 @@
+import { layoutWorldPoint } from "../../features/village/layoutTransforms";
+let flatteningWorld = false;
 import * as T from "three";
 import { landscapeHeight } from "../../features/village/environment";
 import { StudioView } from "./view";
@@ -6,6 +8,7 @@ import { projectWorldLayout, RESIDENT_IDS, type ResidentId, type ResidentRoute }
 import { setAuthoredWorld } from "../../features/village/environment";
 import { VillageNavigation } from "../../features/village/navigation";
 import { VillageMovement } from "../../features/village/movement";
+import { sculptTerrain, sampleTerrainHeight, terrainEditable } from "../../features/village/terrain";
 
 type DocumentState = { layout: Layout; fileId: string | null; revision: string };
 const $ = <E extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as E;
@@ -18,7 +21,7 @@ let clipboard: LayoutItem[] = [];
 let pasteCount = 0;
 let contextPoint: [number, number, number] | null = null;
 let extendingPath: string | null = null;
-const categories = ["All", "Buildings", "Bridges", "Nature", "Animals", "Villagers", "Puppies", "Furnishings", "Paths", "Landscape"];
+const categories = ["All", "Buildings", "Bridges", "Nature", "Animals", "Animal sculptures", "Town", "Villagers", "Puppies", "Furnishings", "Paths", "Landscape"];
 let state: DocumentState;
 let selection: string[] = [];
 let category = "All", tab = "assets", placement: string | null = null;
@@ -61,6 +64,7 @@ const view = new StudioView($("viewport"), {
   path: points => {
     const existing = state.layout.objects.find(item => item.id === extendingPath);
     const fence = placement === "fence";
+    const river = placement === "river";
     const added = transact(() => {
       if (existing?.path) {
         const root = view.model.roots.get(existing.id)!;
@@ -68,13 +72,13 @@ const view = new StudioView($("viewport"), {
           const local = root.worldToLocal(new T.Vector3(x, root.position.y, z)); return [local.x, local.z];
         }); selection = [existing.id];
       } else {
-        const origin = points[0], item = makeItem(fence ? "fence-line" : "custom-path", [origin[0], view.collision.height(...origin), origin[1]]);
-        item.path = { width: fence ? 1.4 : 2.4, points: points.map(([x, z]) => [x - origin[0], z - origin[1]]) };
+        const origin = points[0], item = makeItem(river ? "custom-river" : fence ? "fence-line" : "custom-path", [origin[0], view.collision.height(...origin), origin[1]]);
+        item.path = { width: river ? 6 : fence ? 1.4 : 2.4, points: points.map(([x, z]) => [x - origin[0], z - origin[1]]) };
         state.layout.objects.push(item); selection = [item.id];
       }
     });
-    extendingPath = null; placement = null; $("placement").hidden = true;
-    if (added) { updateSelection(); toast(fence ? "Fence added. Drag its points or height handle to shape it." : existing ? "Path extended. Its width and shape are still editable." : "Path added. Drag its points or width handle to shape it."); }
+    cancelPlacement();
+    if (added) { updateSelection(); toast(river ? "River added. Drag its points or width handle to shape it." : fence ? "Fence added. Drag its points or height handle to shape it." : existing ? "Path extended. Its width and shape are still editable." : "Path added. Drag its points or width handle to shape it."); }
   },
   editPath: (id, kind, index, point) => {
     const item = state.layout.objects.find(o => o.id === id);
@@ -107,6 +111,17 @@ const view = new StudioView($("viewport"), {
     }
     view.refreshBrush();
   },
+  sculpt: (point, sample) => {
+    if (sample) {
+      input("terrain-height").value = sampleTerrainHeight(state.layout.terrain, point[0], point[2]).toFixed(2);
+      select("terrain-mode").value = "flatten"; status("Level height sampled."); return;
+    }
+    if (!terrainEditable(point[0], point[2])) { status("Water, fixed activity foundations and the 640 m world edge are protected."); return; }
+    try {
+      state.layout.terrain = sculptTerrain(state.layout.terrain, point[0], point[2], Number(input("terrain-radius").value), Number(input("terrain-strength").value), select("terrain-mode").value as "raise" | "lower" | "flatten" | "smooth", Number(input("terrain-height").value));
+      setAuthoredWorld(projectWorldLayout(state.layout)); view.model.refreshTerrain(state.layout.terrain);
+    } catch (issue) { error(issue); }
+  },
   routePoint: point => {
     const id = select("route-resident").value as ResidentId;
     transact(() => {
@@ -123,7 +138,27 @@ const view = new StudioView($("viewport"), {
 
 function begin() { before = clone(state); }
 function finish() {
-  if (before && view.avoidOverlaps) view.collision.validateEdits(state.layout, before.layout);
+  const terrainChanged = before && JSON.stringify(before.layout.terrain) !== JSON.stringify(state.layout.terrain);
+  if (terrainChanged && before && !flatteningWorld) {
+    const oldObjects = new Map(before.layout.objects.map(item => [item.id, item]));
+    for (const item of state.layout.objects) {
+      const old = oldObjects.get(item.id);
+      if (!old || !item.visible || item.locked || !(/^(tree-\d+|cottage-\d+|puppy-|horse-|grass-)/.test(item.asset) || ["tower", "oak-bench", "meadow-swings", "bird-crumb-pouch"].includes(item.asset) || item.path)) continue;
+      const previousHeight = sampleTerrainHeight(before.layout.terrain, old.position[0], old.position[2]);
+      item.position[1] += sampleTerrainHeight(state.layout.terrain, item.position[0], item.position[2]) - previousHeight;
+    }
+  }
+  if (before) for (const item of state.layout.objects) {
+    const id = item.asset === "wren-caretaker" ? "wren" : item.asset.startsWith("villager-") ? item.asset.slice(9) as ResidentId : null;
+    const old = before.layout.objects.find(value => value.id === item.id);
+    if (!id || !old || JSON.stringify([old.position, old.rotation, old.scale]) === JSON.stringify([item.position, item.rotation, item.scale])) continue;
+    state.layout.routes ??= {};
+    const route = clone(state.layout.routes[id] ?? view.model.defaultRoutes[id]!);
+    const delta = { ...item, rotation: [0, item.rotation[1] - old.rotation[1], 0] as [number, number, number], scale: item.scale.map((value, index) => value / old.scale[index]) as [number, number, number] };
+    route.points = route.points.map(([x, z]) => { const point = layoutWorldPoint(delta, [x, 0, z], old.position); return [point[0], point[2]]; });
+    state.layout.routes[id] = route;
+  }
+  if (before && view.avoidOverlaps && !terrainChanged) view.collision.validateEdits(state.layout, before.layout);
   state.layout = validateLayout(state.layout, view.model.assets);
   if (before && JSON.stringify(before.layout) !== fingerprint()) { past.push(before); if (past.length > 80) past.shift(); future = []; }
   before = null; view.sync(state.layout); update(); draft();
@@ -205,17 +240,33 @@ function setTool(tool: string) { cancelPlacement(); routeEditing = false; view.s
 function startPlacement(asset: Asset) {
   if (!ready) return;
   if (asset.id === "fence-line") { startFence(); return; }
+  if (asset.id === "custom-river") { startRiver(); return; }
+  cancelPlacement();
   routeEditing = false; renderRoute();
   placement = asset.id; view.startPlacement(asset); $("placement").hidden = false; $("finish-path").hidden = true;
   $("placement-text").textContent = `Place ${asset.name.toLowerCase()} · [ / ] to turn`;
   renderAssets(); status("Click the ground to place. Keep clicking for more; Escape cancels.");
 }
-function startPath() { if (!ready) return; routeEditing = false; renderRoute(); extendingPath = null; placement = "path"; view.startPath(); $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = "Finish path"; $("placement-text").textContent = "Drag to draw a path, or click points for a curve"; renderAssets(); status("Drag a path segment or click two or more points. Enter finishes a curve."); }
-function startFence() { if (!ready) return; routeEditing = false; renderRoute(); extendingPath = null; placement = "fence"; view.startPath([], true); $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = "Finish fence"; $("placement-text").textContent = "Drag a fence line, or click its corner points"; renderAssets(); status("Draw a fence like a path. Enter finishes; Escape cancels."); }
-function cancelPlacement() { extendingPath = null; placement = null; view.cancelPlacement(); $("placement").hidden = true; button("paint-grass").setAttribute("aria-pressed", "false"); button("erase-planting").setAttribute("aria-pressed", "false"); renderAssets(); }
+function startPath() { if (!ready) return; cancelPlacement(); routeEditing = false; renderRoute(); extendingPath = null; placement = "path"; button("draw-path").setAttribute("aria-pressed", "true"); view.startPath(); $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = "Finish path"; $("placement-text").textContent = "Drag to draw a path, or click points for a curve"; renderAssets(); status("Drag a path segment or click two or more points. Enter finishes a curve."); }
+function startFence() { if (!ready) return; cancelPlacement(); routeEditing = false; renderRoute(); extendingPath = null; placement = "fence"; button("draw-fence").setAttribute("aria-pressed", "true"); view.startPath([], true); $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = "Finish fence"; $("placement-text").textContent = "Drag a fence line, or click its corner points"; renderAssets(); status("Draw a fence like a path. Enter finishes; Escape cancels."); }
+function startRiver() {
+  if (!ready) return;
+  cancelPlacement(); routeEditing = false; renderRoute(); placement = "river"; view.startPath();
+  button("draw-river").setAttribute("aria-pressed", "true");
+  $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = "Finish river";
+  $("placement-text").textContent = "Drag a river, or click points for its bends";
+  status("Draw flowing water like a path. Enter finishes; Escape cancels."); renderAssets();
+}
+function cancelPlacement() { extendingPath = null; placement = null; view.cancelPlacement(); $("placement").hidden = true; $("terrain-tool").hidden = true; button("draw-river").setAttribute("aria-pressed", "false"); button("draw-path").setAttribute("aria-pressed", "false"); button("draw-fence").setAttribute("aria-pressed", "false"); button("paint-grass").setAttribute("aria-pressed", "false"); button("erase-planting").setAttribute("aria-pressed", "false"); button("sculpt-terrain").setAttribute("aria-pressed", "false"); renderAssets(); }
 function finishPath() { if (view.finishPath()) { placement = null; $("placement").hidden = true; updateSelection(); renderAssets(); } }
-function setPreview(value: boolean) { preview = value; routeEditing = false; cancelPlacement(); document.body.classList.toggle("preview-mode", value); $("leave-preview").hidden = !value; view.setPreview(value); renderRoute(); }
+function setPreview(value: boolean) {
+  routeEditing = false; cancelPlacement();
+  if (!view.setPreview(value)) { toast("There is no clear ground to spawn on near this view. Frame a clear area and try again."); return; }
+  preview = value; document.body.classList.toggle("preview-mode", value); $("leave-preview").hidden = !value; $("preview-hint").hidden = !value;
+  renderRoute(); if (value) view.renderer.domElement.focus({ preventScroll: true }); else button("preview").focus();
+}
 function update() {
+  input("open-world").checked = Boolean(state.layout.openWorld);
   if (!ready) return;
   input("layout-name").value = state.layout.name;
   $("save-state").textContent = fingerprint() === savedFingerprint ? "Saved on this Mac" : state.fileId ? "Unsaved changes · draft kept" : "Working copy · draft kept";
@@ -262,8 +313,9 @@ function refreshFields() {
 function renderPathSettings(item: LayoutItem | null) {
   $("path-settings").hidden = !item?.path; if (!item?.path) return;
   const fence = item.asset === "fence-line";
-  $("path-settings-title").textContent = fence ? "Fence shape" : "Path shape";
-  $("path-shape-field").hidden = fence;
+  const river = item.asset === "custom-river";
+  $("path-settings-title").textContent = river ? "River shape" : fence ? "Fence shape" : "Path shape";
+  $("path-shape-field").hidden = fence || river;
   $("path-width-label").textContent = fence ? "Height (metres)" : "Width (metres)";
   input("path-width").max = fence ? "3" : "20";
   select("path-shape").value = item.asset === "path-straight" ? "straight" : "curved"; select("path-shape").disabled = item.locked;
@@ -363,7 +415,7 @@ async function applyToGame() {
     const result = await request<{ revision: string }>("/api/apply", { method: "POST", headers: { "Content-Type": "application/json", "If-Match": publishedRevision }, body: JSON.stringify(state.layout) });
     publishedRevision = result.revision;
     const playable = presets.find(preset => preset.id === "playable"); if (playable) playable.layout = clone(state.layout);
-    $<HTMLDialogElement>("layout-dialog").close(); toast("Applied to the local game. Reload its preview to see the new layout.");
+    $<HTMLDialogElement>("layout-dialog").close(); toast("Layout applied. Rebuild local shared-world physics and restart its server before riding or shared play; then reload the village.");
   } catch (issue) { error(issue); }
   finally { saving = false; button("apply-game").disabled = false; }
 }
@@ -373,7 +425,7 @@ function renderAssets() {
   const fragment = document.createDocumentFragment();
   for (const asset of [...view.model.assets.values()].sort((a, b) => categories.indexOf(a.category) - categories.indexOf(b.category))) {
     if (!asset.shelf || (category !== "All" && asset.category !== category) || !asset.name.toLowerCase().includes(query)) continue;
-    const card = dom("button", "asset-card"); card.dataset.asset = asset.id; card.setAttribute("aria-label", `Place ${asset.name}`); card.setAttribute("aria-pressed", String(placement === asset.id));
+    const card = dom("button", "asset-card"); card.dataset.asset = asset.id; card.setAttribute("aria-label", `Place ${asset.name}`); card.setAttribute("aria-pressed", String(placement === asset.id || asset.id === "custom-river" && placement === "river"));
     const img = dom("img"); img.alt = ""; if (asset.thumbnail) img.src = asset.thumbnail;
     card.append(img, dom("span", "", asset.name)); card.onclick = () => startPlacement(asset); fragment.append(card);
   }
@@ -430,7 +482,7 @@ function exportJSON() {
   a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); toast("Layout JSON exported.");
 }
 function openLayout(layout: Layout, fileId: string | null, revision = "") {
-  const validated = validateLayout(layout, view.model.assets);
+  const validated = validateLayout(view.model.editableLayout(layout), view.model.assets);
   past.push(clone(state)); future = [];
   state = { layout: validated, fileId, revision }; if (!fileId) state.layout.name = `${layout.name} copy`.slice(0, 100);
   savedFingerprint = fileId ? JSON.stringify(validated) : ""; selection = []; routeEditing = false; cancelPlacement(); view.sync(state.layout); update(); draft(); view.home();
@@ -502,7 +554,7 @@ input("object-name").onchange = () => transact(() => { const item = selectedItem
 input("object-visible").onchange = () => transact(() => { selectedItems().forEach(item => { item.visible = input("object-visible").checked; }); });
 input("object-locked").onchange = () => transact(() => { selectedItems().forEach(item => { item.locked = input("object-locked").checked; }); });
 input("path-width").onchange = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path) item.path.width = input("path-width").valueAsNumber; });
-select("path-shape").onchange = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path && item.asset !== "fence-line") item.asset = select("path-shape").value === "straight" ? "path-straight" : "path-curved"; });
+select("path-shape").onchange = () => transact(() => { const item = selectedItems(true)[0]; if (item?.path && !["fence-line", "custom-river"].includes(item.asset)) item.asset = select("path-shape").value === "straight" ? "path-straight" : "path-curved"; });
 input("path-length").onchange = () => {
   const length = input("path-length").valueAsNumber;
   const fence = selectedItems()[0]?.asset === "fence-line";
@@ -518,9 +570,10 @@ button("path-continue").onclick = () => {
   const item = selectedItems(true)[0]; if (!item?.path) return;
   const root = view.model.roots.get(item.id)!;
   const points = item.path.points.map(([x, z]) => { const p = root.localToWorld(new T.Vector3(x, 0, z)); return [p.x, p.z] as [number, number]; });
-  extendingPath = item.id; placement = item.asset === "fence-line" ? "fence" : "path"; view.startPath(points, item.asset === "path-straight" || item.asset === "fence-line");
-  $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = item.asset === "fence-line" ? "Finish fence" : "Finish path"; $("placement-text").textContent = `Continue from the last ${item.asset === "fence-line" ? "fence" : "path"} point`;
-  status(`Click to extend the ${item.asset === "fence-line" ? "fence" : "path"}, then finish. Escape cancels.`);
+  cancelPlacement(); extendingPath = item.id; placement = item.asset === "custom-river" ? "river" : item.asset === "fence-line" ? "fence" : "path";
+  view.startPath(points, item.asset === "path-straight" || item.asset === "fence-line");
+  $("placement").hidden = false; $("finish-path").hidden = false; button("finish-path").textContent = `Finish ${placement}`; $("placement-text").textContent = `Continue from the last ${placement} point`;
+  status(`Click to extend the ${placement}, then finish. Escape cancels.`);
 };
 for (const el of document.querySelectorAll<HTMLButtonElement>("[data-expand]")) el.onclick = () => transact(() => {
   const item = selectedItems(true)[0]; if (!item) return;
@@ -558,6 +611,7 @@ document.addEventListener("pointerdown", event => { if (!(event.target instanceo
 button("focus-object").onclick = () => view.focus(); button("home-view").onclick = () => view.home();
 button("start-house").onclick = () => { selection = [state.layout.objects.find(o => o.asset.startsWith("cottage-"))?.id ?? ""]; updateSelection(); view.focus(); setTool("rotate"); };
 button("draw-path").onclick = startPath; button("draw-fence").onclick = startFence; button("finish-path").onclick = finishPath; button("cancel-placement").onclick = cancelPlacement;
+button("draw-river").onclick = startRiver; button("close-terrain").onclick = cancelPlacement;
 button("paint-grass").onclick = () => {
   if (placement === "grass-brush") { cancelPlacement(); return; }
   cancelPlacement(); routeEditing = false; renderRoute(); placement = "grass-brush";
@@ -574,6 +628,39 @@ button("erase-planting").onclick = () => {
   status("Drag across planting to clear it. Paths and buildings stay in place; Undo restores the full stroke.");
 };
 select("erase-size").onchange = () => { if (placement === "planting-eraser") view.startErase(Number(select("erase-size").value)); };
+button("flatten-world").onclick = () => {
+  cancelPlacement();
+  flatteningWorld = true;
+  transact(() => {
+    state.layout = view.model.editableLayout(state.layout);
+    const previousTerrain = state.layout.terrain;
+    state.layout.terrain = { version: 1, cellSize: 2, base: "flat", samples: [] };
+    state.layout.openWorld = true;
+    state.layout.objects = state.layout.objects.filter(item => !item.asset.startsWith("mountain-") && !item.asset.startsWith("island-") && !item.asset.startsWith("land-hill") && item.asset !== "walkable-region");
+    for (const item of state.layout.objects) {
+      const height = Math.max(0, sampleTerrainHeight(state.layout.terrain, item.position[0], item.position[2]));
+      if (/^(forest-|tree-|willow-|bushes-|horse-|puppy-|grass-)/.test(item.asset) || item.asset === "castle")
+        item.position[1] = height;
+      else if (!["terrain", "river", "pond", "shore"].includes(item.asset))
+        item.position[1] = Math.max(height, item.position[1] + height - Math.max(0, sampleTerrainHeight(previousTerrain, item.position[0], item.position[2])));
+    }
+    // finish() must not apply sculpt deltas twice after explicitly grounding the whole map.
+  });
+  flatteningWorld = false;
+  status("The entire map is flat and open. River and pond kept. Undo restores your previous map.");
+};
+input("open-world").onchange = () => transact(() => { state.layout.openWorld = input("open-world").checked; });
+button("sculpt-terrain").onclick = () => {
+  if (placement === "terrain-brush") { cancelPlacement(); return; }
+  cancelPlacement(); routeEditing = false; selection = []; updateSelection(); renderRoute(); placement = "terrain-brush";
+  view.startTerrain(Number(input("terrain-radius").value)); button("sculpt-terrain").setAttribute("aria-pressed", "true");
+  $("terrain-tool").hidden = false;
+  $("placement").hidden = true;
+  status("Drag to sculpt. Alt-click samples a level height. Each stroke is one undo; water and activity foundations are protected.");
+};
+input("terrain-radius").oninput = () => { $("terrain-radius-value").textContent = `${input("terrain-radius").value} m`; if (placement === "terrain-brush") view.startTerrain(Number(input("terrain-radius").value)); };
+input("terrain-strength").oninput = () => { $("terrain-strength-value").textContent = input("terrain-strength").value; };
+input("terrain-height").onchange = () => { input("terrain-height").value = String(Math.max(0, Math.min(35, Number(input("terrain-height").value) || 0))); };
 select("route-resident").onchange = () => { routeEditing = false; renderRoute(); };
 button("route-edit").onclick = () => { if (!ready) return; cancelPlacement(); routeEditing = !routeEditing; renderRoute(); status(routeEditing ? "Click the ground to add waypoints. Use Done adding when finished." : "Route editing finished."); };
 button("route-check").onclick = () => { if (!ready) return; try { const result = checkRoute(select("route-resident").value as ResidentId); $("route-status").textContent = result; status(result); } catch (issue) { error(issue); } };
@@ -594,6 +681,11 @@ input("import-file").onchange = async () => {
   catch (issue) { error(issue); } finally { input("import-file").value = ""; }
 };
 button("preview").onclick = () => setPreview(true); button("leave-preview").onclick = () => setPreview(false);
+document.addEventListener("click", event => {
+  const target = event.target instanceof Element ? event.target.closest("button") : null;
+  if (!(target instanceof HTMLButtonElement) || target.disabled) return;
+  target.classList.add("is-pressed"); window.setTimeout(() => target.classList.remove("is-pressed"), 160);
+});
 for (const close of document.querySelectorAll<HTMLButtonElement>(".close-dialog")) close.onclick = () => close.closest("dialog")!.close();
 window.addEventListener("keydown", event => {
   if (!ready || document.querySelector("dialog[open]")) return;
@@ -614,11 +706,13 @@ window.addEventListener("keydown", event => {
     return;
   }
   if (placement && ["[", "]"].includes(event.key)) { view.turnPlacement(event.key === "[" ? -15 : 15); return; }
-  if ((placement === "path" || placement === "fence") && event.key === "Enter") { event.preventDefault(); finishPath(); return; }
+  if (["path", "fence", "river"].includes(placement ?? "") && event.key === "Enter") { event.preventDefault(); finishPath(); return; }
   const tool = ({ v: "select", g: "translate", e: "rotate", r: "scale" } as Record<string,string>)[event.key.toLowerCase()];
   if (tool) setTool(tool);
   if (event.key.toLowerCase() === "p") startPath();
   if (event.key.toLowerCase() === "b") startFence();
+  if (event.key.toLowerCase() === "u") startRiver();
+  if (event.key.toLowerCase() === "t") button("sculpt-terrain").click();
   if (event.key.toLowerCase() === "f") view.focus();
   if (event.key === "Home") { event.preventDefault(); view.home(); }
   if (event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); removeSelection(); }
@@ -644,14 +738,14 @@ async function start() {
     else if (baselineResponse.status !== 404) throw Error("The preserved village could not be read. Its file has been left intact.");
     presets = createPresets(original);
     const playableResponse = await request<{ layout: Layout; revision: string }>("/api/playable");
-    const playable = validateLayout(playableResponse.layout, view.model.assets);
+    const playable = validateLayout(view.model.editableLayout(playableResponse.layout), view.model.assets);
     publishedRevision = playableResponse.revision;
     presets.unshift({ id: "playable", layout: clone(playable), description: "The map used by the local game." });
     const archiveResponse = await fetch("/api/presets/original-village");
     if (archiveResponse.ok) presets.push({ id: "original", layout: validateLayout((await archiveResponse.json()).layout, view.model.assets), description: "The earlier village, kept for reference." });
     state = { layout: clone(playable), fileId: null, revision: "" }; state.layout.name = "My village";
     let recovered = false;
-    try { const raw = localStorage.getItem(DRAFT_KEY); if (raw) { const draft = JSON.parse(raw); state = { layout: validateLayout(draft.state.layout, view.model.assets), fileId: typeof draft.state.fileId === "string" && /^[a-zA-Z0-9_-]{1,100}$/.test(draft.state.fileId) ? draft.state.fileId : null, revision: typeof draft.state.revision === "string" ? draft.state.revision : "" }; savedFingerprint = typeof draft.savedFingerprint === "string" ? draft.savedFingerprint : ""; recovered = true; } }
+    try { const raw = localStorage.getItem(DRAFT_KEY); if (raw) { const draft = JSON.parse(raw); state = { layout: validateLayout(view.model.editableLayout(draft.state.layout), view.model.assets), fileId: typeof draft.state.fileId === "string" && /^[a-zA-Z0-9_-]{1,100}$/.test(draft.state.fileId) ? draft.state.fileId : null, revision: typeof draft.state.revision === "string" ? draft.state.revision : "" }; savedFingerprint = typeof draft.savedFingerprint === "string" ? draft.savedFingerprint : ""; recovered = true; } }
     catch { toast("The previous browser draft could not be read. It remains in browser storage; a fresh working copy is open."); }
     try { readClipboard(); } catch { toast("The previous clipboard could not be restored. Your layout is unchanged."); }
     ready = true; view.sync(state.layout); update(); $("loading").hidden = true;
@@ -663,7 +757,7 @@ async function start() {
     view.sync(current); view.setSelection(selection);
     void view.thumbnails(() => renderAssets());
     // A read-only development inspection surface supports reproducible studio QA.
-    Object.assign(window, { cosyStudio: { snapshot: () => clone(state), original: () => clone(view.model.original), presets: () => presets.map(p => ({ id: p.id, layout: clone(p.layout) })), selection: () => [...selection], assets: () => [...view.model.assets.values()].map(a => ({ id: a.id, name: a.name, category: a.category })), capture: () => view.capture(), screenPoint: (id: string, offset?: [number, number, number]) => view.screenPoint(id, offset), camera: () => view.navigationState() } });
+    Object.assign(window, { cosyStudio: { snapshot: () => clone(state), original: () => clone(view.model.original), presets: () => presets.map(p => ({ id: p.id, layout: clone(p.layout) })), selection: () => [...selection], assets: () => [...view.model.assets.values()].map(a => ({ id: a.id, name: a.name, category: a.category })), capture: () => view.capture(), screenPoint: (id: string, offset?: [number, number, number]) => view.screenPoint(id, offset), camera: () => view.navigationState(), player: () => view.play.state() } });
   } catch (issue) { $("loading-text").textContent = issue instanceof Error ? issue.message : String(issue); $("loading").querySelector("h2")!.textContent = "The studio couldn't open"; error(issue); }
 }
 void start();

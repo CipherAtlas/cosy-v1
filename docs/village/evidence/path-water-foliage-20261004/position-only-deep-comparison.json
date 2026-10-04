@@ -1,0 +1,149 @@
+{
+  "baselineFile": "/private/tmp/cosy-town-before-path-foliage-moves.json",
+  "baselineHash": "f131740a97644d7f9285700194b01a55271352e41d0ee4239faf73921590fd84",
+  "currentHash": "53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736",
+  "objects": 591,
+  "exactDeepCompareOnlyPositionFields": true,
+  "changes": [
+    {
+      "id": "bushes-8",
+      "field": "position",
+      "before": [
+        -17.462669,
+        0,
+        -7.551164
+      ],
+      "after": [
+        -25.8,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "bushes-35",
+      "field": "position",
+      "before": [
+        -16.4608,
+        0,
+        -8.532767
+      ],
+      "after": [
+        -21.5,
+        0,
+        -2
+      ]
+    },
+    {
+      "id": "willow-1",
+      "field": "position",
+      "before": [
+        -18,
+        0,
+        -3.5
+      ],
+      "after": [
+        -15.9,
+        0,
+        -3.5
+      ]
+    },
+    {
+      "id": "tree-1",
+      "field": "position",
+      "before": [
+        -5,
+        0,
+        22
+      ],
+      "after": [
+        -3.8,
+        0,
+        22
+      ]
+    },
+    {
+      "id": "tree-3",
+      "field": "position",
+      "before": [
+        -7,
+        0,
+        15
+      ],
+      "after": [
+        -3.7,
+        0,
+        15
+      ]
+    },
+    {
+      "id": "tree-6",
+      "field": "position",
+      "before": [
+        -49,
+        0,
+        -4
+      ],
+      "after": [
+        -46,
+        0,
+        -4
+      ]
+    },
+    {
+      "id": "tree-12",
+      "field": "position",
+      "before": [
+        13,
+        0,
+        -41
+      ],
+      "after": [
+        13,
+        0,
+        -45
+      ]
+    },
+    {
+      "id": "tree-24",
+      "field": "position",
+      "before": [
+        -14.214782,
+        0,
+        -54.601768
+      ],
+      "after": [
+        -17.8,
+        0,
+        -54.6
+      ]
+    },
+    {
+      "id": "town-tree-3",
+      "field": "position",
+      "before": [
+        26,
+        0,
+        -56
+      ],
+      "after": [
+        26,
+        0,
+        -61
+      ]
+    },
+    {
+      "id": "town-tree-7",
+      "field": "position",
+      "before": [
+        19,
+        0,
+        0
+      ],
+      "after": [
+        16.5,
+        0,
+        0.5
+      ]
+    }
+  ]
+}

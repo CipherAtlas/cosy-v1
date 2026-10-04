@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "checks": [
+    "Native tagged paving clears blades while its green verge survives",
+    "Moving paving away restores original grass",
+    "Undoing a paving move clears the original footprint again",
+    "Hidden paving does not erase planting",
+    "Actual moved pond water clears land grass",
+    "Bank plants may touch water naturally",
+    "Bank plants cannot stand on paving",
+    "Moving a bank path away restores reeds",
+    "Rotated and nonuniformly scaled paving uses its rendered footprint",
+    "Blade extent is cleared even when its root is just outside paving",
+    "Whole border flower is removed together",
+    "Border flower returns after paving moves away",
+    "Shore planting follows the saved pond position, rotation and scale",
+    "A larger pond keeps its reeds at their natural size",
+    "Repeated pond edits map original coordinates without accumulating transforms",
+    "Pond edits preserve the original asset matrices"
+  ],
+  "scope": "Actual editor methods with isolated in-memory geometry; no layout or browser-draft writes.",
+  "errors": [],
+  "apiWrites": []
+}

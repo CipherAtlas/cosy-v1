@@ -33,12 +33,14 @@ const assert = require('node:assert/strict');
       await page.getByRole('button', { name: 'Enter Hearthwillow' }).click({ timeout: 120000 });
       console.log('Entered client', index + 1);
       await page.waitForFunction(() => {
-        for (let el = document.querySelector('canvas'); el; el = el.parentElement) {
-          for (let fiber = el[Object.keys(el).find(key => key.startsWith('__reactFiber'))]; fiber; fiber = fiber.return) {
-            for (let hook = fiber.memoizedState; hook; hook = hook.next) {
-              const ref = hook.memoizedState?.current;
-              if (ref?.setSharedActors && ref.sharedActors && ref.puppies) window.testEngine = ref;
-              if (ref?.interact && ref.sendChat) window.testConnection = ref;
+        for (const canvas of document.querySelectorAll('canvas')) {
+          for (let el = canvas; el; el = el.parentElement) {
+            for (let fiber = el[Object.keys(el).find(key => key.startsWith('__reactFiber'))]; fiber; fiber = fiber.return) {
+              for (const branch of [fiber, fiber.alternate]) for (let hook = branch?.memoizedState; hook; hook = hook.next) {
+                const ref = hook.memoizedState?.current;
+                if (ref?.setSharedActors && ref.sharedActors && ref.puppies) window.testEngine = ref;
+                if (ref?.interact && ref.sendChat) window.testConnection = ref;
+              }
             }
           }
         }
@@ -50,11 +52,71 @@ const assert = require('node:assert/strict');
     const [a, b, c] = pages;
     await a.waitForFunction(() => testEngine.remoteVisitors.size === 2);
     check(await b.evaluate(() => testEngine.remoteVisitors.size === 2), 'Three real browser clients join one Worker');
+    if (process.env.SWING_ONLY) {
+      const swingIds = await a.evaluate(() => testEngine.world.swings.map(value => value.placement.id));
+      check(swingIds.length === 2, 'Both authored pasture swing copies load in the actual game');
+      const approach = async (page, id, index) => {
+        await page.bringToFront();
+        await page.evaluate(({ id, index }) => {
+          const e = testEngine, swing = e.world.swings.find(value => value.placement.id === id);
+          swing.root.localToWorld(e.temp.set(index === 0 ? -.98 : .98, 0, 1.65));
+          e.movement.settle(e.temp.x, e.temp.z); e.player.position.copy(e.movement.position);
+        }, { id, index });
+        await page.waitForFunction(({ id, index }) => testEngine.nearSwing?.id === id && testEngine.nearSwing.index === index, { id, index });
+        const pose = await page.evaluate(() => ({ id: testEngine.sharedSelfId, x: testEngine.player.position.x, z: testEngine.player.position.z }));
+        await (page === a ? b : a).waitForFunction(({ id, x, z }) => {
+          const target = testEngine.remoteVisitors.get(id)?.target;
+          return target && Math.hypot(target.x - x, target.z - z) < .1;
+        }, pose, { polling: 100 });
+      };
+      for (const id of swingIds) {
+        await approach(a, id, 0); await a.locator('canvas').focus(); await a.keyboard.press('e');
+        await a.waitForFunction(id => testEngine.ridingSwing?.id === id && testEngine.ridingSwing.index === 0, id);
+        check(true, `${id}: E enters the first accepted physical seat`);
+        await a.keyboard.down('w'); await a.waitForTimeout(400); await a.keyboard.up('w');
+        check(await a.evaluate(id => Math.abs(testEngine.world.swings.find(value => value.placement.id === id).pendulums[0].angle) > .02, id), `${id}: W pumps the accepted swing`);
+        await approach(b, id, 1); await b.evaluate(id => testEngine.rideSwing(id, 1), id);
+        await b.waitForFunction(id => testEngine.ridingSwing?.id === id && testEngine.ridingSwing.index === 1, id);
+        check(true, `${id}: another visitor claims the separate second seat`);
+        await c.bringToFront();
+        await c.evaluate(id => {
+          const e = testEngine, swing = e.world.swings.find(value => value.placement.id === id);
+          swing.root.localToWorld(e.temp.set(0, 0, 1.65)); e.movement.settle(e.temp.x, e.temp.z); e.player.position.copy(e.movement.position);
+        }, id);
+        await c.waitForFunction(id => [...testEngine.remoteVisitors.values()].filter(value => value.swing?.id === id).length === 2, id);
+        check(!(await c.evaluate(id => testConnection.interact({ kind: 'swing', id, index: 0 }), id)).ok, `${id}: Worker refuses a third visitor on a full set`);
+        const positions = await Promise.all([a, b].map(page => page.evaluate(() => testEngine.player.position.toArray())));
+        check(Math.hypot(positions[0][0] - positions[1][0], positions[0][2] - positions[1][2]) > 1.7, `${id}: accepted riders occupy distinct seats`);
+        await c.screenshot({ path: path.join(output, `swing-${id}.png`) });
+        await a.evaluate(() => testEngine.leaveSwing());
+        await c.waitForFunction(() => [...testEngine.remoteVisitors.values()].filter(value => value.swing).length === 1);
+        await c.evaluate(id => testEngine.rideSwing(id, 0), id);
+        await c.waitForFunction(id => testEngine.ridingSwing?.id === id, id);
+        check(true, `${id}: leaving makes the real seat available to the waiting visitor`);
+        const oldId = await b.evaluate(() => { const id = testEngine.sharedSelfId; testSockets.at(-1).close(); return id; });
+        await a.waitForFunction(oldId => !testEngine.remoteVisitors.has(oldId), oldId, { polling: 100 });
+        check(true, `${id}: disconnect releases the other visitor's swing claim`);
+        await b.bringToFront();
+        await b.waitForFunction(oldId => testEngine.sharedConnected && testEngine.sharedSelfId !== oldId && !testEngine.ridingSwing, oldId, { timeout: 15000 });
+        check(true, `${id}: reconnect starts without the abandoned seat`);
+        await c.evaluate(() => testEngine.leaveSwing());
+        await a.waitForFunction(() => [...testEngine.remoteVisitors.values()].every(value => !value.swing), null, { polling: 100 });
+      }
+      check(!errors.length, 'Both pasture swing copies have no captured browser page errors');
+      fs.writeFileSync(path.join(output, 'checks.json'), JSON.stringify({ checks, errors }, null, 2) + '\n');
+      console.log(`${checks.length} two-copy swing browser checks passed.`); return;
+    }
     const dogId = await a.evaluate(() => testEngine.sharedActors.actors.find(actor => actor.kind === 'puppy').id);
     const nearDog = async page => {
+      await page.bringToFront();
       await page.evaluate(id => {
-        const e = testEngine, dog = e.sharedActors.actors.find(actor => actor.id === id);
-        e.movement.settle(dog.x + 1.1, dog.z + 1.25); e.player.position.set(e.movement.position.x, e.movement.position.y, e.movement.position.z);
+        const e = testEngine, dog = e.puppies.puppies.find(dog => dog.info.id === id);
+        const point = Array.from({ length: 16 }, (_, index) => ({
+          x: dog.actor.position.x + Math.sin(index * Math.PI / 8) * 1.6,
+          z: dog.actor.position.z + Math.cos(index * Math.PI / 8) * 1.6,
+        })).find(point => e.movement.clear(point.x, point.z) && dog.movement.canWalkTo(point.x, point.z));
+        if (!point) throw Error('The authored dog approach needs clear ground.');
+        e.movement.settle(point.x, point.z); e.player.position.set(e.movement.position.x, e.movement.position.y, e.movement.position.z);
         e.yaw = .65; e.pitch = .18;
       }, dogId);
       await page.waitForFunction(id => testEngine.nearPuppy?.id === id, dogId);
@@ -101,6 +163,7 @@ const assert = require('node:assert/strict');
     await nearDog(a);
     await a.getByRole('button', { name: /Pet / }).click();
     await a.waitForFunction(id => testEngine.sharedActors.actors.find(actor => actor.id === id)?.mode === 'pet', dogId, { timeout: 8000 });
+    await b.bringToFront();
     await b.waitForFunction(id => testEngine.puppies.puppies.find(dog => dog.info.id === id)?.petting, dogId);
     check(await b.evaluate(() => !testEngine.puppies.pettingPuppy), 'Observers see the shared pet clip without entering the owner\'s pet camera');
     await a.waitForFunction(id => !testEngine.sharedActors.actors.find(actor => actor.id === id)?.owner, dogId, { timeout: 8000 });
@@ -119,7 +182,7 @@ const assert = require('node:assert/strict');
     await a.evaluate(id => testConnection.interact({ kind: 'resident', id, action: 'home' }), residentId);
     console.log('Dog hold, tricks, walk and reconnect verified');
 
-    const benchId = await a.evaluate(() => testEngine.world.benches[0].id);
+    const benchId = await a.evaluate(() => testEngine.world.benches.find(bench => bench.id === 'bird-clearing-bench').id);
     for (const page of pages) await page.evaluate(id => {
       const e = testEngine, bench = e.world.benches.find(bench => bench.id === id);
       e.movement.settle(bench.x, bench.z + 1.8); e.player.position.set(e.movement.position.x, e.movement.position.y, e.movement.position.z);

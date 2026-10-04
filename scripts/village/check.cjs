@@ -16,14 +16,17 @@ try {
     run(process.execPath, ['--check', `scripts/village/tests/${file}`]);
   run(process.execPath, ['node_modules/typescript/bin/tsc', '-p', 'worker/tsconfig.json', '--noEmit']);
   run('python3', ['scripts/village/split_puppies.py', '--check']);
-  for (const name of ['device-gate', 'shared-world-worker', 'shared-actions-worker', 'bird-circuits', 'chat-hour', 'chat-cooldown', 'chat-admin', 'player-kick', 'notes', 'write-cleanup'])
+  run('python3', ['scripts/village/split_farm_props.py', '--check']);
+  for (const name of ['device-gate', 'animal-art', 'shared-world-worker', 'shared-actions-worker', 'town-worker', 'town-layout', 'animal-motion', 'patrol-navigation', 'bird-circuits', 'chat-hour', 'chat-cooldown', 'chat-admin', 'player-kick', 'notes', 'write-cleanup'])
     run(process.execPath, [`scripts/village/tests/${name}.cjs`]);
   fs.writeFileSync(path.join(temporary, 'tsconfig.json'), JSON.stringify({
     compilerOptions: { target: 'ES2022', module: 'CommonJS', moduleResolution: 'node', strict: true, skipLibCheck: true,
-      esModuleInterop: true, outDir: path.join(temporary, 'compiled'), rootDir: root, types: ['node'], typeRoots: [path.join(root, 'node_modules/@types')] },
-    files: ['movement', 'composition'].map(name => path.join(root, `features/village/${name}.ts`)),
+      esModuleInterop: true, baseUrl: root, paths: { 'three/addons/*': ['node_modules/@types/three/examples/jsm/*'] },
+      outDir: path.join(temporary, 'compiled'), rootDir: root, types: ['node'], typeRoots: [path.join(root, 'node_modules/@types')] },
+    files: ['movement', 'composition', 'spatialRendering', 'vegetationDetail'].map(name => path.join(root, `features/village/${name}.ts`)),
   }));
   run(process.execPath, ['node_modules/typescript/bin/tsc', '-p', path.join(temporary, 'tsconfig.json')]);
   run(process.execPath, ['scripts/village/tests/contracts.cjs', path.join(temporary, 'compiled/features/village')]);
+  run(process.execPath, ['scripts/village/tests/rendering-budget.cjs', path.join(temporary, 'compiled/features/village')]);
   console.log('Current village contract checks passed.');
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

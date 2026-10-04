@@ -4,7 +4,9 @@ const vm = require('node:vm');
 const ts = require('typescript');
 let now = 10000, current, interval, timerId = 0;
 const timers = new Map(), sent = [], worlds = [], tricks = [];
-let disconnected = 0, rejected = 0, crumbs = false;
+let disconnected = 0, rejected = 0, crumbs = false, inventory;
+const privateStorage = new Map();
+const basketToken = "00000000-0000-0000-0000-000000000001";
 let pose = { x: 1, z: 2, heading: 0, active: true };
 class ClientSocket {
   static OPEN = 1;
@@ -18,19 +20,27 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('features/village/sharedWo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, {
   exports: mod.exports, require: () => ({ readGarden: raw => JSON.parse(raw) }), process: { env: {} },
+  localStorage: { getItem: key => privateStorage.get(key) ?? null, setItem: (key, value) => privateStorage.set(key, value) },
   WebSocket: ClientSocket, Date: class extends Date { static now() { return now; } },
   window: { setInterval: callback => { interval = callback; return 1; }, clearInterval: () => {},
     setTimeout: (callback, delay) => { const id = ++timerId; timers.set(id, { callback, delay }); return id; }, clearTimeout: id => timers.delete(id) },
 });
 const receive = message => current.onmessage({ data: JSON.stringify(message) });
 const world = { time: now, epoch: now, actors: [], birds: {}, pondFeedAt: null, gift: null };
-const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visitors: [], garden: { beds: [] }, chatHour: 1, chat: [], world, hasCrumbs: false });
+const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visitors: [], garden: { beds: [] }, chatHour: 1, chat: [], world, hasCrumbs: false, inventoryToken: basketToken, forageInventory: { apples: 1, mushrooms: 0 } });
 (async () => {
   const joining = mod.exports.connectSharedWorld({ getPose: () => pose, onState: () => {}, onChat: () => {}, onChatCooldown: () => {},
     onAction: () => {}, onDisconnect: () => disconnected++, onSwingTaken: () => rejected++, onPuppyTrick: trick => tricks.push(trick),
-    onWorld: state => worlds.push(state), onCrumbs: value => crumbs = value });
+    onWorld: state => worlds.push(state), onCrumbs: value => crumbs = value, onForageInventory: value => inventory = value });
   welcome('a'); const connection = await joining;
   assert.equal(worlds.length, 1);
+  assert.equal(inventory.apples, 1, 'Only a Worker welcome grants the initial accepted resource snapshot');
+  const cached = JSON.parse(privateStorage.get('cosy.village.inventory.v1'));
+  assert.equal(cached.token, basketToken); assert.equal(cached.inventory.apples, 1);
+  assert(sent.some(message => message.type === 'inventory_resume' && message.token === basketToken && !message.inventory),
+    'The browser sends only its opaque resume token, never local resource counts');
+  receive({ type: 'forageInventory', token: basketToken, inventory: { apples: 0, mushrooms: 1 } });
+  assert.equal(inventory.apples, 0); assert.equal(JSON.parse(privateStorage.get('cosy.village.inventory.v1')).inventory.mushrooms, 1);
   interval(); interval();
   assert.equal(sent.filter(message => message.type === 'move').length, 1);
   assert.equal(sent.filter(message => message.type === 'heartbeat').length, 2);
@@ -58,6 +68,8 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal((await pending).ok, false); assert.equal(disconnected, 1);
   const retry = [...timers.values()].find(timer => timer.delay === 1000); retry.callback();
   welcome('rejoined');
+  assert.equal(JSON.parse(privateStorage.get('cosy.village.inventory.v1')).inventory.mushrooms, 1, 'Disconnect preserves the accepted local cache while the Worker resumes the basket');
+  receive({ type: 'forageInventory', token: basketToken, inventory: { apples: 0, mushrooms: 1 } });
   old.onmessage({ data: JSON.stringify({ type: 'crumbs', hasCrumbs: true }) });
   assert.equal(crumbs, false, 'Stale socket callbacks cannot change the rejoined visit');
   const closing = connection.interact({ kind: 'puppy', id: 'mochi', action: 'hold' });

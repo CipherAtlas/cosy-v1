@@ -1,3 +1,4 @@
+import { residentInLayout } from "./layoutInteractions";
 import * as T from "three";
 import { RESIDENT_ROUTES, COMPANION_STAGES, type SharedActor, type SharedActors } from "./sharedActors";
 import { VillageMovement } from "./movement";
@@ -56,7 +57,7 @@ export class VillageLife {
     this.sharedMotion.receive(residents, time, initial);
     this.residents.forEach((resident, index) => {
       const state = this.sharedStates!.get(VILLAGERS[index].id);
-      if (!state) return;
+      if (!state) { resident.root.visible = false; return; }
       resident.following = state.following && state.owner === selfId;
       resident.chatting = ["visit", "talk"].includes(state.mode);
       if (initial || previous?.get(state.id)?.activity !== state.activity
@@ -74,12 +75,14 @@ export class VillageLife {
   sharedState(id: string) { return this.sharedStates?.get(id); }
   available(id: string) { const state = this.sharedStates?.get(id); return !state?.owner || state.owner === this.selfId; }
 
-  constructor(source: T.Object3D, colliders: Collider[], props?: T.Object3D, authored?: AuthoredWorld) {
+  constructor(source: T.Object3D, colliders: Collider[], props?: T.Object3D, private authored?: AuthoredWorld) {
     this.navigation = new VillageNavigation(colliders, authored);
     this.companionWalk = new CompanionWalk(colliders);
     const routes = RESIDENT_ROUTES.map(route => route.map(point => [...point] as [number, number]));
     for (const [index, id] of RESIDENT_IDS.entries()) if (authored?.routes[id]) routes[index] = authored.routes[id]!.points;
-    routes.forEach((route, i) => {
+    routes.forEach((authoredRoute, i) => {
+      const route = this.navigation.safeRoute(authoredRoute);
+      if (!route.length) return;
       const root = source.clone(true);
       root.name = `${VILLAGERS[i].name.en} spirit`;
       root.position.y = .55;
@@ -99,6 +102,9 @@ export class VillageLife {
       });
       this.dressSpirit(root, i);
       const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1,.96][i]);
+      const placement = authored?.sceneVersion === 1 ? authored.items?.find(item => item.visible && item.asset === (i === 4 ? "wren-caretaker" : `villager-${RESIDENT_IDS[i]}`)) : undefined;
+      if (placement) actor.scale.multiply(new T.Vector3(...placement.scale));
+      actor.visible = residentInLayout(authored, RESIDENT_IDS[i]);
       const movement = new VillageMovement(colliders, () => {});
       movement.settle(...route[0]);
       actor.position.set(movement.position.x, movement.position.y, movement.position.z);
@@ -156,7 +162,7 @@ export class VillageLife {
     this.activity = place;
     if (this.sharedStates) return;
     this.residents.forEach((r, i) => {
-      r.root.visible = place !== "focus" || r.following;
+      r.root.visible = residentInLayout(this.authored, RESIDENT_IDS[i]) && (place !== "focus" || r.following);
       r.cup.visible = (r.following || i === 3) && place === "mood";
       if (!r.following) return;
       r.chatting = false; r.companionPath = []; r.replan = 0;
@@ -239,13 +245,13 @@ export class VillageLife {
       if (!this.activity) this.companionWalk.update(delta, player, this.residents.filter(resident => resident.following).length, playerHeading);
       this.residents.forEach((resident, index) => {
         const state = this.sharedStates!.get(VILLAGERS[index].id);
-        if (!state) return;
+        if (!state) { resident.root.visible = false; return; }
         const pose = this.sharedMotion.sample(state);
         resident.root.position.set(pose.x, pose.y, pose.z);
         resident.movement.position = { x: resident.root.position.x, y: floorHeight(resident.root.position.x, resident.root.position.z), z: resident.root.position.z };
         resident.root.rotation.y = pose.heading;
         resident.walking = pose.speed > .1;
-        resident.root.visible = this.activity !== "focus" || state.owner === this.selfId && state.mode === "activity";
+        resident.root.visible = residentInLayout(this.authored, RESIDENT_IDS[index]) && (this.activity !== "focus" || state.owner === this.selfId && state.mode === "activity");
         resident.spirit.position.y = .55 + (reduced ? 0 : Math.sin(elapsed * 2.5 + resident.phase) * .065);
         resident.spirit.rotation.x = reduced ? 0 : pose.speed * .025;
         resident.spirit.rotation.z = reduced ? 0 : Math.sin(elapsed * 1.6 + resident.phase) * .035;

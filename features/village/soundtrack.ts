@@ -23,11 +23,10 @@ export function soundtrackFor(mix: AudioMix, place: PlaceId | null, frame: Envir
   return "village";
 }
 
-/** Two streaming decks bound memory use; a failed change leaves the previous music playing. */
+/** Two loading decks, with only one playing; a failed change restores the previous cue. */
 export class RecordedSoundtrack {
   private decks: { audio: HTMLAudioElement; source: MediaElementAudioSourceNode; gain: GainNode; cue?: SoundtrackId | RadioTrack }[];
   private active = -1;
-  private fading?: { index: number; until: number };
   private candidate?: SoundtrackId;
   private candidateSince = 0;
   private changedAt = -100;
@@ -79,21 +78,13 @@ export class RecordedSoundtrack {
   }
   tick() {
     const now=this.context.currentTime;
-    if(this.fading && now>=this.fading.until) {
-      this.decks[this.fading.index].audio.pause();this.fading=undefined;
-    }
-    if(this.radio || !this.enabled || this.loading || this.fading || !this.candidate || this.failed===this.candidate || this.current===this.candidate) return;
+    if(this.radio || !this.enabled || this.loading || !this.candidate || this.failed===this.candidate || this.current===this.candidate) return;
     // Hysteresis prevents a new track every time the player skirts a garden boundary.
     if(now-this.candidateSince<2.5 || now-this.changedAt<10) return;
     void this.change(this.candidate).catch(()=>this.onError());
   }
   private async change(cue: SoundtrackId | RadioTrack) {
     this.cancelLoad?.();
-    if (this.fading) {
-      const old = this.decks[this.fading.index];
-      old.audio.pause(); old.gain.gain.cancelScheduledValues(this.context.currentTime); old.gain.gain.value = 0;
-      this.fading = undefined;
-    }
     const generation=++this.generation,index=this.active===0?1:0,deck=this.decks[index];
     this.loading=true;deck.gain.gain.cancelScheduledValues(this.context.currentTime);deck.gain.gain.value=0;
     try {
@@ -113,19 +104,27 @@ export class RecordedSoundtrack {
         deck.audio.load();
       });
       if(this.disposed || !this.enabled || generation!==this.generation) return;
-      await deck.audio.play();
-      if(this.disposed || !this.enabled || generation!==this.generation) { deck.audio.pause();return; }
-      const now=this.context.currentTime,previous=this.active;
-      deck.gain.gain.setValueAtTime(0,now);deck.gain.gain.linearRampToValueAtTime(typeof cue === "string" ? 1 : .7,now+4);
-      if(previous>=0) {
-        const old=this.decks[previous];old.gain.gain.cancelScheduledValues(now);
-        old.gain.gain.setValueAtTime(old.gain.gain.value,now);old.gain.gain.linearRampToValueAtTime(0,now+4);
-        this.fading={index:previous,until:now+4.1};
+      // Load the next cue in silence, then pause the old recording before starting it.
+      if (this.active >= 0) {
+        const old = this.decks[this.active];
+        old.audio.pause(); old.gain.gain.cancelScheduledValues(this.context.currentTime); old.gain.gain.value = 0;
       }
+      await deck.audio.play();
+      if(this.disposed || !this.enabled) { deck.audio.pause();return; }
+      if(generation!==this.generation) return;
+      const now=this.context.currentTime;
+      deck.gain.gain.setValueAtTime(0,now);deck.gain.gain.linearRampToValueAtTime(typeof cue === "string" ? 1 : .7,now+.6);
       this.active=index;this.changedAt=now;
     } catch(error) {
       if (generation !== this.generation) return;
       deck.audio.pause();if (typeof cue === "string") this.failed=cue;
+      if (!this.disposed && this.enabled && this.active >= 0) {
+        const old = this.decks[this.active];
+        await old.audio.play();
+        if (this.disposed || !this.enabled) { old.audio.pause(); return; }
+        if (this.enabled && !this.disposed && generation === this.generation)
+          old.gain.gain.setTargetAtTime(typeof old.cue === "string" ? 1 : .7, this.context.currentTime, .2);
+      }
       if(!this.disposed && this.enabled) throw error;
     } finally { if (generation === this.generation) this.loading=false; }
   }
@@ -133,7 +132,6 @@ export class RecordedSoundtrack {
     this.enabled=false;this.generation++;this.cancelLoad?.();
     this.loading=false;
     this.decks.forEach(deck=>{deck.audio.pause();deck.gain.gain.cancelScheduledValues(this.context.currentTime);});
-    if(this.fading) { this.decks[this.fading.index].gain.gain.value=0;this.fading=undefined; }
   }
   dispose() {
     this.disposed=true;this.pause();

@@ -39,7 +39,7 @@ export function glowSpirit(spirit: T.Object3D, night: number) {
   }
 
 export class VillageVisitors {
-  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null }>();
+  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null }>();
   private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private visitorLabelPoint = new T.Vector3();
   private temp = new T.Vector3();
@@ -97,10 +97,12 @@ export class VillageVisitors {
         label.style.setProperty("--visitor-color", visitor.color);
         this.host.append(label);
         group.add(spirit);
+        const fins: T.Object3D[] = [];
+        spirit.traverse(node => { if (node.name.startsWith("SpiritFin")) fins.push(node); });
         group.position.set(visitor.x, height, visitor.z);
         group.rotation.y = visitor.heading;
         this.scene.add(group);
-        remote = { name: visitor.name, slot: visitor.slot, group, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: elapsed, bench: null, activity: null };
+        remote = { name: visitor.name, slot: visitor.slot, group, spirit, fins, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: elapsed, bench: null, activity: null };
         this.entries.set(visitor.id, remote);
       }
       if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
@@ -131,9 +133,7 @@ export class VillageVisitors {
       } else remote.group.position.lerp(remote.target, 1 - Math.exp(-dt * 12));
       const turn = T.MathUtils.euclideanModulo(remote.heading - remote.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       remote.group.rotation.y += turn * (1 - Math.exp(-dt * 12));
-      remote.group.traverse(node => {
-        if (node.name.startsWith("SpiritFin")) relaxBlobArm(node, elapsed + remote.slot, remote.group.position.distanceTo(remote.target) > .05, reducedMotion);
-      });
+      remote.fins.forEach(fin => relaxBlobArm(fin, elapsed + remote.slot, remote.group.position.distanceTo(remote.target) > .05, reducedMotion));
     }
   }
   projectLabels(camera: T.PerspectiveCamera, player: T.Vector3, focus: boolean) {

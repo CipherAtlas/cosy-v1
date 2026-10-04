@@ -1,0 +1,123 @@
+{
+  "status": "reviewed after final pet framing fixes",
+  "build": 10484,
+  "url": "http://127.0.0.1:3051/?sharedTrial=1",
+  "questions": [
+    "Is this enjoyable for a user?",
+    "Is this pretty enough?",
+    "Is the town big and healthy looking?",
+    "Does it make a user want to stay?"
+  ],
+  "passes": [
+    {
+      "images": [
+        "pasture-fences.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Paths, benches and six grazing animals invite relaxed exploration.",
+        "Is this pretty enough?": "Yes. Rounded timber rails and warm cottage materials make a coherent field.",
+        "Is the town big and healthy looking?": "Yes. The broad grass paddock and surrounding houses look occupied and maintained.",
+        "Does it make a user want to stay?": "Yes. The herd and waterside setting provide gentle reasons to linger."
+      }
+    },
+    {
+      "images": [
+        "pond-life.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Ducks, swan, lily pads, dock and bench support a quiet visit.",
+        "Is this pretty enough?": "Yes. Teal water, stone banks, reeds and willows give the pond a sheltered character.",
+        "Is the town big and healthy looking?": "Yes. The generous pond is visibly alive. Eight fish exist; this wide view does not prove close-up fish readability.",
+        "Does it make a user want to stay?": "Yes. Moving wildlife and waterside sitting are inviting."
+      }
+    },
+    {
+      "images": [
+        "final-cow-stance/cow-highland-2-pet-1366.png",
+        "final-cow-stance/cow-highland-2-pet-1024.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes at a clear stance. Accepted heart and visitor reaching pose make the action understandable.",
+        "Is this pretty enough?": "Mostly. Warm colors and shaggy silhouette fit, but a pure side view hides the near eye behind the cow fringe.",
+        "Is the town big and healthy looking?": "Yes. Grass, herd, fences, brook and cottages look healthy.",
+        "Does it make a user want to stay?": "Yes. A clearer three-quarter face angle would strengthen the pet moment."
+      }
+    },
+    {
+      "images": [
+        "final/sheep-2-pet-1366.png",
+        "final/sheep-2-pet-1024.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Sheep face and visitor are separated; action feedback is visible.",
+        "Is this pretty enough?": "Yes. Soft fleece, round ear and kind eye are clear.",
+        "Is the town big and healthy looking?": "Yes. Herd and full grass field make the pasture feel cared for.",
+        "Does it make a user want to stay?": "Yes. The quiet interaction and companion herd encourage lingering."
+      }
+    },
+    {
+      "images": [
+        "final/lamb-2-pet-1366.png",
+        "final/lamb-2-pet-1024.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. The little face and small scale remain readable on both viewports.",
+        "Is this pretty enough?": "Yes. The lamb is distinctly cute and smaller than the nearby sheep.",
+        "Is the town big and healthy looking?": "Yes. The herd, maintained path and cottages form a healthy town view.",
+        "Does it make a user want to stay?": "Yes. This tiny friend invites repeated visits."
+      }
+    },
+    {
+      "images": [
+        "final/hedgehog-1-pet-1366.png",
+        "final/hedgehog-1-pet-1024.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Moving the home to clear paving exposes the tiny face and pet feedback.",
+        "Is this pretty enough?": "Yes. Eye, snout, nose and closed quill silhouette are all clear.",
+        "Is the town big and healthy looking?": "Yes. Maintained beds, flowers, paving and houses look inhabited.",
+        "Does it make a user want to stay?": "Yes. A tiny garden friend gives the kitchen garden a memorable reason to stop."
+      }
+    },
+    {
+      "images": [
+        "final-reduced/hedgehog-1-pet-reduced.png",
+        "final-reduced/hedgehog-1-pet-1024.png"
+      ],
+      "answers": {
+        "Is this enjoyable for a user?": "Yes. Static side framing keeps the hedgehog visible under real reduced-motion media preference.",
+        "Is this pretty enough?": "Yes. Full tiny face, nose and spines are clear with a still heart.",
+        "Is the town big and healthy looking?": "Yes. Flowers, planting beds, paving and houses look healthy.",
+        "Does it make a user want to stay?": "Yes. The interaction remains readable without motion."
+      }
+    }
+  ],
+  "verifiedFixes": [
+    "Hedgehog home [30.3,0,1] has clear .85m roaming ring at all 24 sampled points.",
+    "Static side pet framing works under reduced motion.",
+    "Side pet framing separates sheep/lamb/hedgehog faces from visitor on 1366×768 and 1024×640."
+  ],
+  "remainingRecommendations": [
+    "Cow pure side profile hides the near eye behind its fringe. Consider a slightly forward three-quarter face camera angle; no additional asset/source edits made in this review.",
+    "A close cow approach can place the visitor partly inside the cow silhouette (accepted distance .71m). The farther natural stance at accepted distance 1.80m separates them."
+  ],
+  "runProvenance": [
+    {
+      "path": "final/capture-metadata.json",
+      "result": "All four normal species captures succeeded; second reduced-motion repeat claim timed out. No page errors were recorded."
+    },
+    {
+      "path": "final-reduced/capture-metadata.json",
+      "result": "Focused reduced-motion first claim succeeded, errors []."
+    },
+    {
+      "path": "final-cow-stance/capture-metadata.json",
+      "result": "Focused farther cow stance succeeded, errors []."
+    }
+  ],
+  "limits": [
+    "Qualitative local headless Chrome rendering review; not user research, physical laptop performance or live deployment evidence.",
+    "Pond wide capture confirms the setting and eight source fish, not close-up fish appearance.",
+    "Observer poses reviewed in the first pass; final single-visitor framing changes reviewed on owner only."
+  ]
+}

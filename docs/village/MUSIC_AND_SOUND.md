@@ -1,6 +1,16 @@
 # Recorded music and world sound
 
-Updated: 2026-09-29. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+Updated: 2026-10-04. Current specification for `AUDIO-01` and `AUDIO-02`. Start with the [canonical handoff](../../VILLAGE_HANDOFF.md) and [movement/event specification](MOVEMENT_AND_WORLD.md).
+
+## Recorded animal calls — 2026-10-04 local
+
+Cows, sheep, lambs, Bramble, owls, horses, ducks, ducklings, swans, doves and the private cat now use short species recordings; petting the cat uses a separate purr. The four existing dog recordings remain. Sources, excerpt edits, license URLs and hashes are in [animal-recordings.json](../../public/village/audio/animal-recordings.json) and shipped [credits](../../public/village/CREDITS.txt). `prepare_animal_sounds.py` rebuilds the twelve new cuts with measured loudness gain, a −6 dB peak ceiling and short fades; the new payload is about 118 KB. Farm clips retain CC BY-SA 3.0; hedgehog/swan excerpts use CC BY 4.0; the others use CC0. Freesound excerpts come from the public HQ MP3 versions.
+
+`TownAnimalAudio` owns one shared call channel across species. A visitor walking within 5.5 m hears the nearest eligible animal; a herd or flock gives one greeting per approach. Leaving beyond 9 m rearms it, with a 45-second actor cooldown, an 18-second species cooldown and a six-second global greeting gap. Standing still does not cycle through calls. Accepted pet/gift/feed clocks play one short response within 12 m; interactions take priority over greetings. Owl group feeding gives one hoot while all three birds retain their speech turns. Horses respond to accepted hay/hold clocks; reconnects do not replay old meals. The cottage cat stays private. Bird speech, reduced motion and Worker ownership are preserved.
+
+Animal calls load only after explicit activation and share Effects/master controls. Muting Effects, leaving the cat's room, hiding the tab, stopping or disposing audio immediately clears them. Missing calls remain silent and retry on the next explicit start. Normalized clips retain their relative species balance, with a shared 1.35× runtime gain boost for all calls, including dog yips and cat purrs. New sound-menu defaults are Music 15%, World 54% and Spirit & details 75%; valid saved slider values remain personal. Sound lives inside the redesigned Settings workspace, with a sound-only reset and optional river/wind controls. Music amplification is reduced from 1.6× to 1.2×. Only close interaction responses briefly lower music by 2.2 dB and ambience by 3.7 dB; walk-by and distant calls do not duck music. Fish splashes have a three-second gap. Quiet river/rain/fire ambience remains alongside the single music track, as requested.
+
+[Browser mix, event timeline and review evidence](evidence/animal-audio-20261004/README.md) distinguish automated signal checks from subjective listening. The independent reviewer attempted audio input, but the tool returned “audio content omitted because you do not support audio input.” Its critique/revision loop covers numerical loudness, peaks, timing and call density only; neither agent has heard the result. Speaker/headphone judgment, species recognition and long-session fatigue remain unverified.
 
 ## Personal lo-fi radio design — disabled 2026-09-28
 
@@ -12,13 +22,13 @@ The catalog and streams depend on Audius availability. Artist pages are linked b
 
 ## Garden and pond effects — 2026-09-27
 
-The local addition uses seven original cached procedural effects in `VillageAudio.gardenEffect`: planting, watering, picking, pouring mint tea, crumbs, splash and a soft duck call. They use the existing effects/master buses, explicit Sound activation, visibility guard, distance attenuation and 16-voice effect budget; simple view uses centered output. Fish landing and occasional nearby ducks can play effects while wandering. The recorded music above is unchanged.
+The local addition uses seven original cached procedural effects in `VillageAudio.gardenEffect`: planting, watering, picking, pouring mint tea, crumbs, splash and a soft duck call (the duck/dove calls now use the recorded animal channel). They use the existing effects/master buses, explicit Sound activation, visibility guard, distance attenuation and 16-voice effect budget; simple view uses centered output. Fish landing plays a bounded splash; pond greetings now follow the shared animal proximity policy. The recorded music above is unchanged.
 
 [Sound checks](evidence/garden-garden-audio.json) verify non-silent output for all seven effects plus activation/mute/off/disposal and voice limits. [Short preview](evidence/garden-garden-sounds.webm) records the production master bus. Perceptual headphone/speaker balance and physical-phone sound remain unreviewed.
 
 ## Puppy yips — 2026-09-29 local
 
-Each of the four breeds has one short recorded bark cut, with subtle runtime pitch variation. Petting schedules a second, lighter yip; an occasional nearby bark gives the village a little life without constant repetition. The four clips come from Brandon Morris's [CC0 dog barking recording](https://opengameart.org/content/dog-barking-mono) and are archived with the [source and modification manifest](puppy-sound-manifest.json); [listen to the four clips](evidence/puppy-yips.mp3). They are decoded only after explicit sound activation, routed through the existing Effects/master buses, spatially attenuated, capped by the existing effect voice budget and silenced by Effects mute or a hidden tab. The browser check verified decode and scheduling, but headphone/speaker judgment and phone output remain open.
+Each of the four breeds has one short recorded bark cut, with subtle runtime pitch variation. The current shared call channel plays a single short yip for accepted petting/tricks and one quiet greeting on approach. The four clips come from Brandon Morris's [CC0 dog barking recording](https://opengameart.org/content/dog-barking-mono) and are archived with the [source and modification manifest](puppy-sound-manifest.json); [listen to the four clips](evidence/puppy-yips.mp3). They are decoded only after explicit sound activation, routed through the existing Effects/master buses, spatially attenuated, capped by the existing effect voice budget and silenced by Effects mute or a hidden tab. The browser check verified decode and scheduling, but headphone/speaker judgment and phone output remain open.
 
 ## The requirement
 
@@ -39,7 +49,7 @@ The goal is music worth leaving on during a long focus session, inside a village
 
 When village recordings are selected, `Follow the scenery` chooses the cue. Explicit activity selection changes it; walking proximity also selects the pond, tea garden, nook and hearth. A 2.5-second stable candidate and a minimum ten-second hold prevent repeated changes near boundaries. Changing the music volume does not change the selected recording.
 
-Two HTML media elements stream through separate Web Audio gains into the music bus. A change crossfades for four seconds, then pauses the old deck. Full pieces repeat through the media element's loop behavior; this is not a claim of sample-perfect musical loops or beat-matched transitions. Failed loads keep the previous recording playing and display a notice. Media load attempts time out after 15 seconds; disposal/cancellation stops pending work. No music assets load while music or master volume is zero.
+Two HTML media elements stream through separate Web Audio gains into the music bus. A change preloads the next cue in silence, pauses the old deck before starting the next and fades the new cue in over 0.6 seconds. Only one recording plays, including during changes. Full pieces repeat through the media element's loop behavior; this is not a claim of sample-perfect musical loops or beat-matched transitions. Failed loads keep the previous recording playing and display a notice. Media load attempts time out after 15 seconds; disposal/cancellation stops pending work. No music assets load while music or master volume is zero.
 
 ## A real world soundscape
 
@@ -53,7 +63,7 @@ Outdoor listener position follows the spirit, with camera-facing orientation. Se
 
 - Separate music, ambience and effects buses feed a master compressor. Existing levels are preserved; old preferences default to `Follow the scenery` without changing notes or timers.
 - Stop fades for 350 ms, pauses both recordings, clears temporary sources and suspends the context. Master zero also pauses/suspends; world-only unmute resumes without restarting music.
-- Only two long recordings stream at once. Three short nature beds are decoded and loop from Web Audio sources; non-effect voices are capped at 32 and effects at 16, including release tails. No full music tracks are decoded into Web Audio buffers.
+- At most one long music recording plays at once; the other deck only preloads the next cue. Three short nature beds are decoded and loop from Web Audio sources; non-effect voices are capped at 32 and effects at 16, including release tails. No full music tracks are decoded into Web Audio buffers.
 - Partial nature failure is reported. Missing beds are retried on the next explicit start. Disposal aborts fetches, stops media and generated sources, removes listeners and closes the audio context.
 - Local audio payload added by this pass is about 13.7 MB on disk, loaded on demand after activation. This is not an initial-page transfer measurement or constrained-network benchmark.
 
@@ -68,7 +78,7 @@ Source URLs, license URLs, modifications, durations, sizes and SHA-256 hashes ar
 
 ## Verification and acceptance
 
-Current browser evidence is under `polish-` in [the evidence index](evidence/README.md). The local harness checks streaming playback, recorded world decoding, each context cue, bounded crossfades, manual selection, failed-track preservation, mute/resume, world-only playback, stop/disposal and missing nature files. It measures non-silent master output and can record a 56-second sequence of the four contexts through the actual music/ambience graph.
+Current browser evidence is under `polish-` in [the evidence index](evidence/README.md). The local harness checks streaming playback, recorded world decoding, each context cue, single-track transitions, manual selection, failed-track preservation, mute/resume, world-only playback, stop/disposal and missing nature files. It measures non-silent master output and can record a 56-second sequence of the four contexts through the actual music/ambience graph.
 
 Historical Firefox files and old offline piano/lo-fi/jazz previews describe the superseded implementation. Do not use those recordings as evidence for this soundtrack.
 

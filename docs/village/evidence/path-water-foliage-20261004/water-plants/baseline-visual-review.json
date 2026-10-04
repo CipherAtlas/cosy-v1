@@ -1,0 +1,111 @@
+{
+  "scope": "Baseline visual review of original water-plant positions before source cleanup. Read-only local evidence; no deployment proof.",
+  "sourceFindings": {
+    "lilies": {
+      "count": 14,
+      "oldNormalizedRadius": [
+        0.6,
+        0.685,
+        0.77
+      ],
+      "defect": "Separated points through open swimming water",
+      "fix": "Three irregular near-bank colonies, radii .84\u2013.91, same models and instanced count"
+    },
+    "bankPlants": {
+      "reeds": 62,
+      "iris": 20,
+      "daisy": 13,
+      "defect": "East-side stalk silhouettes cross actual limestone paving",
+      "fix": "Tag only bank meshes for parent paving-only silhouette mask, .06 sway allowance; do not remove plants merely for touching water"
+    },
+    "explicitPlaceableWaterPlants": 0,
+    "layoutItems": 591,
+    "interactionState": "No changes to birds, fish, accepted clocks, feeding or resources"
+  },
+  "passes": [
+    {
+      "image": "before/pond-west.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the water birds and pond scale make the bank pleasant to explore.",
+        "Is this pretty enough?": "Mostly; isolated lily pads look scattered rather than like a shoreline habitat.",
+        "Is the town big and healthy looking?": "Yes: mature trees and full banks support the expanded town.",
+        "Does it make a user want to stay?": "Yes, though grouping pads would make the water calmer and more inviting."
+      }
+    },
+    {
+      "image": "before/pond-north.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the large swimming area and bird life are readable.",
+        "Is this pretty enough?": "Needs the planned lily regrouping; several pads sit as isolated points through open water.",
+        "Is the town big and healthy looking?": "Yes: the pond is substantial and alive.",
+        "Does it make a user want to stay?": "Yes; clear open swimming water should improve the pause here."
+      }
+    },
+    {
+      "image": "before/pond-east.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Partly: this narrow bank is a useful route to the dock.",
+        "Is this pretty enough?": "Needs cleanup: reeds and grass cross the visible limestone paving.",
+        "Is the town big and healthy looking?": "Yes, although overgrowth makes this passage feel less maintained.",
+        "Does it make a user want to stay?": "Less than the other banks until the path is clear."
+      }
+    },
+    {
+      "image": "before/pond-south.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: a broad pond view with birds provides a relaxing destination.",
+        "Is this pretty enough?": "Mostly; isolated lily pads are the specific plant defect.",
+        "Is the town big and healthy looking?": "Yes: the large pond and planted shores feel established.",
+        "Does it make a user want to stay?": "Yes; grouped lilies should make the view feel more intentional."
+      }
+    },
+    {
+      "image": "before/pond-dock.png",
+      "answers": {
+        "Is this enjoyable for a user?": "This deliberately high review camera is blocked by the willow canopy, so this image is not a useful enjoyment judgment.",
+        "Is this pretty enough?": "Not assessable from this canopy-obscured frame; repeat at normal lower camera height.",
+        "Is the town big and healthy looking?": "Visible foliage is healthy, but the pond is obscured.",
+        "Does it make a user want to stay?": "Not assessable from this frame; lower final dock capture is required."
+      }
+    },
+    {
+      "image": "before/pond-west-overview.png",
+      "answers": {
+        "Is this enjoyable for a user?": "This deliberately high review camera is canopy-obscured; use the clear north-bank overview for the final pass.",
+        "Is this pretty enough?": "Not assessable from this frame.",
+        "Is the town big and healthy looking?": "The tree canopy is full, but this frame does not prove the pond composition.",
+        "Does it make a user want to stay?": "Not assessable from this frame."
+      }
+    },
+    {
+      "image": "before/brook-bank.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the curved water and broad meadow make the route pleasant.",
+        "Is this pretty enough?": "The water itself is pretty; generic grass on path and water margins is handled by the parent mask cleanup.",
+        "Is the town big and healthy looking?": "Yes: the brook adds another substantial natural district.",
+        "Does it make a user want to stay?": "Yes: a useful scenic walking stop once margins are maintained."
+      }
+    },
+    {
+      "image": "before/main-river.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Partly: the bridge, homes and water offer a strong village scene.",
+        "Is this pretty enough?": "Needs a concrete placement fix: two large trunks visibly rise through the river water.",
+        "Is the town big and healthy looking?": "Yes, but trunks in water look accidental rather than healthy shore planting.",
+        "Does it make a user want to stay?": "The scene is inviting; removing accidental water trunks will make it more coherent."
+      }
+    }
+  ],
+  "checks": {
+    "realBrowserPhotos": 8,
+    "pageErrors": 0,
+    "protectedFilesUnchanged": 8,
+    "typecheckAfterLilyEdit": "passed",
+    "typecheckAfterBankTags": "passed"
+  },
+  "limits": [
+    "Final fresh-source and exported-game visual review pending parent build.",
+    "High dock and west-overview baseline camera views are explicitly inconclusive and will be replaced with clear lower framing.",
+    "Parent/layout agent owns path masks and relocation of any river/path trees; this subagent does not edit canonical placement."
+  ]
+}

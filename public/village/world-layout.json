@@ -1,8 +1,52 @@
 {
   "version": 1,
   "base": "cosy-village-2026-09-27",
-  "name": "Playable village · My village",
+  "name": "Willowbank town",
   "objects": [
+    {
+      "id": "horse-juniper",
+      "asset": "horse-bay",
+      "name": "Juniper",
+      "position": [
+        82,
+        0,
+        39
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "horse-willow",
+      "asset": "horse-grey",
+      "name": "Willow",
+      "position": [
+        87,
+        0,
+        39
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
     {
       "id": "terrain",
       "asset": "terrain",
@@ -23,16 +67,16 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "shore",
       "asset": "shore",
       "name": "Willow pond bank",
       "position": [
-        -27,
+        -33,
         0,
-        -14
+        -18
       ],
       "rotation": [
         0,
@@ -40,12 +84,12 @@
         0
       ],
       "scale": [
+        1.6,
         1,
-        1,
-        1
+        1.45
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "path-1",
@@ -309,16 +353,16 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "pond",
       "asset": "pond",
       "name": "Willow pond",
       "position": [
-        -27,
+        -33,
         0,
-        -14
+        -18
       ],
       "rotation": [
         0,
@@ -326,12 +370,12 @@
         0
       ],
       "scale": [
+        1.6,
         1,
-        1,
-        1
+        1.45
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "river-stones",
@@ -353,7 +397,7 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "bridge",
@@ -427,7 +471,7 @@
       "name": "Lilac cottage",
       "position": [
         5.5,
-        0.04367160562172703,
+        0,
         -27
       ],
       "rotation": [
@@ -471,7 +515,7 @@
       "name": "Hilltop cottage",
       "position": [
         2,
-        0.07336999621981011,
+        0,
         -52.5
       ],
       "rotation": [
@@ -493,7 +537,7 @@
       "name": "Orchard cottage",
       "position": [
         15.5,
-        0.055283,
+        0,
         -18
       ],
       "rotation": [
@@ -778,9 +822,9 @@
       "asset": "dock",
       "name": "Willow fishing dock",
       "position": [
-        -21.65,
+        -22.15,
         0,
-        -5.5
+        -6.6
       ],
       "rotation": [
         0,
@@ -1284,7 +1328,7 @@
       "asset": "lamp--27",
       "name": "Hanging lantern",
       "position": [
-        -3.1,
+        -4.8,
         0,
         -27
       ],
@@ -1321,7 +1365,7 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "bushes-1",
@@ -1329,7 +1373,7 @@
       "name": "Leafy shrub 1",
       "position": [
         -2.576379,
-        -0.087516,
+        0,
         24.416397
       ],
       "rotation": [
@@ -1351,7 +1395,7 @@
       "name": "Leafy shrub 2",
       "position": [
         -3.044726,
-        -0.052675,
+        0,
         32.137764
       ],
       "rotation": [
@@ -1373,7 +1417,7 @@
       "name": "Leafy shrub 3",
       "position": [
         -16.127552,
-        -0.070449,
+        0,
         -4.412429
       ],
       "rotation": [
@@ -1395,7 +1439,7 @@
       "name": "Leafy shrub 4",
       "position": [
         -7.415711,
-        -0.039674,
+        0,
         -4.541922
       ],
       "rotation": [
@@ -1417,7 +1461,7 @@
       "name": "Leafy shrub 5",
       "position": [
         -18.010792,
-        -0.073576,
+        0,
         -33.928944
       ],
       "rotation": [
@@ -1439,7 +1483,7 @@
       "name": "Leafy shrub 6",
       "position": [
         -7.969781,
-        -0.012687,
+        0,
         -8.455097
       ],
       "rotation": [
@@ -1461,7 +1505,7 @@
       "name": "Leafy shrub 7",
       "position": [
         -14.667962,
-        -0.109497,
+        0,
         7.286839
       ],
       "rotation": [
@@ -1482,9 +1526,9 @@
       "asset": "bushes-8",
       "name": "Leafy shrub 8",
       "position": [
-        -17.462669,
-        -0.080106,
-        -7.551164
+        -25.8,
+        0,
+        0
       ],
       "rotation": [
         0,
@@ -1505,7 +1549,7 @@
       "name": "Leafy shrub 9",
       "position": [
         -4.01627,
-        -0.104007,
+        0,
         22.256659
       ],
       "rotation": [
@@ -1527,7 +1571,7 @@
       "name": "Leafy shrub 10",
       "position": [
         -2.98435,
-        -0.044935,
+        0,
         34.750996
       ],
       "rotation": [
@@ -1549,7 +1593,7 @@
       "name": "Leafy shrub 11",
       "position": [
         -13.928897,
-        -0.122282,
+        0,
         17.003428
       ],
       "rotation": [
@@ -1571,7 +1615,7 @@
       "name": "Leafy shrub 12",
       "position": [
         -4.639192,
-        -0.12461,
+        0,
         7.09495
       ],
       "rotation": [
@@ -1593,7 +1637,7 @@
       "name": "Leafy shrub 13",
       "position": [
         -4.063478,
-        -0.089125,
+        0,
         24.749844
       ],
       "rotation": [
@@ -1615,7 +1659,7 @@
       "name": "Leafy shrub 14",
       "position": [
         -12.670332,
-        -0.033885,
+        0,
         33.374512
       ],
       "rotation": [
@@ -1637,7 +1681,7 @@
       "name": "Leafy shrub 15",
       "position": [
         -8.758926,
-        -0.108006,
+        0,
         -29.160458
       ],
       "rotation": [
@@ -1659,7 +1703,7 @@
       "name": "Leafy shrub 16",
       "position": [
         -9.909481,
-        -0.135312,
+        0,
         -32.727985
       ],
       "rotation": [
@@ -1681,7 +1725,7 @@
       "name": "Leafy shrub 17",
       "position": [
         -12.390627,
-        -0.096075,
+        0,
         24.037666
       ],
       "rotation": [
@@ -1703,7 +1747,7 @@
       "name": "Leafy shrub 18",
       "position": [
         -4.237168,
-        -0.125138,
+        0,
         7.963796
       ],
       "rotation": [
@@ -1725,7 +1769,7 @@
       "name": "Leafy shrub 19",
       "position": [
         -19.21027,
-        -0.056308,
+        0,
         -36.683907
       ],
       "rotation": [
@@ -1747,7 +1791,7 @@
       "name": "Leafy shrub 20",
       "position": [
         -4.205048,
-        -0.129737,
+        0,
         9.435872
       ],
       "rotation": [
@@ -1769,7 +1813,7 @@
       "name": "Leafy shrub 21",
       "position": [
         -15.056995,
-        -0.107948,
+        0,
         8.24354
       ],
       "rotation": [
@@ -1791,7 +1835,7 @@
       "name": "Leafy shrub 22",
       "position": [
         -3.222287,
-        -0.118837,
+        0,
         17.110914
       ],
       "rotation": [
@@ -1813,7 +1857,7 @@
       "name": "Leafy shrub 23",
       "position": [
         -4.937263,
-        -0.142073,
+        0,
         13.337645
       ],
       "rotation": [
@@ -1835,7 +1879,7 @@
       "name": "Leafy shrub 24",
       "position": [
         -14.963104,
-        -0.111544,
+        0,
         9.524359
       ],
       "rotation": [
@@ -1857,7 +1901,7 @@
       "name": "Leafy shrub 25",
       "position": [
         -2.523113,
-        -0.055512,
+        0,
         32.615139
       ],
       "rotation": [
@@ -1879,7 +1923,7 @@
       "name": "Leafy shrub 26",
       "position": [
         -14.953078,
-        -0.111216,
+        0,
         9.274468
       ],
       "rotation": [
@@ -1901,7 +1945,7 @@
       "name": "Leafy shrub 27",
       "position": [
         -6.295194,
-        -0.070724,
+        0,
         -1.069746
       ],
       "rotation": [
@@ -1923,7 +1967,7 @@
       "name": "Leafy shrub 28",
       "position": [
         -12.310118,
-        -0.027528,
+        0,
         34.203522
       ],
       "rotation": [
@@ -1945,7 +1989,7 @@
       "name": "Leafy shrub 29",
       "position": [
         -3.931531,
-        -0.098855,
+        0,
         23.088102
       ],
       "rotation": [
@@ -1967,7 +2011,7 @@
       "name": "Leafy shrub 30",
       "position": [
         -13.216969,
-        -0.129642,
+        0,
         16.880312
       ],
       "rotation": [
@@ -1989,7 +2033,7 @@
       "name": "Leafy shrub 31",
       "position": [
         -4.22999,
-        -0.124672,
+        0,
         7.858645
       ],
       "rotation": [
@@ -2011,7 +2055,7 @@
       "name": "Leafy shrub 32",
       "position": [
         -12.837944,
-        -0.133578,
+        0,
         16.713463
       ],
       "rotation": [
@@ -2033,7 +2077,7 @@
       "name": "Leafy shrub 33",
       "position": [
         -4.004527,
-        -0.132646,
+        0,
         13.726682
       ],
       "rotation": [
@@ -2055,7 +2099,7 @@
       "name": "Leafy shrub 34",
       "position": [
         -9.524478,
-        -0.12264,
+        0,
         -30.919113
       ],
       "rotation": [
@@ -2076,9 +2120,9 @@
       "asset": "bushes-35",
       "name": "Leafy shrub 35",
       "position": [
-        -16.4608,
-        -0.067857,
-        -8.532767
+        -21.5,
+        0,
+        -2
       ],
       "rotation": [
         180,
@@ -2099,7 +2143,7 @@
       "name": "Leafy shrub 36",
       "position": [
         -7.905592,
-        -0.017749,
+        0,
         -7.545533
       ],
       "rotation": [
@@ -2121,7 +2165,7 @@
       "name": "Leafy shrub 37",
       "position": [
         -16.02235,
-        -0.07727,
+        0,
         -1.119651
       ],
       "rotation": [
@@ -2143,7 +2187,7 @@
       "name": "Leafy shrub 38",
       "position": [
         -2.659022,
-        -0.05668,
+        0,
         31.890989
       ],
       "rotation": [
@@ -2165,7 +2209,7 @@
       "name": "Leafy shrub 39",
       "position": [
         -3.065057,
-        -0.057032,
+        0,
         31.01054
       ],
       "rotation": [
@@ -2186,9 +2230,9 @@
       "asset": "bushes-40",
       "name": "Leafy shrub 40",
       "position": [
-        -18.425142,
-        -0.082687,
-        -24.561323
+        -41.173,
+        0,
+        0.001
       ],
       "rotation": [
         0,
@@ -2209,7 +2253,7 @@
       "name": "Leafy shrub 41",
       "position": [
         -8.430349,
-        -0.122251,
+        0,
         -30.823975
       ],
       "rotation": [
@@ -2231,7 +2275,7 @@
       "name": "Leafy shrub 42",
       "position": [
         -12.39001,
-        -0.030842,
+        0,
         33.601791
       ],
       "rotation": [
@@ -2253,7 +2297,7 @@
       "name": "Leafy shrub 43",
       "position": [
         -5.317788,
-        -0.140161,
+        0,
         9.729699
       ],
       "rotation": [
@@ -2275,7 +2319,7 @@
       "name": "Leafy shrub 44",
       "position": [
         -14.074534,
-        -0.116369,
+        0,
         18.512684
       ],
       "rotation": [
@@ -2297,7 +2341,7 @@
       "name": "Leafy shrub 45",
       "position": [
         -7.36126,
-        -0.035402,
+        0,
         -5.102424
       ],
       "rotation": [
@@ -2319,7 +2363,7 @@
       "name": "Leafy shrub 46",
       "position": [
         -19.453672,
-        -0.060935,
+        0,
         -32.370209
       ],
       "rotation": [
@@ -2341,7 +2385,7 @@
       "name": "Leafy shrub 47",
       "position": [
         -3.595556,
-        -0.108985,
+        0,
         20.808014
       ],
       "rotation": [
@@ -2363,7 +2407,7 @@
       "name": "Leafy shrub 48",
       "position": [
         -13.329655,
-        -0.134072,
+        0,
         13.188891
       ],
       "rotation": [
@@ -2385,7 +2429,7 @@
       "name": "Leafy shrub 49",
       "position": [
         -9.369025,
-        -0.136415,
+        0,
         -32.758286
       ],
       "rotation": [
@@ -2407,7 +2451,7 @@
       "name": "Leafy shrub 50",
       "position": [
         -18.253145,
-        -0.073744,
+        0,
         -30.983681
       ],
       "rotation": [
@@ -2429,7 +2473,7 @@
       "name": "Leafy shrub 51",
       "position": [
         -8.916851,
-        -0.158091,
+        0,
         -37.468063
       ],
       "rotation": [
@@ -2450,9 +2494,9 @@
       "asset": "bushes-52",
       "name": "Leafy shrub 52",
       "position": [
-        -18.233198,
-        -0.084217,
-        -22.960945
+        -45.274,
+        0,
+        -3.802
       ],
       "rotation": [
         0,
@@ -2473,7 +2517,7 @@
       "name": "Leafy shrub 53",
       "position": [
         -4.527588,
-        -0.134703,
+        0,
         16.000006
       ],
       "rotation": [
@@ -2495,7 +2539,7 @@
       "name": "Leafy shrub 54",
       "position": [
         -14.362931,
-        -0.122239,
+        0,
         13.171799
       ],
       "rotation": [
@@ -2517,7 +2561,7 @@
       "name": "Leafy shrub 55",
       "position": [
         -4.039727,
-        -0.03697,
+        0,
         34.035812
       ],
       "rotation": [
@@ -2539,7 +2583,7 @@
       "name": "Leafy shrub 56",
       "position": [
         -15.452136,
-        -0.100946,
+        0,
         6.977477
       ],
       "rotation": [
@@ -2561,7 +2605,7 @@
       "name": "Leafy shrub 57",
       "position": [
         -9.079986,
-        -0.095274,
+        0,
         -27.78404
       ],
       "rotation": [
@@ -2583,7 +2627,7 @@
       "name": "Leafy shrub 58",
       "position": [
         -14.472484,
-        -0.120785,
+        0,
         12.48386
       ],
       "rotation": [
@@ -2605,7 +2649,7 @@
       "name": "Leafy shrub 59",
       "position": [
         -4.107358,
-        -0.12667,
+        0,
         17.45689
       ],
       "rotation": [
@@ -2627,7 +2671,7 @@
       "name": "Leafy shrub 60",
       "position": [
         -19.146135,
-        -0.060528,
+        0,
         -34.066437
       ],
       "rotation": [
@@ -2649,7 +2693,7 @@
       "name": "Leafy shrub 61",
       "position": [
         -9.161162,
-        -0.145636,
+        0,
         -34.235111
       ],
       "rotation": [
@@ -2671,7 +2715,7 @@
       "name": "Leafy shrub 62",
       "position": [
         -18.047222,
-        -0.081743,
+        0,
         -24.465954
       ],
       "rotation": [
@@ -2693,7 +2737,7 @@
       "name": "Leafy shrub 63",
       "position": [
         -9.383784,
-        -0.131182,
+        0,
         -32.013912
       ],
       "rotation": [
@@ -2715,7 +2759,7 @@
       "name": "Leafy shrub 64",
       "position": [
         -2.828516,
-        -0.048907,
+        0,
         33.871246
       ],
       "rotation": [
@@ -2737,7 +2781,7 @@
       "name": "Leafy shrub 65",
       "position": [
         -12.025642,
-        -0.052238,
+        0,
         29.780106
       ],
       "rotation": [
@@ -2759,7 +2803,7 @@
       "name": "Leafy shrub 66",
       "position": [
         -9.14883,
-        -0.00382,
+        0,
         -15.599181
       ],
       "rotation": [
@@ -2781,7 +2825,7 @@
       "name": "Leafy shrub 67",
       "position": [
         -13.10385,
-        -0.086121,
+        0,
         25.274124
       ],
       "rotation": [
@@ -2803,7 +2847,7 @@
       "name": "Leafy shrub 68",
       "position": [
         -3.175544,
-        -0.094929,
+        0,
         23.244963
       ],
       "rotation": [
@@ -2825,7 +2869,7 @@
       "name": "Leafy shrub 69",
       "position": [
         -13.500771,
-        -0.097408,
+        0,
         23.348524
       ],
       "rotation": [
@@ -2847,7 +2891,7 @@
       "name": "Leafy shrub 70",
       "position": [
         -2.739782,
-        -0.045108,
+        0,
         35.941372
       ],
       "rotation": [
@@ -2869,7 +2913,7 @@
       "name": "Leafy shrub 71",
       "position": [
         -3.318392,
-        -0.079098,
+        0,
         26.347097
       ],
       "rotation": [
@@ -2891,7 +2935,7 @@
       "name": "Leafy shrub 72",
       "position": [
         7.263914,
-        -0.146664,
+        0,
         34.857025
       ],
       "rotation": [
@@ -2913,7 +2957,7 @@
       "name": "Leafy shrub 73",
       "position": [
         -3.321424,
-        -0.108087,
+        0,
         20.56719
       ],
       "rotation": [
@@ -2935,7 +2979,7 @@
       "name": "Leafy shrub 74",
       "position": [
         6.443916,
-        -0.019656,
+        0,
         18.127401
       ],
       "rotation": [
@@ -2957,7 +3001,7 @@
       "name": "Leafy shrub 75",
       "position": [
         -3.604666,
-        -0.117681,
+        0,
         18.731287
       ],
       "rotation": [
@@ -2979,7 +3023,7 @@
       "name": "Leafy shrub 76",
       "position": [
         6.020729,
-        -0.122256,
+        0,
         31.518644
       ],
       "rotation": [
@@ -3001,7 +3045,7 @@
       "name": "Leafy shrub 77",
       "position": [
         -2.952892,
-        -0.107912,
+        0,
         19.852783
       ],
       "rotation": [
@@ -3023,7 +3067,7 @@
       "name": "Leafy shrub 78",
       "position": [
         7.27215,
-        -0.03112,
+        0,
         20.472864
       ],
       "rotation": [
@@ -3045,7 +3089,7 @@
       "name": "Leafy shrub 79",
       "position": [
         -2.517859,
-        -0.074386,
+        0,
         27.52125
       ],
       "rotation": [
@@ -3067,7 +3111,7 @@
       "name": "Leafy shrub 80",
       "position": [
         6.093778,
-        -0.149485,
+        0,
         37.445843
       ],
       "rotation": [
@@ -3089,7 +3133,7 @@
       "name": "Leafy shrub 81",
       "position": [
         -2.557696,
-        -0.049498,
+        0,
         34.777428
       ],
       "rotation": [
@@ -3111,7 +3155,7 @@
       "name": "Leafy shrub 82",
       "position": [
         5.671896,
-        -0.100954,
+        0,
         28.782026
       ],
       "rotation": [
@@ -3133,7 +3177,7 @@
       "name": "Leafy shrub 83",
       "position": [
         -3.284681,
-        -0.055675,
+        0,
         30.988228
       ],
       "rotation": [
@@ -3155,7 +3199,7 @@
       "name": "Leafy shrub 84",
       "position": [
         5.585242,
-        -0.022062,
+        0,
         17.589542
       ],
       "rotation": [
@@ -3177,7 +3221,7 @@
       "name": "Leafy shrub 85",
       "position": [
         -1.85545,
-        -0.066404,
+        0,
         30.721739
       ],
       "rotation": [
@@ -3199,7 +3243,7 @@
       "name": "Leafy shrub 86",
       "position": [
         6.701559,
-        -0.048993,
+        0,
         22.615189
       ],
       "rotation": [
@@ -3221,7 +3265,7 @@
       "name": "Leafy shrub 87",
       "position": [
         -2.397724,
-        -0.04821,
+        0,
         36.622211
       ],
       "rotation": [
@@ -3243,7 +3287,7 @@
       "name": "Leafy shrub 88",
       "position": [
         5.542292,
-        -0.041646,
+        0,
         21.119429
       ],
       "rotation": [
@@ -3265,7 +3309,7 @@
       "name": "Leafy shrub 89",
       "position": [
         -2.132086,
-        -0.086752,
+        0,
         24.285082
       ],
       "rotation": [
@@ -3287,7 +3331,7 @@
       "name": "Leafy shrub 90",
       "position": [
         6.261863,
-        -0.043384,
+        0,
         21.751402
       ],
       "rotation": [
@@ -3309,7 +3353,7 @@
       "name": "Leafy shrub 91",
       "position": [
         -3.013719,
-        -0.040052,
+        0,
         37.131943
       ],
       "rotation": [
@@ -3331,7 +3375,7 @@
       "name": "Leafy shrub 92",
       "position": [
         6.859696,
-        -0.091232,
+        0,
         27.423923
       ],
       "rotation": [
@@ -3353,7 +3397,7 @@
       "name": "Leafy shrub 93",
       "position": [
         -3.468184,
-        -0.120958,
+        0,
         17.285572
       ],
       "rotation": [
@@ -3375,7 +3419,7 @@
       "name": "Leafy shrub 94",
       "position": [
         6.939274,
-        -0.030014,
+        0,
         20.188473
       ],
       "rotation": [
@@ -3397,7 +3441,7 @@
       "name": "Leafy shrub 95",
       "position": [
         -2.886144,
-        -0.052876,
+        0,
         32.444908
       ],
       "rotation": [
@@ -3419,7 +3463,7 @@
       "name": "Leafy shrub 96",
       "position": [
         6.371196,
-        -0.139381,
+        0,
         34.110207
       ],
       "rotation": [
@@ -3441,7 +3485,7 @@
       "name": "Leafy shrub 97",
       "position": [
         -3.754237,
-        -0.118896,
+        0,
         18.760075
       ],
       "rotation": [
@@ -3463,7 +3507,7 @@
       "name": "Leafy shrub 98",
       "position": [
         7.502752,
-        -0.115742,
+        0,
         30.142952
       ],
       "rotation": [
@@ -3485,7 +3529,7 @@
       "name": "Leafy shrub 99",
       "position": [
         -2.454806,
-        -0.065948,
+        0,
         29.707352
       ],
       "rotation": [
@@ -3507,7 +3551,7 @@
       "name": "Leafy shrub 100",
       "position": [
         6.765654,
-        -0.145446,
+        0,
         35.004208
       ],
       "rotation": [
@@ -3529,7 +3573,7 @@
       "name": "Leafy shrub 101",
       "position": [
         -2.405424,
-        -0.092634,
+        0,
         22.964203
       ],
       "rotation": [
@@ -3551,7 +3595,7 @@
       "name": "Leafy shrub 102",
       "position": [
         6.994496,
-        -0.155329,
+        0,
         38.05014
       ],
       "rotation": [
@@ -3573,7 +3617,7 @@
       "name": "Leafy shrub 103",
       "position": [
         -2.75871,
-        -0.101125,
+        0,
         21.284262
       ],
       "rotation": [
@@ -3595,7 +3639,7 @@
       "name": "Leafy shrub 104",
       "position": [
         5.886331,
-        -0.03381,
+        0,
         20.150599
       ],
       "rotation": [
@@ -3617,7 +3661,7 @@
       "name": "Leafy shrub 105",
       "position": [
         -3.170534,
-        -0.054781,
+        0,
         31.372326
       ],
       "rotation": [
@@ -3639,7 +3683,7 @@
       "name": "Leafy shrub 106",
       "position": [
         7.203169,
-        -0.083549,
+        0,
         26.564095
       ],
       "rotation": [
@@ -3661,7 +3705,7 @@
       "name": "Leafy shrub 107",
       "position": [
         -2.397488,
-        -0.069807,
+        0,
         28.759377
       ],
       "rotation": [
@@ -3683,7 +3727,7 @@
       "name": "Leafy shrub 108",
       "position": [
         6.030757,
-        -0.031041,
+        0,
         19.812813
       ],
       "rotation": [
@@ -3705,7 +3749,7 @@
       "name": "Leafy shrub 109",
       "position": [
         -2.409071,
-        -0.062726,
+        0,
         30.677557
       ],
       "rotation": [
@@ -3727,7 +3771,7 @@
       "name": "Leafy shrub 110",
       "position": [
         6.671209,
-        -0.0209,
+        0,
         18.557615
       ],
       "rotation": [
@@ -3749,7 +3793,7 @@
       "name": "Leafy shrub 111",
       "position": [
         -2.079033,
-        -0.051896,
+        0,
         36.935188
       ],
       "rotation": [
@@ -3771,7 +3815,7 @@
       "name": "Leafy shrub 112",
       "position": [
         6.363229,
-        -0.152536,
+        0,
         38.473026
       ],
       "rotation": [
@@ -3793,7 +3837,7 @@
       "name": "Leafy shrub 113",
       "position": [
         -2.607124,
-        -0.045408,
+        0,
         36.791763
       ],
       "rotation": [
@@ -3815,7 +3859,7 @@
       "name": "Leafy shrub 114",
       "position": [
         6.975215,
-        -0.136283,
+        0,
         33.122253
       ],
       "rotation": [
@@ -3837,7 +3881,7 @@
       "name": "Leafy shrub 115",
       "position": [
         -2.000911,
-        -0.052224,
+        0,
         37.832939
       ],
       "rotation": [
@@ -3859,7 +3903,7 @@
       "name": "Leafy shrub 116",
       "position": [
         7.051421,
-        -0.134707,
+        0,
         32.832169
       ],
       "rotation": [
@@ -3881,7 +3925,7 @@
       "name": "Leafy shrub 117",
       "position": [
         -2.921229,
-        -0.067374,
+        0,
         28.845554
       ],
       "rotation": [
@@ -3903,7 +3947,7 @@
       "name": "Leafy shrub 118",
       "position": [
         6.451673,
-        -0.027695,
+        0,
         19.568316
       ],
       "rotation": [
@@ -3925,7 +3969,7 @@
       "name": "Leafy shrub 119",
       "position": [
         -3.055979,
-        -0.058444,
+        0,
         30.692616
       ],
       "rotation": [
@@ -3947,7 +3991,7 @@
       "name": "Leafy shrub 120",
       "position": [
         6.20682,
-        -0.043994,
+        0,
         21.809914
       ],
       "rotation": [
@@ -3969,7 +4013,7 @@
       "name": "Leafy shrub 121",
       "position": [
         -3.140126,
-        -0.038482,
+        0,
         37.188301
       ],
       "rotation": [
@@ -3991,7 +4035,7 @@
       "name": "Leafy shrub 122",
       "position": [
         6.200703,
-        -0.134906,
+        0,
         33.42485
       ],
       "rotation": [
@@ -4013,7 +4057,7 @@
       "name": "Leafy shrub 123",
       "position": [
         -3.123003,
-        -0.100623,
+        0,
         21.972961
       ],
       "rotation": [
@@ -4035,7 +4079,7 @@
       "name": "Leafy shrub 124",
       "position": [
         6.143479,
-        -0.035247,
+        0,
         20.544691
       ],
       "rotation": [
@@ -4057,7 +4101,7 @@
       "name": "Leafy shrub 125",
       "position": [
         -3.467073,
-        -0.044421,
+        0,
         33.388119
       ],
       "rotation": [
@@ -4079,7 +4123,7 @@
       "name": "Leafy shrub 126",
       "position": [
         6.025572,
-        -0.150379,
+        0,
         38.439667
       ],
       "rotation": [
@@ -4101,7 +4145,7 @@
       "name": "Leafy shrub 127",
       "position": [
         -3.552482,
-        -0.084738,
+        0,
         25.351463
       ],
       "rotation": [
@@ -4123,7 +4167,7 @@
       "name": "Leafy shrub 128",
       "position": [
         5.895467,
-        -0.023838,
+        0,
         18.393679
       ],
       "rotation": [
@@ -4145,7 +4189,7 @@
       "name": "Leafy shrub 129",
       "position": [
         -3.271308,
-        -0.116238,
+        0,
         18.231867
       ],
       "rotation": [
@@ -4167,7 +4211,7 @@
       "name": "Leafy shrub 130",
       "position": [
         7.017246,
-        -0.155981,
+        0,
         38.579311
       ],
       "rotation": [
@@ -4203,73 +4247,7 @@
         1
       ],
       "visible": true,
-      "locked": true
-    },
-    {
-      "id": "mountain-0",
-      "asset": "mountain-0",
-      "name": "Near mountain ridge",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "locked": true
-    },
-    {
-      "id": "mountain-1",
-      "asset": "mountain-1",
-      "name": "Blue mountain ridge",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "locked": true
-    },
-    {
-      "id": "mountain-2",
-      "asset": "mountain-2",
-      "name": "Distant mountain ridge",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "castle",
@@ -4277,7 +4255,7 @@
       "name": "Distant castle",
       "position": [
         -18,
-        10,
+        0,
         -158
       ],
       "rotation": [
@@ -4294,57 +4272,13 @@
       "locked": false
     },
     {
-      "id": "island--64",
-      "asset": "island--64",
-      "name": "Floating garden",
-      "position": [
-        -64,
-        44,
-        -178
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "locked": false
-    },
-    {
-      "id": "island-88",
-      "asset": "island-88",
-      "name": "Floating garden",
-      "position": [
-        88,
-        57,
-        -245
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        0.7,
-        0.7,
-        0.7
-      ],
-      "visible": true,
-      "locked": false
-    },
-    {
       "id": "willow-1",
       "asset": "willow-1",
       "name": "Weeping willow 1",
       "position": [
-        -14,
-        -0.525516,
-        -7
+        -15.9,
+        0,
+        -3.5
       ],
       "rotation": [
         0,
@@ -4364,14 +4298,14 @@
       "asset": "willow-2",
       "name": "Weeping willow 2",
       "position": [
-        -36.5,
-        0.020186,
-        -17
+        -49,
+        0,
+        -14
       ],
       "rotation": [
-        -180,
-        65.408441,
-        -180
+        0,
+        42,
+        0
       ],
       "scale": [
         1.45,
@@ -4401,37 +4335,15 @@
         1
       ],
       "visible": true,
-      "locked": true
-    },
-    {
-      "id": "forest",
-      "asset": "forest",
-      "name": "Distant forest",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "tree-1",
       "asset": "tree-1",
       "name": "Round canopy tree 1",
       "position": [
-        -5,
-        -0.389765,
+        -3.8,
+        0,
         22
       ],
       "rotation": [
@@ -4453,7 +4365,7 @@
       "name": "Round canopy tree 2",
       "position": [
         7,
-        -0.016504,
+        0,
         28
       ],
       "rotation": [
@@ -4474,8 +4386,8 @@
       "asset": "tree-3",
       "name": "Round canopy tree 3",
       "position": [
-        -7,
-        -0.640651,
+        -3.7,
+        0,
         15
       ],
       "rotation": [
@@ -4497,7 +4409,7 @@
       "name": "Round canopy tree 4",
       "position": [
         16,
-        0.015701,
+        0,
         19
       ],
       "rotation": [
@@ -4518,9 +4430,9 @@
       "asset": "tree-5",
       "name": "Round canopy tree 5",
       "position": [
-        -36.5,
-        -0.005309,
-        -28.5
+        -40,
+        0,
+        -46
       ],
       "rotation": [
         0,
@@ -4540,9 +4452,9 @@
       "asset": "tree-6",
       "name": "Round canopy tree 6",
       "position": [
-        -37,
-        0.024114,
-        -8
+        -46,
+        0,
+        -4
       ],
       "rotation": [
         -180,
@@ -4562,9 +4474,9 @@
       "asset": "tree-7",
       "name": "Round canopy tree 7",
       "position": [
-        33,
-        0.1262472724494207,
-        -16
+        31,
+        0,
+        -18
       ],
       "rotation": [
         -180,
@@ -4585,7 +4497,7 @@
       "name": "Round canopy tree 8",
       "position": [
         -31,
-        0.050379,
+        0,
         15
       ],
       "rotation": [
@@ -4607,7 +4519,7 @@
       "name": "Round canopy tree 9",
       "position": [
         -25,
-        -0.025962,
+        0,
         29
       ],
       "rotation": [
@@ -4628,9 +4540,9 @@
       "asset": "tree-10",
       "name": "Round canopy tree 10",
       "position": [
-        35,
-        0.001334,
-        12
+        37,
+        0,
+        11
       ],
       "rotation": [
         -180,
@@ -4651,7 +4563,7 @@
       "name": "Round canopy tree 11",
       "position": [
         -2.5,
-        0.026150621410244504,
+        0,
         -40.5
       ],
       "rotation": [
@@ -4673,8 +4585,8 @@
       "name": "Round canopy tree 12",
       "position": [
         13,
-        0.056465,
-        -41
+        0,
+        -45
       ],
       "rotation": [
         0,
@@ -4695,7 +4607,7 @@
       "name": "Round canopy tree 14",
       "position": [
         14.214782,
-        -0.043896,
+        0,
         38.601768
       ],
       "rotation": [
@@ -4717,7 +4629,7 @@
       "name": "Round canopy tree 15",
       "position": [
         27.038122,
-        0.048179,
+        0,
         31.641832
       ],
       "rotation": [
@@ -4738,9 +4650,9 @@
       "asset": "tree-16",
       "name": "Round canopy tree 16",
       "position": [
-        37.214783,
-        0.019423,
-        20.801477
+        41,
+        0,
+        22
       ],
       "rotation": [
         0,
@@ -4760,9 +4672,9 @@
       "asset": "tree-17",
       "name": "Round canopy tree 17",
       "position": [
-        43.7486,
-        0.270338,
-        7.141833
+        45,
+        0,
+        4
       ],
       "rotation": [
         -180,
@@ -4783,8 +4695,8 @@
       "name": "Round canopy tree 18",
       "position": [
         46,
-        0.510593,
-        -8
+        0,
+        -9
       ],
       "rotation": [
         -180,
@@ -4804,9 +4716,9 @@
       "asset": "tree-19",
       "name": "Round canopy tree 19",
       "position": [
-        43.7486,
-        0.93267,
-        -23.141832
+        46,
+        0,
+        -23
       ],
       "rotation": [
         0,
@@ -4826,9 +4738,9 @@
       "asset": "tree-20",
       "name": "Round canopy tree 20",
       "position": [
-        37.214783,
-        1.06286,
-        -36.801476
+        43,
+        0,
+        -32
       ],
       "rotation": [
         -180,
@@ -4849,7 +4761,7 @@
       "name": "Round canopy tree 21",
       "position": [
         27.038122,
-        0.319194,
+        0,
         -47.641834
       ],
       "rotation": [
@@ -4871,7 +4783,7 @@
       "name": "Round canopy tree 22",
       "position": [
         14.214782,
-        -0.359082,
+        0,
         -54.601768
       ],
       "rotation": [
@@ -4893,7 +4805,7 @@
       "name": "Round canopy tree 23",
       "position": [
         -5.5,
-        0.5384752421173208,
+        0,
         -59
       ],
       "rotation": [
@@ -4914,9 +4826,9 @@
       "asset": "tree-24",
       "name": "Round canopy tree 24",
       "position": [
-        -14.214782,
-        0.264301,
-        -54.601768
+        -17.8,
+        0,
+        -54.6
       ],
       "rotation": [
         0,
@@ -4937,7 +4849,7 @@
       "name": "Round canopy tree 25",
       "position": [
         -27.038122,
-        1.064117,
+        0,
         -47.641834
       ],
       "rotation": [
@@ -4959,7 +4871,7 @@
       "name": "Round canopy tree 26",
       "position": [
         -37.214783,
-        0.757505,
+        0,
         -36.801476
       ],
       "rotation": [
@@ -4980,9 +4892,9 @@
       "asset": "tree-27",
       "name": "Round canopy tree 27",
       "position": [
-        -43.7486,
-        0.504343,
-        -23.141832
+        -55,
+        0,
+        -22
       ],
       "rotation": [
         0,
@@ -5002,8 +4914,8 @@
       "asset": "tree-28",
       "name": "Round canopy tree 28",
       "position": [
-        -46,
-        0.285394,
+        -53,
+        0,
         -8
       ],
       "rotation": [
@@ -5025,7 +4937,7 @@
       "name": "Round canopy tree 29",
       "position": [
         -43.7486,
-        -0.002911,
+        0,
         7.141833
       ],
       "rotation": [
@@ -5047,7 +4959,7 @@
       "name": "Round canopy tree 30",
       "position": [
         -37.214783,
-        -0.019423,
+        0,
         20.801477
       ],
       "rotation": [
@@ -5068,9 +4980,9 @@
       "asset": "tree-31",
       "name": "Round canopy tree 31",
       "position": [
-        -27.038122,
-        -0.048179,
-        31.641832
+        -29,
+        0,
+        35
       ],
       "rotation": [
         -180,
@@ -5091,7 +5003,7 @@
       "name": "Round canopy tree 32",
       "position": [
         -14.214782,
-        0.043896,
+        0,
         38.601768
       ],
       "rotation": [
@@ -5127,7 +5039,7 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "kitchen-garden",
@@ -5149,7 +5061,7 @@
         1
       ],
       "visible": true,
-      "locked": true
+      "locked": false
     },
     {
       "id": "resident-pip",
@@ -5552,13 +5464,13 @@
       "asset": "bench-1",
       "name": "Oak bench",
       "position": [
-        -24,
+        -27,
         0,
-        -30
+        -40
       ],
       "rotation": [
         0,
-        0,
+        180,
         0
       ],
       "scale": [
@@ -5574,9 +5486,9 @@
       "asset": "tea-terrace",
       "name": "Tea courtyard paving",
       "position": [
-        -24,
-        0.02867727470825035,
-        -29.5
+        -27,
+        0,
+        -40
       ],
       "rotation": [
         0,
@@ -5596,9 +5508,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -30.5,
-        0.0021889620241282728,
-        -26.5
+        -48.24,
+        0,
+        -8.919
       ],
       "rotation": [
         0,
@@ -5618,9 +5530,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -28,
-        0.04870400533322876,
-        -32
+        -49.794,
+        0,
+        -14.877
       ],
       "rotation": [
         0,
@@ -5640,9 +5552,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -26.5,
-        0.06147569016718084,
-        -33.5
+        -49.794,
+        0,
+        -21.123
       ],
       "rotation": [
         0,
@@ -5662,9 +5574,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -24.5,
-        0.061601576312927966,
-        -34
+        -48.24,
+        0,
+        -27.081
       ],
       "rotation": [
         0,
@@ -5685,7 +5597,7 @@
       "name": "Leafy shrub",
       "position": [
         -22.5,
-        0.05088307723410275,
+        0,
         -34
       ],
       "rotation": [
@@ -5707,7 +5619,7 @@
       "name": "Leafy shrub",
       "position": [
         -20.5,
-        0.030448035371557824,
+        0,
         -33
       ],
       "rotation": [
@@ -5728,9 +5640,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -29,
-        0.038220625820518224,
-        -31
+        -45.274,
+        0,
+        -32.198
       ],
       "rotation": [
         0,
@@ -5750,9 +5662,9 @@
       "asset": "bushes-1",
       "name": "Leafy shrub",
       "position": [
-        -29,
-        0.023209967905932886,
-        -29
+        -41.173,
+        0,
+        -36.001
       ],
       "rotation": [
         0,
@@ -5768,31 +5680,9 @@
       "locked": false
     },
     {
-      "id": "sunrise-meadow-region",
-      "asset": "walkable-region",
-      "name": "Sunrise meadow walkable area",
-      "position": [
-        54,
-        1.633484,
-        21
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "scale": [
-        2.1,
-        1,
-        1.6
-      ],
-      "visible": true,
-      "locked": false
-    },
-    {
       "id": "sunrise-meadow-path",
       "asset": "path-curved",
-      "name": "Sunrise meadow path",
+      "name": "Sunrise meadow lane",
       "position": [
         4,
         0,
@@ -5817,31 +5707,47 @@
             0
           ],
           [
-            4,
+            10,
             1
           ],
           [
-            12,
-            1
-          ],
-          [
-            21,
-            2
-          ],
-          [
-            30,
+            20,
             3
           ],
           [
-            40,
-            6
+            30,
+            4
           ],
           [
-            52,
-            9
+            37,
+            12
+          ],
+          [
+            42,
+            20
+          ],
+          [
+            46,
+            26
+          ],
+          [
+            54,
+            26
+          ],
+          [
+            62,
+            26
+          ],
+          [
+            68,
+            26
+          ],
+          [
+            73,
+            23
           ]
         ],
-        "width": 2.3
+        "width": 2.8
       }
     },
     {
@@ -5849,9 +5755,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 1",
       "position": [
-        42,
-        0.184458,
-        12
+        47,
+        0,
+        16
       ],
       "rotation": [
         0,
@@ -5871,9 +5777,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 2",
       "position": [
-        50,
-        1.760212,
-        31
+        53,
+        0,
+        51
       ],
       "rotation": [
         0,
@@ -5893,9 +5799,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 3",
       "position": [
-        62,
-        1.726269,
-        13
+        68,
+        0,
+        -1
       ],
       "rotation": [
         0,
@@ -5915,9 +5821,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 4",
       "position": [
-        68,
-        3.723373,
-        32
+        67,
+        0,
+        49
       ],
       "rotation": [
         0,
@@ -5937,9 +5843,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 1",
       "position": [
-        31,
-        0.017174,
-        29
+        24,
+        0,
+        -51
       ],
       "rotation": [
         0,
@@ -5947,9 +5853,9 @@
         0
       ],
       "scale": [
-        1.15,
-        1,
-        1.15
+        1.6,
+        0.8,
+        1.6
       ],
       "visible": true,
       "locked": false
@@ -5960,8 +5866,8 @@
       "name": "Sunrise meadow grass 2",
       "position": [
         44,
-        1.181541,
-        29
+        0,
+        -56
       ],
       "rotation": [
         0,
@@ -5969,9 +5875,9 @@
         0
       ],
       "scale": [
-        1.1,
-        1,
-        1.1
+        1.5,
+        0.8,
+        1.5
       ],
       "visible": true,
       "locked": false
@@ -5981,9 +5887,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 3",
       "position": [
-        57,
-        1.61102,
-        16
+        21,
+        0,
+        -34
       ],
       "rotation": [
         0,
@@ -5991,9 +5897,9 @@
         0
       ],
       "scale": [
-        1,
-        1,
-        1
+        1.6,
+        0.8,
+        1.6
       ],
       "visible": true,
       "locked": false
@@ -6003,9 +5909,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 4",
       "position": [
-        62,
-        3.126674,
-        33
+        44,
+        0,
+        -19
       ],
       "rotation": [
         0,
@@ -6013,9 +5919,9 @@
         0
       ],
       "scale": [
-        1.2,
-        1,
-        1.2
+        1.6,
+        0.8,
+        1.6
       ],
       "visible": true,
       "locked": false
@@ -6023,15 +5929,15 @@
     {
       "id": "sunrise-meadow-swings",
       "asset": "meadow-swings",
-      "name": "Sunrise meadow swings",
+      "name": "Pasture meadow swings",
       "position": [
-        59,
-        2.397839,
-        28
+        -46,
+        0.015,
+        36.5
       ],
       "rotation": [
         0,
-        90,
+        0,
         0
       ],
       "scale": [
@@ -6047,9 +5953,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 5",
       "position": [
-        34,
-        0.35791,
-        30
+        23,
+        0,
+        28
       ],
       "rotation": [
         0,
@@ -6069,9 +5975,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 6",
       "position": [
-        40,
-        1.236871,
-        36
+        36,
+        0,
+        48
       ],
       "rotation": [
         0,
@@ -6091,9 +5997,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 7",
       "position": [
-        48,
-        0.82911,
-        8
+        46,
+        0,
+        9
       ],
       "rotation": [
         0,
@@ -6113,9 +6019,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 8",
       "position": [
-        55,
-        2.61043,
-        37
+        50,
+        0,
+        36
       ],
       "rotation": [
         0,
@@ -6135,9 +6041,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 9",
       "position": [
-        72,
-        3.362419,
-        25
+        122,
+        0,
+        11
       ],
       "rotation": [
         0,
@@ -6157,9 +6063,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 10",
       "position": [
-        77,
-        2.518538,
-        14
+        106,
+        0,
+        -2
       ],
       "rotation": [
         0,
@@ -6179,9 +6085,9 @@
       "asset": "tree-1",
       "name": "Sunrise meadow tree 11",
       "position": [
-        74,
-        5.064007,
-        37
+        109,
+        0,
+        46
       ],
       "rotation": [
         0,
@@ -6201,9 +6107,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 5",
       "position": [
-        32,
-        -0.037255,
-        10
+        22,
+        0,
+        -4
       ],
       "rotation": [
         0,
@@ -6211,9 +6117,9 @@
         0
       ],
       "scale": [
-        1.1,
-        1.1,
-        1.1
+        1.7,
+        0.8,
+        1.7
       ],
       "visible": true,
       "locked": false
@@ -6223,8 +6129,8 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 6",
       "position": [
-        41,
-        0.046935,
+        45,
+        0,
         6
       ],
       "rotation": [
@@ -6233,9 +6139,9 @@
         0
       ],
       "scale": [
-        0.94,
-        0.94,
-        0.94
+        1.6,
+        0.8,
+        1.6
       ],
       "visible": true,
       "locked": false
@@ -6245,9 +6151,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 7",
       "position": [
-        74,
-        3.209725,
-        22
+        21,
+        0,
+        25
       ],
       "rotation": [
         0,
@@ -6255,9 +6161,9 @@
         0
       ],
       "scale": [
-        1.2,
-        1.2,
-        1.2
+        1.7,
+        0.8,
+        1.7
       ],
       "visible": true,
       "locked": false
@@ -6267,8 +6173,8 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 8",
       "position": [
-        73,
-        5.08206,
+        41,
+        0,
         38
       ],
       "rotation": [
@@ -6277,9 +6183,9 @@
         0
       ],
       "scale": [
-        1.05,
-        1.05,
-        1.05
+        1.6,
+        0.8,
+        1.6
       ],
       "visible": true,
       "locked": false
@@ -6289,9 +6195,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 9",
       "position": [
-        49,
-        2.064794,
-        39
+        78,
+        0,
+        1
       ],
       "rotation": [
         0,
@@ -6299,9 +6205,9 @@
         0
       ],
       "scale": [
-        0.97,
-        0.97,
-        0.97
+        1.8,
+        0.8,
+        1.8
       ],
       "visible": true,
       "locked": false
@@ -6311,9 +6217,9 @@
       "asset": "grass-wide",
       "name": "Sunrise meadow grass 10",
       "position": [
-        35,
-        1.020615,
-        37
+        101,
+        0,
+        4
       ],
       "rotation": [
         0,
@@ -6321,9 +6227,9 @@
         0
       ],
       "scale": [
-        1.15,
-        1.15,
-        1.15
+        1.7,
+        0.8,
+        1.7
       ],
       "visible": true,
       "locked": false
@@ -6334,7 +6240,7 @@
       "name": "Sunrise meadow grass 11",
       "position": [
         61,
-        2.921732,
+        0,
         32
       ],
       "rotation": [
@@ -6356,7 +6262,7 @@
       "name": "Sunrise meadow grass 12",
       "position": [
         66,
-        2.983064,
+        0,
         27
       ],
       "rotation": [
@@ -6399,9 +6305,9 @@
       "asset": "lamp-moon-garden",
       "name": "Moonlit path lamppost",
       "position": [
-        19,
+        16,
         0,
-        -6
+        1.5
       ],
       "rotation": [
         0,
@@ -6445,7 +6351,7 @@
       "position": [
         -20,
         0,
-        -29
+        -41
       ],
       "rotation": [
         0,
@@ -6575,9 +6481,9 @@
       "asset": "grass-wide",
       "name": "Wide meadow grass",
       "position": [
-        11.5,
+        101,
         0,
-        -51
+        44
       ],
       "rotation": [
         0,
@@ -6585,9 +6491,9 @@
         0
       ],
       "scale": [
-        1,
-        1,
-        1
+        1.8,
+        0.8,
+        1.8
       ],
       "visible": true,
       "locked": false
@@ -7587,9 +7493,9 @@
       "asset": "grass-wide",
       "name": "Wide meadow grass",
       "position": [
-        22.5,
-        0.012630911971718981,
-        -24.5
+        77,
+        0,
+        47
       ],
       "rotation": [
         0,
@@ -7597,9 +7503,9 @@
         0
       ],
       "scale": [
-        1,
-        1,
-        1
+        1.8,
+        0.8,
+        1.8
       ],
       "visible": true,
       "locked": false
@@ -7632,7 +7538,7 @@
       "name": "Meadow grass patch",
       "position": [
         11.5,
-        0.02724855713282748,
+        0,
         -29.5
       ],
       "rotation": [
@@ -7653,7 +7559,7 @@
       "asset": "edge-lantern-garden-1",
       "name": "Low stone lantern",
       "position": [
-        20,
+        17,
         0.1,
         -2.3
       ],
@@ -7677,7 +7583,7 @@
       "position": [
         31.2,
         0.1,
-        -10.5
+        -16
       ],
       "rotation": [
         0,
@@ -7697,7 +7603,7 @@
       "asset": "edge-lantern-garden-3",
       "name": "Low stone lantern",
       "position": [
-        31.2,
+        37.1,
         0.1,
         -2.3
       ],
@@ -7719,9 +7625,9 @@
       "asset": "edge-lantern-pond-1",
       "name": "Low stone lantern",
       "position": [
-        -30,
-        -0.014695,
-        -2
+        -33,
+        0.1,
+        1
       ],
       "rotation": [
         0,
@@ -7741,9 +7647,9 @@
       "asset": "edge-lantern-pond-2",
       "name": "Low stone lantern",
       "position": [
-        -36.4,
-        0.021121,
-        -14
+        -50,
+        0.1,
+        -16
       ],
       "rotation": [
         0,
@@ -7763,9 +7669,9 @@
       "asset": "edge-lantern-pond-3",
       "name": "Low stone lantern",
       "position": [
-        -31,
-        -0.004216,
-        -25.5
+        -32,
+        0.1,
+        -42.7
       ],
       "rotation": [
         0,
@@ -7784,9 +7690,21 @@
       "id": "puppy-mochi",
       "asset": "puppy-corgi",
       "name": "Mochi",
-      "position": [30, 0.05, 19],
-      "rotation": [0, 0, 0],
-      "scale": [1, 1, 1],
+      "position": [
+        30,
+        0,
+        19
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
       "visible": true,
       "locked": false
     },
@@ -7794,9 +7712,21 @@
       "id": "puppy-kiko",
       "asset": "puppy-shiba",
       "name": "Kiko",
-      "position": [17, 0.05, -5.8],
-      "rotation": [0, 0, 0],
-      "scale": [1, 1, 1],
+      "position": [
+        17,
+        0,
+        -5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
       "visible": true,
       "locked": false
     },
@@ -7804,9 +7734,21 @@
       "id": "puppy-biscuit",
       "asset": "puppy-beagle",
       "name": "Biscuit",
-      "position": [-29, 0.05, 3],
-      "rotation": [0, 0, 0],
-      "scale": [1, 1, 1],
+      "position": [
+        -29,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
       "visible": true,
       "locked": false
     },
@@ -7814,9 +7756,6624 @@
       "id": "puppy-cloud",
       "asset": "puppy-samoyed",
       "name": "Cloud",
-      "position": [-1, 0.05, -29],
-      "rotation": [0, 0, 0],
-      "scale": [1, 1, 1],
+      "position": [
+        -1,
+        0,
+        -29
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "activity-furnishings",
+      "asset": "activity-furnishings",
+      "name": "Writing desk & activity furnishings",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-1",
+      "asset": "cottage-2",
+      "name": "Marigold cottage",
+      "position": [
+        25,
+        0,
+        -42
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-2",
+      "asset": "cottage-8",
+      "name": "Orchard lane cottage",
+      "position": [
+        42,
+        0,
+        -47
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-3",
+      "asset": "cottage-3",
+      "name": "Sage cottage",
+      "position": [
+        25,
+        0,
+        -25
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-4",
+      "asset": "cottage-9",
+      "name": "Brookside cottage",
+      "position": [
+        42,
+        0,
+        -17
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-5",
+      "asset": "cottage-2",
+      "name": "Sunrise cottage",
+      "position": [
+        25,
+        0,
+        5
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-6",
+      "asset": "cottage-8",
+      "name": "Maple lane cottage",
+      "position": [
+        42,
+        0,
+        15
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-cottage-7",
+      "asset": "cottage-9",
+      "name": "Meadow lane cottage",
+      "position": [
+        28,
+        0,
+        35
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-brook",
+      "asset": "custom-river",
+      "name": "Willowbank winding brook",
+      "position": [
+        -8.8,
+        0,
+        -105
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            23.8,
+            5
+          ],
+          [
+            50.8,
+            8
+          ],
+          [
+            64.8,
+            17
+          ],
+          [
+            65.8,
+            35
+          ],
+          [
+            67.8,
+            59
+          ],
+          [
+            63.8,
+            83
+          ],
+          [
+            58.8,
+            105
+          ],
+          [
+            61.8,
+            123
+          ],
+          [
+            64.8,
+            135
+          ],
+          [
+            66.8,
+            147
+          ],
+          [
+            69.8,
+            163
+          ],
+          [
+            83.8,
+            178
+          ],
+          [
+            106.8,
+            188
+          ],
+          [
+            83.8,
+            201
+          ],
+          [
+            53.8,
+            213
+          ],
+          [
+            26.8,
+            218
+          ],
+          [
+            -3.8,
+            215
+          ]
+        ],
+        "width": 4.8
+      }
+    },
+    {
+      "id": "town-brook-bridge",
+      "asset": "bridge",
+      "name": "Willowbank meadow bridge",
+      "position": [
+        58,
+        0,
+        42
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-east-lane",
+      "asset": "path-curved",
+      "name": "Willowbank cottage lane",
+      "position": [
+        10,
+        0,
+        -32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            8,
+            -3
+          ],
+          [
+            18,
+            -5
+          ],
+          [
+            24,
+            -9
+          ],
+          [
+            24,
+            -22
+          ],
+          [
+            10,
+            -26
+          ],
+          [
+            0.5,
+            -32
+          ]
+        ],
+        "width": 2.8
+      }
+    },
+    {
+      "id": "town-cottage-street",
+      "asset": "path-curved",
+      "name": "Cottage street",
+      "position": [
+        34,
+        0,
+        -54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            13
+          ],
+          [
+            0,
+            27
+          ],
+          [
+            0,
+            44
+          ],
+          [
+            0,
+            59
+          ],
+          [
+            0,
+            74
+          ],
+          [
+            1,
+            85
+          ],
+          [
+            0,
+            96
+          ]
+        ],
+        "width": 3
+      }
+    },
+    {
+      "id": "town-north-loop",
+      "asset": "path-curved",
+      "name": "Orchard lane loop",
+      "position": [
+        2,
+        0,
+        -46
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            15,
+            4
+          ],
+          [
+            22,
+            9
+          ],
+          [
+            32,
+            9
+          ],
+          [
+            39,
+            6
+          ],
+          [
+            48,
+            6
+          ],
+          [
+            51,
+            1
+          ]
+        ],
+        "width": 2.3
+      }
+    },
+    {
+      "id": "town-core-link",
+      "asset": "path-curved",
+      "name": "Town green lane",
+      "position": [
+        0,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            7,
+            0
+          ],
+          [
+            14,
+            1
+          ],
+          [
+            19,
+            0
+          ],
+          [
+            20,
+            5
+          ],
+          [
+            25,
+            7
+          ],
+          [
+            30,
+            7
+          ],
+          [
+            34,
+            6
+          ]
+        ],
+        "width": 2.2
+      }
+    },
+    {
+      "id": "town-meadow-loop",
+      "asset": "path-curved",
+      "name": "South meadow loop",
+      "position": [
+        1.5,
+        0,
+        38
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            3
+          ],
+          [
+            11.5,
+            5
+          ],
+          [
+            22.5,
+            5
+          ],
+          [
+            32.5,
+            4
+          ],
+          [
+            42.5,
+            4
+          ],
+          [
+            48.5,
+            4
+          ]
+        ],
+        "width": 2.5
+      }
+    },
+    {
+      "id": "town-race-yard-lane",
+      "asset": "path-curved",
+      "name": "Racetrack spectator lane",
+      "position": [
+        77,
+        0,
+        39
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            -0.8
+          ],
+          [
+            8,
+            -0.85
+          ],
+          [
+            14,
+            -0.8
+          ],
+          [
+            23,
+            0
+          ],
+          [
+            32,
+            -0.5
+          ],
+          [
+            38,
+            -7
+          ],
+          [
+            39,
+            -14
+          ],
+          [
+            39,
+            -19
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-stable-entry",
+      "asset": "path-straight",
+      "name": "Stable hay yard",
+      "position": [
+        82,
+        0,
+        38.15
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0.0
+          ],
+          [
+            0,
+            0.65
+          ],
+          [
+            0,
+            1.13
+          ]
+        ],
+        "width": 1.7
+      }
+    },
+    {
+      "id": "town-door-path-1",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 1",
+      "position": [
+        28.47,
+        0,
+        -42.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            2.765,
+            0.0
+          ],
+          [
+            5.53,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-2",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 2",
+      "position": [
+        38.18,
+        0,
+        -47.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            -2.09,
+            0.0
+          ],
+          [
+            -4.18,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-3",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 3",
+      "position": [
+        28.82,
+        0,
+        -25.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            2.59,
+            0.0
+          ],
+          [
+            5.18,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-4",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 4",
+      "position": [
+        38.58,
+        0,
+        -17.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            -2.29,
+            0.0
+          ],
+          [
+            -4.58,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-5",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 5",
+      "position": [
+        28.47,
+        0,
+        5.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            2.765,
+            0.0
+          ],
+          [
+            5.53,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-6",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 6",
+      "position": [
+        38.18,
+        0,
+        15.0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            -2.09,
+            0.0
+          ],
+          [
+            -4.18,
+            0.0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-door-path-7",
+      "asset": "path-straight",
+      "name": "Cottage doorstep 7",
+      "position": [
+        28.0,
+        0,
+        38.42
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2.29
+          ],
+          [
+            0.0,
+            4.58
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-pond-walk",
+      "asset": "path-curved",
+      "name": "Willow pond walk",
+      "position": [
+        -24,
+        0,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -10,
+            1
+          ],
+          [
+            -19,
+            0
+          ],
+          [
+            -25,
+            -4
+          ],
+          [
+            -28,
+            -12
+          ],
+          [
+            -29,
+            -22
+          ],
+          [
+            -29,
+            -30
+          ],
+          [
+            -29,
+            -36
+          ],
+          [
+            -27,
+            -40
+          ]
+        ],
+        "width": 2.2
+      }
+    },
+    {
+      "id": "town-owl-loop",
+      "asset": "path-curved",
+      "name": "Owl grove and pond overlook",
+      "position": [
+        -51,
+        0,
+        -37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            6,
+            -4
+          ],
+          [
+            14,
+            -4
+          ],
+          [
+            20,
+            -1
+          ],
+          [
+            24,
+            -1.5
+          ],
+          [
+            28,
+            -1
+          ],
+          [
+            30,
+            1
+          ],
+          [
+            32,
+            8
+          ]
+        ],
+        "width": 2
+      }
+    },
+    {
+      "id": "town-overlook-return",
+      "asset": "path-curved",
+      "name": "Pond overlook return",
+      "position": [
+        -19,
+        0,
+        -29
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.6,
+            4
+          ],
+          [
+            1.5,
+            11
+          ],
+          [
+            2,
+            18
+          ],
+          [
+            2.2,
+            20.5
+          ],
+          [
+            2.2,
+            23.3
+          ],
+          [
+            0.7,
+            23.3
+          ],
+          [
+            -0.4,
+            22.4
+          ]
+        ],
+        "width": 1.2
+      }
+    },
+    {
+      "id": "town-dock-approach",
+      "asset": "path-curved",
+      "name": "Pond dock approach",
+      "position": [
+        -18.4,
+        0,
+        -5.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -0.6,
+            -0.3
+          ],
+          [
+            -1,
+            -1.1
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "horse-racetrack",
+      "asset": "horse-racetrack",
+      "name": "Willowbank horse racetrack",
+      "position": [
+        85,
+        0,
+        20
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "horse-stable",
+      "asset": "horse-stable",
+      "name": "Willowbank feeding stable",
+      "position": [
+        85,
+        0,
+        42
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "stable-hay-bale-1",
+      "asset": "hay-bale",
+      "name": "Stable hay bale",
+      "position": [
+        81,
+        0,
+        43
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "stable-hay-bale-2",
+      "asset": "hay-bale",
+      "name": "Stable hay bale",
+      "position": [
+        89,
+        0,
+        43
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "owl-feeding-perch",
+      "asset": "owl-feeding-perch",
+      "name": "Moonwillow owl feeding perch",
+      "position": [
+        -48,
+        0,
+        -30
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "owl-brown-1",
+      "asset": "owl-brown",
+      "name": "Moonwillow owl 1",
+      "position": [
+        -49.4,
+        2.28,
+        -30
+      ],
+      "rotation": [
+        0,
+        10,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "owl-brown-2",
+      "asset": "owl-brown",
+      "name": "Moonwillow owl 2",
+      "position": [
+        -48,
+        2.28,
+        -30
+      ],
+      "rotation": [
+        0,
+        -8,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "owl-brown-3",
+      "asset": "owl-brown",
+      "name": "Moonwillow owl 3",
+      "position": [
+        -46.6,
+        2.28,
+        -30
+      ],
+      "rotation": [
+        0,
+        16,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-1",
+      "asset": "tree-1",
+      "name": "Willowbank tree 1",
+      "position": [
+        18,
+        0,
+        -48
+      ],
+      "rotation": [
+        0,
+        47,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-2",
+      "asset": "tree-1",
+      "name": "Willowbank tree 2",
+      "position": [
+        47,
+        0,
+        -55
+      ],
+      "rotation": [
+        0,
+        94,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-3",
+      "asset": "tree-1",
+      "name": "Willowbank tree 3",
+      "position": [
+        26,
+        0,
+        -61
+      ],
+      "rotation": [
+        0,
+        141,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-4",
+      "asset": "tree-1",
+      "name": "Willowbank tree 4",
+      "position": [
+        48,
+        0,
+        -42
+      ],
+      "rotation": [
+        0,
+        188,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-5",
+      "asset": "tree-1",
+      "name": "Willowbank tree 5",
+      "position": [
+        20,
+        0,
+        -32
+      ],
+      "rotation": [
+        0,
+        235,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-6",
+      "asset": "tree-1",
+      "name": "Willowbank tree 6",
+      "position": [
+        39,
+        0,
+        -31
+      ],
+      "rotation": [
+        0,
+        282,
+        0
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-7",
+      "asset": "tree-1",
+      "name": "Willowbank tree 7",
+      "position": [
+        16.5,
+        0,
+        0.5
+      ],
+      "rotation": [
+        0,
+        329,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-8",
+      "asset": "tree-1",
+      "name": "Willowbank tree 8",
+      "position": [
+        39,
+        0,
+        1
+      ],
+      "rotation": [
+        0,
+        16,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-9",
+      "asset": "tree-1",
+      "name": "Willowbank tree 9",
+      "position": [
+        18,
+        0,
+        29
+      ],
+      "rotation": [
+        0,
+        63,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-10",
+      "asset": "tree-1",
+      "name": "Willowbank tree 10",
+      "position": [
+        40,
+        0,
+        36
+      ],
+      "rotation": [
+        0,
+        110,
+        0
+      ],
+      "scale": [
+        0.87,
+        0.87,
+        0.87
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-11",
+      "asset": "tree-1",
+      "name": "Willowbank tree 11",
+      "position": [
+        72,
+        0,
+        50
+      ],
+      "rotation": [
+        0,
+        157,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-12",
+      "asset": "tree-1",
+      "name": "Willowbank tree 12",
+      "position": [
+        98,
+        0,
+        49
+      ],
+      "rotation": [
+        0,
+        204,
+        0
+      ],
+      "scale": [
+        0.91,
+        0.91,
+        0.91
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-13",
+      "asset": "tree-1",
+      "name": "Willowbank tree 13",
+      "position": [
+        -55,
+        0,
+        -36
+      ],
+      "rotation": [
+        0,
+        251,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-14",
+      "asset": "tree-1",
+      "name": "Willowbank tree 14",
+      "position": [
+        -43,
+        0,
+        -45
+      ],
+      "rotation": [
+        0,
+        298,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-15",
+      "asset": "tree-1",
+      "name": "Willowbank tree 15",
+      "position": [
+        -52,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        345,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-1",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 1",
+      "position": [
+        -51,
+        0,
+        -19
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        0.8,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-2",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 2",
+      "position": [
+        -39,
+        0,
+        -43
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.5,
+        0.8,
+        1.5
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-3",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 3",
+      "position": [
+        10,
+        0,
+        -64
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.8,
+        0.8,
+        1.8
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-4",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 4",
+      "position": [
+        14,
+        0,
+        35
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.7,
+        0.8,
+        1.7
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-5",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 5",
+      "position": [
+        74,
+        0,
+        -84
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.3,
+        0.8,
+        2.3
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-grass-6",
+      "asset": "grass-wide",
+      "name": "Willowbank meadow lawn 6",
+      "position": [
+        104,
+        0,
+        -65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.3,
+        0.8,
+        2.3
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-track-clearance",
+      "asset": "planting-clearance",
+      "name": "Racecourse planting clearance",
+      "position": [
+        85,
+        0,
+        20
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        26.5,
+        1,
+        16.5
+      ],
+      "visible": false,
+      "locked": false
+    },
+    {
+      "id": "town-stable-clearance",
+      "asset": "planting-clearance",
+      "name": "Stable yard planting clearance",
+      "position": [
+        85,
+        0,
+        40
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        7,
+        1,
+        6
+      ],
+      "visible": false,
+      "locked": false
+    },
+    {
+      "id": "town-owl-clearance",
+      "asset": "planting-clearance",
+      "name": "Owl grove planting clearance",
+      "position": [
+        -48,
+        0,
+        -28.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        4.3,
+        1,
+        3.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-1",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 1",
+      "position": [
+        30.8,
+        0,
+        -33.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-2",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 2",
+      "position": [
+        37,
+        0,
+        -9
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-3",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 3",
+      "position": [
+        31,
+        0,
+        15
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-4",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 4",
+      "position": [
+        44,
+        0,
+        44.5
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-5",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 5",
+      "position": [
+        68,
+        0,
+        45
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-6",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 6",
+      "position": [
+        112,
+        0,
+        34
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-7",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 7",
+      "position": [
+        -56,
+        0,
+        -30
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-8",
+      "asset": "lamp-20",
+      "name": "Willowbank lane lantern 8",
+      "position": [
+        -40,
+        0,
+        7
+      ],
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-row-1",
+      "asset": "farm-row",
+      "name": "Willowbank farm 1 crop row 1",
+      "position": [
+        30,
+        0,
+        -83.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-row-2",
+      "asset": "farm-row",
+      "name": "Willowbank farm 1 crop row 2",
+      "position": [
+        30,
+        0,
+        -80.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-row-3",
+      "asset": "farm-row",
+      "name": "Willowbank farm 1 crop row 3",
+      "position": [
+        30,
+        0,
+        -78
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-row-4",
+      "asset": "farm-row",
+      "name": "Willowbank farm 1 crop row 4",
+      "position": [
+        30,
+        0,
+        -75.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-row-5",
+      "asset": "farm-row",
+      "name": "Willowbank farm 1 crop row 5",
+      "position": [
+        30,
+        0,
+        -72.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-1-planting-clearance",
+      "asset": "planting-clearance",
+      "name": "Farm 1 planting clearance",
+      "position": [
+        30,
+        0,
+        -78
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        9.3,
+        1,
+        7.5
+      ],
+      "visible": false,
+      "locked": false
+    },
+    {
+      "id": "farm-1-fence-back",
+      "asset": "fence-line",
+      "name": "Farm 1 back fence",
+      "position": [
+        21,
+        0,
+        -85.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            18,
+            0
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-1-fence-west",
+      "asset": "fence-line",
+      "name": "Farm 1 west fence",
+      "position": [
+        21,
+        0,
+        -85.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-1-fence-east",
+      "asset": "fence-line",
+      "name": "Farm 1 east fence",
+      "position": [
+        39,
+        0,
+        -85.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-1-front-path",
+      "asset": "path-curved",
+      "name": "Farm 1 front lane",
+      "position": [
+        20,
+        0,
+        -69.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            20,
+            0
+          ]
+        ],
+        "width": 2.1
+      }
+    },
+    {
+      "id": "farm-1-west-path",
+      "asset": "path-curved",
+      "name": "Farm 1 west aisle",
+      "position": [
+        20,
+        0,
+        -69.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "farm-1-east-path",
+      "asset": "path-curved",
+      "name": "Farm 1 east aisle",
+      "position": [
+        40,
+        0,
+        -69.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "farm-2-row-1",
+      "asset": "farm-row",
+      "name": "Willowbank farm 2 crop row 1",
+      "position": [
+        73,
+        0,
+        -71.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-2-row-2",
+      "asset": "farm-row",
+      "name": "Willowbank farm 2 crop row 2",
+      "position": [
+        73,
+        0,
+        -68.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-2-row-3",
+      "asset": "farm-row",
+      "name": "Willowbank farm 2 crop row 3",
+      "position": [
+        73,
+        0,
+        -66
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-2-row-4",
+      "asset": "farm-row",
+      "name": "Willowbank farm 2 crop row 4",
+      "position": [
+        73,
+        0,
+        -63.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-2-row-5",
+      "asset": "farm-row",
+      "name": "Willowbank farm 2 crop row 5",
+      "position": [
+        73,
+        0,
+        -60.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-2-planting-clearance",
+      "asset": "planting-clearance",
+      "name": "Farm 2 planting clearance",
+      "position": [
+        73,
+        0,
+        -66
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        9.3,
+        1,
+        7.5
+      ],
+      "visible": false,
+      "locked": false
+    },
+    {
+      "id": "farm-2-fence-back",
+      "asset": "fence-line",
+      "name": "Farm 2 back fence",
+      "position": [
+        64,
+        0,
+        -73.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            18,
+            0
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-2-fence-west",
+      "asset": "fence-line",
+      "name": "Farm 2 west fence",
+      "position": [
+        64,
+        0,
+        -73.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-2-fence-east",
+      "asset": "fence-line",
+      "name": "Farm 2 east fence",
+      "position": [
+        82,
+        0,
+        -73.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-2-front-path",
+      "asset": "path-curved",
+      "name": "Farm 2 front lane",
+      "position": [
+        63,
+        0,
+        -57.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            20,
+            0
+          ]
+        ],
+        "width": 2.1
+      }
+    },
+    {
+      "id": "farm-2-west-path",
+      "asset": "path-curved",
+      "name": "Farm 2 west aisle",
+      "position": [
+        63,
+        0,
+        -57.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "farm-2-east-path",
+      "asset": "path-curved",
+      "name": "Farm 2 east aisle",
+      "position": [
+        83,
+        0,
+        -57.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "farm-3-row-1",
+      "asset": "farm-row",
+      "name": "Willowbank farm 3 crop row 1",
+      "position": [
+        98,
+        0,
+        -57.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-3-row-2",
+      "asset": "farm-row",
+      "name": "Willowbank farm 3 crop row 2",
+      "position": [
+        98,
+        0,
+        -54.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-3-row-3",
+      "asset": "farm-row",
+      "name": "Willowbank farm 3 crop row 3",
+      "position": [
+        98,
+        0,
+        -52
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-3-row-4",
+      "asset": "farm-row",
+      "name": "Willowbank farm 3 crop row 4",
+      "position": [
+        98,
+        0,
+        -49.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-3-row-5",
+      "asset": "farm-row",
+      "name": "Willowbank farm 3 crop row 5",
+      "position": [
+        98,
+        0,
+        -46.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "farm-3-planting-clearance",
+      "asset": "planting-clearance",
+      "name": "Farm 3 planting clearance",
+      "position": [
+        98,
+        0,
+        -52
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        9.3,
+        1,
+        7.5
+      ],
+      "visible": false,
+      "locked": false
+    },
+    {
+      "id": "farm-3-fence-back",
+      "asset": "fence-line",
+      "name": "Farm 3 back fence",
+      "position": [
+        89,
+        0,
+        -59.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            18,
+            0
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-3-fence-west",
+      "asset": "fence-line",
+      "name": "Farm 3 west fence",
+      "position": [
+        89,
+        0,
+        -59.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-3-fence-east",
+      "asset": "fence-line",
+      "name": "Farm 3 east fence",
+      "position": [
+        107,
+        0,
+        -59.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            3.7
+          ],
+          [
+            0,
+            10.3
+          ]
+        ],
+        "width": 0.8
+      }
+    },
+    {
+      "id": "farm-3-front-path",
+      "asset": "path-curved",
+      "name": "Farm 3 front lane",
+      "position": [
+        88,
+        0,
+        -43.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            20,
+            0
+          ]
+        ],
+        "width": 2.1
+      }
+    },
+    {
+      "id": "farm-3-west-path",
+      "asset": "path-curved",
+      "name": "Farm 3 west aisle",
+      "position": [
+        88,
+        0,
+        -43.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "farm-3-east-path",
+      "asset": "path-curved",
+      "name": "Farm 3 east aisle",
+      "position": [
+        108,
+        0,
+        -43.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -7.3
+          ],
+          [
+            0,
+            -14.3
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-farm-lane",
+      "asset": "path-curved",
+      "name": "Northern farm lane",
+      "position": [
+        34,
+        0,
+        -54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            -6
+          ],
+          [
+            -5,
+            -11
+          ],
+          [
+            -11,
+            -15.7
+          ],
+          [
+            -14,
+            -15.7
+          ]
+        ],
+        "width": 2.6
+      }
+    },
+    {
+      "id": "town-farm-bridge-lane",
+      "asset": "path-curved",
+      "name": "Farm bridge lane",
+      "position": [
+        34,
+        0,
+        -54
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            1
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            24.8,
+            1
+          ],
+          [
+            32,
+            1
+          ],
+          [
+            39,
+            -3.7
+          ]
+        ],
+        "width": 2.6
+      }
+    },
+    {
+      "id": "town-farm-bridge",
+      "asset": "bridge",
+      "name": "Willowbank orchard bridge",
+      "position": [
+        58.8,
+        0,
+        -53
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-east-farm-lane",
+      "asset": "path-curved",
+      "name": "Eastern farm lane",
+      "position": [
+        66,
+        0,
+        -53
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            1
+          ],
+          [
+            18,
+            5
+          ],
+          [
+            24,
+            9.3
+          ],
+          [
+            32,
+            9.3
+          ],
+          [
+            42,
+            9.3
+          ]
+        ],
+        "width": 2.5
+      }
+    },
+    {
+      "id": "town-farm-race-link",
+      "asset": "path-curved",
+      "name": "Farm to race meadow lane",
+      "position": [
+        108,
+        0,
+        -43.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0.0
+          ],
+          [
+            6,
+            9.7
+          ],
+          [
+            9,
+            25.7
+          ],
+          [
+            9,
+            43.7
+          ],
+          [
+            9,
+            57.7
+          ],
+          [
+            8,
+            63.7
+          ]
+        ],
+        "width": 2.3
+      }
+    },
+    {
+      "id": "town-lamp-9",
+      "asset": "lamp-20",
+      "name": "Willowbank farm lantern 9",
+      "position": [
+        28,
+        0,
+        -58.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-10",
+      "asset": "lamp-20",
+      "name": "Willowbank farm lantern 10",
+      "position": [
+        65,
+        0,
+        -49
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-lamp-11",
+      "asset": "lamp-20",
+      "name": "Willowbank farm lantern 11",
+      "position": [
+        91,
+        0,
+        -41
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cow-highland-1",
+      "asset": "cow-highland-girl",
+      "name": "Honey the Highland cow",
+      "position": [
+        -46,
+        1.37859,
+        56
+      ],
+      "rotation": [
+        0,
+        70,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "cow-highland-2",
+      "asset": "cow-highland",
+      "name": "Maple the Highland cow",
+      "position": [
+        -39,
+        1.37859,
+        61
+      ],
+      "rotation": [
+        0,
+        -110,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sheep-1",
+      "asset": "sheep",
+      "name": "Clover the sheep",
+      "position": [
+        -47,
+        1.19756,
+        63
+      ],
+      "rotation": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "sheep-2",
+      "asset": "sheep",
+      "name": "Daisy the sheep",
+      "position": [
+        -40,
+        1.32045,
+        53
+      ],
+      "rotation": [
+        0,
+        -65,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamb-1",
+      "asset": "lamb",
+      "name": "Buttercup the lamb",
+      "position": [
+        -45,
+        1.15371,
+        65
+      ],
+      "rotation": [
+        0,
+        30,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "lamb-2",
+      "asset": "lamb",
+      "name": "Pipkin the lamb",
+      "position": [
+        -38,
+        1.3434,
+        55
+      ],
+      "rotation": [
+        0,
+        -55,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "hedgehog-1",
+      "asset": "hedgehog",
+      "name": "Bramble the garden hedgehog",
+      "position": [
+        29.3,
+        0,
+        2.8
+      ],
+      "rotation": [
+        0,
+        -35,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-pasture-lane",
+      "asset": "path-curved",
+      "name": "West meadow pasture lane",
+      "position": [
+        -28,
+        0,
+        32
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -8,
+            3
+          ],
+          [
+            -14,
+            8
+          ],
+          [
+            -16,
+            12
+          ],
+          [
+            -14,
+            16
+          ]
+        ],
+        "width": 2.4
+      }
+    },
+    {
+      "id": "town-pasture-loop",
+      "asset": "path-curved",
+      "name": "Pasture meadow walk",
+      "position": [
+        -42,
+        0,
+        48
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            14,
+            9
+          ],
+          [
+            9,
+            21
+          ],
+          [
+            -3,
+            25
+          ],
+          [
+            -14,
+            19
+          ],
+          [
+            -17,
+            7
+          ],
+          [
+            -11,
+            -2
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "town-pasture-fence",
+      "asset": "fence-line",
+      "name": "Low pasture fence",
+      "position": [
+        -56,
+        0,
+        50
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            8
+          ],
+          [
+            3,
+            17
+          ],
+          [
+            11,
+            20
+          ],
+          [
+            21,
+            18
+          ],
+          [
+            26,
+            10
+          ],
+          [
+            23,
+            1
+          ]
+        ],
+        "width": 0.75
+      }
+    },
+    {
+      "id": "pasture-meadow-grass-1",
+      "asset": "grass-wide",
+      "name": "Pasture meadow grass 1",
+      "position": [
+        -46,
+        0,
+        57
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.8,
+        1,
+        1.8
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "pasture-meadow-grass-2",
+      "asset": "grass-wide",
+      "name": "Pasture meadow grass 2",
+      "position": [
+        -36,
+        0,
+        61
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.8,
+        1,
+        1.8
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "pasture-oak-bench",
+      "asset": "oak-bench",
+      "name": "Pasture overlook bench",
+      "position": [
+        -40.5,
+        0.72723,
+        46
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-16",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 16",
+      "position": [
+        -57,
+        0.00656,
+        43
+      ],
+      "rotation": [
+        0,
+        32,
+        0
+      ],
+      "scale": [
+        0.93,
+        0.93,
+        0.93
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-17",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 17",
+      "position": [
+        -59,
+        0.00328,
+        72
+      ],
+      "rotation": [
+        0,
+        79,
+        0
+      ],
+      "scale": [
+        1.02,
+        1.02,
+        1.02
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-18",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 18",
+      "position": [
+        -26,
+        0.20414,
+        65
+      ],
+      "rotation": [
+        0,
+        126,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-19",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 19",
+      "position": [
+        19,
+        0,
+        -85
+      ],
+      "rotation": [
+        0,
+        173,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-20",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 20",
+      "position": [
+        44,
+        0,
+        -87
+      ],
+      "rotation": [
+        0,
+        220,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-21",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 21",
+      "position": [
+        65,
+        0,
+        -79
+      ],
+      "rotation": [
+        0,
+        267,
+        0
+      ],
+      "scale": [
+        1.02,
+        1.02,
+        1.02
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-22",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 22",
+      "position": [
+        85,
+        0,
+        -79
+      ],
+      "rotation": [
+        0,
+        314,
+        0
+      ],
+      "scale": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-23",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 23",
+      "position": [
+        91,
+        0,
+        -65
+      ],
+      "rotation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-24",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 24",
+      "position": [
+        110,
+        0,
+        -62
+      ],
+      "rotation": [
+        0,
+        48,
+        0
+      ],
+      "scale": [
+        0.93,
+        0.93,
+        0.93
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-tree-25",
+      "asset": "tree-1",
+      "name": "Willowbank meadow tree 25",
+      "position": [
+        109,
+        0,
+        -37
+      ],
+      "rotation": [
+        0,
+        95,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-waterside-door",
+      "asset": "path-curved",
+      "name": "Waterside cottage doorstep",
+      "position": [
+        -19.9,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1.8,
+            0
+          ],
+          [
+            1.8,
+            -3
+          ],
+          [
+            -0.1,
+            -4
+          ],
+          [
+            -3.1,
+            -5
+          ]
+        ],
+        "width": 1.5
+      }
+    },
+    {
+      "id": "town-rosewood-door",
+      "asset": "path-curved",
+      "name": "Rosewood cottage doorstep",
+      "position": [
+        6.95,
+        0,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -2.65,
+            1
+          ],
+          [
+            -6.95,
+            2
+          ]
+        ],
+        "width": 1.5
+      }
+    },
+    {
+      "id": "town-lilac-door",
+      "asset": "path-curved",
+      "name": "Lilac cottage doorstep",
+      "position": [
+        2,
+        0,
+        -27
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            -1.5,
+            0
+          ],
+          [
+            -2.6,
+            0
+          ]
+        ],
+        "width": 1.5
+      }
+    },
+    {
+      "id": "town-orchard-door",
+      "asset": "path-curved",
+      "name": "Orchard cottage doorstep",
+      "position": [
+        15.5,
+        0,
+        -14.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1.6
+          ],
+          [
+            0,
+            3.1
+          ]
+        ],
+        "width": 1.5
+      }
+    },
+    {
+      "id": "town-meadow-door",
+      "asset": "path-curved",
+      "name": "Meadow cottage doorstep",
+      "position": [
+        -31.8,
+        0,
+        28.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            3.8,
+            3.3
+          ],
+          [
+            8.8,
+            2.3
+          ],
+          [
+            11.8,
+            -6.7
+          ],
+          [
+            12.3,
+            -14.7
+          ],
+          [
+            13.7,
+            -17.7
+          ],
+          [
+            13.7,
+            -20.7
+          ],
+          [
+            13.7,
+            -23.7
+          ],
+          [
+            11.8,
+            -24.7
+          ],
+          [
+            8.8,
+            -25.7
+          ]
+        ],
+        "width": 1.8
+      }
+    },
+    {
+      "id": "apple-tree-1",
+      "asset": "apple-tree",
+      "name": "Garden apple tree",
+      "position": [
+        31.25,
+        0,
+        2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "mushroom-patch-1",
+      "asset": "mushroom-patch",
+      "name": "Bramble’s mushroom patch",
+      "position": [
+        28.5,
+        0,
+        2.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-1",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 1",
+      "position": [
+        -78.845,
+        0,
+        -86.669
+      ],
+      "rotation": [
+        0,
+        353,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-1",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 1",
+      "position": [
+        -78.845,
+        0,
+        -86.669
+      ],
+      "rotation": [
+        0,
+        353,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-2",
+      "asset": "grass-meadow",
+      "name": "Pond bank grass 2",
+      "position": [
+        -45.48,
+        0,
+        -87.279
+      ],
+      "rotation": [
+        0,
+        169,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-2",
+      "asset": "flower-meadow",
+      "name": "Pond bank wildflowers 2",
+      "position": [
+        -45.48,
+        0,
+        -87.279
+      ],
+      "rotation": [
+        0,
+        169,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-3",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 3",
+      "position": [
+        -12.296,
+        0,
+        -86.738
+      ],
+      "rotation": [
+        0,
+        317,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-3",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 3",
+      "position": [
+        -12.296,
+        0,
+        -86.738
+      ],
+      "rotation": [
+        0,
+        317,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-4",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 4",
+      "position": [
+        18.51,
+        0,
+        -89.275
+      ],
+      "rotation": [
+        0,
+        324,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-4",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 4",
+      "position": [
+        18.51,
+        0,
+        -89.275
+      ],
+      "rotation": [
+        0,
+        324,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-5",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 5",
+      "position": [
+        52.363,
+        0,
+        -88.453
+      ],
+      "rotation": [
+        0,
+        31,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-5",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 5",
+      "position": [
+        52.363,
+        0,
+        -88.453
+      ],
+      "rotation": [
+        0,
+        31,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-6",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 6",
+      "position": [
+        85.217,
+        0,
+        -88.035
+      ],
+      "rotation": [
+        0,
+        270,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-6",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 6",
+      "position": [
+        85.217,
+        0,
+        -88.035
+      ],
+      "rotation": [
+        0,
+        270,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-7",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 7",
+      "position": [
+        119.269,
+        0,
+        -87.9
+      ],
+      "rotation": [
+        0,
+        227,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-7",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 7",
+      "position": [
+        119.269,
+        0,
+        -87.9
+      ],
+      "rotation": [
+        0,
+        227,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-8",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 8",
+      "position": [
+        -78.904,
+        0,
+        -57.674
+      ],
+      "rotation": [
+        0,
+        326,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-8",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 8",
+      "position": [
+        -78.904,
+        0,
+        -57.674
+      ],
+      "rotation": [
+        0,
+        326,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-9",
+      "asset": "grass-meadow",
+      "name": "Pond bank grass 9",
+      "position": [
+        -47.594,
+        0,
+        -60.022
+      ],
+      "rotation": [
+        0,
+        215,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-9",
+      "asset": "flower-meadow",
+      "name": "Pond bank wildflowers 9",
+      "position": [
+        -47.594,
+        0,
+        -60.022
+      ],
+      "rotation": [
+        0,
+        215,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-10",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 10",
+      "position": [
+        -14.024,
+        0,
+        -58.924
+      ],
+      "rotation": [
+        0,
+        71,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-10",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 10",
+      "position": [
+        -14.024,
+        0,
+        -58.924
+      ],
+      "rotation": [
+        0,
+        71,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-11",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 11",
+      "position": [
+        21.009,
+        0,
+        -59.144
+      ],
+      "rotation": [
+        0,
+        347,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-11",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 11",
+      "position": [
+        21.009,
+        0,
+        -59.144
+      ],
+      "rotation": [
+        0,
+        347,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-12",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 12",
+      "position": [
+        54.778,
+        0,
+        -58.785
+      ],
+      "rotation": [
+        0,
+        111,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-12",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 12",
+      "position": [
+        54.778,
+        0,
+        -58.785
+      ],
+      "rotation": [
+        0,
+        111,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-13",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 13",
+      "position": [
+        88.017,
+        0.05,
+        -58.026
+      ],
+      "rotation": [
+        0,
+        85,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-13",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 13",
+      "position": [
+        88.017,
+        0.05,
+        -58.026
+      ],
+      "rotation": [
+        0,
+        85,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-14",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 14",
+      "position": [
+        121.434,
+        0,
+        -60.089
+      ],
+      "rotation": [
+        0,
+        360,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-14",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 14",
+      "position": [
+        121.434,
+        0,
+        -60.089
+      ],
+      "rotation": [
+        0,
+        360,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-15",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 15",
+      "position": [
+        -79.081,
+        0,
+        -29.121
+      ],
+      "rotation": [
+        0,
+        105,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-15",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 15",
+      "position": [
+        -79.081,
+        0,
+        -29.121
+      ],
+      "rotation": [
+        0,
+        105,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-16",
+      "asset": "grass-meadow",
+      "name": "Pond bank grass 16",
+      "position": [
+        -47.342,
+        0,
+        -31.161
+      ],
+      "rotation": [
+        0,
+        331,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-16",
+      "asset": "flower-meadow",
+      "name": "Pond bank wildflowers 16",
+      "position": [
+        -47.342,
+        0,
+        -31.161
+      ],
+      "rotation": [
+        0,
+        331,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-17",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 17",
+      "position": [
+        -12.932,
+        0,
+        -31.235
+      ],
+      "rotation": [
+        0,
+        212,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-17",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 17",
+      "position": [
+        -12.932,
+        0,
+        -31.235
+      ],
+      "rotation": [
+        0,
+        212,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-18",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 18",
+      "position": [
+        21.475,
+        0,
+        -31.688
+      ],
+      "rotation": [
+        0,
+        301,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-18",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 18",
+      "position": [
+        21.475,
+        0,
+        -31.688
+      ],
+      "rotation": [
+        0,
+        301,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-19",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 19",
+      "position": [
+        54.231,
+        0,
+        -29.025
+      ],
+      "rotation": [
+        0,
+        164,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-19",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 19",
+      "position": [
+        54.231,
+        0,
+        -29.025
+      ],
+      "rotation": [
+        0,
+        164,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-20",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 20",
+      "position": [
+        87.945,
+        0,
+        -31.757
+      ],
+      "rotation": [
+        0,
+        51,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-20",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 20",
+      "position": [
+        87.945,
+        0,
+        -31.757
+      ],
+      "rotation": [
+        0,
+        51,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-21",
+      "asset": "grass-meadow",
+      "name": "Farm bank grass 21",
+      "position": [
+        121.071,
+        0,
+        -31.231
+      ],
+      "rotation": [
+        0,
+        28,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-21",
+      "asset": "flower-meadow",
+      "name": "Farm bank wildflowers 21",
+      "position": [
+        121.071,
+        0,
+        -31.231
+      ],
+      "rotation": [
+        0,
+        28,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-22",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 22",
+      "position": [
+        -80.076,
+        0,
+        -2.002
+      ],
+      "rotation": [
+        0,
+        66,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-22",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 22",
+      "position": [
+        -80.076,
+        0,
+        -2.002
+      ],
+      "rotation": [
+        0,
+        66,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-23",
+      "asset": "grass-meadow",
+      "name": "Pond bank grass 23",
+      "position": [
+        -45.343,
+        0,
+        -0.536
+      ],
+      "rotation": [
+        0,
+        336,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-23",
+      "asset": "flower-meadow",
+      "name": "Pond bank wildflowers 23",
+      "position": [
+        -45.343,
+        0,
+        -0.536
+      ],
+      "rotation": [
+        0,
+        336,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-24",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 24",
+      "position": [
+        -14.546,
+        0,
+        -0.015
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-24",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 24",
+      "position": [
+        -14.546,
+        0,
+        -0.015
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-25",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 25",
+      "position": [
+        20.3,
+        0,
+        -0.942
+      ],
+      "rotation": [
+        0,
+        241,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-25",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 25",
+      "position": [
+        20.3,
+        0,
+        -0.942
+      ],
+      "rotation": [
+        0,
+        241,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-26",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 26",
+      "position": [
+        54.703,
+        0,
+        -1.474
+      ],
+      "rotation": [
+        0,
+        15,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-26",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 26",
+      "position": [
+        54.703,
+        0,
+        -1.474
+      ],
+      "rotation": [
+        0,
+        15,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-27",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 27",
+      "position": [
+        86.897,
+        0,
+        -1.586
+      ],
+      "rotation": [
+        0,
+        172,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-27",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 27",
+      "position": [
+        86.897,
+        0,
+        -1.586
+      ],
+      "rotation": [
+        0,
+        172,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-28",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 28",
+      "position": [
+        120.713,
+        0,
+        -1.938
+      ],
+      "rotation": [
+        0,
+        298,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-28",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 28",
+      "position": [
+        120.713,
+        0,
+        -1.938
+      ],
+      "rotation": [
+        0,
+        298,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-29",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 29",
+      "position": [
+        -80.506,
+        0,
+        28.485
+      ],
+      "rotation": [
+        0,
+        276,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-29",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 29",
+      "position": [
+        -80.506,
+        0,
+        28.485
+      ],
+      "rotation": [
+        0,
+        276,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-30",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 30",
+      "position": [
+        -47.775,
+        0,
+        26.894
+      ],
+      "rotation": [
+        0,
+        326,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-30",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 30",
+      "position": [
+        -47.775,
+        0,
+        26.894
+      ],
+      "rotation": [
+        0,
+        326,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-31",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 31",
+      "position": [
+        -12.421,
+        0,
+        26.607
+      ],
+      "rotation": [
+        0,
+        84,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-31",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 31",
+      "position": [
+        -12.421,
+        0,
+        26.607
+      ],
+      "rotation": [
+        0,
+        84,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-32",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 32",
+      "position": [
+        18.884,
+        0,
+        28.283
+      ],
+      "rotation": [
+        0,
+        219,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-32",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 32",
+      "position": [
+        18.884,
+        0,
+        28.283
+      ],
+      "rotation": [
+        0,
+        219,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-33",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 33",
+      "position": [
+        52.214,
+        0,
+        27.372
+      ],
+      "rotation": [
+        0,
+        333,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-33",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 33",
+      "position": [
+        52.214,
+        0,
+        27.372
+      ],
+      "rotation": [
+        0,
+        333,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-34",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 34",
+      "position": [
+        85.567,
+        0,
+        28.088
+      ],
+      "rotation": [
+        0,
+        33,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-34",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 34",
+      "position": [
+        85.567,
+        0,
+        28.088
+      ],
+      "rotation": [
+        0,
+        33,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-35",
+      "asset": "grass-meadow",
+      "name": "Racecourse meadow grass 35",
+      "position": [
+        119.25,
+        0,
+        26.851
+      ],
+      "rotation": [
+        0,
+        223,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-35",
+      "asset": "flower-meadow",
+      "name": "Racecourse meadow wildflowers 35",
+      "position": [
+        119.25,
+        0,
+        26.851
+      ],
+      "rotation": [
+        0,
+        223,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-36",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 36",
+      "position": [
+        -78.635,
+        0,
+        56.775
+      ],
+      "rotation": [
+        0,
+        77,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-36",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 36",
+      "position": [
+        -78.635,
+        0,
+        56.775
+      ],
+      "rotation": [
+        0,
+        77,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-37",
+      "asset": "grass-meadow",
+      "name": "Grazing meadow grass 37",
+      "position": [
+        -45.686,
+        1.404978,
+        57.261
+      ],
+      "rotation": [
+        0,
+        133,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-37",
+      "asset": "flower-meadow",
+      "name": "Grazing meadow wildflowers 37",
+      "position": [
+        -45.686,
+        1.404978,
+        57.261
+      ],
+      "rotation": [
+        0,
+        133,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-38",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 38",
+      "position": [
+        -13.961,
+        0,
+        54.79
+      ],
+      "rotation": [
+        0,
+        291,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-38",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 38",
+      "position": [
+        -13.961,
+        0,
+        54.79
+      ],
+      "rotation": [
+        0,
+        291,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-39",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 39",
+      "position": [
+        20.746,
+        0,
+        55.504
+      ],
+      "rotation": [
+        0,
+        197,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-39",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 39",
+      "position": [
+        20.746,
+        0,
+        55.504
+      ],
+      "rotation": [
+        0,
+        197,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-40",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 40",
+      "position": [
+        52.102,
+        0,
+        55.703
+      ],
+      "rotation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-40",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 40",
+      "position": [
+        52.102,
+        0,
+        55.703
+      ],
+      "rotation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-41",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 41",
+      "position": [
+        86.762,
+        0,
+        56.974
+      ],
+      "rotation": [
+        0,
+        150,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-41",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 41",
+      "position": [
+        86.762,
+        0,
+        56.974
+      ],
+      "rotation": [
+        0,
+        150,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-42",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 42",
+      "position": [
+        120.189,
+        0,
+        57.567
+      ],
+      "rotation": [
+        0,
+        196,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-42",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 42",
+      "position": [
+        120.189,
+        0,
+        57.567
+      ],
+      "rotation": [
+        0,
+        196,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-43",
+      "asset": "grass-meadow",
+      "name": "West meadow grass 43",
+      "position": [
+        -78.95,
+        0,
+        86.333
+      ],
+      "rotation": [
+        0,
+        270,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-43",
+      "asset": "flower-meadow",
+      "name": "West meadow wildflowers 43",
+      "position": [
+        -78.95,
+        0,
+        86.333
+      ],
+      "rotation": [
+        0,
+        270,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-44",
+      "asset": "grass-meadow",
+      "name": "Grazing meadow grass 44",
+      "position": [
+        -46.99,
+        0,
+        84.914
+      ],
+      "rotation": [
+        0,
+        189,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-44",
+      "asset": "flower-meadow",
+      "name": "Grazing meadow wildflowers 44",
+      "position": [
+        -46.99,
+        0,
+        84.914
+      ],
+      "rotation": [
+        0,
+        189,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-45",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 45",
+      "position": [
+        -11.893,
+        0,
+        85.138
+      ],
+      "rotation": [
+        0,
+        97,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-45",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 45",
+      "position": [
+        -11.893,
+        0,
+        85.138
+      ],
+      "rotation": [
+        0,
+        97,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-46",
+      "asset": "grass-meadow",
+      "name": "Village lawn grass 46",
+      "position": [
+        19.026,
+        0,
+        85.087
+      ],
+      "rotation": [
+        0,
+        235,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-46",
+      "asset": "flower-meadow",
+      "name": "Village lawn wildflowers 46",
+      "position": [
+        19.026,
+        0,
+        85.087
+      ],
+      "rotation": [
+        0,
+        235,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-47",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 47",
+      "position": [
+        52.826,
+        0,
+        86.25
+      ],
+      "rotation": [
+        0,
+        95,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-47",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 47",
+      "position": [
+        52.826,
+        0,
+        86.25
+      ],
+      "rotation": [
+        0,
+        95,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-48",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 48",
+      "position": [
+        85.65,
+        0,
+        84.913
+      ],
+      "rotation": [
+        0,
+        118,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-48",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 48",
+      "position": [
+        85.65,
+        0,
+        84.913
+      ],
+      "rotation": [
+        0,
+        118,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-groundcover-49",
+      "asset": "grass-meadow",
+      "name": "Brook bend grass 49",
+      "position": [
+        120.324,
+        0,
+        84.425
+      ],
+      "rotation": [
+        0,
+        310,
+        0
+      ],
+      "scale": [
+        1.16,
+        0.9,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-wildflower-meadow-49",
+      "asset": "flower-meadow",
+      "name": "Brook bend wildflowers 49",
+      "position": [
+        120.324,
+        0,
+        84.425
+      ],
+      "rotation": [
+        0,
+        310,
+        0
+      ],
+      "scale": [
+        1.16,
+        1,
+        1.16
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-owl-approach",
+      "asset": "path-curved",
+      "name": "Owl feeding grove approach",
+      "position": [
+        -53,
+        0,
+        -25
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            -1
+          ],
+          [
+            4,
+            -2
+          ],
+          [
+            5,
+            -2.4499999999999993
+          ]
+        ],
+        "width": 1.6
+      }
+    },
+    {
+      "id": "town-stable-willow-entry",
+      "asset": "path-curved",
+      "name": "Willow stable bay approach",
+      "position": [
+        87.1,
+        0,
+        38.15
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false,
+      "path": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.6499999999999986
+          ],
+          [
+            0.0,
+            1.1300000000000026
+          ]
+        ],
+        "width": 1.7
+      }
+    },
+    {
+      "id": "pasture-meadow-swings-2",
+      "asset": "meadow-swings",
+      "name": "Pasture meadow swings · second set",
+      "position": [
+        -55,
+        0,
+        36
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "town-meadow-cottage-landing",
+      "asset": "tea-terrace",
+      "name": "Meadow cottage doorstep landing",
+      "position": [
+        -32.167304825933016,
+        0,
+        28.773579129070107
+      ],
+      "rotation": [
+        0,
+        -17.188734,
+        0
+      ],
+      "scale": [
+        0.29,
+        1,
+        0.22
+      ],
       "visible": true,
       "locked": false
     }
@@ -7861,7 +14418,7 @@
           22
         ],
         [
-          56,
+          48,
           25
         ],
         [
@@ -7908,5 +14465,1879 @@
         3
       ]
     }
-  }
+  },
+  "sceneVersion": 1,
+  "terrain": {
+    "version": 1,
+    "cellSize": 2,
+    "base": "flat",
+    "samples": [
+      [
+        -31,
+        25,
+        0.00256
+      ],
+      [
+        -31,
+        26,
+        0.01475
+      ],
+      [
+        -31,
+        27,
+        0.02961
+      ],
+      [
+        -31,
+        28,
+        0.04098
+      ],
+      [
+        -31,
+        29,
+        0.04518
+      ],
+      [
+        -31,
+        30,
+        0.04098
+      ],
+      [
+        -31,
+        31,
+        0.02961
+      ],
+      [
+        -31,
+        32,
+        0.01475
+      ],
+      [
+        -31,
+        33,
+        0.00256
+      ],
+      [
+        -30,
+        23,
+        0.00164
+      ],
+      [
+        -30,
+        24,
+        0.02305
+      ],
+      [
+        -30,
+        25,
+        0.05901
+      ],
+      [
+        -30,
+        26,
+        0.09846
+      ],
+      [
+        -30,
+        27,
+        0.13278
+      ],
+      [
+        -30,
+        28,
+        0.15583
+      ],
+      [
+        -30,
+        29,
+        0.16392
+      ],
+      [
+        -30,
+        30,
+        0.15583
+      ],
+      [
+        -30,
+        31,
+        0.13278
+      ],
+      [
+        -30,
+        32,
+        0.09846
+      ],
+      [
+        -30,
+        33,
+        0.05901
+      ],
+      [
+        -30,
+        34,
+        0.02305
+      ],
+      [
+        -30,
+        35,
+        0.00164
+      ],
+      [
+        -29,
+        22,
+        0.00656
+      ],
+      [
+        -29,
+        23,
+        0.04518
+      ],
+      [
+        -29,
+        24,
+        0.10491
+      ],
+      [
+        -29,
+        25,
+        0.17222
+      ],
+      [
+        -29,
+        26,
+        0.23605
+      ],
+      [
+        -29,
+        27,
+        0.28779
+      ],
+      [
+        -29,
+        28,
+        0.32129
+      ],
+      [
+        -29,
+        29,
+        0.33287
+      ],
+      [
+        -29,
+        30,
+        0.32129
+      ],
+      [
+        -29,
+        31,
+        0.28779
+      ],
+      [
+        -29,
+        32,
+        0.23605
+      ],
+      [
+        -29,
+        33,
+        0.17222
+      ],
+      [
+        -29,
+        34,
+        0.10491
+      ],
+      [
+        -29,
+        35,
+        0.04518
+      ],
+      [
+        -29,
+        36,
+        0.00656
+      ],
+      [
+        -28,
+        21,
+        0.00656
+      ],
+      [
+        -28,
+        22,
+        0.0542
+      ],
+      [
+        -28,
+        23,
+        0.13278
+      ],
+      [
+        -28,
+        24,
+        0.22632
+      ],
+      [
+        -28,
+        25,
+        0.32129
+      ],
+      [
+        -28,
+        26,
+        0.40663
+      ],
+      [
+        -28,
+        27,
+        0.47374
+      ],
+      [
+        -28,
+        28,
+        0.51646
+      ],
+      [
+        -28,
+        29,
+        0.53111
+      ],
+      [
+        -28,
+        30,
+        0.51646
+      ],
+      [
+        -28,
+        31,
+        0.47374
+      ],
+      [
+        -28,
+        32,
+        0.40663
+      ],
+      [
+        -28,
+        33,
+        0.32129
+      ],
+      [
+        -28,
+        34,
+        0.22632
+      ],
+      [
+        -28,
+        35,
+        0.13278
+      ],
+      [
+        -28,
+        36,
+        0.0542
+      ],
+      [
+        -28,
+        37,
+        0.00656
+      ],
+      [
+        -27,
+        20,
+        0.00164
+      ],
+      [
+        -27,
+        21,
+        0.04518
+      ],
+      [
+        -27,
+        22,
+        0.13278
+      ],
+      [
+        -27,
+        23,
+        0.24599
+      ],
+      [
+        -27,
+        24,
+        0.36883
+      ],
+      [
+        -27,
+        25,
+        0.48777
+      ],
+      [
+        -27,
+        26,
+        0.59176
+      ],
+      [
+        -27,
+        27,
+        0.67219
+      ],
+      [
+        -27,
+        28,
+        0.7229
+      ],
+      [
+        -27,
+        29,
+        0.74022
+      ],
+      [
+        -27,
+        30,
+        0.7229
+      ],
+      [
+        -27,
+        31,
+        0.67219
+      ],
+      [
+        -27,
+        32,
+        0.59176
+      ],
+      [
+        -27,
+        33,
+        0.48777
+      ],
+      [
+        -27,
+        34,
+        0.36883
+      ],
+      [
+        -27,
+        35,
+        0.24599
+      ],
+      [
+        -27,
+        36,
+        0.13278
+      ],
+      [
+        -27,
+        37,
+        0.04518
+      ],
+      [
+        -27,
+        38,
+        0.00164
+      ],
+      [
+        -26,
+        20,
+        0.02305
+      ],
+      [
+        -26,
+        21,
+        0.10491
+      ],
+      [
+        -26,
+        22,
+        0.22632
+      ],
+      [
+        -26,
+        23,
+        0.36883
+      ],
+      [
+        -26,
+        24,
+        0.51646
+      ],
+      [
+        -26,
+        25,
+        0.65569
+      ],
+      [
+        -26,
+        26,
+        0.77546
+      ],
+      [
+        -26,
+        27,
+        0.86715
+      ],
+      [
+        -26,
+        28,
+        0.92463
+      ],
+      [
+        -26,
+        29,
+        0.9442
+      ],
+      [
+        -26,
+        30,
+        0.92463
+      ],
+      [
+        -26,
+        31,
+        0.86715
+      ],
+      [
+        -26,
+        32,
+        0.77546
+      ],
+      [
+        -26,
+        33,
+        0.65569
+      ],
+      [
+        -26,
+        34,
+        0.51646
+      ],
+      [
+        -26,
+        35,
+        0.36883
+      ],
+      [
+        -26,
+        36,
+        0.22632
+      ],
+      [
+        -26,
+        37,
+        0.10491
+      ],
+      [
+        -26,
+        38,
+        0.02305
+      ],
+      [
+        -25,
+        19,
+        0.00256
+      ],
+      [
+        -25,
+        20,
+        0.05901
+      ],
+      [
+        -25,
+        21,
+        0.17222
+      ],
+      [
+        -25,
+        22,
+        0.32129
+      ],
+      [
+        -25,
+        23,
+        0.48777
+      ],
+      [
+        -25,
+        24,
+        0.65569
+      ],
+      [
+        -25,
+        25,
+        0.81152
+      ],
+      [
+        -25,
+        26,
+        0.9442
+      ],
+      [
+        -25,
+        27,
+        1.04511
+      ],
+      [
+        -25,
+        28,
+        1.10812
+      ],
+      [
+        -25,
+        29,
+        1.12953
+      ],
+      [
+        -25,
+        30,
+        1.10812
+      ],
+      [
+        -25,
+        31,
+        1.04511
+      ],
+      [
+        -25,
+        32,
+        0.9442
+      ],
+      [
+        -25,
+        33,
+        0.81152
+      ],
+      [
+        -25,
+        34,
+        0.65569
+      ],
+      [
+        -25,
+        35,
+        0.48777
+      ],
+      [
+        -25,
+        36,
+        0.32129
+      ],
+      [
+        -25,
+        37,
+        0.17222
+      ],
+      [
+        -25,
+        38,
+        0.05901
+      ],
+      [
+        -25,
+        39,
+        0.00256
+      ],
+      [
+        -24,
+        19,
+        0.01475
+      ],
+      [
+        -24,
+        20,
+        0.09846
+      ],
+      [
+        -24,
+        21,
+        0.23605
+      ],
+      [
+        -24,
+        22,
+        0.40663
+      ],
+      [
+        -24,
+        23,
+        0.59176
+      ],
+      [
+        -24,
+        24,
+        0.77546
+      ],
+      [
+        -24,
+        25,
+        0.9442
+      ],
+      [
+        -24,
+        26,
+        1.08691
+      ],
+      [
+        -24,
+        27,
+        1.195
+      ],
+      [
+        -24,
+        28,
+        1.26231
+      ],
+      [
+        -24,
+        29,
+        1.28516
+      ],
+      [
+        -24,
+        30,
+        1.26231
+      ],
+      [
+        -24,
+        31,
+        1.195
+      ],
+      [
+        -24,
+        32,
+        1.08691
+      ],
+      [
+        -24,
+        33,
+        0.9442
+      ],
+      [
+        -24,
+        34,
+        0.77546
+      ],
+      [
+        -24,
+        35,
+        0.59176
+      ],
+      [
+        -24,
+        36,
+        0.40663
+      ],
+      [
+        -24,
+        37,
+        0.23605
+      ],
+      [
+        -24,
+        38,
+        0.09846
+      ],
+      [
+        -24,
+        39,
+        0.01475
+      ],
+      [
+        -23,
+        19,
+        0.02961
+      ],
+      [
+        -23,
+        20,
+        0.13278
+      ],
+      [
+        -23,
+        21,
+        0.28779
+      ],
+      [
+        -23,
+        22,
+        0.47374
+      ],
+      [
+        -23,
+        23,
+        0.67219
+      ],
+      [
+        -23,
+        24,
+        0.86715
+      ],
+      [
+        -23,
+        25,
+        1.04511
+      ],
+      [
+        -23,
+        26,
+        1.195
+      ],
+      [
+        -23,
+        27,
+        1.30821
+      ],
+      [
+        -23,
+        28,
+        1.37859
+      ],
+      [
+        -23,
+        29,
+        1.40247
+      ],
+      [
+        -23,
+        30,
+        1.37859
+      ],
+      [
+        -23,
+        31,
+        1.30821
+      ],
+      [
+        -23,
+        32,
+        1.195
+      ],
+      [
+        -23,
+        33,
+        1.04511
+      ],
+      [
+        -23,
+        34,
+        0.86715
+      ],
+      [
+        -23,
+        35,
+        0.67219
+      ],
+      [
+        -23,
+        36,
+        0.47374
+      ],
+      [
+        -23,
+        37,
+        0.28779
+      ],
+      [
+        -23,
+        38,
+        0.13278
+      ],
+      [
+        -23,
+        39,
+        0.02961
+      ],
+      [
+        -22,
+        19,
+        0.04098
+      ],
+      [
+        -22,
+        20,
+        0.15583
+      ],
+      [
+        -22,
+        21,
+        0.32129
+      ],
+      [
+        -22,
+        22,
+        0.51646
+      ],
+      [
+        -22,
+        23,
+        0.7229
+      ],
+      [
+        -22,
+        24,
+        0.92463
+      ],
+      [
+        -22,
+        25,
+        1.10812
+      ],
+      [
+        -22,
+        26,
+        1.26231
+      ],
+      [
+        -22,
+        27,
+        1.37859
+      ],
+      [
+        -22,
+        28,
+        1.45082
+      ],
+      [
+        -22,
+        29,
+        1.47531
+      ],
+      [
+        -22,
+        30,
+        1.45082
+      ],
+      [
+        -22,
+        31,
+        1.37859
+      ],
+      [
+        -22,
+        32,
+        1.26231
+      ],
+      [
+        -22,
+        33,
+        1.10812
+      ],
+      [
+        -22,
+        34,
+        0.92463
+      ],
+      [
+        -22,
+        35,
+        0.7229
+      ],
+      [
+        -22,
+        36,
+        0.51646
+      ],
+      [
+        -22,
+        37,
+        0.32129
+      ],
+      [
+        -22,
+        38,
+        0.15583
+      ],
+      [
+        -22,
+        39,
+        0.04098
+      ],
+      [
+        -21,
+        19,
+        0.04518
+      ],
+      [
+        -21,
+        20,
+        0.16392
+      ],
+      [
+        -21,
+        21,
+        0.33287
+      ],
+      [
+        -21,
+        22,
+        0.53111
+      ],
+      [
+        -21,
+        23,
+        0.74022
+      ],
+      [
+        -21,
+        24,
+        0.9442
+      ],
+      [
+        -21,
+        25,
+        1.12953
+      ],
+      [
+        -21,
+        26,
+        1.28516
+      ],
+      [
+        -21,
+        27,
+        1.40247
+      ],
+      [
+        -21,
+        28,
+        1.47531
+      ],
+      [
+        -21,
+        29,
+        1.5
+      ],
+      [
+        -21,
+        30,
+        1.47531
+      ],
+      [
+        -21,
+        31,
+        1.40247
+      ],
+      [
+        -21,
+        32,
+        1.28516
+      ],
+      [
+        -21,
+        33,
+        1.12953
+      ],
+      [
+        -21,
+        34,
+        0.9442
+      ],
+      [
+        -21,
+        35,
+        0.74022
+      ],
+      [
+        -21,
+        36,
+        0.53111
+      ],
+      [
+        -21,
+        37,
+        0.33287
+      ],
+      [
+        -21,
+        38,
+        0.16392
+      ],
+      [
+        -21,
+        39,
+        0.04518
+      ],
+      [
+        -20,
+        19,
+        0.04098
+      ],
+      [
+        -20,
+        20,
+        0.15583
+      ],
+      [
+        -20,
+        21,
+        0.32129
+      ],
+      [
+        -20,
+        22,
+        0.51646
+      ],
+      [
+        -20,
+        23,
+        0.7229
+      ],
+      [
+        -20,
+        24,
+        0.92463
+      ],
+      [
+        -20,
+        25,
+        1.10812
+      ],
+      [
+        -20,
+        26,
+        1.26231
+      ],
+      [
+        -20,
+        27,
+        1.37859
+      ],
+      [
+        -20,
+        28,
+        1.45082
+      ],
+      [
+        -20,
+        29,
+        1.47531
+      ],
+      [
+        -20,
+        30,
+        1.45082
+      ],
+      [
+        -20,
+        31,
+        1.37859
+      ],
+      [
+        -20,
+        32,
+        1.26231
+      ],
+      [
+        -20,
+        33,
+        1.10812
+      ],
+      [
+        -20,
+        34,
+        0.92463
+      ],
+      [
+        -20,
+        35,
+        0.7229
+      ],
+      [
+        -20,
+        36,
+        0.51646
+      ],
+      [
+        -20,
+        37,
+        0.32129
+      ],
+      [
+        -20,
+        38,
+        0.15583
+      ],
+      [
+        -20,
+        39,
+        0.04098
+      ],
+      [
+        -19,
+        19,
+        0.02961
+      ],
+      [
+        -19,
+        20,
+        0.13278
+      ],
+      [
+        -19,
+        21,
+        0.28779
+      ],
+      [
+        -19,
+        22,
+        0.47374
+      ],
+      [
+        -19,
+        23,
+        0.67219
+      ],
+      [
+        -19,
+        24,
+        0.86715
+      ],
+      [
+        -19,
+        25,
+        1.04511
+      ],
+      [
+        -19,
+        26,
+        1.195
+      ],
+      [
+        -19,
+        27,
+        1.30821
+      ],
+      [
+        -19,
+        28,
+        1.37859
+      ],
+      [
+        -19,
+        29,
+        1.40247
+      ],
+      [
+        -19,
+        30,
+        1.37859
+      ],
+      [
+        -19,
+        31,
+        1.30821
+      ],
+      [
+        -19,
+        32,
+        1.195
+      ],
+      [
+        -19,
+        33,
+        1.04511
+      ],
+      [
+        -19,
+        34,
+        0.86715
+      ],
+      [
+        -19,
+        35,
+        0.67219
+      ],
+      [
+        -19,
+        36,
+        0.47374
+      ],
+      [
+        -19,
+        37,
+        0.28779
+      ],
+      [
+        -19,
+        38,
+        0.13278
+      ],
+      [
+        -19,
+        39,
+        0.02961
+      ],
+      [
+        -18,
+        19,
+        0.01475
+      ],
+      [
+        -18,
+        20,
+        0.09846
+      ],
+      [
+        -18,
+        21,
+        0.23605
+      ],
+      [
+        -18,
+        22,
+        0.40663
+      ],
+      [
+        -18,
+        23,
+        0.59176
+      ],
+      [
+        -18,
+        24,
+        0.77546
+      ],
+      [
+        -18,
+        25,
+        0.9442
+      ],
+      [
+        -18,
+        26,
+        1.08691
+      ],
+      [
+        -18,
+        27,
+        1.195
+      ],
+      [
+        -18,
+        28,
+        1.26231
+      ],
+      [
+        -18,
+        29,
+        1.28516
+      ],
+      [
+        -18,
+        30,
+        1.26231
+      ],
+      [
+        -18,
+        31,
+        1.195
+      ],
+      [
+        -18,
+        32,
+        1.08691
+      ],
+      [
+        -18,
+        33,
+        0.9442
+      ],
+      [
+        -18,
+        34,
+        0.77546
+      ],
+      [
+        -18,
+        35,
+        0.59176
+      ],
+      [
+        -18,
+        36,
+        0.40663
+      ],
+      [
+        -18,
+        37,
+        0.23605
+      ],
+      [
+        -18,
+        38,
+        0.09846
+      ],
+      [
+        -18,
+        39,
+        0.01475
+      ],
+      [
+        -17,
+        19,
+        0.00256
+      ],
+      [
+        -17,
+        20,
+        0.05901
+      ],
+      [
+        -17,
+        21,
+        0.17222
+      ],
+      [
+        -17,
+        22,
+        0.32129
+      ],
+      [
+        -17,
+        23,
+        0.48777
+      ],
+      [
+        -17,
+        24,
+        0.65569
+      ],
+      [
+        -17,
+        25,
+        0.81152
+      ],
+      [
+        -17,
+        26,
+        0.9442
+      ],
+      [
+        -17,
+        27,
+        1.04511
+      ],
+      [
+        -17,
+        28,
+        1.10812
+      ],
+      [
+        -17,
+        29,
+        1.12953
+      ],
+      [
+        -17,
+        30,
+        1.10812
+      ],
+      [
+        -17,
+        31,
+        1.04511
+      ],
+      [
+        -17,
+        32,
+        0.9442
+      ],
+      [
+        -17,
+        33,
+        0.81152
+      ],
+      [
+        -17,
+        34,
+        0.65569
+      ],
+      [
+        -17,
+        35,
+        0.48777
+      ],
+      [
+        -17,
+        36,
+        0.32129
+      ],
+      [
+        -17,
+        37,
+        0.17222
+      ],
+      [
+        -17,
+        38,
+        0.05901
+      ],
+      [
+        -17,
+        39,
+        0.00256
+      ],
+      [
+        -16,
+        20,
+        0.02305
+      ],
+      [
+        -16,
+        21,
+        0.10491
+      ],
+      [
+        -16,
+        22,
+        0.22632
+      ],
+      [
+        -16,
+        23,
+        0.36883
+      ],
+      [
+        -16,
+        24,
+        0.51646
+      ],
+      [
+        -16,
+        25,
+        0.65569
+      ],
+      [
+        -16,
+        26,
+        0.77546
+      ],
+      [
+        -16,
+        27,
+        0.86715
+      ],
+      [
+        -16,
+        28,
+        0.92463
+      ],
+      [
+        -16,
+        29,
+        0.9442
+      ],
+      [
+        -16,
+        30,
+        0.92463
+      ],
+      [
+        -16,
+        31,
+        0.86715
+      ],
+      [
+        -16,
+        32,
+        0.77546
+      ],
+      [
+        -16,
+        33,
+        0.65569
+      ],
+      [
+        -16,
+        34,
+        0.51646
+      ],
+      [
+        -16,
+        35,
+        0.36883
+      ],
+      [
+        -16,
+        36,
+        0.22632
+      ],
+      [
+        -16,
+        37,
+        0.10491
+      ],
+      [
+        -16,
+        38,
+        0.02305
+      ],
+      [
+        -15,
+        20,
+        0.00164
+      ],
+      [
+        -15,
+        21,
+        0.04518
+      ],
+      [
+        -15,
+        22,
+        0.13278
+      ],
+      [
+        -15,
+        23,
+        0.24599
+      ],
+      [
+        -15,
+        24,
+        0.36883
+      ],
+      [
+        -15,
+        25,
+        0.48777
+      ],
+      [
+        -15,
+        26,
+        0.59176
+      ],
+      [
+        -15,
+        27,
+        0.67219
+      ],
+      [
+        -15,
+        28,
+        0.7229
+      ],
+      [
+        -15,
+        29,
+        0.74022
+      ],
+      [
+        -15,
+        30,
+        0.7229
+      ],
+      [
+        -15,
+        31,
+        0.67219
+      ],
+      [
+        -15,
+        32,
+        0.59176
+      ],
+      [
+        -15,
+        33,
+        0.48777
+      ],
+      [
+        -15,
+        34,
+        0.36883
+      ],
+      [
+        -15,
+        35,
+        0.24599
+      ],
+      [
+        -15,
+        36,
+        0.13278
+      ],
+      [
+        -15,
+        37,
+        0.04518
+      ],
+      [
+        -15,
+        38,
+        0.00164
+      ],
+      [
+        -14,
+        21,
+        0.00656
+      ],
+      [
+        -14,
+        22,
+        0.0542
+      ],
+      [
+        -14,
+        23,
+        0.13278
+      ],
+      [
+        -14,
+        24,
+        0.22632
+      ],
+      [
+        -14,
+        25,
+        0.32129
+      ],
+      [
+        -14,
+        26,
+        0.40663
+      ],
+      [
+        -14,
+        27,
+        0.47374
+      ],
+      [
+        -14,
+        28,
+        0.51646
+      ],
+      [
+        -14,
+        29,
+        0.53111
+      ],
+      [
+        -14,
+        30,
+        0.51646
+      ],
+      [
+        -14,
+        31,
+        0.47374
+      ],
+      [
+        -14,
+        32,
+        0.40663
+      ],
+      [
+        -14,
+        33,
+        0.32129
+      ],
+      [
+        -14,
+        34,
+        0.22632
+      ],
+      [
+        -14,
+        35,
+        0.13278
+      ],
+      [
+        -14,
+        36,
+        0.0542
+      ],
+      [
+        -14,
+        37,
+        0.00656
+      ],
+      [
+        -13,
+        22,
+        0.00656
+      ],
+      [
+        -13,
+        23,
+        0.04518
+      ],
+      [
+        -13,
+        24,
+        0.10491
+      ],
+      [
+        -13,
+        25,
+        0.17222
+      ],
+      [
+        -13,
+        26,
+        0.23605
+      ],
+      [
+        -13,
+        27,
+        0.28779
+      ],
+      [
+        -13,
+        28,
+        0.32129
+      ],
+      [
+        -13,
+        29,
+        0.33287
+      ],
+      [
+        -13,
+        30,
+        0.32129
+      ],
+      [
+        -13,
+        31,
+        0.28779
+      ],
+      [
+        -13,
+        32,
+        0.23605
+      ],
+      [
+        -13,
+        33,
+        0.17222
+      ],
+      [
+        -13,
+        34,
+        0.10491
+      ],
+      [
+        -13,
+        35,
+        0.04518
+      ],
+      [
+        -13,
+        36,
+        0.00656
+      ],
+      [
+        -12,
+        23,
+        0.00164
+      ],
+      [
+        -12,
+        24,
+        0.02305
+      ],
+      [
+        -12,
+        25,
+        0.05901
+      ],
+      [
+        -12,
+        26,
+        0.09846
+      ],
+      [
+        -12,
+        27,
+        0.13278
+      ],
+      [
+        -12,
+        28,
+        0.15583
+      ],
+      [
+        -12,
+        29,
+        0.16392
+      ],
+      [
+        -12,
+        30,
+        0.15583
+      ],
+      [
+        -12,
+        31,
+        0.13278
+      ],
+      [
+        -12,
+        32,
+        0.09846
+      ],
+      [
+        -12,
+        33,
+        0.05901
+      ],
+      [
+        -12,
+        34,
+        0.02305
+      ],
+      [
+        -12,
+        35,
+        0.00164
+      ],
+      [
+        -11,
+        25,
+        0.00256
+      ],
+      [
+        -11,
+        26,
+        0.01475
+      ],
+      [
+        -11,
+        27,
+        0.02961
+      ],
+      [
+        -11,
+        28,
+        0.04098
+      ],
+      [
+        -11,
+        29,
+        0.04518
+      ],
+      [
+        -11,
+        30,
+        0.04098
+      ],
+      [
+        -11,
+        31,
+        0.02961
+      ],
+      [
+        -11,
+        32,
+        0.01475
+      ],
+      [
+        -11,
+        33,
+        0.00256
+      ]
+    ]
+  },
+  "openWorld": true
 }

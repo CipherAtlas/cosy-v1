@@ -1,0 +1,185 @@
+{
+  "status": "visual-reviewed-after-willow-correction",
+  "baselinePathCoverage": {
+    "authored": 39,
+    "native": 9,
+    "pictures": 109
+  },
+  "finalPictures": 65,
+  "changedWalkingViews": 45,
+  "bridgePictures": 12,
+  "defaultCameraPictures": 1,
+  "bridgeCrossings": {
+    "total": 6,
+    "passed": true,
+    "walks": [
+      {
+        "id": "bridge",
+        "name": "bridge-walk-east",
+        "direction": 1,
+        "start": {
+          "x": -16.833896,
+          "z": 3,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            -4.093820983602296,
+            0.05,
+            3
+          ],
+          "clear": true
+        },
+        "progress": 12.740075016397704,
+        "crossed": true
+      },
+      {
+        "id": "bridge",
+        "name": "bridge-walk-west",
+        "direction": -1,
+        "start": {
+          "x": -4.2338960000000005,
+          "z": 3,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            -16.930637250385253,
+            0.05,
+            3
+          ],
+          "clear": true
+        },
+        "progress": 12.696741250385251,
+        "crossed": true
+      },
+      {
+        "id": "town-brook-bridge",
+        "name": "town-brook-bridge-walk-east",
+        "direction": 1,
+        "start": {
+          "x": 51.7,
+          "z": 42,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            64.48340774481288,
+            0.05,
+            42
+          ],
+          "clear": true
+        },
+        "progress": 12.783407744812877,
+        "crossed": true
+      },
+      {
+        "id": "town-brook-bridge",
+        "name": "town-brook-bridge-walk-west",
+        "direction": -1,
+        "start": {
+          "x": 64.3,
+          "z": 42,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            51.51659152630385,
+            0.05,
+            42
+          ],
+          "clear": true
+        },
+        "progress": 12.783408473696149,
+        "crossed": true
+      },
+      {
+        "id": "town-farm-bridge",
+        "name": "town-farm-bridge-walk-east",
+        "direction": 1,
+        "start": {
+          "x": 52.5,
+          "z": -53,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            65.26174125038521,
+            0.05,
+            -53
+          ],
+          "clear": true
+        },
+        "progress": 12.761741250385214,
+        "crossed": true
+      },
+      {
+        "id": "town-farm-bridge",
+        "name": "town-farm-bridge-walk-west",
+        "direction": -1,
+        "start": {
+          "x": 65.1,
+          "z": -53,
+          "clear": true
+        },
+        "end": {
+          "position": [
+            52.33825836628258,
+            0.05,
+            -53
+          ],
+          "clear": true
+        },
+        "progress": 12.761741633717413,
+        "crossed": true
+      }
+    ]
+  },
+  "fourQuestions": {
+    "enjoyable": true,
+    "pretty": true,
+    "bigAndHealthy": true,
+    "stayWorthy": true
+  },
+  "remainingConfirmedPavingOrWaterPlantingIssues": [],
+  "notes": [
+    "Overhead willow fronds can cross the enlarged camera view; no low shrub spill remains on path 5.",
+    "Tea-path pergola occlusion in the enlarged audit camera clears at the normal distance 3.8 and pitch 0.15.",
+    "The first contact-sheet review missed willow-1 bark on native path4. Actual geometry confirmed the obstruction; the approved 2.1 m move was measured and seven fresh views now confirm the base on the dry verge."
+  ],
+  "pageErrors": [],
+  "skippedFinalViews": [],
+  "layoutHash": "53cef683dbff6496c7a2800007ea2e9c18c97ef3206356a01fb3afb1af898736",
+  "layoutObjects": 591,
+  "protectedFiles": {
+    "tools/village-editor/presets/original-village.json": "c3582c507ad2cf02f0dd6246329500f0f31a8b46b9ec707c84ad199026a749bb",
+    "tools/village-editor/presets/current-village.json": "9193adb0a2adeac489057e0b8f741fd0d873120a6a019a6106b2d15422310f6a",
+    "tools/village-editor/layouts/layout-eabc4c64-e081-4567-b3b5-7cf3bf373514.json": "8f02603486eafe9c38c8e712d65ff4f324de7cb279243a3d0494417ae2f40e15",
+    "tools/village-editor/layouts/layout-flat-2ecb6c1d-3c3a-47f1-830d-bd6bec5d2dd7.json": "51f384245ca6bf0db487ee626808c9164f11c5ac244fc90ab2e76f47c3a054f0",
+    "tools/village-editor/layouts/layout-2dac0022-0110-47ea-936b-a0c7aae75d6b.json": "5c4870f3b8263c7f24f475fff24756590a834a3162c481f06b4f539ac7574268",
+    "tools/village-editor/layouts/layout-b05ff22d-67e7-4be9-81ec-1dc8cec81ecb.json": "11431a617a43676805c375241d2e06a284b99452217e1ad53a6b499da71332a0",
+    "tools/village-editor/layouts/layout-c087f09f-6662-415f-b80b-b70fe9fb5783.json": "955dc9e2cb7aa42fb13b3dc1e59947b9e8817d917134bf3db88919b6daf14c8c"
+  },
+  "preservation": true,
+  "scope": "Local exported shared-connected Chrome visual review and actual keyboard walking. No final source/layout edits; no editor mutations, interaction tests, performance or deployed proof.",
+  "willowFollowupPictures": 7,
+  "first58PictureLayoutHash": "866d18102ae76f8b74cc53bc6ef5799444c7968ca47ac9a8cc9d820d14237128",
+  "willowFollowup": {
+    "status": "passed",
+    "runtimePosition": [
+      -15.9,
+      0,
+      -3.5
+    ],
+    "pictures": 7,
+    "errors": [],
+    "skipped": [],
+    "preservation": true,
+    "evidence": [
+      "willow-final/capture-metadata.json",
+      "willow-final/corner-angles/capture-metadata.json",
+      "editor-pond/willow-clearance-after.json",
+      "position-only-deep-comparison.json"
+    ]
+  }
+}

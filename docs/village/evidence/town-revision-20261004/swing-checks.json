@@ -1,0 +1,24 @@
+{
+  "checks": [
+    "Three real browser clients join one Worker",
+    "Both authored pasture swing copies load in the actual game",
+    "sunrise-meadow-swings: E enters the first accepted physical seat",
+    "sunrise-meadow-swings: W pumps the accepted swing",
+    "sunrise-meadow-swings: another visitor claims the separate second seat",
+    "sunrise-meadow-swings: Worker refuses a third visitor on a full set",
+    "sunrise-meadow-swings: accepted riders occupy distinct seats",
+    "sunrise-meadow-swings: leaving makes the real seat available to the waiting visitor",
+    "sunrise-meadow-swings: disconnect releases the other visitor's swing claim",
+    "sunrise-meadow-swings: reconnect starts without the abandoned seat",
+    "pasture-meadow-swings-2: E enters the first accepted physical seat",
+    "pasture-meadow-swings-2: W pumps the accepted swing",
+    "pasture-meadow-swings-2: another visitor claims the separate second seat",
+    "pasture-meadow-swings-2: Worker refuses a third visitor on a full set",
+    "pasture-meadow-swings-2: accepted riders occupy distinct seats",
+    "pasture-meadow-swings-2: leaving makes the real seat available to the waiting visitor",
+    "pasture-meadow-swings-2: disconnect releases the other visitor's swing claim",
+    "pasture-meadow-swings-2: reconnect starts without the abandoned seat",
+    "Both pasture swing copies have no captured browser page errors"
+  ],
+  "errors": []
+}

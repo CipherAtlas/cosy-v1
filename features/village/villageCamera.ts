@@ -4,6 +4,8 @@ import { BIRD_CLEARING, floorHeight, type Collider } from "./environment";
 import type { PlaceId } from "./places";
 import type { PuppyPack } from "./puppies";
 import type { VillageSwingSet } from "./swings";
+import type { TownAnimal } from "./townShared";
+import type { WorldItem } from "./worldLayout";
 
 /** Reuses scratch vectors while calculating activity, walking and swing viewpoints. */
 export class VillageCamera {
@@ -14,6 +16,33 @@ export class VillageCamera {
   private collisionBox = new T.Box3();
   private cameraRay = new T.Ray();
   private cameraHit = new T.Vector3();
+  animal(state: TownAnimal, player: T.Vector3, position: T.Vector3, colliders: Collider[], items: WorldItem[] = []) {
+    const cow = state.species === "cow", distance = cow ? 4.1 : 3.4;
+    const dx = position.x - player.x, dz = position.z - player.z, length = Math.hypot(dx, dz) || 1;
+    this.look.copy(player).lerp(position, .5); this.look.y = player.y + (cow ? 1.45 : .75);
+    const angle = Math.atan2(-dz, dx);
+    const obstacles = state.species === "hedgehog" ? [...colliders, ...items.filter(item => item.visible && item.asset === "apple-tree").map(item => ({
+      x: item.position[0], z: item.position[2], w: 3.8 * item.scale[0], d: 3.8 * item.scale[2],
+      bottom: item.position[1] + 1.7 * item.scale[1], top: item.position[1] + 5 * item.scale[1],
+    }))] : colliders;
+    let best = -1;
+    // Try both sides and the diagonals so an orchard or cottage cannot hide a tiny friend.
+    for (const offset of [0, Math.PI, Math.PI / 4, -Math.PI / 4, Math.PI * .75, -Math.PI * .75, Math.PI / 2, -Math.PI / 2]) {
+      this.temp.set(this.look.x - dx / length * .4 + Math.sin(angle + offset) * distance,
+        player.y + (cow ? 2.7 : 2.05), this.look.z - dz / length * .4 + Math.cos(angle + offset) * distance);
+      this.cameraRay.origin.copy(this.look); this.cameraRay.direction.subVectors(this.temp, this.look).normalize();
+      const full = this.temp.distanceTo(this.look); let clear = full;
+      for (const collider of obstacles) {
+        this.collisionBox.min.set(collider.x - collider.w / 2 - .2, collider.bottom ?? 0, collider.z - collider.d / 2 - .2);
+        this.collisionBox.max.set(collider.x + collider.w / 2 + .2, collider.top ?? 8, collider.z + collider.d / 2 + .2);
+        if (this.collisionBox.containsPoint(this.look)) continue;
+        if (this.cameraRay.intersectBox(this.collisionBox, this.cameraHit)) clear = Math.min(clear, Math.max(.55, this.cameraHit.distanceTo(this.look) - .2));
+      }
+      if (clear > best) { best = clear; this.goal.copy(this.look).addScaledVector(this.cameraRay.direction, clear); }
+      if (clear >= full - .01) break;
+    }
+    this.goal.y = Math.max(this.goal.y, floorHeight(this.goal.x, this.goal.z) + .3);
+  }
   swing(swing: VillageSwingSet, yaw: number, pitch: number, compactView: boolean) {
     swing.root.localToWorld(this.look.set(0, compactView ? 2 : 1.6, 0));
     const distance = (compactView ? 10.5 : 7.3) * swing.placement.scale[0];

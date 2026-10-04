@@ -1,0 +1,16 @@
+[
+  {
+    "name": "willow-corner-south",
+    "x": -18.3,
+    "z": 0.6,
+    "yaw": 0,
+    "extra": true
+  },
+  {
+    "name": "willow-corner-north",
+    "x": -18.35,
+    "z": -6,
+    "yaw": 3.141592653589793,
+    "extra": true
+  }
+]

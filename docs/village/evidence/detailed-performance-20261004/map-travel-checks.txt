@@ -1,0 +1,28 @@
+Isolated client loaded
+Isolated client entered
+Isolated client loaded
+Isolated client entered
+Both visitors can use their private focus cottages simultaneously before map travel
+Both swings, field, circuit, three farms and owl grove have clickable map buttons
+All map buttons remain reachable and 44 px at 1366×768
+Map buttons do not overlap at 1366×768
+All map buttons remain reachable and 44 px at 1280×720
+Map buttons do not overlap at 1280×720
+All map buttons remain reachable and 44 px at 1024×640
+Map buttons do not overlap at 1024×640
+All map buttons remain reachable and 44 px at 800×640
+Map buttons do not overlap at 800×640
+Meadow swings 1 click moves the real player and broadcasts the accepted position to another client
+Meadow swings 2 click moves the real player and broadcasts the accepted position to another client
+Willow circuit click moves the real player and broadcasts the accepted position to another client
+Owl grove click moves the real player and broadcasts the accepted position to another client
+Carrot farm click moves the real player and broadcasts the accepted position to another client
+Radish farm click moves the real player and broadcasts the accepted position to another client
+Mint farm click moves the real player and broadcasts the accepted position to another client
+Grazing field click moves the real player and broadcasts the accepted position to another client
+Enter activates the focused owl teleport
+Disconnected travel preserves the player position and open map
+Reconnect restores accepted map travel
+Travelling out of one private cottage does not alter the other visitor’s private focus
+Two real clients have no page errors
+23 isolated map travel checks passed.

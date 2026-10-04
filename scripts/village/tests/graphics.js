@@ -1,5 +1,50 @@
 import { GRAPHICS_TIERS, graphicsPixelRatio } from './modules/features/village/graphics.js';
 
+// Run on the local QA engine so real render frames exercise the shadow cadence.
+export function checkMovingShadows(engine) {
+  const quality = engine.quality, reducedMotion = engine.reducedMotion;
+  const keys = [...engine.keys], position = { ...engine.movement.position };
+  const results = [];
+  const check = (condition, name) => { if (!condition) throw Error(name); results.push(name); };
+  try {
+    let now = performance.now() + 100;
+    for (const fps of [30, 60, 120]) {
+      for (const reduced of [false, true]) {
+        engine.setQuality('low'); engine.reducedMotion = reduced;
+        engine.keys.clear(); engine.keys.add('w'); engine.keys.add('shift');
+        engine.movement.settle(.3, 20);
+        engine.lastTime = now;
+        for (let frame = 0; frame < 13; frame++) {
+          now += 1000 / fps; engine.frame(now);
+          if (frame === 0) continue;
+          check(engine.movement.speed > .12 && engine.shadowTime === now,
+            `Battery sprint shadow matches frame ${frame} at ${fps} FPS, reduced motion ${reduced}`);
+        }
+        check(engine.sun.shadow.mapSize.x === 1024, `Battery shadow resolution retained at ${fps} FPS, reduced motion ${reduced}`);
+      }
+    }
+    engine.keys.clear(); engine.movement.settle(.3, 20);
+    engine.reducedMotion = false;
+    now += 100;
+    engine.lastTime = now; engine.frame(now);
+    const idleShadow = engine.shadowTime;
+    now += 1000 / 120; engine.frame(now);
+    check(engine.shadowTime === idleShadow, 'Idle battery shadows retain their refresh cap');
+    engine.reducedMotion = true; engine.movement.jump();
+    for (let frame = 0; frame < 4; frame++) {
+      now += 1000 / 120; engine.frame(now);
+      check(!engine.movement.grounded && engine.shadowTime === now, `Reduced-motion jump shadow matches frame ${frame}`);
+    }
+    const gl = engine.renderer.getContext();
+    check(gl.getError() === gl.NO_ERROR, 'Moving battery shadows render without WebGL errors');
+    return { passed: results.length, results };
+  } finally {
+    engine.keys.clear(); keys.forEach(key => engine.keys.add(key));
+    engine.movement.settle(position.x, position.z);
+    engine.reducedMotion = reducedMotion; engine.setQuality(quality); engine.lastTime = 0;
+  }
+}
+
 // Exercise the production engine's resize and frame paths, including a second downgrade.
 export function checkGraphics(engine) {
   const results = [];

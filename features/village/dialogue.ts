@@ -1,3 +1,4 @@
+import { DEFAULT_KEYBINDINGS, gameKey, shortcutKeys, type Keybindings } from "./keybindings";
 import * as T from "three";
 import type { VillageLife } from "./life";
 import type { Collider } from "./environment";
@@ -11,6 +12,7 @@ const line = (en: string, ja: string): Line => ({ en, ja });
 export class VillagerDialogue {
   private layer = document.createElement("div");
   private announcement = document.createElement("span");
+  private keybindings: Keybindings = DEFAULT_KEYBINDINGS;
   private language: "en" | "ja" = "en";
   private enabled = false;
   private nearest = -1;
@@ -55,7 +57,7 @@ export class VillagerDialogue {
       button.append(buttonLabel, shortcut);
       button.addEventListener("click", () => this.talk(index));
       button.addEventListener("keydown", event => {
-        if (event.key.toLowerCase() === "f" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        if (gameKey(this.keybindings, event.key) === "f" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
           event.preventDefault(); event.stopPropagation(); this.talk(index);
         }
       });
@@ -67,7 +69,7 @@ export class VillagerDialogue {
       const companionKey = document.createElement("kbd"); companionKey.textContent = "C"; companionKey.setAttribute("aria-hidden", "true");
       companion.append(companionLabel, companionKey);
       companion.addEventListener("keydown", event => {
-        if (event.key.toLowerCase() === "c" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        if (gameKey(this.keybindings, event.key) === "c" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
           event.preventDefault(); event.stopPropagation(); this.invite(index);
         }
       });
@@ -78,7 +80,7 @@ export class VillagerDialogue {
       const crumbsKey = document.createElement("kbd"); crumbsKey.textContent = "B"; crumbsKey.setAttribute("aria-hidden", "true");
       crumbs.append(crumbsLabel, crumbsKey);
       crumbs.addEventListener("keydown", event => {
-        if (event.key.toLowerCase() === "b" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        if (gameKey(this.keybindings, event.key) === "b" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
           event.preventDefault(); event.stopPropagation(); this.bread(index);
         }
       });
@@ -95,7 +97,7 @@ export class VillagerDialogue {
         tea.setAttribute("aria-keyshortcuts", "E");
         tea.addEventListener("click", () => this.visitTea()); actions.append(tea);
         tea.addEventListener("keydown", event => {
-          if (event.key.toLowerCase() === "e" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          if (gameKey(this.keybindings, event.key) === "e" && !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey) {
             event.preventDefault(); event.stopPropagation(); this.visitTea();
           }
         });
@@ -132,6 +134,18 @@ export class VillagerDialogue {
     luma.measured = "";
   }
 
+  setKeybindings(bindings: Keybindings) {
+    this.keybindings = bindings;
+    this.bubbles.forEach(b => {
+      ([ [b.button, "F"], [b.companion, "C"], [b.crumbs, "B"], [b.tea, "E"] ] as const).forEach(([button, key]) => {
+        if (!button) return;
+        button.setAttribute("aria-keyshortcuts", shortcutKeys(bindings, key));
+        const cap = button.querySelector("kbd"); if (cap) cap.textContent = shortcutKeys(bindings, key);
+      });
+      b.measured = "";
+    });
+  }
+
   setLanguage(language: "en" | "ja") {
     this.language = language;
     this.layer.lang = language;
@@ -141,7 +155,7 @@ export class VillagerDialogue {
       b.text.textContent = b.line[language];
       b.buttonLabel.textContent = language === "ja" ? "話す" : "Chat";
       b.button.setAttribute("aria-label", language === "ja" ? `${b.profile.name.ja}と話す` : `Chat with ${b.profile.name.en}`);
-      b.button.setAttribute("aria-keyshortcuts", "F");
+      b.button.setAttribute("aria-keyshortcuts", shortcutKeys(this.keybindings, "F"));
       this.actionLabels(b);
     });
     if (this.clock < this.teaSpeechUntil) {

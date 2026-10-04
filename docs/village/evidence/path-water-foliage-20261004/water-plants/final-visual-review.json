@@ -1,0 +1,118 @@
+{
+  "scope": "Final local exported-game3051, normal entrance and actual shared connection. Read-only geometry/visual review, not deployment or broader interaction lifecycle proof.",
+  "checks": {
+    "photosInspected": 8,
+    "normalEntry": true,
+    "sharedConnectedAtReadiness": true,
+    "clearCameraVisitorPositions": true,
+    "pageErrors": [],
+    "protectedFilesUnchanged": true,
+    "protectedFileCount": 8,
+    "layoutHash": "866d18102ae76f8b74cc53bc6ef5799444c7968ca47ac9a8cc9d820d14237128",
+    "explicitPlaceableWaterPlantInstances": 0,
+    "birds": 15,
+    "fish": 8,
+    "lilyCount": 14,
+    "lilyNormalizedRadius": [
+      0.839999927529293,
+      0.9100001065642074
+    ],
+    "visibleBankPlants": {
+      "reeds": 50,
+      "iris": 16,
+      "daisy": 11
+    },
+    "pavingMaskedBankPlants": {
+      "reeds": 12,
+      "iris": 4,
+      "daisy": 2
+    },
+    "sameAllocatedPlantBudgets": {
+      "reeds": 62,
+      "iris": 20,
+      "daisy": 13,
+      "lily": 14
+    },
+    "childSourceTypecheck": "Passed after lily grouping and bank metadata; parent owns subsequent combined typecheck/build."
+  },
+  "passes": [
+    {
+      "image": "final-3051/pond-west.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: a clear walking path, lively water and shaded bank make this enjoyable to explore.",
+        "Is this pretty enough?": "Yes: lilies read as small shoreline colonies, with natural willow branches framing the view.",
+        "Is the town big and healthy looking?": "Yes: a large planted pond, established trees and surrounding homes feel healthy and substantial.",
+        "Does it make a user want to stay?": "Yes: the bench and calm water offer a pleasant place to linger."
+      }
+    },
+    {
+      "image": "final-3051/pond-north.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the broad pond is easy to see and the path beside the bench is clear.",
+        "Is this pretty enough?": "Yes: grouped lilies and reeds stay by the bank; the swimming center is uncluttered.",
+        "Is the town big and healthy looking?": "Yes: mature trees, banks and numerous water birds make this a full town destination.",
+        "Does it make a user want to stay?": "Yes: it is a quiet sitting and bird-watching place."
+      }
+    },
+    {
+      "image": "final-3051/pond-east.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the previously crowded narrow bank is now clearly traversable and readable.",
+        "Is this pretty enough?": "Yes: the limestone paving is clean, while small plant clumps remain at the actual shore.",
+        "Is the town big and healthy looking?": "Yes: cleanup preserves the lush perimeter and large lively pond.",
+        "Does it make a user want to stay?": "Yes: the clear route makes it easy to stop and look across the water."
+      }
+    },
+    {
+      "image": "final-3051/pond-south.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: homes, the writing terrace, dock and water birds give this bank several reasons to visit.",
+        "Is this pretty enough?": "Yes: shore flowers, lily colonies and an open pond form an intentional composition without plants on the paving.",
+        "Is the town big and healthy looking?": "Yes: the wide pond and neighboring village amenities feel established and healthy.",
+        "Does it make a user want to stay?": "Yes: this is an inviting pond-side gathering and resting spot."
+      }
+    },
+    {
+      "image": "final-3051/pond-dock.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the dock is open and the nearby ducks are visible with the contextual keyboard control.",
+        "Is this pretty enough?": "Yes: open water is the focal point, with natural overhead willow leaves and bank planting at the edges.",
+        "Is the town big and healthy looking?": "Yes: the large pond, many birds and distant planted banks read as a thriving town.",
+        "Does it make a user want to stay?": "Yes: the dock is a strong place to pause, feed birds and watch the water."
+      }
+    },
+    {
+      "image": "final-3051/pond-north-overview.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the clean bench path and nearby lily group make the shore easy to understand.",
+        "Is this pretty enough?": "Yes: the pads are grouped beside the bank and the path is completely clear in the frame.",
+        "Is the town big and healthy looking?": "Yes: the mature tree and full shoreline retain a healthy landscape.",
+        "Does it make a user want to stay?": "Yes: the bench and clear water encourage a longer stay."
+      }
+    },
+    {
+      "image": "final-3051/brook-bank.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the clean bridge and curved stream provide a pleasant walking route.",
+        "Is this pretty enough?": "Yes: the water stays open and plants sit on the surrounding dry meadow.",
+        "Is the town big and healthy looking?": "Yes: the broad meadow and long brook add depth and scale to the town.",
+        "Does it make a user want to stay?": "Yes: this is a calm scenic crossing with room to explore."
+      }
+    },
+    {
+      "image": "final-3051/main-river.png",
+      "answers": {
+        "Is this enjoyable for a user?": "Yes: the maintained riverside, signs and bridge connect attractive village destinations.",
+        "Is this pretty enough?": "Yes: the previously misplaced trunks now meet the dry foreground bank; overhanging canopy remains natural.",
+        "Is the town big and healthy looking?": "Yes: established homes, mature trees and a clear river look healthy and substantial.",
+        "Does it make a user want to stay?": "Yes: the water, architecture and readable routes make this an appealing walking stop."
+      }
+    }
+  ],
+  "preservation": "Child changed only GardenScene lily placement and bank mesh tags, without model, interaction, layout or asset-catalog changes. Root owns shared paving masks, canonical nine tree/shrub moves, editor pond conformance and final build. No API save/Apply or feeding/claim action was performed in this review. Child Chrome closed in finally.",
+  "limits": [
+    "Local laptop-sized1366x768 evidence; no deployed result is claimed.",
+    "This water-plant pass does not repeat unrelated shared interaction lifecycle tests.",
+    "Parent editor pond conformance metadata is being finalized separately; runtime geometry is unchanged and these final runtime photos remain applicable."
+  ]
+}

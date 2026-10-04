@@ -93,3 +93,65 @@ CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
 Four short cuts were trimmed, filtered, pitched and normalized for individual dogs.
 The original recording is archived at assets/village/audio/dog-barking-source.wav;
 file hashes and modifications are in docs/village/puppy-sound-manifest.json.
+
+Animal one-shot recordings (2026-10-04)
+
+animals/cow.mp3 — Secretlondon
+Source: https://opengameart.org/content/farm-animals
+License for this adapted clip: https://creativecommons.org/licenses/by-sa/3.0/
+Changes: Mono excerpt, 70 Hz high-pass / 4200 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/sheep.mp3 — Secretlondon
+Source: https://opengameart.org/content/farm-animals
+License for this adapted clip: https://creativecommons.org/licenses/by-sa/3.0/
+Changes: Mono excerpt, 100 Hz high-pass / 4500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/lamb.mp3 — Secretlondon
+Source: https://opengameart.org/content/farm-animals
+License for this adapted clip: https://creativecommons.org/licenses/by-sa/3.0/
+Changes: Mono excerpt, 130 Hz high-pass / 4500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/duck.mp3 — Secretlondon
+Source: https://opengameart.org/content/farm-animals
+License for this adapted clip: https://creativecommons.org/licenses/by-sa/3.0/
+Changes: Mono excerpt, 130 Hz high-pass / 4500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/horse.mp3 — Joseph Sardin
+Source: https://bigsoundbank.com/horse-neighing-4-s1541.html
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 110 Hz high-pass / 5000 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/owl.mp3 — Breviceps
+Source: https://freesound.org/people/Breviceps/sounds/465697/
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 240 Hz high-pass / 1800 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/hedgehog.mp3 — soundmary
+Source: https://freesound.org/people/soundmary/sounds/194938/
+License for this adapted clip: https://creativecommons.org/licenses/by/4.0/
+Changes: Mono excerpt, 250 Hz high-pass / 4000 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/swan.mp3 — omnisounddesign
+Source: https://freesound.org/people/omnisounddesign/sounds/336174/
+License for this adapted clip: https://creativecommons.org/licenses/by/4.0/
+Changes: Mono excerpt, 220 Hz high-pass / 4500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/duckling.mp3 — LantC
+Source: https://freesound.org/people/LantC/sounds/678061/
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 550 Hz high-pass / 6000 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/dove.mp3 — Alva Majo / 5ro4
+Source: https://freesound.org/people/5ro4/sounds/795719/
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 160 Hz high-pass / 2400 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/cat.mp3 — IgnasD
+Source: https://opengameart.org/content/meow
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 130 Hz high-pass / 4500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.
+
+animals/purr.mp3 — esperri
+Source: https://freesound.org/people/esperri/sounds/118959/
+License for this adapted clip: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Mono excerpt, 40 Hz high-pass / 1500 Hz low-pass, measured -22 LUFS gain with -6 dB peak ceiling, short fades, 32 kHz 64 kbps MP3. Freesound sources use the publicly downloadable HQ MP3.

@@ -1,0 +1,91 @@
+{
+  "status": "failed fixture timing: occupied-button check ran after the accepted eight-second meal ended; corrected final evidence is ../runtime-confirmed",
+  "gifts": [
+    {
+      "food": "mushroom",
+      "before": {
+        "apples": 0,
+        "mushrooms": 0
+      },
+      "after": {
+        "apples": 0,
+        "mushrooms": 1
+      }
+    },
+    {
+      "food": "apple",
+      "before": {
+        "apples": 0,
+        "mushrooms": 1
+      },
+      "after": {
+        "apples": 1,
+        "mushrooms": 1
+      }
+    },
+    {
+      "food": "mushroom",
+      "before": {
+        "apples": 0,
+        "mushrooms": 1
+      },
+      "after": {
+        "apples": 0,
+        "mushrooms": 2
+      }
+    },
+    {
+      "food": "apple",
+      "before": {
+        "apples": 0,
+        "mushrooms": 2
+      },
+      "after": {
+        "apples": 1,
+        "mushrooms": 2
+      }
+    }
+  ],
+  "meals": [
+    {
+      "reduced": false,
+      "clock": {
+        "id": "cow-highland-1",
+        "species": "cow",
+        "x": -43.15191803248368,
+        "y": 1.4226811428052684,
+        "z": 54.940469171068074,
+        "heading": -0.09499070469631561,
+        "owner": "2e5bc8fd-97bf-4545-9f7e-24edc9c52741",
+        "mode": "apple",
+        "startedAt": 1791066316639,
+        "until": 1791066324639,
+        "carry": null,
+        "forageSource": null,
+        "nextForageAt": 0
+      },
+      "poses": [
+        {
+          "x": -0.16011148556275984,
+          "z": 0.00008759591040677555
+        },
+        {
+          "x": -0.12945362843189842,
+          "z": -0.027823661833888357
+        },
+        {
+          "x": -0.13023539463479794,
+          "z": -0.0480441410829943
+        },
+        {
+          "x": -0.16109259383993704,
+          "z": -0.054993298277935344
+        }
+      ]
+    }
+  ],
+  "identities": [
+    "2e5bc8fd-97bf-4545-9f7e-24edc9c52741",
+    "a3e0db1a-085a-49da-ac8f-eef74798a017"
+  ]
+}

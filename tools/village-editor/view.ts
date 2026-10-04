@@ -1,10 +1,15 @@
 import * as T from "three";
+import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
+import { townPlantingClearance } from "../../features/village/worldLayout";
+import { inRiver, pondDistance } from "../../features/village/environment";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { createAtmosphere } from "../../features/village/atmosphere";
 import { StudioCollision } from "./spatial";
 import { LayoutScene, readTransform, type Asset, type Layout, type LayoutItem } from "./model";
 import { insidePlantingClearance, projectWorldLayout } from "../../features/village/worldLayout";
+import { PlayPreview } from "./playPreview";
+import { PlantingSurfaceMask, clearPavingBorders } from "../../features/village/plantingClearance";
 
 export class StudioView {
   readonly renderer = new T.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
@@ -16,6 +21,8 @@ export class StudioView {
   readonly transform: TransformControls;
   readonly model = new LayoutScene();
   readonly collision = new StudioCollision(this.model);
+  readonly play = new PlayPreview(this.collision);
+  private editorCamera?: { camera: StudioView["camera"]; position: T.Vector3; target: T.Vector3; grid: boolean };
   avoidOverlaps = true;
   private cameraAnchor = new T.Vector3();
   private atmosphere = createAtmosphere();
@@ -52,7 +59,7 @@ export class StudioView {
   private pathHandles = new T.Group();
   private pathDrag: { pointer: number; id: string; kind: "point" | "width"; index: number } | null = null;
   private pathDrawingDrag: { pointer: number; start: [number, number] } | null = null;
-  private brush?: { mode: "paint" | "erase"; asset?: string; radius: number };
+  private brush?: { mode: "paint" | "erase" | "terrain"; asset?: string; radius: number };
   private brushDrag: { pointer: number; last: [number, number] } | null = null;
   private rightStart: { pointer: number; x: number; y: number } | null = null;
   private brushPreview = new T.Mesh(new T.RingGeometry(.96, 1, 48), new T.MeshBasicMaterial({ color: "#bc6844", transparent: true, opacity: .9, depthTest: false, side: T.DoubleSide }));
@@ -77,6 +84,7 @@ export class StudioView {
     editPath: (id: string, kind: "point" | "width", index: number, point: [number, number]) => void;
     paintGrass: (asset: string, point: [number, number, number]) => void;
     erasePlanting: (points: [number, number, number][], radius: number) => void;
+    sculpt: (point: [number, number, number], sample: boolean) => void;
     routePoint: (point: [number, number]) => void;
     status: (message: string) => void;
     coordinates: (position: T.Vector3) => void;
@@ -94,7 +102,7 @@ export class StudioView {
     this.sun.position.set(40, 60, 25); this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(2048, 2048); Object.assign(this.sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 1, far: 220 });
     this.sun.shadow.bias = -.0004; this.sun.shadow.normalBias = .07;
-    this.scene.add(this.sun, this.sun.target, this.fill, new T.AmbientLight("#e8e5cf", .24), this.atmosphere.sky, this.model.group, this.pivot);
+    this.scene.add(this.sun, this.sun.target, this.fill, new T.AmbientLight("#e8e5cf", .24), this.atmosphere.sky, this.model.group, this.pivot, this.play.player);
     this.orbit = new OrbitControls(this.camera, this.renderer.domElement); this.orbit.enableDamping = false;
     this.orbit.maxPolarAngle = Math.PI * .49; this.orbit.minDistance = .8; this.orbit.maxDistance = 700; this.orbit.zoomSpeed = 2.6; this.orbit.zoomToCursor = true; this.orbit.panSpeed = 1.2;
     this.orbit.minZoom = .15; this.orbit.maxZoom = 160;
@@ -137,6 +145,7 @@ export class StudioView {
         this.updateRay(event); const point = this.groundPoint();
         if (point) {
           event.preventDefault(); event.stopImmediatePropagation(); this.orbit.enabled = false;
+          if (this.brush.mode === "terrain" && event.altKey) { this.orbit.enabled = true; this.moved = true; this.callbacks.sculpt(point.toArray() as [number, number, number], true); return; }
           this.callbacks.begin(); this.brushAt(point);
           this.brushDrag = { pointer: event.pointerId, last: [point.x, point.z] };
           canvas.setPointerCapture(event.pointerId); return;
@@ -178,7 +187,7 @@ export class StudioView {
         event.preventDefault(); event.stopImmediatePropagation(); this.updateRay(event);
         const point = this.groundPoint();
         const distance = point && Math.hypot(point.x - this.brushDrag.last[0], point.z - this.brushDrag.last[1]);
-        const spacing = this.brush.radius * (this.brush.mode === "erase" ? .8 : 1.1);
+        const spacing = this.brush.radius * (this.brush.mode === "terrain" ? .2 : this.brush.mode === "erase" ? .8 : 1.1);
         if (point && distance && distance >= spacing) {
           if (this.brush.mode === "erase") {
             const points: [number, number, number][] = [];
@@ -189,6 +198,11 @@ export class StudioView {
               points.push([x, this.collision.height(x, z), z]);
             }
             this.callbacks.erasePlanting(points, this.brush.radius);
+          } else if (this.brush.mode === "terrain") {
+            const steps = Math.min(12, Math.ceil(distance / spacing));
+            for (let i = 1; i <= steps; i++) this.brushAt(new T.Vector3(
+              this.brushDrag.last[0] + (point.x - this.brushDrag.last[0]) * i / steps, point.y,
+              this.brushDrag.last[1] + (point.z - this.brushDrag.last[1]) * i / steps));
           } else this.brushAt(point);
           this.brushDrag.last = [point.x, point.z];
         }
@@ -252,7 +266,7 @@ export class StudioView {
       const point = this.groundPoint();
       if (point) {
         this.ground.copy(point); this.callbacks.coordinates(point);
-        if (this.brush?.mode === "erase") { this.brushPreview.position.set(point.x, point.y + .25, point.z); this.brushPreview.visible = true; }
+        if (this.brush?.mode === "erase" || this.brush?.mode === "terrain") { this.brushPreview.position.set(point.x, point.y + .25, point.z); this.brushPreview.visible = true; }
         if (this.ghost) this.updateGhost(point);
         if (this.drawing) this.updatePathGuide([point.x, point.z]);
       }
@@ -276,7 +290,7 @@ export class StudioView {
       }
       this.pick(event, event.shiftKey);
     });
-    canvas.addEventListener("dblclick", () => { if (!this.placement && !this.drawing) this.focus(); });
+    canvas.addEventListener("dblclick", () => { if (!this.preview && !this.placement && !this.drawing) this.focus(); });
     canvas.addEventListener("contextmenu", event => event.preventDefault());
     canvas.addEventListener("webglcontextlost", event => { event.preventDefault(); this.renderer.setAnimationLoop(null); this.callbacks.status("The 3D view was interrupted. Export or save your layout, then reload the studio."); });
     window.addEventListener("keyup", event => { this.navigationKeys.delete(event.code); if (!event.shiftKey) { this.navigationKeys.delete("ShiftLeft"); this.navigationKeys.delete("ShiftRight"); } });
@@ -296,6 +310,7 @@ export class StudioView {
   }
   private cancelBrushDrag() { if (!this.brushDrag) return; this.brushDrag = null; this.orbit.enabled = true; this.callbacks.commit(); }
   private brushAt(point: T.Vector3) {
+    if (this.brush?.mode === "terrain") this.callbacks.sculpt(point.toArray() as [number, number, number], false);
     if (this.brush?.mode === "paint") this.callbacks.paintGrass(this.brush.asset!, point.toArray() as [number, number, number]);
     if (this.brush?.mode === "erase") this.callbacks.erasePlanting([point.toArray() as [number, number, number]], this.brush.radius);
   }
@@ -330,7 +345,9 @@ export class StudioView {
     this.callbacks.selectArea(ids);
   }
   navigate(event: KeyboardEvent) {
-    if (!["KeyW", "KeyA", "KeyS", "KeyD", "PageUp", "PageDown", "ShiftLeft", "ShiftRight"].includes(event.code)) return false;
+    if (this.preview && event.code === "Space") { if (!event.repeat) this.play.jump(); event.preventDefault(); return true; }
+    const codes = this.preview ? ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ShiftLeft", "ShiftRight"] : ["KeyW", "KeyA", "KeyS", "KeyD", "PageUp", "PageDown", "ShiftLeft", "ShiftRight"];
+    if (!codes.includes(event.code)) return false;
     this.navigationKeys.add(event.code);
     if (event.shiftKey) this.navigationKeys.add("ShiftLeft");
     if (!event.code.startsWith("Shift")) event.preventDefault();
@@ -352,6 +369,7 @@ export class StudioView {
     this.orbit.target.add(next.clone().sub(this.camera.position)); this.camera.position.copy(next);
   }
   private constrainCamera() {
+    if (this.preview) { this.camera.lookAt(this.orbit.target); this.camera.updateMatrixWorld(); return; }
     this.camera.position.copy(this.collision.moveCamera(this.cameraAnchor, this.camera.position));
     this.cameraAnchor.copy(this.camera.position);
     this.orbit.target.y = Math.max(this.orbit.target.y, this.collision.height(this.orbit.target.x, this.orbit.target.z));
@@ -372,7 +390,13 @@ export class StudioView {
   private render(time: number) {
     if (document.hidden || time - this.lastFrame < 32) return;
     const dt = Math.min((time - this.lastFrame) / 1000, .05); this.lastFrame = time;
-    this.moveCamera(dt); this.orbit.update(); this.constrainCamera();
+    if (this.preview) {
+      const movement = this.play.update(dt, this.navigationKeys, this.camera, this.reduced);
+      this.camera.position.add(movement); this.orbit.target.copy(this.play.player.position).add(new T.Vector3(0, 1.2, 0));
+      this.camera.position.y = Math.max(this.camera.position.y, this.collision.height(this.camera.position.x, this.camera.position.z) + 1.5);
+      this.renderer.shadowMap.needsUpdate = true;
+    } else this.moveCamera(dt);
+    this.orbit.update(); this.constrainCamera();
     if (this.model.world) {
       const world = this.model.world; world.wind.time.value = this.reduced ? 0 : time / 1000; world.wind.strength.value = this.reduced ? 0 : .25;
       world.water.userData.time.value = this.reduced ? 0 : time / 1000;
@@ -382,15 +406,20 @@ export class StudioView {
     this.renderer.render(this.scene, this.camera);
     if (++this.frame % 60 === 0) this.callbacks.stats(this.renderer.info.render.calls, this.renderer.info.render.triangles);
   }
-  async load(progress: (n: number) => void) { await this.model.load(this.renderer, progress); this.collision.refresh(this.model.original); this.renderer.shadowMap.needsUpdate = true; }
-  sync(layout: Layout) { this.layout = layout; this.model.apply(layout); this.collision.refresh(layout); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.refreshPlanting(); this.setLighting(this.lighting); this.renderer.shadowMap.needsUpdate = true; this.setSelection(this.selected.filter(id => this.model.roots.has(id))); }
-  refreshPath() { if (!this.layout) return; this.model.apply(this.layout); this.updateClearanceMarkers(); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.renderer.shadowMap.needsUpdate = true; this.updateOutline(); this.updatePathHandles(); }
+  async load(progress: (n: number) => void) { await this.model.load(this.renderer, progress); await this.play.load(); this.collision.refresh(this.model.original); this.renderer.shadowMap.needsUpdate = true; }
+  sync(layout: Layout) { this.layout = layout; this.model.apply(layout); this.collision.refresh(layout); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.collision.refresh(layout); this.refreshPlanting(); this.setLighting(this.lighting); this.renderer.shadowMap.needsUpdate = true; this.setSelection(this.selected.filter(id => this.model.roots.has(id))); }
+  refreshPath() { if (!this.layout) return; this.model.apply(this.layout); this.updateClearanceMarkers(); this.model.conformPaths((x, z) => this.collision.height(x, z)); this.collision.refresh(this.layout); this.refreshPlanting(); this.renderer.shadowMap.needsUpdate = true; this.updateOutline(); this.updatePathHandles(); }
   refreshBrush() { if (!this.layout) return; this.model.apply(this.layout); this.updateClearanceMarkers(); this.refreshPlanting(); this.renderer.shadowMap.needsUpdate = true; }
   private refreshPlanting() {
     const clearings = projectWorldLayout(this.layout!).clearings;
-    const cleared = (x: number, z: number) => insidePlantingClearance(x, z, clearings);
+    const townPlantingItems = this.layout!.objects.filter(item => ["horse-racetrack", "farm-row", "horse-stable", "hay-bale"].includes(item.asset));
+    const surfaces = new PlantingSurfaceMask(this.model.group), paving = new PlantingSurfaceMask(this.model.group, "paving");
+    const cleared = (x: number, z: number, radius: number) => surfaces.covers(x, z, radius) || inRiver(x, z) || pondDistance(x, z) < 1.035
+      || insidePlantingClearance(x, z, clearings) || townPlantingClearance(x, z, townPlantingItems);
     this.model.conformGrass((x, z) => this.collision.height(x, z), p => this.collision.blocksGrass(p), cleared);
-    this.model.conformWildflowers(cleared);
+    this.model.conformWildflowers(cleared, (x, z) => this.collision.height(x, z));
+    this.model.conformBorderPlants(cleared, (x, z, radius) => paving.covers(x, z, radius), this.layout!);
+    clearPavingBorders(this.model.group, paving);
   }
   showRoute(points: [number, number][], editing: boolean) {
     this.routeMode = editing;
@@ -514,7 +543,7 @@ export class StudioView {
     this.renderer.domElement.style.cursor = blocked ? "not-allowed" : "crosshair";
   }
   startPlacement(asset: Asset) {
-    this.cancelPlacement(); this.placement = asset.id; this.ghostYaw = 0; this.ghost = asset.template.clone(true);
+    this.cancelPlacement(); this.placement = asset.id; this.ghostYaw = 0; this.ghost = cloneSkeleton(asset.template);
     this.ghost.traverse(o => {
       if (o instanceof T.Mesh) {
         const materials = (Array.isArray(o.material) ? o.material : [o.material]).map(m => { const material = m.clone(); material.transparent = true; material.opacity = .52; material.depthWrite = false; if ((m as T.MeshStandardMaterial).color) material.userData.placementColor = (m as T.MeshStandardMaterial).color.clone(); this.ghostMaterials.push(material); return material; });
@@ -525,6 +554,7 @@ export class StudioView {
   }
   startGrassBrush(asset: string) { this.cancelPlacement(); this.brush = { mode: "paint", asset, radius: asset === "grass-wide" ? 7 : asset === "grass-patch" ? 3 : .5 }; this.renderer.domElement.style.cursor = "crosshair"; }
   startErase(radius: number) { this.cancelPlacement(); this.brush = { mode: "erase", radius }; this.brushPreview.scale.set(radius, radius, 1); this.renderer.domElement.style.cursor = "crosshair"; }
+  startTerrain(radius: number) { this.cancelPlacement(); this.brush = { mode: "terrain", radius }; this.brushPreview.scale.set(radius, radius, 1); this.renderer.domElement.style.cursor = "crosshair"; }
   turnPlacement(degrees: number) { this.ghostYaw += T.MathUtils.degToRad(degrees); if (this.ghost) this.updateGhost(this.ground); }
   cancelPlacement() {
     this.brush = undefined; this.brushPreview.visible = false;
@@ -544,11 +574,29 @@ export class StudioView {
     for (const [x, z] of this.pathPoints) { const dot = new T.Mesh(new T.SphereGeometry(.25, 8, 6), new T.MeshBasicMaterial({ color: "#fff4c9", depthTest: false })); dot.position.set(x, this.collision.height(x, z) + .25, z); dot.renderOrder = 101; this.pathDots.add(dot); }
   }
   setPreview(preview: boolean) {
+    if (preview === this.preview) return true;
+    if (preview) {
+      if (!this.play.enter(this.orbit.target)) return false;
+      this.editorCamera = { camera: this.camera, position: this.camera.position.clone(), target: this.orbit.target.clone(), grid: this.grid.visible };
+      this.camera = this.perspective; this.orbit.object = this.camera; this.transform.camera = this.camera;
+      this.orbit.target.copy(this.play.player.position).add(new T.Vector3(0, 1.2, 0));
+      this.camera.position.copy(this.orbit.target).add(new T.Vector3(0, 2, 8)); this.grid.visible = false;
+      this.orbit.enablePan = false; this.orbit.minDistance = 3; this.orbit.maxDistance = 16;
+    } else {
+      this.play.leave(); const saved = this.editorCamera!; this.camera = saved.camera; this.orbit.object = this.camera; this.transform.camera = this.camera;
+      this.camera.position.copy(saved.position); this.orbit.target.copy(saved.target); this.grid.visible = saved.grid;
+      this.orbit.enablePan = true; this.orbit.minDistance = .8; this.orbit.maxDistance = 700; this.editorCamera = undefined;
+      this.cameraAnchor.copy(this.camera.position);
+    }
+    this.navigationKeys.clear();
     this.preview = preview; if (preview) this.cancelPlacement(); this.setSelection(this.selected);
     this.routeGuide.visible = !preview && this.routeMode && this.routeGuide.geometry.attributes.position?.count > 1;
     this.routeDots.visible = !preview && this.routeMode;
     for (const [id, root] of this.model.roots) if (root.userData.asset === "walkable-region") root.visible = !preview && !!this.layout?.objects.find(item => item.id === id)?.visible;
     this.updateClearanceMarkers();
+    this.orbit.update(); this.resize(); this.renderer.shadowMap.needsUpdate = true;
+    this.renderer.domElement.setAttribute("aria-label", preview ? "Play preview. WASD or arrows move the blob, Shift runs, Space jumps, drag to look, Escape returns to the editor." : "Village layout canvas. WASD moves the camera, drag to orbit, Scene list selects objects.");
+    return true;
   }
   capture() { this.renderer.render(this.scene, this.camera); return this.renderer.domElement.toDataURL("image/png"); }
   getBounds() { this.updateOutline(); return this.outline.box.clone(); }
@@ -566,7 +614,20 @@ export class StudioView {
     const camera = new T.PerspectiveCamera(34, 240 / 192, .01, 2000);
     for (const asset of this.model.assets.values()) {
       if (!asset.shelf) continue;
-      const root = asset.template.clone(true); scene.add(root); root.updateMatrixWorld(true);
+      const root = cloneSkeleton(asset.template);
+      if (asset.id === "flower-meadow") {
+        // A close cluster keeps half-metre flowers legible on the shelf; the placed zone stays 48 m wide.
+        const matrix = new T.Matrix4();
+        root.traverse(node => {
+          if (!(node instanceof T.InstancedMesh)) return;
+          node.count = Math.min(node.count, 24);
+          for (let i = 0; i < node.count; i++) {
+            node.getMatrixAt(i, matrix); matrix.elements[12] /= 18; matrix.elements[14] /= 18; node.setMatrixAt(i, matrix);
+          }
+          node.instanceMatrix.needsUpdate = true; node.computeBoundingBox(); node.computeBoundingSphere();
+        });
+      }
+      scene.add(root); root.updateMatrixWorld(true);
       const bounds = new T.Box3().setFromObject(root), center = bounds.getCenter(new T.Vector3()), size = bounds.getSize(new T.Vector3());
       const distance = Math.max(size.x, size.y * 1.25, size.z) * 2.25;
       camera.position.copy(center).add(new T.Vector3(1, .65, 1.2).normalize().multiplyScalar(Math.max(distance, .5))); camera.lookAt(center);

@@ -1,0 +1,3484 @@
+{
+  "version": 2,
+  "animals": [
+    {
+      "id": "horse-bay",
+      "root": "Animal_Horse_bay",
+      "triangles": 12148,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 751120,
+      "sha256": "98abfabfb5f10c192b70dfa4f947aa2513f9e7b7bc35ac55c6036cf0e4ce1b16",
+      "boundsBlender": [
+        [
+          -0.4300000071525574,
+          -1.7101024389266968,
+          -5.960464477539063e-08
+        ],
+        [
+          0.4300000071525574,
+          1.2842575311660767,
+          2.4988839626312256
+        ]
+      ],
+      "decisions": "Continuous anatomical skin; defined withers, shoulder, hocks, tapered face, broad mane and tail; warm bay and smooth blaze.",
+      "optionalVariants": [
+        "dapple coat",
+        "separate tack",
+        "skinned gaits"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Horse_bay",
+      "staticSha256": "246e684a52d9121693f49b7550c18d326d7feda1dc6dd2e3c659bc94e06f2eef",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower",
+        "HorseSeat"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.05999999865889549,
+          1.2000000476837158
+        ],
+        "Neck": [
+          0.0,
+          -0.5699999928474426,
+          1.3799999952316284
+        ],
+        "Head": [
+          0.0,
+          -1.0099999904632568,
+          2.130000114440918
+        ],
+        "Tail": [
+          0.0,
+          0.9200000166893005,
+          1.3799999952316284
+        ],
+        "LegFrontLeft": [
+          -0.25999999046325684,
+          -0.5699999928474426,
+          1.1399999856948853
+        ],
+        "LegFrontLeftLower": [
+          -0.25999999046325684,
+          -0.5699999928474426,
+          0.5600000023841858
+        ],
+        "LegBackLeft": [
+          -0.25999999046325684,
+          0.6499999761581421,
+          1.1399999856948853
+        ],
+        "LegBackLeftLower": [
+          -0.25999999046325684,
+          0.6499999761581421,
+          0.5600000023841858
+        ],
+        "EarLeft": [
+          -0.11500000208616257,
+          -0.949999988079071,
+          2.190000057220459
+        ],
+        "LegFrontRight": [
+          0.25999999046325684,
+          -0.5699999928474426,
+          1.1399999856948853
+        ],
+        "LegFrontRightLower": [
+          0.25999999046325684,
+          -0.5699999928474426,
+          0.5600000023841858
+        ],
+        "LegBackRight": [
+          0.25999999046325684,
+          0.6499999761581421,
+          1.1399999856948853
+        ],
+        "LegBackRightLower": [
+          0.25999999046325684,
+          0.6499999761581421,
+          0.5600000023841858
+        ],
+        "EarRight": [
+          0.11500000208616257,
+          -0.949999988079071,
+          2.190000057220459
+        ],
+        "HorseSeat": [
+          0.0,
+          0.07999999821186066,
+          1.6399999856948853
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "trot": 0.8,
+        "canter": 0.9
+      },
+      "skinning": {
+        "horse-bay_coat": {
+          "weightedVertices": 7878,
+          "blendedVertices": 2194,
+          "jointVertices": {
+            "Body": 3246,
+            "Neck": 845,
+            "Head": 2253,
+            "EarLeft": 130,
+            "EarRight": 275,
+            "Tail": 554,
+            "LegFrontLeft": 417,
+            "LegFrontLeftLower": 323,
+            "LegBackLeft": 347,
+            "LegBackLeftLower": 383,
+            "LegFrontRight": 412,
+            "LegFrontRightLower": 323,
+            "LegBackRight": 352,
+            "LegBackRightLower": 384
+          }
+        },
+        "horse-bay_eyes": {
+          "weightedVertices": 424,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 424,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "horse-bay_coat": "d94d7f3a1432c1b24b69b78dc14a87e35a42ec675d7a2ca920b50abc2a0ac1ec",
+        "horse-bay_eyes": "4ff116db90f16fe978b3caaff1870e68e37de0ca03e68f3d3b4c409c6674a526"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.047016692061641836,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.3343940475422046,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.2825876963892626,
+          "loopSeam": 0.0
+        },
+        "trot": {
+          "maxDeformation": 0.5850765833590502,
+          "loopSeam": 0.0
+        },
+        "canter": {
+          "maxDeformation": 0.7542132891367774,
+          "loopSeam": 0.0
+        }
+      },
+      "restAttributeFingerprints": {
+        "horse-bay_coat_mesh": "f4adc318349325601d19f1450c432ac307ace032b6bd12ff3295e4f259ff9b34",
+        "horse-bay_eyes_mesh": "9bcdefeb451f55036028c12d27a3403047d1fbd128d52c0b8a9d0fcfd3abc2bb"
+      }
+    },
+    {
+      "id": "horse-grey",
+      "root": "Animal_Horse_grey",
+      "triangles": 10692,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 615924,
+      "sha256": "228dc09b4785d988e135af1f7512f6d3c3d154152594be00a729779668385fae",
+      "boundsBlender": [
+        [
+          -0.42691168189048767,
+          -1.7102203369140625,
+          -5.960464477539063e-08
+        ],
+        [
+          0.4275176525115967,
+          1.2842575311660767,
+          2.499495029449463
+        ]
+      ],
+      "decisions": "Matching anatomical cage; cool grey and cream hair keep the cool variant within the warm set palette.",
+      "optionalVariants": [
+        "dapple coat",
+        "separate tack",
+        "skinned gaits"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Horse_grey",
+      "staticSha256": "6f50de2fbb28697d7453f01576f0999dd482685627f8e832099f9bbfc498bf52",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower",
+        "HorseSeat"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.05999999865889549,
+          1.2000000476837158
+        ],
+        "Neck": [
+          0.0,
+          -0.5699999928474426,
+          1.3799999952316284
+        ],
+        "Head": [
+          0.0,
+          -1.0099999904632568,
+          2.130000114440918
+        ],
+        "Tail": [
+          0.0,
+          0.9200000166893005,
+          1.3799999952316284
+        ],
+        "LegFrontLeft": [
+          -0.25999999046325684,
+          -0.5699999928474426,
+          1.1399999856948853
+        ],
+        "LegFrontLeftLower": [
+          -0.25999999046325684,
+          -0.5699999928474426,
+          0.5600000023841858
+        ],
+        "LegBackLeft": [
+          -0.25999999046325684,
+          0.6499999761581421,
+          1.1399999856948853
+        ],
+        "LegBackLeftLower": [
+          -0.25999999046325684,
+          0.6499999761581421,
+          0.5600000023841858
+        ],
+        "EarLeft": [
+          -0.11500000208616257,
+          -0.949999988079071,
+          2.190000057220459
+        ],
+        "LegFrontRight": [
+          0.25999999046325684,
+          -0.5699999928474426,
+          1.1399999856948853
+        ],
+        "LegFrontRightLower": [
+          0.25999999046325684,
+          -0.5699999928474426,
+          0.5600000023841858
+        ],
+        "LegBackRight": [
+          0.25999999046325684,
+          0.6499999761581421,
+          1.1399999856948853
+        ],
+        "LegBackRightLower": [
+          0.25999999046325684,
+          0.6499999761581421,
+          0.5600000023841858
+        ],
+        "EarRight": [
+          0.11500000208616257,
+          -0.949999988079071,
+          2.190000057220459
+        ],
+        "HorseSeat": [
+          0.0,
+          0.07999999821186066,
+          1.6399999856948853
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "trot": 0.8,
+        "canter": 0.9
+      },
+      "skinning": {
+        "horse-grey_coat": {
+          "weightedVertices": 5090,
+          "blendedVertices": 1651,
+          "jointVertices": {
+            "Body": 2150,
+            "Neck": 660,
+            "Head": 1500,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 378,
+            "LegFrontLeft": 306,
+            "LegFrontLeftLower": 211,
+            "LegBackLeft": 317,
+            "LegBackLeftLower": 252,
+            "LegFrontRight": 312,
+            "LegFrontRightLower": 212,
+            "LegBackRight": 309,
+            "LegBackRightLower": 250
+          }
+        },
+        "horse-grey_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "horse-grey_coat": "eea32c62cf04a196578c36e247313668cf69e3bdfc16393387562edf98da3ae6",
+        "horse-grey_eyes": "33463bf69b22bbfaf8ab3e1a14b95d49146947ed55001c79be7d3c125b7770f5"
+      },
+      "restAttributeFingerprints": {
+        "horse-grey_coat_mesh": "ab7f0038c8e53556257d06ba8a0e1789806fed213113b49f9001a7294d697d97",
+        "horse-grey_eyes_mesh": "dc99ad67430c86e0a236ea408c253e95edf97b20e1c7903deb45c22ed2743476"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.047016692061641836,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.3343940475422046,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.2825876963892626,
+          "loopSeam": 0.0
+        },
+        "trot": {
+          "maxDeformation": 0.5850765833590502,
+          "loopSeam": 0.0
+        },
+        "canter": {
+          "maxDeformation": 0.7542132891367774,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "highland-copper",
+      "root": "Animal_Highland_copper",
+      "triangles": 10472,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 627084,
+      "sha256": "2ccfc4e5cb507dbe94a5ecd0a2b445fd59ca86ef6f587a3e0223d17cbf9cf47c",
+      "boundsBlender": [
+        [
+          -0.7918998599052429,
+          -1.312999963760376,
+          0.0
+        ],
+        [
+          0.7918998599052429,
+          1.0859079360961914,
+          1.6157093048095703
+        ]
+      ],
+      "decisions": "One blended shag sculpture with large directional locks, a broad dark muzzle, swept horns and clear eyes.",
+      "optionalVariants": [
+        "cream coat",
+        "calf",
+        "grazing rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Highland_copper",
+      "staticSha256": "f1ed0aa0923f8b21f2ffb12085600389cd0ce924e9072be5f197586a062c6c0b",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07999999821186066,
+          0.8399999737739563
+        ],
+        "Neck": [
+          0.0,
+          -0.4300000071525574,
+          0.8799999952316284
+        ],
+        "Head": [
+          0.0,
+          -0.7400000095367432,
+          1.0499999523162842
+        ],
+        "Tail": [
+          0.0,
+          0.8799999952316284,
+          0.9399999976158142
+        ],
+        "LegFrontLeft": [
+          -0.27000001072883606,
+          -0.4099999964237213,
+          0.8299999833106995
+        ],
+        "LegFrontLeftLower": [
+          -0.27000001072883606,
+          -0.4099999964237213,
+          0.3499999940395355
+        ],
+        "LegBackLeft": [
+          -0.27000001072883606,
+          0.5799999833106995,
+          0.8299999833106995
+        ],
+        "LegBackLeftLower": [
+          -0.27000001072883606,
+          0.5799999833106995,
+          0.3499999940395355
+        ],
+        "EarLeft": [
+          -0.23999999463558197,
+          -0.8199999928474426,
+          1.0700000524520874
+        ],
+        "LegFrontRight": [
+          0.27000001072883606,
+          -0.4099999964237213,
+          0.8299999833106995
+        ],
+        "LegFrontRightLower": [
+          0.27000001072883606,
+          -0.4099999964237213,
+          0.3499999940395355
+        ],
+        "LegBackRight": [
+          0.27000001072883606,
+          0.5799999833106995,
+          0.8299999833106995
+        ],
+        "LegBackRightLower": [
+          0.27000001072883606,
+          0.5799999833106995,
+          0.3499999940395355
+        ],
+        "EarRight": [
+          0.23999999463558197,
+          -0.8199999928474426,
+          1.0700000524520874
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0
+      },
+      "skinning": {
+        "highland-copper_coat": {
+          "weightedVertices": 4976,
+          "blendedVertices": 1160,
+          "jointVertices": {
+            "Body": 2309,
+            "Neck": 436,
+            "Head": 943,
+            "EarLeft": 416,
+            "EarRight": 416,
+            "Tail": 201,
+            "LegFrontLeft": 201,
+            "LegFrontLeftLower": 204,
+            "LegBackLeft": 230,
+            "LegBackLeftLower": 200,
+            "LegFrontRight": 199,
+            "LegFrontRightLower": 203,
+            "LegBackRight": 237,
+            "LegBackRightLower": 207
+          }
+        },
+        "highland-copper_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "highland-copper_coat": "f9ff6b4dd09119dc51ca2cc996403c5ccc53bd6601464513be3a3e98fe57e032",
+        "highland-copper_eyes": "e0cd73e6b06a080e9a1b9c991663112394392c38b88f8fb9c7866525429353aa"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.031033887993102745,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.18119629483558455,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.18823630873802133,
+          "loopSeam": 0.0
+        }
+      },
+      "restAttributeFingerprints": {
+        "highland-copper_coat_mesh": "83c7e1ed819d710b0f9c2c03191b144edb3cd4607d0855da9a9e20bb3363aeaf",
+        "highland-copper_eyes_mesh": "41e6247891c1a5e52158bdf9e42704291822172ba9de250939ae3cb1ace5f1c4"
+      }
+    },
+    {
+      "id": "highland-flower",
+      "root": "Animal_Highland_flower",
+      "triangles": 11480,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 672684,
+      "sha256": "4aed2dfce191260514dc7f832b8cbb34d0d6f8f6cee3d9bacfa8df6a34c64440",
+      "boundsBlender": [
+        [
+          -0.7918998599052429,
+          -1.312999963760376,
+          0.0
+        ],
+        [
+          0.7918998599052429,
+          1.0859079360961914,
+          1.6157093048095703
+        ]
+      ],
+      "decisions": "Matching copper Highland with a small muted rose flower behind one ear.",
+      "optionalVariants": [
+        "alternate flowers",
+        "cream coat",
+        "grazing rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Highland_flower",
+      "staticSha256": "cef02a4f56089f03cda0df6ada0c8ab2a1dee83f137058a56f35e063ddb9662b",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07999999821186066,
+          0.8399999737739563
+        ],
+        "Neck": [
+          0.0,
+          -0.4300000071525574,
+          0.8799999952316284
+        ],
+        "Head": [
+          0.0,
+          -0.7400000095367432,
+          1.0499999523162842
+        ],
+        "Tail": [
+          0.0,
+          0.8799999952316284,
+          0.9399999976158142
+        ],
+        "LegFrontLeft": [
+          -0.27000001072883606,
+          -0.4099999964237213,
+          0.8299999833106995
+        ],
+        "LegFrontLeftLower": [
+          -0.27000001072883606,
+          -0.4099999964237213,
+          0.3499999940395355
+        ],
+        "LegBackLeft": [
+          -0.27000001072883606,
+          0.5799999833106995,
+          0.8299999833106995
+        ],
+        "LegBackLeftLower": [
+          -0.27000001072883606,
+          0.5799999833106995,
+          0.3499999940395355
+        ],
+        "EarLeft": [
+          -0.23999999463558197,
+          -0.8199999928474426,
+          1.0700000524520874
+        ],
+        "LegFrontRight": [
+          0.27000001072883606,
+          -0.4099999964237213,
+          0.8299999833106995
+        ],
+        "LegFrontRightLower": [
+          0.27000001072883606,
+          -0.4099999964237213,
+          0.3499999940395355
+        ],
+        "LegBackRight": [
+          0.27000001072883606,
+          0.5799999833106995,
+          0.8299999833106995
+        ],
+        "LegBackRightLower": [
+          0.27000001072883606,
+          0.5799999833106995,
+          0.3499999940395355
+        ],
+        "EarRight": [
+          0.23999999463558197,
+          -0.8199999928474426,
+          1.0700000524520874
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0
+      },
+      "skinning": {
+        "highland-flower_coat": {
+          "weightedVertices": 5492,
+          "blendedVertices": 1160,
+          "jointVertices": {
+            "Body": 2309,
+            "Neck": 436,
+            "Head": 943,
+            "EarLeft": 416,
+            "EarRight": 932,
+            "Tail": 201,
+            "LegFrontLeft": 201,
+            "LegFrontLeftLower": 204,
+            "LegBackLeft": 230,
+            "LegBackLeftLower": 200,
+            "LegFrontRight": 199,
+            "LegFrontRightLower": 203,
+            "LegBackRight": 237,
+            "LegBackRightLower": 207
+          }
+        },
+        "highland-flower_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "highland-flower_coat": "31bdba27d8143b591bf0564d735cb3b6d75e05410e12eb8c91cedd7db21d9253",
+        "highland-flower_eyes": "e0cd73e6b06a080e9a1b9c991663112394392c38b88f8fb9c7866525429353aa"
+      },
+      "restAttributeFingerprints": {
+        "highland-flower_coat_mesh": "00930e80a75586ac2a3c95220230d629b5ef1155e7d87a7e484dd0637c193780",
+        "highland-flower_eyes_mesh": "41e6247891c1a5e52158bdf9e42704291822172ba9de250939ae3cb1ace5f1c4"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.031033887993102745,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.18119629483558455,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.18823630873802133,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-corgi",
+      "root": "Animal_Dog_corgi",
+      "triangles": 6660,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 495216,
+      "sha256": "0ddcd5fe8502217b07828ed1761fc455a11bf31281f374475dd19d3ab0b83152",
+      "boundsBlender": [
+        [
+          -0.20100000500679016,
+          -0.6802499890327454,
+          0.0
+        ],
+        [
+          0.20100000500679016,
+          0.5675895810127258,
+          0.8022485971450806
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and breed-specific ears and tail. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_corgi",
+      "staticSha256": "920f08481758f47d36bea954d1769463be1b72024104973ff0b1ffdf4cc3c4f3",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.05999999865889549,
+          0.3449999988079071
+        ],
+        "Neck": [
+          0.0,
+          -0.21000000834465027,
+          0.42000001668930054
+        ],
+        "Head": [
+          0.0,
+          -0.30000001192092896,
+          0.5400000214576721
+        ],
+        "Tail": [
+          0.0,
+          0.38999998569488525,
+          0.375
+        ],
+        "LegFrontLeft": [
+          -0.11999999731779099,
+          -0.2175000011920929,
+          0.32999998331069946
+        ],
+        "LegFrontLeftLower": [
+          -0.11999999731779099,
+          -0.2175000011920929,
+          0.17999999225139618
+        ],
+        "LegBackLeft": [
+          -0.11999999731779099,
+          0.27000001072883606,
+          0.32999998331069946
+        ],
+        "LegBackLeftLower": [
+          -0.11999999731779099,
+          0.27000001072883606,
+          0.17999999225139618
+        ],
+        "EarLeft": [
+          -0.1274999976158142,
+          -0.2775000035762787,
+          0.6449999809265137
+        ],
+        "LegFrontRight": [
+          0.11999999731779099,
+          -0.2175000011920929,
+          0.32999998331069946
+        ],
+        "LegFrontRightLower": [
+          0.11999999731779099,
+          -0.2175000011920929,
+          0.17999999225139618
+        ],
+        "LegBackRight": [
+          0.11999999731779099,
+          0.27000001072883606,
+          0.32999998331069946
+        ],
+        "LegBackRightLower": [
+          0.11999999731779099,
+          0.27000001072883606,
+          0.17999999225139618
+        ],
+        "EarRight": [
+          0.1274999976158142,
+          -0.2775000035762787,
+          0.6449999809265137
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-corgi_coat": {
+          "weightedVertices": 2912,
+          "blendedVertices": 1359,
+          "jointVertices": {
+            "Body": 1568,
+            "Neck": 459,
+            "Head": 517,
+            "EarLeft": 272,
+            "EarRight": 272,
+            "Tail": 197,
+            "LegFrontLeft": 147,
+            "LegFrontLeftLower": 198,
+            "LegBackLeft": 149,
+            "LegBackLeftLower": 207,
+            "LegFrontRight": 144,
+            "LegFrontRightLower": 195,
+            "LegBackRight": 153,
+            "LegBackRightLower": 213
+          }
+        },
+        "dog-corgi_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-corgi_coat": "cb9d60944da16f10fc21250dc30c6903e2c02495c12347ccc8ae59b57591fa37",
+        "dog-corgi_eyes": "1281c48ce04bdabcd4d0bad3a5ad41fd8f6934d86e45101862cc2bb01454995d"
+      },
+      "restAttributeFingerprints": {
+        "dog-corgi_coat_mesh": "7b827b900665d727a4bb72fcd4d8547888e0dc8cf9fecb9aca35cd08a0915487",
+        "dog-corgi_eyes_mesh": "42e66371223fa43e29308013062904332da118623619307c80a0604c8b0c083a"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.009048896813977662,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.10040877652180319,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.06134939607153198,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.18295693540176614,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.00960931502927142,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.13461543911053708,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.0468737758800124,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.04828612312988602,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.06188283749729202,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.6849348917703565,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-shiba",
+      "root": "Animal_Dog_shiba",
+      "triangles": 6660,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 489172,
+      "sha256": "8b7ee19c6ea6be88d72819dd6fc71837d0557f851779372c6ef2ff306a9d2e2d",
+      "boundsBlender": [
+        [
+          -0.20100000500679016,
+          -0.6802499890327454,
+          0.0
+        ],
+        [
+          0.20100000500679016,
+          0.5675895810127258,
+          0.8772484064102173
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and breed-specific ears and tail. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_shiba",
+      "staticSha256": "903eb069ff8c8401e28a0a7337cb95b06820ec076a014c84ba0be4ae3b15207b",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.05999999865889549,
+          0.42000001668930054
+        ],
+        "Neck": [
+          0.0,
+          -0.21000000834465027,
+          0.4950000047683716
+        ],
+        "Head": [
+          0.0,
+          -0.30000001192092896,
+          0.6150000095367432
+        ],
+        "Tail": [
+          0.0,
+          0.38999998569488525,
+          0.45000001788139343
+        ],
+        "LegFrontLeft": [
+          -0.11999999731779099,
+          -0.2175000011920929,
+          0.4050000309944153
+        ],
+        "LegFrontLeftLower": [
+          -0.11999999731779099,
+          -0.2175000011920929,
+          0.17999999225139618
+        ],
+        "LegBackLeft": [
+          -0.11999999731779099,
+          0.27000001072883606,
+          0.4050000309944153
+        ],
+        "LegBackLeftLower": [
+          -0.11999999731779099,
+          0.27000001072883606,
+          0.17999999225139618
+        ],
+        "EarLeft": [
+          -0.1274999976158142,
+          -0.2775000035762787,
+          0.7199999690055847
+        ],
+        "LegFrontRight": [
+          0.11999999731779099,
+          -0.2175000011920929,
+          0.4050000309944153
+        ],
+        "LegFrontRightLower": [
+          0.11999999731779099,
+          -0.2175000011920929,
+          0.17999999225139618
+        ],
+        "LegBackRight": [
+          0.11999999731779099,
+          0.27000001072883606,
+          0.4050000309944153
+        ],
+        "LegBackRightLower": [
+          0.11999999731779099,
+          0.27000001072883606,
+          0.17999999225139618
+        ],
+        "EarRight": [
+          0.1274999976158142,
+          -0.2775000035762787,
+          0.7199999690055847
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-shiba_coat": {
+          "weightedVertices": 2912,
+          "blendedVertices": 1321,
+          "jointVertices": {
+            "Body": 1562,
+            "Neck": 446,
+            "Head": 503,
+            "EarLeft": 272,
+            "EarRight": 272,
+            "Tail": 197,
+            "LegFrontLeft": 157,
+            "LegFrontLeftLower": 160,
+            "LegBackLeft": 160,
+            "LegBackLeftLower": 176,
+            "LegFrontRight": 160,
+            "LegFrontRightLower": 159,
+            "LegBackRight": 164,
+            "LegBackRightLower": 172
+          }
+        },
+        "dog-shiba_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-shiba_coat": "edf52bce1399f317e7eaffbf07e823869e80103ae8278c75fb00dc2529d6d30d",
+        "dog-shiba_eyes": "cf4bdff1f1414f93cd80e0c4e4e9f5a76d5adf7ab4c1d67dab5bc793605fde4d"
+      },
+      "restAttributeFingerprints": {
+        "dog-shiba_coat_mesh": "c5b5cc2df6bcb5e24f57599cac5bf88fd87d1ee2b0197d5cdc5cf62531843bd9",
+        "dog-shiba_eyes_mesh": "25771acb60cad60a48b2488457d7ba3a3c53cf082081d24e7ccf49b39ee69c32"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.00904888651180913,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.12040475019522802,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.061349398206308255,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.21619719614127736,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.00960931502927142,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.15747461905526655,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.0468737189441644,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.04828611868940971,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.061882864069539426,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.6849346089476563,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-beagle",
+      "root": "Animal_Dog_beagle",
+      "triangles": 6100,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 462600,
+      "sha256": "555853dbdc6ec62f159b3d4a6f37306828550ce972ca9f247f6a4f1e312076ba",
+      "boundsBlender": [
+        [
+          -0.2632126212120056,
+          -0.7074599862098694,
+          0.0
+        ],
+        [
+          0.2632126212120056,
+          0.8593013882637024,
+          0.8202936053276062
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and breed-specific ears and tail. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_beagle",
+      "staticSha256": "36a2c56925c0b796c662e63eff5825507cc342e30f208fe163c9909bc95f620a",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.06239999458193779,
+          0.4367999732494354
+        ],
+        "Neck": [
+          0.0,
+          -0.2183999866247177,
+          0.5148000121116638
+        ],
+        "Head": [
+          0.0,
+          -0.31200000643730164,
+          0.6395999789237976
+        ],
+        "Tail": [
+          0.0,
+          0.405599981546402,
+          0.46799999475479126
+        ],
+        "LegFrontLeft": [
+          -0.12479998916387558,
+          -0.22619998455047607,
+          0.4212000072002411
+        ],
+        "LegFrontLeftLower": [
+          -0.12479998916387558,
+          -0.22619998455047607,
+          0.18719999492168427
+        ],
+        "LegBackLeft": [
+          -0.12479998916387558,
+          0.2808000147342682,
+          0.4212000072002411
+        ],
+        "LegBackLeftLower": [
+          -0.12479998916387558,
+          0.2808000147342682,
+          0.18719999492168427
+        ],
+        "EarLeft": [
+          -0.13259999454021454,
+          -0.28859999775886536,
+          0.7487999796867371
+        ],
+        "LegFrontRight": [
+          0.12479998916387558,
+          -0.22619998455047607,
+          0.4212000072002411
+        ],
+        "LegFrontRightLower": [
+          0.12479998916387558,
+          -0.22619998455047607,
+          0.18719999492168427
+        ],
+        "LegBackRight": [
+          0.12479998916387558,
+          0.2808000147342682,
+          0.4212000072002411
+        ],
+        "LegBackRightLower": [
+          0.12479998916387558,
+          0.2808000147342682,
+          0.18719999492168427
+        ],
+        "EarRight": [
+          0.13259999454021454,
+          -0.28859999775886536,
+          0.7487999796867371
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-beagle_coat": {
+          "weightedVertices": 2628,
+          "blendedVertices": 1568,
+          "jointVertices": {
+            "Body": 1562,
+            "Neck": 768,
+            "Head": 827,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 234,
+            "LegFrontLeft": 157,
+            "LegFrontLeftLower": 160,
+            "LegBackLeft": 160,
+            "LegBackLeftLower": 176,
+            "LegFrontRight": 160,
+            "LegFrontRightLower": 159,
+            "LegBackRight": 164,
+            "LegBackRightLower": 172
+          }
+        },
+        "dog-beagle_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-beagle_coat": "6b3967bd88204247e0c0104047117a2730c9781931b3dabdb9b18e6d1cd0b827",
+        "dog-beagle_eyes": "0ad1062222855875e3217a34f1729b528e0befb0e2f2912ca7ed8694a3199ac0"
+      },
+      "restAttributeFingerprints": {
+        "dog-beagle_coat_mesh": "ed0d9197de23e4d19001c4583c9ba89931e52ee204faed616f74237d5b2d5b2f",
+        "dog-beagle_eyes_mesh": "0490361d66db5e961c3ef795fcc11d6c3d3e85115af0b72028d138b37187d206"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.0046566045932696165,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.12522097609460472,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.05097735611767811,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.22484502662431466,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.009993707989444732,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.16377365743173936,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.0960364354853993,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.045159891950208,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.0643582265182322,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.6763227861829777,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-samoyed",
+      "root": "Animal_Dog_samoyed",
+      "triangles": 7060,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 515880,
+      "sha256": "3a45bd576f9ff218916c9a504be539f5cabc2fb528a881376aaf58a270ef1c68",
+      "boundsBlender": [
+        [
+          -0.28461846709251404,
+          -0.7981600165367126,
+          0.0
+        ],
+        [
+          0.2850576341152191,
+          0.6659717559814453,
+          1.0281277894973755
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and a blended neck ruff. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_samoyed",
+      "staticSha256": "8c03fa0235d6810c22276aee59ac4489a08d3edaf451f0d331923f1cefface29",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07199999690055847,
+          0.5040000081062317
+        ],
+        "Neck": [
+          0.0,
+          -0.25200000405311584,
+          0.593999981880188
+        ],
+        "Head": [
+          0.0,
+          -0.35999998450279236,
+          0.7379999756813049
+        ],
+        "Tail": [
+          0.0,
+          0.46799996495246887,
+          0.5400000214576721
+        ],
+        "LegFrontLeft": [
+          -0.14399999380111694,
+          -0.26099997758865356,
+          0.4860000014305115
+        ],
+        "LegFrontLeftLower": [
+          -0.14399999380111694,
+          -0.26099997758865356,
+          0.21599999070167542
+        ],
+        "LegBackLeft": [
+          -0.14399999380111694,
+          0.3240000009536743,
+          0.4860000014305115
+        ],
+        "LegBackLeftLower": [
+          -0.14399999380111694,
+          0.3240000009536743,
+          0.21599999070167542
+        ],
+        "EarLeft": [
+          -0.15299999713897705,
+          -0.3330000042915344,
+          0.8639999628067017
+        ],
+        "LegFrontRight": [
+          0.14399999380111694,
+          -0.26099997758865356,
+          0.4860000014305115
+        ],
+        "LegFrontRightLower": [
+          0.14399999380111694,
+          -0.26099997758865356,
+          0.21599999070167542
+        ],
+        "LegBackRight": [
+          0.14399999380111694,
+          0.3240000009536743,
+          0.4860000014305115
+        ],
+        "LegBackRightLower": [
+          0.14399999380111694,
+          0.3240000009536743,
+          0.21599999070167542
+        ],
+        "EarRight": [
+          0.15299999713897705,
+          -0.3330000042915344,
+          0.8639999628067017
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-samoyed_coat": {
+          "weightedVertices": 3112,
+          "blendedVertices": 1464,
+          "jointVertices": {
+            "Body": 1848,
+            "Neck": 641,
+            "Head": 509,
+            "EarLeft": 272,
+            "EarRight": 272,
+            "Tail": 171,
+            "LegFrontLeft": 174,
+            "LegFrontLeftLower": 151,
+            "LegBackLeft": 140,
+            "LegBackLeftLower": 157,
+            "LegFrontRight": 172,
+            "LegFrontRightLower": 147,
+            "LegBackRight": 138,
+            "LegBackRightLower": 153
+          }
+        },
+        "dog-samoyed_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-samoyed_coat": "ae2526f3eab178cfed47b6c2ffc3f5df7f724e085575107650c1ed12651049dc",
+        "dog-samoyed_eyes": "d7090f37377c24d1d31f55164017405b19d15050cb63a675808332ba2d7e9be6"
+      },
+      "restAttributeFingerprints": {
+        "dog-samoyed_coat_mesh": "5a972f76377dd2032aa78db0d25212661359971f75927638779d66237757a15b",
+        "dog-samoyed_eyes_mesh": "bda496da5771173871d7b503d5e56f2077b92258edff290abd8ae5a08fee0a4b"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.009537799061495456,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.14504242244345428,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.06427169743953254,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.2605814742087925,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.011156440825051982,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.18840614668686223,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.230594568026436,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.050478542365936026,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.07319913791064935,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.787125636990577,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-collie",
+      "root": "Animal_Dog_collie",
+      "triangles": 6932,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 505864,
+      "sha256": "6a658009c3fb204431ebf18d068a8cc791d7546e20364a7392778f29008fc2e1",
+      "boundsBlender": [
+        [
+          -0.2716812491416931,
+          -0.7618799805641174,
+          0.0
+        ],
+        [
+          0.27210044860839844,
+          0.925401508808136,
+          0.9523058533668518
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and a blended neck ruff. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_collie",
+      "staticSha256": "e3891b3319b0af45cc41577351dd3232fa3ceb0475ec740546fe3aa8a3ce3c1a",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.06719999760389328,
+          0.47039997577667236
+        ],
+        "Neck": [
+          0.0,
+          -0.23519998788833618,
+          0.5544000267982483
+        ],
+        "Head": [
+          0.0,
+          -0.335999995470047,
+          0.6887999773025513
+        ],
+        "Tail": [
+          0.0,
+          0.4367999732494354,
+          0.5040000081062317
+        ],
+        "LegFrontLeft": [
+          -0.13439999520778656,
+          -0.24359998106956482,
+          0.4535999894142151
+        ],
+        "LegFrontLeftLower": [
+          -0.13439999520778656,
+          -0.24359998106956482,
+          0.20159998536109924
+        ],
+        "LegBackLeft": [
+          -0.13439999520778656,
+          0.30239999294281006,
+          0.4535999894142151
+        ],
+        "LegBackLeftLower": [
+          -0.13439999520778656,
+          0.30239999294281006,
+          0.20159998536109924
+        ],
+        "EarLeft": [
+          -0.1428000032901764,
+          -0.3107999861240387,
+          0.806399941444397
+        ],
+        "LegFrontRight": [
+          0.13439999520778656,
+          -0.24359998106956482,
+          0.4535999894142151
+        ],
+        "LegFrontRightLower": [
+          0.13439999520778656,
+          -0.24359998106956482,
+          0.20159998536109924
+        ],
+        "LegBackRight": [
+          0.13439999520778656,
+          0.30239999294281006,
+          0.4535999894142151
+        ],
+        "LegBackRightLower": [
+          0.13439999520778656,
+          0.30239999294281006,
+          0.20159998536109924
+        ],
+        "EarRight": [
+          0.1428000032901764,
+          -0.3107999861240387,
+          0.806399941444397
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-collie_coat": {
+          "weightedVertices": 3048,
+          "blendedVertices": 1380,
+          "jointVertices": {
+            "Body": 1639,
+            "Neck": 624,
+            "Head": 519,
+            "EarLeft": 272,
+            "EarRight": 272,
+            "Tail": 230,
+            "LegFrontLeft": 175,
+            "LegFrontLeftLower": 147,
+            "LegBackLeft": 140,
+            "LegBackLeftLower": 157,
+            "LegFrontRight": 173,
+            "LegFrontRightLower": 136,
+            "LegBackRight": 137,
+            "LegBackRightLower": 156
+          }
+        },
+        "dog-collie_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-collie_coat": "7c5ce01a688915eeb12c1d313620e931c94af2549611d3be71240d2d9c9ef789",
+        "dog-collie_eyes": "b06c1a01acceb7b14a95a96f60ba5e863efee480414a8b48116e6bf7e17f950d"
+      },
+      "restAttributeFingerprints": {
+        "dog-collie_coat_mesh": "6298c8c42a5e84bc13b016ddf138742426a4ee8a33eac94ad6882642253708ab",
+        "dog-collie_eyes_mesh": "50e6f25b9f3bfb4b9922e58181ec9ff73cc102fb691b7494206f9cbed38c8e94"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.005051648130558357,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.13512738366102192,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.05491014245348834,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.24269334587529565,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.01076660882311791,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.17618337900807388,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.180483451036604,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.048469647096572345,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.0691939399683816,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.7285610471172496,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "dog-shepherd",
+      "root": "Animal_Dog_shepherd",
+      "triangles": 6532,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 481136,
+      "sha256": "35e45ecedd6c83849d257f6ac62db33fc8386cd46739d81197cdcbc62283039e",
+      "boundsBlender": [
+        [
+          -0.24120000004768372,
+          -0.8162999749183655,
+          0.0
+        ],
+        [
+          0.24120000004768372,
+          0.9915016293525696,
+          1.151698112487793
+        ]
+      ],
+      "decisions": "Unified canine anatomy with a longer muzzle, restrained eyes, defined paws and breed-specific ears and tail. Native size is baked into mesh coordinates.",
+      "optionalVariants": [
+        "collar and tag",
+        "sitting pose",
+        "skinned locomotion and tricks"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Dog_shepherd",
+      "staticSha256": "2b14af3939ca3a3efa1576b115d23cdee5e5d65a02164c636724f668da0c31b5",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07199999690055847,
+          0.5400000214576721
+        ],
+        "Neck": [
+          0.0,
+          -0.25200000405311584,
+          0.6299999952316284
+        ],
+        "Head": [
+          0.0,
+          -0.35999998450279236,
+          0.7739999890327454
+        ],
+        "Tail": [
+          0.0,
+          0.46799996495246887,
+          0.5759999752044678
+        ],
+        "LegFrontLeft": [
+          -0.14399999380111694,
+          -0.26099997758865356,
+          0.5219999551773071
+        ],
+        "LegFrontLeftLower": [
+          -0.14399999380111694,
+          -0.26099997758865356,
+          0.21599999070167542
+        ],
+        "LegBackLeft": [
+          -0.14399999380111694,
+          0.3240000009536743,
+          0.5219999551773071
+        ],
+        "LegBackLeftLower": [
+          -0.14399999380111694,
+          0.3240000009536743,
+          0.21599999070167542
+        ],
+        "EarLeft": [
+          -0.15299999713897705,
+          -0.3330000042915344,
+          0.8999999761581421
+        ],
+        "LegFrontRight": [
+          0.14399999380111694,
+          -0.26099997758865356,
+          0.5219999551773071
+        ],
+        "LegFrontRightLower": [
+          0.14399999380111694,
+          -0.26099997758865356,
+          0.21599999070167542
+        ],
+        "LegBackRight": [
+          0.14399999380111694,
+          0.3240000009536743,
+          0.5219999551773071
+        ],
+        "LegBackRightLower": [
+          0.14399999380111694,
+          0.3240000009536743,
+          0.21599999070167542
+        ],
+        "EarRight": [
+          0.15299999713897705,
+          -0.3330000042915344,
+          0.8999999761581421
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "run": 0.7,
+        "sit": 7.0,
+        "dance": 5.2,
+        "spin": 3.2,
+        "bow": 3.8,
+        "wave": 4.2,
+        "roll": 4.6
+      },
+      "skinning": {
+        "dog-shepherd_coat": {
+          "weightedVertices": 2848,
+          "blendedVertices": 1219,
+          "jointVertices": {
+            "Body": 1402,
+            "Neck": 440,
+            "Head": 500,
+            "EarLeft": 272,
+            "EarRight": 272,
+            "Tail": 234,
+            "LegFrontLeft": 164,
+            "LegFrontLeftLower": 148,
+            "LegBackLeft": 169,
+            "LegBackLeftLower": 158,
+            "LegFrontRight": 160,
+            "LegFrontRightLower": 146,
+            "LegBackRight": 168,
+            "LegBackRightLower": 156
+          }
+        },
+        "dog-shepherd_eyes": {
+          "weightedVertices": 438,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 438,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "dog-shepherd_coat": "3142bfd19f964bad70d2cf8638e6141b5eea3e37c27b29b5b331d44c7be73691",
+        "dog-shepherd_eyes": "c0e035eaa01d28a195e3058cfab226f1a5dd728a306886d26ed7ff1eef53ccb7"
+      },
+      "restAttributeFingerprints": {
+        "dog-shepherd_coat_mesh": "4c479f25a971ddc99bdb854e11121c908172890f54d49742612f1f5c9bc6a839",
+        "dog-shepherd_eyes_mesh": "abb05d29d9014f27fa2e8855fd6469845ef8f5aa326f6732e86f35c4ec4959a8"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.005372970206537838,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.15418390019182363,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.05881990600830911,
+          "loopSeam": 0.0
+        },
+        "run": {
+          "maxDeformation": 0.27562517634319106,
+          "loopSeam": 0.0
+        },
+        "sit": {
+          "maxDeformation": 0.011531226030322021,
+          "loopSeam": 0.0
+        },
+        "dance": {
+          "maxDeformation": 0.19982521983147492,
+          "loopSeam": 0.0
+        },
+        "spin": {
+          "maxDeformation": 1.2646576177786704,
+          "loopSeam": 0.0
+        },
+        "bow": {
+          "maxDeformation": 0.05210747256865786,
+          "loopSeam": 0.0
+        },
+        "wave": {
+          "maxDeformation": 0.07428542078936645,
+          "loopSeam": 0.0
+        },
+        "roll": {
+          "maxDeformation": 0.9050757100645602,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "sheep",
+      "root": "Animal_Sheep",
+      "triangles": 9496,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 524912,
+      "sha256": "50836d01a89ff8751dac69adc13c398ad8f7c80ca7a63edf73f528e54e413ebe",
+      "boundsBlender": [
+        [
+          -0.43950602412223816,
+          -0.8899999856948853,
+          0.0
+        ],
+        [
+          0.4380885064601898,
+          0.7677499651908875,
+          1.1788129806518555
+        ]
+      ],
+      "decisions": "Blended wool volume with broad irregular curls; tapered face, leaf ears, slender legs and defined hooves.",
+      "optionalVariants": [
+        "dark face",
+        "shorn coat",
+        "grazing rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Sheep",
+      "staticSha256": "a96eff93d76863b4b19f4ae032f95de2f3ab13fbf69a7712115cb28d1eec2116",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07999999821186066,
+          0.7799999713897705
+        ],
+        "Neck": [
+          0.0,
+          -0.30000001192092896,
+          0.7900000214576721
+        ],
+        "Head": [
+          0.0,
+          -0.47999998927116394,
+          0.8999999761581421
+        ],
+        "Tail": [
+          0.0,
+          0.5899999737739563,
+          0.7599999904632568
+        ],
+        "LegFrontLeft": [
+          -0.20000000298023224,
+          -0.2800000011920929,
+          0.6299999952316284
+        ],
+        "LegFrontLeftLower": [
+          -0.20000000298023224,
+          -0.2800000011920929,
+          0.30000001192092896
+        ],
+        "LegBackLeft": [
+          -0.20000000298023224,
+          0.4300000071525574,
+          0.6299999952316284
+        ],
+        "LegBackLeftLower": [
+          -0.20000000298023224,
+          0.4300000071525574,
+          0.30000001192092896
+        ],
+        "EarLeft": [
+          -0.10999999940395355,
+          -0.4699999988079071,
+          0.9599999785423279
+        ],
+        "LegFrontRight": [
+          0.20000000298023224,
+          -0.2800000011920929,
+          0.6299999952316284
+        ],
+        "LegFrontRightLower": [
+          0.20000000298023224,
+          -0.2800000011920929,
+          0.30000001192092896
+        ],
+        "LegBackRight": [
+          0.20000000298023224,
+          0.4300000071525574,
+          0.6299999952316284
+        ],
+        "LegBackRightLower": [
+          0.20000000298023224,
+          0.4300000071525574,
+          0.30000001192092896
+        ],
+        "EarRight": [
+          0.10999999940395355,
+          -0.4699999988079071,
+          0.9599999785423279
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0
+      },
+      "skinning": {
+        "sheep_coat": {
+          "weightedVertices": 4494,
+          "blendedVertices": 1440,
+          "jointVertices": {
+            "Body": 2687,
+            "Neck": 569,
+            "Head": 1007,
+            "EarLeft": 248,
+            "EarRight": 248,
+            "Tail": 144,
+            "LegFrontLeft": 247,
+            "LegFrontLeftLower": 124,
+            "LegBackLeft": 176,
+            "LegBackLeftLower": 125,
+            "LegFrontRight": 194,
+            "LegFrontRightLower": 123,
+            "LegBackRight": 178,
+            "LegBackRightLower": 133
+          }
+        },
+        "sheep_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "sheep_coat": "f8425cd60d75e8618ffafa2c801299cf45127ded351ce48f110c58574f2a0c2b",
+        "sheep_eyes": "ded49a3a47cd8f90b4fc60902637aa64861348abe68bd55087f9237f515680c7"
+      },
+      "restAttributeFingerprints": {
+        "sheep_coat_mesh": "08e23440681d127dea99ab515a978ef710963b3fc808acadc33be7d9d33571e7",
+        "sheep_eyes_mesh": "c7afdce0a6a177ba902f492b7a40569d518958a4f2b5402bfda5cae838d6874c"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.012117817201570426,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.15905795386418553,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.06831514529475995,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "lamb",
+      "root": "Animal_Lamb",
+      "triangles": 5800,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 366640,
+      "sha256": "5640ba946228ff272dcb0bc746cfa7224a3eb839b3d546d18cbe2b654e9bcc84",
+      "boundsBlender": [
+        [
+          -0.2772409915924072,
+          -0.5607196092605591,
+          6.517003381389941e-09
+        ],
+        [
+          0.2763168215751648,
+          0.4836824834346771,
+          0.742652177810669
+        ]
+      ],
+      "decisions": "Same wool and face language at 0.63 native scale, baked into neutral mesh transforms.",
+      "optionalVariants": [
+        "newborn proportions",
+        "dark face",
+        "grazing rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Lamb",
+      "staticSha256": "b56907d4c18a5a7de0f107cb031744cb8460421016884be5e8b5e3349f197941",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.05040000006556511,
+          0.49139997363090515
+        ],
+        "Neck": [
+          0.0,
+          -0.18900001049041748,
+          0.4977000057697296
+        ],
+        "Head": [
+          0.0,
+          -0.30239999294281006,
+          0.5669999718666077
+        ],
+        "Tail": [
+          0.0,
+          0.3716999888420105,
+          0.4787999987602234
+        ],
+        "LegFrontLeft": [
+          -0.12600000202655792,
+          -0.17640000581741333,
+          0.3968999981880188
+        ],
+        "LegFrontLeftLower": [
+          -0.12600000202655792,
+          -0.17640000581741333,
+          0.18900001049041748
+        ],
+        "LegBackLeft": [
+          -0.12600000202655792,
+          0.27090001106262207,
+          0.3968999981880188
+        ],
+        "LegBackLeftLower": [
+          -0.12600000202655792,
+          0.27090001106262207,
+          0.18900001049041748
+        ],
+        "EarLeft": [
+          -0.06929999589920044,
+          -0.296099990606308,
+          0.6047999858856201
+        ],
+        "LegFrontRight": [
+          0.12600000202655792,
+          -0.17640000581741333,
+          0.3968999981880188
+        ],
+        "LegFrontRightLower": [
+          0.12600000202655792,
+          -0.17640000581741333,
+          0.18900001049041748
+        ],
+        "LegBackRight": [
+          0.12600000202655792,
+          0.27090001106262207,
+          0.3968999981880188
+        ],
+        "LegBackRightLower": [
+          0.12600000202655792,
+          0.27090001106262207,
+          0.18900001049041748
+        ],
+        "EarRight": [
+          0.06929999589920044,
+          -0.296099990606308,
+          0.6047999858856201
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0
+      },
+      "skinning": {
+        "lamb_coat": {
+          "weightedVertices": 2646,
+          "blendedVertices": 874,
+          "jointVertices": {
+            "Body": 1656,
+            "Neck": 384,
+            "Head": 594,
+            "EarLeft": 140,
+            "EarRight": 130,
+            "Tail": 82,
+            "LegFrontLeft": 153,
+            "LegFrontLeftLower": 62,
+            "LegBackLeft": 103,
+            "LegBackLeftLower": 64,
+            "LegFrontRight": 116,
+            "LegFrontRightLower": 63,
+            "LegBackRight": 102,
+            "LegBackRightLower": 68
+          }
+        },
+        "lamb_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "lamb_coat": "eac0cd86dc6ec839bcebbb62d44dfed9544275a62ca3d173c9d736cf97f352f4",
+        "lamb_eyes": "4e0ea291d138e1a3cc303275f5cacb7f086643590132df93bf14cfbb0296980e"
+      },
+      "restAttributeFingerprints": {
+        "lamb_coat_mesh": "bdb0b841375c59c5ce13188f013347200496edc9992571b11d6b866c4ea989ad",
+        "lamb_eyes_mesh": "47c8061ddee049faa391c63fb6f4e5f3a23c864149846a93c3c0890ee55d695b"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.007634928554462412,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.10020598852898173,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.04307074627304013,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "cat",
+      "root": "Animal_Cat",
+      "triangles": 5800,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 403284,
+      "sha256": "55fd8ce1bfca5541c70a4df93cb2c18c82a27544b8c8c3ec8cc6fad2e9c74a4e",
+      "boundsBlender": [
+        [
+          -0.16321037709712982,
+          -0.538070023059845,
+          0.0
+        ],
+        [
+          0.16321037709712982,
+          0.6166853904724121,
+          0.7400099039077759
+        ]
+      ],
+      "decisions": "Nimble arched torso, tapered legs, almond sage eyes, shorter pointed ears and a continuous raised tail; soft cream and caramel coat.",
+      "optionalVariants": [
+        "tabby markings",
+        "sitting pose",
+        "skinned nap and stretch"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Cat",
+      "staticSha256": "de2764875d1ec215dcbb49875344c5197e8c40fe5eea5bff738faca16c67f758",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "EarLeft",
+        "EarRight",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "LegBackLeft",
+        "LegBackLeftLower",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "LegBackRight",
+        "LegBackRightLower"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.06719999760389328,
+          0.30239999294281006
+        ],
+        "Neck": [
+          0.0,
+          -0.18479999899864197,
+          0.3779999911785126
+        ],
+        "Head": [
+          0.0,
+          -0.27720001339912415,
+          0.48719996213912964
+        ],
+        "Tail": [
+          0.0,
+          0.3401999771595001,
+          0.335999995470047
+        ],
+        "LegFrontLeft": [
+          -0.0965999960899353,
+          -0.18479999899864197,
+          0.2939999997615814
+        ],
+        "LegFrontLeftLower": [
+          -0.0965999960899353,
+          -0.18479999899864197,
+          0.13439999520778656
+        ],
+        "LegBackLeft": [
+          -0.0965999960899353,
+          0.24359998106956482,
+          0.2939999997615814
+        ],
+        "LegBackLeftLower": [
+          -0.0965999960899353,
+          0.24359998106956482,
+          0.13439999520778656
+        ],
+        "EarLeft": [
+          -0.08819999545812607,
+          -0.2856000065803528,
+          0.5669999718666077
+        ],
+        "LegFrontRight": [
+          0.0965999960899353,
+          -0.18479999899864197,
+          0.2939999997615814
+        ],
+        "LegFrontRightLower": [
+          0.0965999960899353,
+          -0.18479999899864197,
+          0.13439999520778656
+        ],
+        "LegBackRight": [
+          0.0965999960899353,
+          0.24359998106956482,
+          0.2939999997615814
+        ],
+        "LegBackRightLower": [
+          0.0965999960899353,
+          0.24359998106956482,
+          0.13439999520778656
+        ],
+        "EarRight": [
+          0.08819999545812607,
+          -0.2856000065803528,
+          0.5669999718666077
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "nap": 5.0,
+        "stretch": 3.0,
+        "ask": 3.0,
+        "up": 2.0,
+        "down": 2.0
+      },
+      "skinning": {
+        "cat_coat": {
+          "weightedVertices": 2346,
+          "blendedVertices": 966,
+          "jointVertices": {
+            "Body": 1024,
+            "Neck": 410,
+            "Head": 628,
+            "EarLeft": 131,
+            "EarRight": 131,
+            "Tail": 346,
+            "LegFrontLeft": 123,
+            "LegFrontLeftLower": 131,
+            "LegBackLeft": 117,
+            "LegBackLeftLower": 125,
+            "LegFrontRight": 118,
+            "LegFrontRightLower": 125,
+            "LegBackRight": 116,
+            "LegBackRightLower": 128
+          }
+        },
+        "cat_eyes": {
+          "weightedVertices": 584,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 584,
+            "EarLeft": 0,
+            "EarRight": 0,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "LegBackLeft": 0,
+            "LegBackLeftLower": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "LegBackRight": 0,
+            "LegBackRightLower": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "cat_coat": "6348a82843767422e20f747ba7f000cf4f5cdec33a0ea42ced7f713e86ddbb4e",
+        "cat_eyes": "8bd1f99ce473b893d59f988ffbaef41930cbd04e7602f8c28b4d5e903120a7df"
+      },
+      "restAttributeFingerprints": {
+        "cat_coat_mesh": "9b9f8061ae85f60fa879ad7454a437fbcfbfdff31446be36b4ba5ca9fe43fe24",
+        "cat_eyes_mesh": "3fd54d581b0bdb6a1c109a39df838e8b5058228fb5b9d50f3b875562d33e9af7"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.012494557568876314,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.09382197602306333,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.08349924541682259,
+          "loopSeam": 0.0
+        },
+        "nap": {
+          "maxDeformation": 0.0021141381404051695,
+          "loopSeam": 0.0
+        },
+        "stretch": {
+          "maxDeformation": 0.06387605912577651,
+          "loopSeam": 0.0
+        },
+        "ask": {
+          "maxDeformation": 0.08349924541682259,
+          "loopSeam": 0.0
+        },
+        "up": {
+          "maxDeformation": 0.03587371569675816,
+          "loopSeam": 0.0
+        },
+        "down": {
+          "maxDeformation": 0.03587371569675816,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "swan",
+      "root": "Animal_Swan",
+      "triangles": 5800,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 351624,
+      "sha256": "9985a7dd5d7a31b7bc688b5d3f8ba1be5a2bfd369cca94a6642122202e5f1c6d",
+      "boundsBlender": [
+        [
+          -0.3783336877822876,
+          -1.2300561666488647,
+          0.0
+        ],
+        [
+          0.37824273109436035,
+          0.8704264163970947,
+          1.1743310689926147
+        ]
+      ],
+      "decisions": "Refined continuous S-curve neck and scalloped wing anatomy; reduced coat topology preserves the silhouette within the small-bird budget.",
+      "optionalVariants": [
+        "alternate coat",
+        "resting pose",
+        "swimming or flight rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Swan",
+      "staticSha256": "02c25065e63b6dcb1a4ceb5d7e59d577de403bc4e1fba3eb3265ad7aa9650e5d",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "WingLeft",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "WingRight"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.11999999731779099,
+          0.2800000011920929
+        ],
+        "Neck": [
+          0.0,
+          -0.3199999928474426,
+          0.3400000035762787
+        ],
+        "Head": [
+          0.0,
+          -0.7799999713897705,
+          1.1200000047683716
+        ],
+        "Tail": [
+          0.0,
+          0.699999988079071,
+          0.4000000059604645
+        ],
+        "LegFrontLeft": [
+          -0.15000000596046448,
+          0.03999999910593033,
+          0.1599999964237213
+        ],
+        "LegFrontLeftLower": [
+          -0.15000000596046448,
+          0.03999999910593033,
+          0.054999999701976776
+        ],
+        "WingLeft": [
+          -0.20000000298023224,
+          0.019999999552965164,
+          0.4000000059604645
+        ],
+        "LegFrontRight": [
+          0.15000000596046448,
+          0.03999999910593033,
+          0.1599999964237213
+        ],
+        "LegFrontRightLower": [
+          0.15000000596046448,
+          0.03999999910593033,
+          0.054999999701976776
+        ],
+        "WingRight": [
+          0.20000000298023224,
+          0.019999999552965164,
+          0.4000000059604645
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "fly": 1.5,
+        "swim": 2.0
+      },
+      "skinning": {
+        "swan_coat": {
+          "weightedVertices": 2626,
+          "blendedVertices": 529,
+          "jointVertices": {
+            "Body": 628,
+            "Neck": 566,
+            "Head": 710,
+            "Tail": 101,
+            "LegFrontLeft": 44,
+            "LegFrontLeftLower": 33,
+            "WingLeft": 501,
+            "LegFrontRight": 47,
+            "LegFrontRightLower": 27,
+            "WingRight": 505
+          }
+        },
+        "swan_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "WingLeft": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "WingRight": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "swan_coat": "50019bbbe523bc5cb76eed77e03c4a143597d175dfa0159666439f710afed6ce",
+        "swan_eyes": "9963b3a361c89f22293a96cdffce5da701d31ca823cb4757dbc0504236082ee3"
+      },
+      "restAttributeFingerprints": {
+        "swan_coat_mesh": "7dc99da8118091be2ed74b4b9cf74634480315aaf478c6ed83463e05b166925f",
+        "swan_eyes_mesh": "f9c84add21faa6574a7abdba2863c8b18b38dd4a99657cdae81e0a935ecc0df1"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.011393916214767166,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.08225879142811401,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.06591377377407273,
+          "loopSeam": 0.0
+        },
+        "fly": {
+          "maxDeformation": 0.46254079386505714,
+          "loopSeam": 0.0
+        },
+        "swim": {
+          "maxDeformation": 0.16082087743261272,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "owl",
+      "root": "Animal_Owl",
+      "triangles": 5800,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 349092,
+      "sha256": "9774daea09727e8284a382436a40c4b1b2f5ed2dadb75301f9bb80adc495da26",
+      "boundsBlender": [
+        [
+          -0.21802887320518494,
+          -0.17217406630516052,
+          0.0
+        ],
+        [
+          0.21826006472110748,
+          0.1876278519630432,
+          0.5122116208076477
+        ]
+      ],
+      "decisions": "Continuous rounded head and breast with flush feather-color face disks, shallow eyes and broad folded wings; removes attached face plates.",
+      "optionalVariants": [
+        "barn-owl palette",
+        "sleeping pose",
+        "flight rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Owl",
+      "staticSha256": "ccecb3b134143e2052b2aa9576ba946737b26bf9c5a195855fc4c3b9e1497b85",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "WingLeft",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "WingRight"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.010499999858438969,
+          0.19599999487400055
+        ],
+        "Neck": [
+          0.0,
+          -0.003499999875202775,
+          0.2800000011920929
+        ],
+        "Head": [
+          0.0,
+          -0.003499999875202775,
+          0.3499999940395355
+        ],
+        "Tail": [
+          0.0,
+          0.09099999815225601,
+          0.13300000131130219
+        ],
+        "LegFrontLeft": [
+          -0.07000000029802322,
+          0.010499999858438969,
+          0.09799999743700027
+        ],
+        "LegFrontLeftLower": [
+          -0.07000000029802322,
+          0.010499999858438969,
+          0.03150000050663948
+        ],
+        "WingLeft": [
+          -0.1119999960064888,
+          -0.0139999995008111,
+          0.335999995470047
+        ],
+        "LegFrontRight": [
+          0.07000000029802322,
+          0.010499999858438969,
+          0.09799999743700027
+        ],
+        "LegFrontRightLower": [
+          0.07000000029802322,
+          0.010499999858438969,
+          0.03150000050663948
+        ],
+        "WingRight": [
+          0.1119999960064888,
+          -0.0139999995008111,
+          0.335999995470047
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "fly": 1.0,
+        "swim": 2.0
+      },
+      "skinning": {
+        "owl_coat": {
+          "weightedVertices": 2350,
+          "blendedVertices": 599,
+          "jointVertices": {
+            "Body": 511,
+            "Neck": 271,
+            "Head": 750,
+            "Tail": 469,
+            "LegFrontLeft": 43,
+            "LegFrontLeftLower": 181,
+            "WingLeft": 369,
+            "LegFrontRight": 47,
+            "LegFrontRightLower": 180,
+            "WingRight": 375
+          }
+        },
+        "owl_eyes": {
+          "weightedVertices": 584,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 584,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "WingLeft": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "WingRight": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "owl_coat": "27231b0a6ade0b0d03536ddb5467b4f5199421badf94a38c606cb252a000456d",
+        "owl_eyes": "af32c500ec00007a79a571e897536b5da38c7830524a981deb0f6e8bec68ca93"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.005636042879557404,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.03310824203883949,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.039988446956575566,
+          "loopSeam": 0.0
+        },
+        "fly": {
+          "maxDeformation": 0.21448711879353474,
+          "loopSeam": 0.0
+        },
+        "swim": {
+          "maxDeformation": 0.04704773512790093,
+          "loopSeam": 0.0
+        }
+      },
+      "restAttributeFingerprints": {
+        "owl_coat_mesh": "d05746312f77c8b9d0a9c8030e22eaf338c68ff89e03386a4b0d87c0376177f7",
+        "owl_eyes_mesh": "1150172f25aea546da590b1864b5cf78b4e8ee01ad435d2186de04a46d69a6dc"
+      }
+    },
+    {
+      "id": "duck",
+      "root": "Animal_Duck",
+      "triangles": 5408,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 344932,
+      "sha256": "9eac0baf6b24ec6059d4199a3795918937414038d1fa23f59d7377b2ba9aaad7",
+      "boundsBlender": [
+        [
+          -0.24371449649333954,
+          -0.5800000429153442,
+          0.0
+        ],
+        [
+          0.24365739524364471,
+          0.4766768217086792,
+          0.6148759126663208
+        ]
+      ],
+      "decisions": "Compact waterfowl anatomy, shaped broad bill, true webbed feet and sculpted folded wings; warm cream coat.",
+      "optionalVariants": [
+        "mallard markings",
+        "resting pose",
+        "swimming rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Duck",
+      "staticSha256": "42faece84b935662b7e9bd07c9b673fd71168f3f799f22a2e697ecab0cb801ec",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "WingLeft",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "WingRight"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.07999999821186066,
+          0.23999999463558197
+        ],
+        "Neck": [
+          0.0,
+          -0.1599999964237213,
+          0.2800000011920929
+        ],
+        "Head": [
+          0.0,
+          -0.27000001072883606,
+          0.4699999988079071
+        ],
+        "Tail": [
+          0.0,
+          0.3499999940395355,
+          0.3100000023841858
+        ],
+        "LegFrontLeft": [
+          -0.0949999988079071,
+          0.014999999664723873,
+          0.1599999964237213
+        ],
+        "LegFrontLeftLower": [
+          -0.0949999988079071,
+          0.014999999664723873,
+          0.054999999701976776
+        ],
+        "WingLeft": [
+          -0.15000000596046448,
+          -0.019999999552965164,
+          0.33000001311302185
+        ],
+        "LegFrontRight": [
+          0.0949999988079071,
+          0.014999999664723873,
+          0.1599999964237213
+        ],
+        "LegFrontRightLower": [
+          0.0949999988079071,
+          0.014999999664723873,
+          0.054999999701976776
+        ],
+        "WingRight": [
+          0.15000000596046448,
+          -0.019999999552965164,
+          0.33000001311302185
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "fly": 1.5,
+        "swim": 2.0
+      },
+      "skinning": {
+        "duck_coat": {
+          "weightedVertices": 2438,
+          "blendedVertices": 850,
+          "jointVertices": {
+            "Body": 939,
+            "Neck": 531,
+            "Head": 850,
+            "Tail": 175,
+            "LegFrontLeft": 106,
+            "LegFrontLeftLower": 152,
+            "WingLeft": 327,
+            "LegFrontRight": 105,
+            "LegFrontRightLower": 153,
+            "WingRight": 327
+          }
+        },
+        "duck_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "WingLeft": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "WingRight": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "duck_coat": "8a3e4f6adaf17de2fe17b14cd800533f541db250bd18a056f17b25f66c0681bb",
+        "duck_eyes": "1de1ad402a71ccabbbcf86e15f9c9ba8eb64c1e4e8ff4f24a220aa2d5d364e74"
+      },
+      "restAttributeFingerprints": {
+        "duck_coat_mesh": "924aabd0985313926d405b9ae26104887b24fbbe64ef2e7c1e3dfd78972dbe73",
+        "duck_eyes_mesh": "3d36092a4c83eb7e203fea50e8a15518937a0188e93706a9c50bbcf1c2f9f4f1"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.004392673272913649,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.05173605967530216,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.042639370766771274,
+          "loopSeam": 0.0
+        },
+        "fly": {
+          "maxDeformation": 0.24342782356153295,
+          "loopSeam": 0.0
+        },
+        "swim": {
+          "maxDeformation": 0.0749189776759357,
+          "loopSeam": 0.0
+        }
+      }
+    },
+    {
+      "id": "duckling",
+      "root": "Animal_Duckling",
+      "triangles": 5408,
+      "materials": [
+        "AnimalArt_Eye",
+        "AnimalArt_Matte"
+      ],
+      "draws": 2,
+      "bytes": 344816,
+      "sha256": "c9b02739f50d5533d0cc9253abbe078694339c9f661c282752edffa970aed44c",
+      "boundsBlender": [
+        [
+          -0.14622870087623596,
+          -0.34800004959106445,
+          0.0
+        ],
+        [
+          0.1461944431066513,
+          0.2860060930252075,
+          0.3689255714416504
+        ]
+      ],
+      "decisions": "Golden duckling with the same bill and webbed-foot design, a subtle dorsal marking and 0.60 native scale.",
+      "optionalVariants": [
+        "pale duckling",
+        "fluffy head tuft",
+        "swimming rig"
+      ],
+      "textures": 0,
+      "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
+      "orientation": "metres; glTF Y up, +Z forward; ground origin",
+      "animation": "Skinned anatomical rig; stationary root; native looping clips",
+      "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Duckling",
+      "staticSha256": "a2479446d3debab72ec2aaafc5e9cba0be98675aaf9aa95fec55ec6fcfe61fd0",
+      "rigVersion": 1,
+      "bones": [
+        "Body",
+        "Neck",
+        "Head",
+        "Tail",
+        "LegFrontLeft",
+        "LegFrontLeftLower",
+        "WingLeft",
+        "LegFrontRight",
+        "LegFrontRightLower",
+        "WingRight"
+      ],
+      "bonePivotsBlender": {
+        "Body": [
+          0.0,
+          0.04800000041723251,
+          0.14400000870227814
+        ],
+        "Neck": [
+          0.0,
+          -0.09600000083446503,
+          0.1680000126361847
+        ],
+        "Head": [
+          0.0,
+          -0.16200001537799835,
+          0.28200000524520874
+        ],
+        "Tail": [
+          0.0,
+          0.21000000834465027,
+          0.1860000044107437
+        ],
+        "LegFrontLeft": [
+          -0.05700000002980232,
+          0.009000000543892384,
+          0.09600000083446503
+        ],
+        "LegFrontLeftLower": [
+          -0.05700000002980232,
+          0.009000000543892384,
+          0.032999999821186066
+        ],
+        "WingLeft": [
+          -0.09000000357627869,
+          -0.012000000104308128,
+          0.1980000138282776
+        ],
+        "LegFrontRight": [
+          0.05700000002980232,
+          0.009000000543892384,
+          0.09600000083446503
+        ],
+        "LegFrontRightLower": [
+          0.05700000002980232,
+          0.009000000543892384,
+          0.032999999821186066
+        ],
+        "WingRight": [
+          0.09000000357627869,
+          -0.012000000104308128,
+          0.1980000138282776
+        ]
+      },
+      "clips": {
+        "idle": 4.0,
+        "walk": 1.2,
+        "pet": 3.0,
+        "fly": 1.5,
+        "swim": 2.0
+      },
+      "skinning": {
+        "duckling_coat": {
+          "weightedVertices": 2438,
+          "blendedVertices": 850,
+          "jointVertices": {
+            "Body": 939,
+            "Neck": 531,
+            "Head": 850,
+            "Tail": 175,
+            "LegFrontLeft": 106,
+            "LegFrontLeftLower": 152,
+            "WingLeft": 327,
+            "LegFrontRight": 105,
+            "LegFrontRightLower": 153,
+            "WingRight": 327
+          }
+        },
+        "duckling_eyes": {
+          "weightedVertices": 292,
+          "blendedVertices": 0,
+          "jointVertices": {
+            "Body": 0,
+            "Neck": 0,
+            "Head": 292,
+            "Tail": 0,
+            "LegFrontLeft": 0,
+            "LegFrontLeftLower": 0,
+            "WingLeft": 0,
+            "LegFrontRight": 0,
+            "LegFrontRightLower": 0,
+            "WingRight": 0
+          }
+        }
+      },
+      "restArtworkHashes": {
+        "duckling_coat": "7727ce463513d656a0776b0dc8d176a37aa36e98de9535dfc63716cd9d489134",
+        "duckling_eyes": "1061c3a112391141e31f8fade11564e56299ac59234413ac357fee2f1bc1d4a2"
+      },
+      "restAttributeFingerprints": {
+        "duckling_coat_mesh": "37a6f0a7b883e9a962f3d56519b9d631fb8f4063863905f7aa6a5a60ca709f06",
+        "duckling_eyes_mesh": "52f3ae962901e3f7da711afb17a061be23be13c65ff2469218a5eb6e65b482ff"
+      },
+      "deformation": {
+        "idle": {
+          "maxDeformation": 0.0026355846678720193,
+          "loopSeam": 0.0
+        },
+        "walk": {
+          "maxDeformation": 0.03104163042057619,
+          "loopSeam": 0.0
+        },
+        "pet": {
+          "maxDeformation": 0.025583666359505097,
+          "loopSeam": 0.0
+        },
+        "fly": {
+          "maxDeformation": 0.14605674333118981,
+          "loopSeam": 0.0
+        },
+        "swim": {
+          "maxDeformation": 0.04495139616194053,
+          "loopSeam": 0.0
+        }
+      }
+    }
+  ],
+  "staticArtworkSourceSha256": "68bb9eb0567d2c99dcfdf5cb450fa8af1e0319192240156f0c5425745cb89205",
+  "rigProducer": "scripts/village/rig_animal_art.py"
+}
