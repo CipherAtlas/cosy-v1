@@ -808,3 +808,7 @@ Retain `gardenGrowthDisplay.ts`, shared by kitchen and farm renderers. Farm row 
 ## Integrated release authorization — 2026-10-04
 
 Release authorized for the pending village work: town/terrain and shared animal interactions, native animal assets and local editor support, recorded animal audio, saved settings and customizable keybindings. Fresh type checking passes; the unchanged integrated source reuses the successful isolated build, complete contract suite, export boundary check, 39 settings browser checks, 44 binding assertions and 26 three-client shared checks recorded above. Production Pages runs its own contracts/build/export gate. Audio defaults are music 15%, world 54%, spirit/details 75%; animal levels are increased 35%. Subjective listening and physical-device/Firefox/Safari acceptance remain unverified. Publication completion is recorded by the GitHub deployment for the release commit.
+
+## 2026-10-04 — distant castle removal
+
+The active Willowbank town hides the distant castle, including the local editor’s Playable village view. Original presets and the reusable asset remain available. Regenerated physics retains identical collisions/seats with an updated layout hash. `npm run check`, isolated production build, export privacy and physics parity pass. Publication completion is recorded by the release workflow; live layout verification follows deployment.

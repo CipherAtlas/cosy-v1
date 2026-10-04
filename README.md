@@ -160,3 +160,5 @@ The village and local editor share a decorative mountain horizon in the sky, usi
 Farm rows use the kitchen garden’s small circular growth countdowns beside each row, with sprouts before watering and gradual vertical crop growth. The countdown disappears when the crop is ready. This focused display change is locally checked; see [verification and preview limits](VILLAGE_BUILD.md#2026-10-04--farm-display-matches-kitchen-garden-local-side-change).
 
 The expanded village map also lets you click or keyboard-activate both swings, the grazing field, Willow circuit, the carrot/radish/mint farms and owl grove to travel nearby. The Worker checks clear arrival ground before moving you. Named farms only plant and harvest their own crop. See [local verification and preview status](VILLAGE_BUILD.md#2026-10-04--map-travel-and-named-farm-crops-local-side-change).
+
+The active Willowbank town hides the distant castle spires. Layout Studio’s Playable village shares this visibility setting; original presets and the castle shelf asset remain available.
