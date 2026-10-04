@@ -15133,7 +15133,7 @@
       "id": "bird-clearing-bench",
       "x": -37,
       "z": 6.5,
-      "facing": 0,
+      "facing": 3.141592653589793,
       "seatHeight": 0.47
     },
     {

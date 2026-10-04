@@ -1,5 +1,9 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-04 — bench facing correction
+
+Saved-layout bench transforms retain the asset’s intrinsic facing offset. The birdwatching bench now faces away from its backrest from either approach; matching Worker seat data is regenerated. Fresh `npm run check`, isolated production build/export privacy, 16 actual-model front/rear face/heading/clear-exit checks and rendering/Worker parity pass. Only the bird bench facing changes in the 1,890-collider/eight-bench catalog. Twenty-eight actual three-client checks pass, including the corrected observer heading, full-seat refusal, release, dog ownership/disconnect/reconnect, simultaneous private focus and 1280×720/1024×640 layouts. The matching Worker and Pages release use the existing deployment workflow; live completion is recorded below after publication. The unrelated local Tab-label edit is excluded from this release. Native Firefox and physical-device review remain unverified.
+
 ## 2026-10-04 — settings and personal keybindings (local)
 
 `VillageSettings.tsx` replaces the long settings form with Experience, Sound and Controls sections. Forest-green translucent surfaces, cream text, limited sand/sage accents, content-sized panels and independent body scrolling preserve the village view. Common controls have 44 px targets, visible keyboard focus and the existing press feedback. Advanced performance and river/wind adjustments stay collapsed. Sound has its own reset, and weather changes preserve the chosen mix. Graphics choices now persist, with Gentle on battery as the fresh-browser default.

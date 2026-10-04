@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-04 — bench facing correction
+
+Saved-layout benches retain their intrinsic facing offset, correcting backward birdwatching seating. See the [verification ledger](VILLAGE_BUILD.md#2026-10-04--bench-facing-correction) for checks and release status.
+
 ## 2026-10-04 — settings and personal keybindings (local)
 
 Experience, Sound and Controls now share a compact translucent forest-green settings panel. Twenty-nine personal keys can be replaced, explicitly swapped or reset; gameplay, keycaps and native villager prompts use the same mapping. Graphics and key choices persist; fresh browsers retain battery graphics and 15%/54%/75% sound defaults. Types/lint/contracts, 44 binding assertions and isolated build/export privacy pass. Fresh 39 actual settings/rebinding/two-client assertions and 26 three-client regressions pass, including four desktop sizes, accepted cow petting, private focus pause, Japanese labels and per-visitor reload persistence. The main 3051 preview now serves the verified isolated export in `/tmp/cosy-town-final-preview-path.txt`; reload to receive it. Native Firefox/Safari and physical-device review remain open. [Evidence](docs/village/evidence/settings-20261004/README.md). [Current ledger](VILLAGE_BUILD.md#2026-10-04--settings-and-personal-keybindings-local). No Git writes or deployment.

@@ -49,8 +49,10 @@ export class SceneLayout {
       for (const [placementIndex, item] of placements.entries()) {
         const placed = placementIndex === 0 ? root : cloneSkeleton(template); applySceneTransform(placed, item); this.group.add(placed); placed.updateMatrixWorld(true);
         const delta = placed.matrixWorld.clone().multiply(inverse);
+        const benchForward = sourceBench && new T.Vector3(Math.sin(sourceBench.facing), 0, Math.cos(sourceBench.facing)).transformDirection(delta);
         if (sourceBench) this.benches.push({ ...sourceBench, id: item.id, x: item.position[0], z: item.position[2],
-          facing: item.rotation[1] * Math.PI / 180, seatHeight: item.position[1] + (sourceBench.seatHeight - template.position.y) * item.scale[1],
+          facing: Math.atan2(benchForward!.x, benchForward!.z),
+          seatHeight: item.position[1] + (sourceBench.seatHeight - template.position.y) * item.scale[1],
           hitBox: sourceBench.hitBox.clone().applyMatrix4(new T.Matrix4().makeScale(...item.scale)) });
         if (fence) {
           const lift = Math.max(0, item.position[1] - landscapeHeight(item.position[0], item.position[2]));
