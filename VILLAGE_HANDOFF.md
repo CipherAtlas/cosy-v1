@@ -2,7 +2,7 @@
 
 ## 2026-10-04 — bench facing correction
 
-Saved-layout benches retain their intrinsic facing offset, correcting backward birdwatching seating. See the [verification ledger](VILLAGE_BUILD.md#2026-10-04--bench-facing-correction) for checks and release status.
+Published `818d59b` and matching Worker data retain saved-layout benches’ intrinsic facing offset, correcting backward birdwatching seating. Pages deployment succeeded; two live clients verified both approaches, observer heading and seat release. Reload existing village tabs. See the [verification ledger](VILLAGE_BUILD.md#2026-10-04--bench-facing-correction) for checks and release status.
 
 ## 2026-10-04 — settings and personal keybindings (local)
 
