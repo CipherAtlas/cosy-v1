@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-05 — welcome guide and menu back keys (local, verified)
+## 2026-10-05 — welcome guide and menu back keys (published)
 
-A short English/Japanese guide appears after entry with touch-aware instructions, saved “Don't show tutorial” and a Settings reopening action. Manual-guide Back returns to Settings; Escape/Backspace and visible Back buttons make menus easy to leave without taking over editing/key capture. Build/lint/types/contracts/export privacy and 57 guide/back, 70 onboarding and 18 two-client Japanese checks pass with zero page errors. Preview3051 is refreshed; publication/live smoke is pending. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--short-welcome-guide-and-keyboard-back-navigation). This addition is not deployed yet; the release below remains public.
+A short English/Japanese guide appears after entry with touch-aware instructions, saved “Don't show tutorial” and a Settings reopening action. Manual-guide Back returns to Settings; Escape/Backspace and visible Back buttons make menus easy to leave without taking over editing/key capture. Build/lint/types/contracts/export privacy and 57 guide/back, 70 onboarding and 18 two-client Japanese checks pass with zero page errors. Preview3051 is refreshed. Application `515dc7e` is pushed/live after successful [Pages run 37343764054](https://github.com/CipherAtlas/cosy-v1/actions/runs/37343764054); all 32 public smoke checks pass with zero page errors. The matching Worker is unchanged. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--short-welcome-guide-and-keyboard-back-navigation). Native/physical-device and assistive-technology acceptance retains its stated limits. Earlier entries below are development/release checkpoints.
 
 ## 2026-10-05 — onboarding/tablet/Japanese release complete
 
