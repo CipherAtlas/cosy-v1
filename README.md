@@ -1,5 +1,16 @@
 # Hearthwillow
 
+The onboarding/tablet/Japanese release is being published with a matching Worker. It includes the animated starter screen, padded keyboard hints, touch controls, Japanese UI/chat, Luma shortcuts and watch-tower atlas destination. [Publication and verification status](VILLAGE_BUILD.md#2026-10-05--onboarding-tablet-and-japanese-release); earlier local-only notes below are development checkpoints.
+
+The local starter screen uses an animated view of the village with **Enter Hearthwillow**, **Language** and **Settings**. Choose English/Japanese and adjust experience, sound or controls before entering; changes save on this device. Bottom keyboard hints leave padding inside their borders. [Local onboarding checks and limits](VILLAGE_BUILD.md#2026-10-05--animated-title-screen-and-first-use-menus-local).
+
+Japanese can be selected on arrival or in Settings; Japanese browser defaults respect saved choices. Chat supports Japanese IME confirmation, localized controls/notices and readable Japanese wrapping. Farms, racing, animals and inventory also use Japanese. [Local checks and remaining limits](VILLAGE_BUILD.md#2026-10-05--japanese-language-and-chat-support-local).
+
+iPads, tablets and PCs are supported; phones are refused before the village loads. Tablets use a left Move thumbstick and scene dragging to look, with Run/Jump and contextual touch actions. The local preview on 3051 contains these controls; mini, standard iPad and 11-inch Air simulator previews were reviewed one at a time. [Local tablet verification](VILLAGE_BUILD.md#2026-10-05--tablet-controls-local).
+
+
+Luma’s tea offerings now support visible, rebindable shortcuts: **1** carrot, **2** radish, **3** mint, **C** sunflower, **B** daisy and **E** to drink prepared tea. [Local checks and limits](VILLAGE_BUILD.md#2026-10-05--luma-offering-shortcuts-local).
+
 The 2026-10-05 integrated release is live at [cosy.sabarg.com](https://cosy.sabarg.com/) as application `46db3d0`, with the matching shared Worker. It includes the smooth full-screen atlas, farm residents and Rowan's race invitation, centered farm clocks, shared first-person watchtower walking, riverbank/pond stones and bridge/path polish. Matching local editor support is included in source; the public export excludes the editor and save API. [Release checks, publication status and remaining limits](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release). Older local-preview notes below describe development checkpoints.
 
 The working pond layout removes the bench beside the dock, adds a stone landing over the green entrance patch and dresses the pond edge with small rocks. These remain editable in Layout Studio. The main preview still needs a coordinated refresh; [local checks and limits](VILLAGE_BUILD.md#2026-10-05--pond-dock-landing-and-shoreline-stones-local).
@@ -12,7 +23,7 @@ The local preview on 3051 shows circular growth countdowns above each farm row's
 
 The local playable layout removes the empty Orchard lane spur south of the radish-farm bridge while retaining the connected cottage and bridge approaches. [Verification and publication limits](VILLAGE_BUILD.md#2026-10-05--radish-bridge-dead-end-path-removal-local).
 
-M opens a full-screen illustrated atlas with its own cursor, readable labels above destinations, a gold marker for you, blue markers with names directly above other players, no NPC/dog clutter, a closer view, and click/Enter travel through one Meadow Swings option, all three farms, the grazing field, Willow circuit and the owl grove. M or Escape closes it. The local preview on 3051 includes these Worker-approved destinations; see [current local verification](VILLAGE_BUILD.md#2026-10-05--smooth-map-motion-and-accurate-destination-anchors-local).
+M opens a full-screen illustrated atlas with its own cursor, readable labels above destinations, a gold marker for you, blue markers with names directly above other players, no NPC/dog clutter, a closer view, and click/Enter travel through one Meadow Swings option, all three farms, the grazing field, Willow circuit, the owl grove and the watch tower entrance. M or Escape closes it. The watch tower marker is locally verified in an isolated export; main3051/Worker2567 need a coordinated refresh ([checks](VILLAGE_BUILD.md#2026-10-05--watch-tower-map-destination-local)). The local preview on 3051 includes the earlier Worker-approved destinations; see [current local verification](VILLAGE_BUILD.md#2026-10-05--smooth-map-motion-and-accurate-destination-anchors-local).
 
 The village horse rigs visibly lower their heads and chew through accepted hay meals, including feeder reconnection. Decorative helper prose is removed from village panels and toasts; controls, timers, dialogue and personal notes remain. [Local checks and preview limits](VILLAGE_BUILD.md#2026-10-04--horse-eating-and-decorative-helper-text-removal-local).
 

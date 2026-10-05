@@ -1,3 +1,4 @@
+import { readVillageLanguage } from "./localization";
 import { useEffect, useState } from "react";
 import { DEFAULT_KEYBINDINGS, readKeybindings } from "./keybindings";
 import { DEFAULT_MIX, localTimeWeather, type AudioMix, type Quality, type Weather } from "./places";
@@ -13,6 +14,7 @@ export function useVillagePreferences() {
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   useEffect(() => {
+    setLanguage(readVillageLanguage());
     try {
       const p = JSON.parse(
         localStorage.getItem("cosy-village-preferences") || "null",
@@ -25,7 +27,6 @@ export function useVillagePreferences() {
           setWeather(savedWeather);
           setWeatherMode("manual");
         }
-        if (p.language === "ja") setLanguage("ja");
         if (typeof p.mouseSensitivity === "number" && Number.isFinite(p.mouseSensitivity)
           && p.mouseSensitivity >= .25 && p.mouseSensitivity <= 2)
           setMouseSensitivity(p.mouseSensitivity);

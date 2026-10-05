@@ -22,7 +22,7 @@ export function installButtonFeedback(root: HTMLElement) {
     return button instanceof HTMLButtonElement && (root.contains(button) || button.closest(".v-dialog")) ? button : null;
   };
   const pointerDown = (event: PointerEvent) => {
-    if (event.button !== 0 || !event.isPrimary) return;
+    if (event.button !== 0) return;
     const button = buttonAt(event.target);
     if (button) feedback(button);
   };

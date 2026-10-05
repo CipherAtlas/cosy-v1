@@ -13,7 +13,7 @@ import type { RadioStationId } from "./radioCatalog";
 import { VillageSettings } from "./VillageSettings";
 import { Keycap } from "./KeybindingControls";
 
-export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | null;
+export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | null;
 
 export function VillageMenus({ panel, setPanel, canvas, engine, settings, inventory, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
   sound, soundLoading, toggleSound, radioPrefs, radioLoading, radioError, selectStation, nextRadioTrack, playVillageMusic, showStats, setShowStats, stats }: {
@@ -44,9 +44,9 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace ? " v-settings-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
+          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace || displayedPanel === "language" ? " v-settings-overlay" : ""}${!entered ? " v-start-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace ? " v-settings-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace || displayedPanel === "language" ? " v-settings-dialog" : ""}${!entered ? " v-start-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
             onOpenAutoFocus={event => {
               if (panel === "places") {
                 event.preventDefault();
@@ -55,7 +55,8 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
             }}
             onCloseAutoFocus={(e) => {
               e.preventDefault();
-              canvas.current?.querySelector("canvas")?.focus();
+              if (entered) canvas.current?.querySelector("canvas")?.focus();
+              else document.querySelector<HTMLButtonElement>(`[data-start-panel="${displayedPanel}"]`)?.focus();
             }}
           >
             <Dialog.Title>
@@ -63,6 +64,8 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
                 ? t("Hearthwillow", "ハースウィロー")
                 : displayedPanel === "sound" && PERSONAL_RADIO_ENABLED
                   ? t("Sound", "音")
+                  : displayedPanel === "language"
+                    ? t("Language", "言語")
                   : displayedPanel === "basket"
                     ? t("Harvest basket", "収穫かご")
                   : displayedPanel === "controls"
@@ -73,11 +76,13 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
               {displayedPanel === "places"
                 ? t("Full-screen village map. The gold diamond marks you; blue circles mark other players. Names appear above markers. Click a destination to travel, or use arrow keys and Enter. Press the map key again or Escape to close.", "全画面の村の地図。金色のひし形はあなた、青い丸は他のプレイヤーです。名前はマーカーの上に表示されます。クリック、または矢印キーとEnterで移動し、地図キーかEscapeで閉じます。")
                 : displayedPanel === "sound"
-                  ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
+                  ? PERSONAL_RADIO_ENABLED ? t("Choose a radio station and adjust all sound volumes.", "ラジオ局を選び、音量を調整します。") : t("Music and ambience controls.", "音楽と環境音の設定。")
+                  : displayedPanel === "language"
+                    ? t("Choose the language for menus, controls and village conversations.", "メニュー・操作・村での会話の言語を選びます。")
                   : displayedPanel === "basket"
                     ? t("Your saved harvests and woodland treats.", "庭で収穫して保存したもの。")
                   : displayedPanel === "controls"
-                    ? "Gliding, camera and interaction controls."
+                    ? t("Gliding, camera and interaction controls.", "移動・カメラ・ふれあいの操作。")
                     : t("Village appearance, sound and personal keyboard settings.", "村の環境・音・個人のキー設定。")}
             </Dialog.Description>
             <Dialog.Close
@@ -87,7 +92,15 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
               {displayedPanel === "places" && <Keycap aria-hidden="true">Esc</Keycap>}
               <X size={22} />
             </Dialog.Close>
-            {displayedPanel === "basket" && <VillageInventory inventory={inventory} />}
+            {displayedPanel === "language" && <div className="v-language-menu">
+              <p>{t("Choose your language.", "言語を選んでください。")}</p>
+              {([['en', 'English'], ['ja', '日本語']] as const).map(([id, name]) => <button key={id} lang={id}
+                aria-pressed={language === id} onClick={() => settings.setLanguage(id)}>
+                <span>{name}</span><span aria-hidden="true">{language === id ? "✓" : ""}</span>
+              </button>)}
+              <footer className="v-settings-footer"><span>{t("Changes save on this device.", "変更はこの端末に保存されます。")}</span></footer>
+            </div>}
+            {displayedPanel === "basket" && <VillageInventory inventory={inventory} language={language} />}
             {displayedPanel === "controls" && (
               <div className="v-control-guide">
                 <dl>
@@ -152,6 +165,7 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
                 </>}
               </>
             )}
+            {settingsWorkspace && !entered && notice && <p className="v-settings-help" role="status">{notice}</p>}
             {settingsWorkspace && <VillageSettings key={displayedPanel} settings={settings}
               initial={displayedPanel === "sound" ? "sound" : "experience"} sound={sound} soundLoading={soundLoading} toggleSound={toggleSound}
               engine={engine.current} showStats={showStats} setShowStats={setShowStats} stats={stats} />}

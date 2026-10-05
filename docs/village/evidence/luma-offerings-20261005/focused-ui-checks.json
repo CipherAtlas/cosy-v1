@@ -1,0 +1,29 @@
+{
+  "checks": [
+    "carrot displays its real shortcut",
+    "1 invokes the carrot offering callback",
+    "radish displays its real shortcut",
+    "2 invokes the radish offering callback",
+    "mint displays its real shortcut",
+    "3 invokes the mint offering callback",
+    "sunflower displays its real shortcut",
+    "C invokes the sunflower offering callback",
+    "daisy displays its real shortcut",
+    "B invokes the daisy offering callback",
+    "Each shortcut dispatches once",
+    "Typing in chat does not invoke offerings",
+    "Rebinding updates both the keycap and actual shortcut",
+    "Original key stops offering after rebinding",
+    "Rebound key offers and depleted inventory hides the button",
+    "Depleted offering shortcut is inactive",
+    "Pointer click uses the same offering callback",
+    "E drinks prepared mint tea",
+    "Panel fits 1280 × 800",
+    "Buttons retain 44px targets and visible square keycaps",
+    "Panel fits 1024 × 700",
+    "Buttons retain 44px targets and visible square keycaps",
+    "No page errors"
+  ],
+  "errors": [],
+  "method": "Production MintTea, KeybindingContext, gardenAction and extracted unmodified Village keyboard handler in an isolated inventory fixture; no shared acceptance claim."
+}

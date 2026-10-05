@@ -6,31 +6,33 @@ function clock(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 }
 
-export function TownActivityHUD({ state }: { state: TownActivityHUDState | null }) {
+export function TownActivityHUD({ state, language }: { state: TownActivityHUDState | null; language: "en" | "ja" }) {
   if (!state || state.kind === "farm") return null;
-  const title = state.phase === "countdown" ? "Ready for your lap?" : state.phase === "cancelled" ? "Race ended"
-    : state.phase === "finished" ? state.result === "visitor" ? "You won!" : state.result === "tie" ? "A tie!" : "Lap complete!" : "Race Rowan";
-  return <section className="v-town-progress v-race-progress" aria-label="Race progress">
+  const t = (en: string, ja: string) => language === "ja" ? ja : en;
+  const title = state.phase === "countdown" ? t("Ready for your lap?", "準備はいい？") : state.phase === "cancelled" ? t("Race ended", "レース終了")
+    : state.phase === "finished" ? state.result === "visitor" ? t("You won!", "あなたの勝ち！") : state.result === "tie" ? t("A tie!", "引き分け！") : t("Lap complete!", "ゴール！") : t("Race Rowan", "ローワンと競走");
+  return <section className="v-town-progress v-race-progress" aria-label={t("Race progress", "レースの進み具合")}>
     <strong>{title}</strong>
-    {state.phase === "cancelled" ? null : state.phase === "countdown" ? <span className="v-race-countdown" role="timer" aria-live="polite">{state.countdown || "Go!"}</span>
+    {state.phase === "cancelled" ? null : state.phase === "countdown" ? <span className="v-race-countdown" role="timer" aria-live="polite">{state.countdown || t("Go!", "スタート！")}</span>
       : <>
-        <span className="v-race-clock" role="timer">{state.phase === "racing" ? clock(state.remaining) : `${state.elapsed.toFixed(1)}s`}</span>
-        <div className="v-race-statistics"><span>{state.checkpoints} / 8 flags</span><span>Lap {state.elapsed.toFixed(1)}s</span></div>
-        <div className="v-race-positions" aria-label="Lap positions">
-          <label>You<progress max={8} value={state.checkpoints} /></label>
-          <label>Rowan<progress max={1} value={state.rivalProgress} /></label>
+        <span className="v-race-clock" role="timer">{state.phase === "racing" ? clock(state.remaining) : t(`${state.elapsed.toFixed(1)}s`, `${state.elapsed.toFixed(1)}秒`)}</span>
+        <div className="v-race-statistics"><span>{t(`${state.checkpoints} / 8 flags`, `旗 ${state.checkpoints} / 8`)}</span><span>{t(`Lap ${state.elapsed.toFixed(1)}s`, `タイム ${state.elapsed.toFixed(1)}秒`)}</span></div>
+        <div className="v-race-positions" aria-label={t("Lap positions", "コース上の位置")}>
+          <label>{t("You", "あなた")}<progress max={8} value={state.checkpoints} /></label>
+          <label>{t("Rowan", "ローワン")}<progress max={1} value={state.rivalProgress} /></label>
         </div>
-        {state.phase === "racing" && <p>{state.nextGateDistance === undefined ? "Next gate" : `Next gate ${state.nextGateDistance}m`}</p>}
+        {state.phase === "racing" && <p>{state.nextGateDistance === undefined ? t("Next gate", "次の旗へ") : t(`Next gate ${state.nextGateDistance}m`, `次の旗まで${state.nextGateDistance}m`)}</p>}
       </>}
   </section>;
 }
 
-export function VillageInventory({ inventory }: { inventory: ForageInventory }) {
+export function VillageInventory({ inventory, language }: { inventory: ForageInventory; language: "en" | "ja" }) {
+  const t = (en: string, ja: string) => language === "ja" ? ja : en;
   const items = readInventory(inventory);
   return <div className="v-harvest-inventory v-local-inventory">
     <dl>{([
-      ["apples", "Apples"], ["mushrooms", "Mushrooms"], ["carrots", "Carrots"], ["radishes", "Radishes"], ["mint", "Mint leaves"],
-      ["daisies", "Daisies"], ["sunflowers", "Sunflowers"], ["mintTea", "Mint tea"],
+      ["apples", t("Apples", "リンゴ")], ["mushrooms", t("Mushrooms", "キノコ")], ["carrots", t("Carrots", "ニンジン")], ["radishes", t("Radishes", "ラディッシュ")], ["mint", t("Mint leaves", "ミントの葉")],
+      ["daisies", t("Daisies", "デイジー")], ["sunflowers", t("Sunflowers", "ヒマワリ")], ["mintTea", t("Mint tea", "ミントティー")],
     ] as const).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{items[key]}</dd></div>)}</dl>
   </div>;
 }

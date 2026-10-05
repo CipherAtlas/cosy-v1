@@ -1,7 +1,10 @@
 "use client";
+import { readVillageLanguage, villageNotice } from "./localization";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { TouchControls } from "./TouchControls";
 import { VillageMenus, type VillagePanel } from "./VillageMenus";
+import { VillageStartScreen } from "./VillageStartScreen";
 import { TownActivityHUD } from "./TownActivityHUD";
 import type { TownActivityHUDState } from "./townProgress";
 import { readInventory, withGardenInventory, type ForageInventory } from "./townShared";
@@ -9,9 +12,7 @@ import { KeybindingContext, Keycap, ShortcutButton } from "./KeybindingControls"
 import { gameKey } from "./keybindings";
 import { useVillagePreferences } from "./useVillagePreferences";
 import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
+  ArrowCounterClockwise,
   ArrowUp,
   ArrowUpRight,
   CaretDown,
@@ -56,34 +57,50 @@ import type { NearbyHorse } from "./horses";
 export function Village() {
   const [isPhone, setIsPhone] = useState<boolean | null>(null);
   const [kicked, setKicked] = useState(false);
+  const [gateLanguage, setGateLanguage] = useState<"en" | "ja">("en");
   const onKicked = useCallback(() => setKicked(true), []);
   useEffect(() => {
+    setGateLanguage(readVillageLanguage());
     const browser = navigator as Navigator & { userAgentData?: { mobile?: boolean } };
-    setIsPhone(browser.userAgentData?.mobile === true || /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(browser.userAgent));
+    const tablet = /iPad|Tablet|Silk/i.test(browser.userAgent) ||
+      (/Macintosh/i.test(browser.userAgent) && browser.maxTouchPoints > 1) ||
+      (/Android/i.test(browser.userAgent) && !/Mobile/i.test(browser.userAgent));
+    setIsPhone(/iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(browser.userAgent) ||
+      (browser.userAgentData?.mobile === true && !tablet));
   }, []);
   if (isPhone === false) return kicked ? <KickedScreen /> : <VillageScene onKicked={onKicked} />;
-  return <main className="v-device-gate" aria-busy={isPhone === null}>
-    <h1>Hearthwillow</h1>
-    <p role="status">{isPhone ? "Please open the village on a laptop or PC." : "Opening the village…"}</p>
+  return <main className="v-device-gate" lang={gateLanguage} aria-busy={isPhone === null}>
+    <h1>{gateLanguage === "ja" ? "ハースウィロー" : "Hearthwillow"}</h1>
+    <p role="status">{gateLanguage === "ja" ? isPhone ? "iPad・タブレット・ノートパソコン・PCで村を開いてください。" : "村を準備しています…" : isPhone ? "Please open the village on an iPad, tablet, laptop or PC." : "Opening the village…"}</p>
   </main>;
 }
 
 function KickedScreen() {
+  const [language, setLanguage] = useState<"en" | "ja">("en");
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
+    setLanguage(readVillageLanguage());
     if (document.pointerLockElement) document.exitPointerLock();
     heading.current?.focus();
   }, []);
-  return <main className="v-scenery-loading">
+  return <main className="v-scenery-loading" lang={language}>
     <div className="v-scenery-loading-content v-kicked-content">
       <Leaf size={35} weight="light" aria-hidden="true" />
-      <h1 ref={heading} tabIndex={-1}>You've been kicked from this village.</h1>
-      <p>Log back in later!</p>
+      <h1 ref={heading} tabIndex={-1}>{language === "ja" ? "村から一時的に退出しました。" : "You've been kicked from this village."}</h1>
+      <p>{language === "ja" ? "しばらくしてから入り直してください。" : "Log back in later!"}</p>
     </div>
   </main>;
 }
 
 function VillageScene({ onKicked }: { onKicked: () => void }) {
+  const [touchControls, setTouchControls] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(any-pointer: coarse)");
+    const update = () => setTouchControls(query.matches || navigator.maxTouchPoints > 1);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const canvas = useRef<HTMLDivElement>(null),
     engine = useRef<VillageEngine | null>(null),
     audio = useRef<VillageAudio | null>(null);
@@ -130,7 +147,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [sharedSelfId, setSharedSelfId] = useState("");
   const [sharedChat, setSharedChat] = useState<SharedChatEntry[]>([]);
   const [sharedChatHour, setSharedChatHour] = useState(0);
-  const [chatOpen, setChatOpen] = useState(true);
+  const [chatOpen, setChatOpen] = useState(() => navigator.maxTouchPoints === 0 && !window.matchMedia("(any-pointer: coarse)").matches);
   const chatOpenRef = useRef(chatOpen);
   chatOpenRef.current = chatOpen;
   const [chatUnread, setChatUnread] = useState(false);
@@ -138,6 +155,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [chatDraft, setChatDraft] = useState("");
   const [chatCooldownUntil, setChatCooldownUntil] = useState(0);
   const [, setChatClock] = useState(0);
+  const chatComposing = useRef(false);
   const chatInput = useRef<HTMLInputElement>(null);
   const chatLog = useRef<HTMLDivElement>(null);
   const [companions, setCompanions] = useState<string[]>([]);
@@ -145,7 +163,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [activityCompact,setActivityCompact]=useState(false);
   const onMoment=useCallback((moment:ActivityMoment)=>engine.current?.setActivityMoment(moment),[]);
   const soundBusy = useRef(false);
-  const [movement, setMovement] = useState<MovementStatus>({ gait: "idle", running: false });
+  const soundChosen = useRef(false);
+  const [, setMovement] = useState<MovementStatus>({ gait: "idle", running: false });
   const [mouseLook, setMouseLook] = useState<"free" | "locked" | "drag">("free");
   const [soundLoading, setSoundLoading] = useState(false);
   const settings = useVillagePreferences();
@@ -502,6 +521,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         local.setForageInventory(inventoryRef.current);
         local.setCompanions(companionsRef.current);
         local.setBlocked(!enterRef.current);
+        local.setTitleScreen(!enterRef.current);
         await local.load();
         if (!cancelled) {
           local.setGarden(gardenRef.current);
@@ -533,6 +553,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineAttempt, openPlace, scatterBenchCrumbs]);
   useEffect(() => {
+    engine.current?.setTitleScreen(!entered);
     engine.current?.setBlocked(!entered || panel !== null || sceneryLoading !== null);
     engine.current?.setMapOpen(panel === "places");
     enterRef.current = entered;
@@ -574,6 +595,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     return () => clearTimeout(id);
   }, [notice]);
   useEffect(() => {
+    if (!chatOpen) chatComposing.current = false;
     if (chatOpen && chatLog.current) chatLog.current.scrollTop = chatLog.current.scrollHeight;
   }, [sharedChat, chatOpen]);
   useEffect(() => {
@@ -678,6 +700,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   }
   function toggleSound() {
     if (soundBusy.current) return;
+    soundChosen.current = true;
     if (sound) {
       audio.current?.stop();
       setSound(false);
@@ -689,7 +712,10 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const showWorldInteraction = entered && !place;
   const chatCooldownSeconds = Math.min(3, Math.ceil(Math.max(0, chatCooldownUntil - Date.now()) / 1000));
   const chatPeople = chatOpen ? [...sharedPeople].sort((a, b) => a.id === sharedSelfId ? -1 : b.id === sharedSelfId ? 1 : 0) : [];
-  const chatPeopleList = chatOpen && <div className="v-shared-people-list">{chatPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? " (you)" : ""}</span>)}</div>;
+  const localizedNotice = villageNotice(notice, language);
+  const chatTime = (time: number) => new Date(time).toLocaleTimeString(ja ? "ja-JP" : "en-US", { hour: "numeric", minute: "2-digit" });
+  const puppyName = nearPuppy ? t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name) : "";
+  const chatPeopleList = chatOpen && <div className="v-shared-people-list">{chatPeople.map(person => <span key={person.id}><i style={{ background: person.color }} />{person.name}{person.id === sharedSelfId ? t(" (you)", "（あなた）") : ""}</span>)}</div>;
   const nearBirds = nearPlace?.id === "birds" || seatedBench === "bird-clearing-bench";
   const birdMealBusy = birdStatus === "crumbs" || birdStatus === "eating" || birdStatus === "happy";
   const showActivityPanel = entered && place && !activityCompact;
@@ -739,7 +765,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       : PLACES.find((p) => p.id === id)!.name;
   return (
     <KeybindingContext.Provider value={keybindings}><div
-      className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""}`}
+      className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""} ${touchControls ? "v-touch-device" : ""}`}
       data-weather={weather}
       data-activity={place ?? "explore"}
     >
@@ -756,16 +782,21 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           <span className="v-scenery-loading-line" aria-hidden="true" />
         </div>
       </div>, document.body)}
-      <header className="v-header">
+      {entered && <header className="v-header">
         <button
           className="v-wordmark"
           onClick={leave}
           aria-label={t("Return to village", "村に戻る")}
         >
-          {current ? placeName(current.id) : "Hearthwillow"}
+          {current ? placeName(current.id) : t("Hearthwillow", "ハースウィロー")}
           {!current && <Leaf size={24} weight="light" />}
         </button>
         <nav aria-label={t("Village controls", "村の操作")}>
+          {touchControls && entered && !place && !seatedBench && !ridingSwing && !ridingHorse && !lookout.inside && <ShortcutButton
+            aria-label={t("Recover to safe ground", "安全な場所へ戻る")} title={t("Recover to safe ground", "安全な場所へ戻る")}
+            aria-keyshortcuts="R" onClick={() => engine.current?.resetPosition()}>
+            <Keycap aria-hidden="true">R</Keycap><ArrowCounterClockwise size={20} aria-hidden="true" />
+          </ShortcutButton>}
           {ready ? <VillageMinimap scenery={engine.current?.mapScenery} current={place} language={language}
             readPose={readMapPose} readActors={readMapActors} expand={() => setPanel("places")} /> : <ShortcutButton
             disabled={!ready}
@@ -788,42 +819,19 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             <Keycap aria-hidden="true">,</Keycap><GearSix size={20} />
           </ShortcutButton>
         </nav>
-      </header>
+      </header>}
       {PERSONAL_RADIO_ENABLED && entered && <RadioDock expanded={radioExpanded} setExpanded={setRadioExpanded}
         track={radioPrefs.mode === "radio" ? radioPrefs.track : null} mode={radioPrefs.mode} sound={sound} paused={radioPrefs.paused}
         loading={soundLoading} toggleMusic={toggleMusic}
         next={nextRadioTrack} openSound={openRadio} language={language} />}
-      {!entered && (
-        <div className="v-arrival">
-          <div className="v-arrival-content">
-            <h1>{t("Welcome to Hearthwillow.", "ハースウィローへようこそ。")}</h1>
-            {!ready && !error ? (
-              <div className="v-loading">
-                <progress max={100} value={progress} />
-                <span>
-                  {t("Opening the village", "村を準備しています")} · {progress}%
-                </span>
-              </div>
-            ) : error ? (
-              <button className="v-button v-primary v-enter-button" onClick={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}>
-                {t("Retry the village", "村をもう一度開く")}<ArrowRight size={19} />
-              </button>
-            ) : (
-              <button
-                className="v-button v-primary v-enter-button"
-                onClick={() => {
-                  void enableSound();
-                  setEntered(true);
-                  setPanel(null);
-                }}
-              >
-                {t("Enter Hearthwillow", "ハースウィローに入る")}
-                <ArrowRight size={19} />
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+      {!entered && <VillageStartScreen language={language} ready={ready} progress={progress} error={error} touch={touchControls}
+        enter={() => {
+          if (!soundChosen.current) void enableSound();
+          setEntered(true); setPanel(null);
+          requestAnimationFrame(() => canvas.current?.querySelector("canvas")?.focus());
+        }}
+        retry={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}
+        openLanguage={() => setPanel("language")} openSettings={() => setPanel("settings")} />}
       {entered && !place && !ridingSwing && !ridingHorse && (
         <>
           <footer className="v-walk-hints">
@@ -836,56 +844,15 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
               : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
                 : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
           </footer>
-          <div
-            className="v-touch-pad"
-            aria-label={t("Movement controls", "移動操作")}
-          >
-            {[
-              ["w", ArrowUp],
-              ["a", ArrowLeft],
-              ["s", ArrowDown],
-              ["d", ArrowRight],
-            ].map(([key, Icon]) => {
-              const I = Icon as typeof ArrowUp;
-              return (
-                <button
-                  key={key as string}
-                  aria-label={t(
-                    `Glide ${{ w: "forward", a: "left", s: "backward", d: "right" }[key as "w" | "a" | "s" | "d"]}`,
-                    `移動 ${{ w: "前", a: "左", s: "後ろ", d: "右" }[key as "w" | "a" | "s" | "d"]}`,
-                  )}
-                  onPointerDown={(e) => {
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                    engine.current?.walkKey(key as string, true);
-                  }}
-                  onPointerUp={() =>
-                    engine.current?.walkKey(key as string, false)
-                  }
-                  onPointerCancel={() => engine.current?.walkKey(key as string, false)}
-                  onLostPointerCapture={() => engine.current?.walkKey(key as string, false)}
-                >
-                  <I size={21} />
-                </button>
-              );
-            })}
-          </div>
-          <div className="v-touch-actions">
-            <button aria-pressed={movement.running} onClick={() => engine.current?.toggleRun()}>{t("Glide faster", "速く移動")}</button>
-            <button onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); engine.current?.walkKey("shift", true); }}
-              onPointerUp={() => engine.current?.walkKey("shift", false)}
-              onPointerCancel={() => engine.current?.walkKey("shift", false)}
-              onLostPointerCapture={() => engine.current?.walkKey("shift", false)}>{t("Dash", "ダッシュ")}</button>
-            <button onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); engine.current?.walkKey(" ", true); }}
-              onPointerUp={() => engine.current?.walkKey(" ", false)}
-              onPointerCancel={() => engine.current?.walkKey(" ", false)}
-              onLostPointerCapture={() => engine.current?.walkKey(" ", false)}>{t("Jump", "ジャンプ")}</button>
-            <button onClick={() => engine.current?.resetPosition()}>{t("Unstuck", "安全な場所へ")}</button>
-          </div>
         </>
       )}
+      {touchControls && entered && !panel && !sceneryLoading && <TouchControls
+        key={`${place ?? "outdoor"}-${!!seatedBench}-${!!ridingSwing}-${!!ridingHorse}-${lookout.inside}`}
+        engine={engine} canMove={!place && !seatedBench && !ridingSwing}
+        horse={!!ridingHorse} lookout={lookout.inside} t={t} />}
       {entered && place && (
         <div id="v-activity-panel" hidden={activityCompact}>
-        {notice && <div className="v-notice" role="status">{notice}</div>}
+        {notice && <div className="v-notice" role="status">{localizedNotice}</div>}
         <div className="v-activity-content">
         <Activities
           key={place}
@@ -927,9 +894,9 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           {t("Back to focus", "集中に戻る")}
         </button>
       )}
-      {error && (
+      {error && entered && (
         <div className="v-error" role="status">
-          {error}
+          {villageNotice(error, language)}
           {entered && <button onClick={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}>{t("Retry the village", "村をもう一度開く")}</button>}
         </div>
       )}
@@ -942,7 +909,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         </div>
       )}
       {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}${showPuppyActions ? " has-puppy-actions" : ""}${showSwingActions || showHorseActions || showTownActions ? " has-swing-actions" : ""}${ridingSwing ? " is-swinging" : ""}`}>
-        {notice && !showPuppyActions && <div className="v-notice" role="status">{notice}</div>}
+        {notice && !showPuppyActions && <div className="v-notice" role="status">{localizedNotice}</div>}
         {showLookout && <section className="v-lookout-controls" aria-label={t("Watchtower lookout", "見張り塔の展望台")}>
           <h2>{t("Watchtower lookout", "見張り塔の展望台")}</h2>
           {lookout.inside && <p>{t("WASD / arrows to walk · Mouse to look · Home/End turn, PgUp/PgDn tilt", "WASD・矢印で歩く · マウスで見回す · Home/Endで回転、PgUp/PgDnで上下")}</p>}
@@ -1020,7 +987,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           }}>
           <Keycap aria-hidden="true">H</Keycap>{t(followingPuppies.length === 1 ? `Send ${followingPuppies[0].name} home` : `Send all ${followingPuppies.length} dogs home`, "犬たちを元の場所に戻す")}
         </ShortcutButton>}
-        {showPuppyActions && nearPuppy && <section className="v-puppy-actions" aria-label={t(`${nearPuppy.name} actions`, `${nearPuppy.name}とのふれあい`)}
+        {showPuppyActions && nearPuppy && <section className="v-puppy-actions" aria-label={t(`${nearPuppy.name} actions`, `${puppyName}とのふれあい`)}
           onKeyDown={event => {
             if (puppyBusy || event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
             const key = gameKey(keybindings, event.key);
@@ -1036,16 +1003,16 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           }}>
           <div className="v-puppy-heading">
             <PawPrint size={22} aria-hidden="true" />
-            <div><h2>{t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name)}</h2>
+            <div><h2>{puppyName}</h2>
               <p>{t(puppyBusy ? "Spending time with another visitor" : puppyIsFollowing ? "Walking with you" : PUPPY_INFO[nearPuppy.breed].breed, puppyBusy ? "ほかの人とふれあい中" : puppyIsFollowing ? "一緒にお散歩中" : "小さなお友だち")}</p></div>
             {puppyTricksOpen && <ShortcutButton className="v-context-close" aria-label={t("Close dog tricks", "犬の芸を閉じる")} aria-keyshortcuts="Escape" onClick={() => { setTricksPuppyId(null); canvas.current?.querySelector("canvas")?.focus(); }}><X size={18} aria-hidden="true" /></ShortcutButton>}
           </div>
           <div className="v-puppy-main-actions">
-            <ShortcutButton disabled={puppyBusy} className="v-interact" aria-keyshortcuts="E" aria-label={t(`Pet ${nearPuppy.name}`, `${nearPuppy.name}をなでる`)}
+            <ShortcutButton disabled={puppyBusy} className="v-interact" aria-keyshortcuts="E" aria-label={t(`Pet ${nearPuppy.name}`, `${puppyName}をなでる`)}
               onClick={() => { canvas.current?.querySelector("canvas")?.focus(); engine.current?.petPuppy(nearPuppy.id); }}>
               <Keycap aria-hidden="true">E</Keycap>{t("Pet", "なでる")}
             </ShortcutButton>
-            <ShortcutButton disabled={puppyBusy} className="v-interact" aria-keyshortcuts="P" aria-label={t(puppyIsFollowing ? `Let ${nearPuppy.name} go home` : `Walk with ${nearPuppy.name}`, puppyIsFollowing ? `${nearPuppy.name}を元の場所に戻す` : `${nearPuppy.name}と歩く`)}
+            <ShortcutButton disabled={puppyBusy} className="v-interact" aria-keyshortcuts="P" aria-label={t(puppyIsFollowing ? `Let ${nearPuppy.name} go home` : `Walk with ${nearPuppy.name}`, puppyIsFollowing ? `${puppyName}を元の場所に戻す` : `${puppyName}と歩く`)}
               onClick={() => engine.current?.togglePuppyFollow(nearPuppy.id)}>
               <Keycap aria-hidden="true">P</Keycap>{t(puppyIsFollowing ? "Home" : "Walk", puppyIsFollowing ? "おうちへ" : "お散歩")}
             </ShortcutButton>
@@ -1065,49 +1032,54 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           {showPackHome && <ShortcutButton className="v-interact v-puppy-home" aria-keyshortcuts="H" onClick={() => engine.current?.sendPuppyHome()}>
             <Keycap aria-hidden="true">H</Keycap>{t(followingPuppies.length === 1 ? `Send ${followingPuppies[0].name} home` : `Send all ${followingPuppies.length} dogs home`, "犬たちを元の場所に戻す")}
           </ShortcutButton>}
-          {notice && <div className="v-puppy-response" role="status">{notice}</div>}
+          {notice && <div className="v-puppy-response" role="status">{localizedNotice}</div>}
         </section>}
         {showWorldInteraction && !showTownActions && !showHorseActions && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => openPlace(nearPlace.id)}>
           <Keycap>E</Keycap>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </ShortcutButton>}
       </div>}
-      {showWorldInteraction && !panel && !sceneryLoading && <TownActivityHUD state={activityHUD} />}
+      {showWorldInteraction && !panel && !sceneryLoading && <TownActivityHUD state={activityHUD} language={language} />}
       {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
       {sharedTrialEnabled && entered && <div className="v-shared-trial">
-        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? "Hide Hearthwillow chat" : chatUnread ? "Open Hearthwillow chat, new message" : "Open Hearthwillow chat"}>
-          <UsersThree size={18} /> {sharedStatus === "Connected" ? `${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here` : sharedStatus}
+        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? t("Hide Hearthwillow chat", "村のチャットを隠す") : chatUnread ? t("Open Hearthwillow chat, new message", "村のチャットを開く。新しいメッセージがあります") : t("Open Hearthwillow chat", "村のチャットを開く")}>
+          <UsersThree size={18} /> {sharedStatus === "Connected" ? t(`${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here`, `${sharedPeople.length}人が村にいます`) : villageNotice(sharedStatus, language)}
           {chatUnread && !chatOpen && <span key={chatPulse} className="v-shared-unread" aria-hidden="true" />}
         </button>
-        {chatOpen && <section className="v-shared-chat" aria-label="Hearthwillow chat">
-          <div className="v-shared-chat-header"><h2>Hearthwillow chat</h2><button onClick={() => setChatOpen(false)} aria-label="Close Hearthwillow chat"><X size={18} /></button></div>
+        {chatOpen && <section className="v-shared-chat" aria-label={t("Hearthwillow chat", "村のチャット")}>
+          <div className="v-shared-chat-header"><h2>{t("Hearthwillow chat", "村のチャット")}</h2><button onClick={() => setChatOpen(false)} aria-label={t("Close Hearthwillow chat", "村のチャットを閉じる")}><X size={18} /></button></div>
           {chatPeople.length > 0 && <div className="v-shared-people">
             {chatPeople.length > 3 && <details>
-              <summary>See everyone here ({chatPeople.length})</summary>
+              <summary>{t(`See everyone here (${chatPeople.length})`, `村にいるみんなを見る（${chatPeople.length}人）`)}</summary>
               {chatPeopleList}
             </details>}
             {chatPeople.length <= 3 && chatPeopleList}
           </div>}
-          <p className="v-shared-chat-note">Everyone is in Hearthwillow. Messages clear each hour{sharedChatHour ? `, next at ${new Date((sharedChatHour + 1) * 3_600_000).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} your time` : ""}.</p>
+          <p className="v-shared-chat-note">{t(`Everyone is in Hearthwillow. Messages clear each hour${sharedChatHour ? `, next at ${chatTime((sharedChatHour + 1) * 3_600_000)} your time` : ""}.`, `みんな同じ村にいます。メッセージは毎時消去されます。${sharedChatHour ? `次は端末の時刻で${chatTime((sharedChatHour + 1) * 3_600_000)}です。` : ""}`)}</p>
           <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => {
             const sentAt = typeof entry.sentAt === "number" && Number.isFinite(entry.sentAt) ? new Date(entry.sentAt) : null;
-            return <p key={index}><strong>{entry.name}</strong> {entry.message}{sentAt && Number.isFinite(sentAt.getTime()) && <time className="v-shared-chat-time" dateTime={sentAt.toISOString()}>{sentAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</time>}</p>;
-          }) : <p className="v-shared-chat-empty">No messages yet.</p>}</div>
+            return <p key={index}><strong><bdi>{entry.name}</bdi></strong> <bdi>{entry.message}</bdi>{sentAt && Number.isFinite(sentAt.getTime()) && <time className="v-shared-chat-time" dateTime={sentAt.toISOString()}>{chatTime(sentAt.getTime())}</time>}</p>;
+          }) : <p className="v-shared-chat-empty">{t("No messages yet.", "まだメッセージはありません。")}</p>}</div>
           <form onSubmit={event => {
             event.preventDefault();
             const message = chatDraft.trim();
-            if (!message || Date.now() < chatCooldownUntil) return;
+            if (chatComposing.current || !message || Date.now() < chatCooldownUntil) return;
             if (sharedTrialRef.current?.sendChat(message)) setChatDraft("");
             else setNotice(t("Chat isn't ready yet. Your message is still here.", "チャットの準備ができていません。メッセージは入力欄に残っています。"));
           }}>
-            <input ref={chatInput} aria-label="Message" value={chatDraft} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => {
+            <input ref={chatInput} aria-label={t("Message", "メッセージ")} value={chatDraft} onCompositionStart={() => { chatComposing.current = true; }} onCompositionEnd={() => { chatComposing.current = false; }} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => {
               event.stopPropagation();
+              // IME confirmation must not submit or close chat (Safari also uses keyCode 229).
+              if (chatComposing.current || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) {
+                if (event.key === "Enter") event.preventDefault();
+                return;
+              }
               if (event.key === "Escape") {
                 event.preventDefault();
                 setChatOpen(false);
                 canvas.current?.querySelector("canvas")?.focus();
               } else if (event.key === "Enter" && Date.now() < chatCooldownUntil) event.preventDefault();
-            }} maxLength={180} placeholder='Press "Enter" to type!' disabled={sharedStatus !== "Connected"} />
-            <button type="submit" aria-label={chatCooldownSeconds > 0 ? `Send in ${chatCooldownSeconds} seconds` : "Send message"} disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
+            }} maxLength={180} placeholder={t('Press "Enter" to type!', "Enterで入力を始める")} disabled={sharedStatus !== "Connected"} />
+            <button type="submit" aria-label={chatCooldownSeconds > 0 ? t(`Send in ${chatCooldownSeconds} seconds`, `あと${chatCooldownSeconds}秒で送信できます`) : t("Send message", "メッセージを送信")} disabled={!chatDraft.trim() || sharedStatus !== "Connected" || chatCooldownSeconds > 0}>
               <ArrowUp size={20} weight="bold" aria-hidden="true" />
               {chatCooldownSeconds > 0 && <span className="v-shared-send-count" aria-hidden="true">{chatCooldownSeconds}</span>}
             </button>
@@ -1122,7 +1094,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         </output>
       )}
       <VillageMenus panel={panel} setPanel={setPanel} canvas={canvas} engine={engine} settings={settings} inventory={inventory}
-        place={place} notice={notice} entered={entered} setEntered={setEntered} enableSound={enableSound} openPlace={openPlace} travelOutdoor={id => {
+        place={place} notice={localizedNotice} entered={entered} setEntered={setEntered} enableSound={enableSound} openPlace={openPlace} travelOutdoor={id => {
           engine.current?.travelToMapDestination(id, () => {
             activityRequestRef.current++; pendingActivityRef.current = null;
             setPlace(null); audio.current?.setPlace(null); setPanel(null); setEntered(true);

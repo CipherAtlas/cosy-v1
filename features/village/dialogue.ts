@@ -151,6 +151,7 @@ export class VillagerDialogue {
     this.layer.lang = language;
     this.layer.setAttribute("aria-label", language === "ja" ? "村人との会話" : "Villager conversations");
     this.bubbles.forEach(b => {
+      b.measured = "";
       b.name.textContent = b.profile.name[language];
       b.text.textContent = b.line[language];
       b.buttonLabel.textContent = language === "ja" ? "話す" : "Chat";

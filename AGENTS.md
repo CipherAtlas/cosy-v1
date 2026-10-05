@@ -15,15 +15,17 @@ When the current reasoning level is appropriate or the user has explicitly resol
 
 Keep scene engines and React controllers focused on orchestration. When a feature introduces a distinct responsibility such as asset loading, scene construction, camera calculations, visitor rendering, settings or audio lifecycle, put it in a clearly named helper module or hook. Extract an existing responsibility before substantially extending a large mixed-purpose file. Prefer cohesive helpers with small typed interfaces; avoid generic utility buckets, giant context objects and tiny-file fragmentation. File length is a signal to review responsibilities, not a reason to split related code arbitrarily.
 
-# Laptop and desktop experience
+# Tablet, laptop and desktop experience
 
-The village is for laptops and desktop PCs. Do not optimize the village game or its controls for phones. Prioritize available world-view space, keyboard access and compatibility with 13-inch laptop screens.
+The village supports iPads, other tablets, laptops and desktop PCs. Phones are not supported. Prioritize the standard iPad, 11-inch iPad Air and iPad mini for tablet verification. Run only one simulator at a time; close the current device before booting another. Avoid simultaneous simulator, browser rendering and build workloads on this laptop. Use a touch-capability-based left movement thumbstick and direct thumb dragging on the scene to look, comfortable touch targets and safe-area spacing without covering the player or contextual actions. Prioritize available world-view space, keyboard access and compatibility with 13-inch laptop screens.
+
+Develop every screen, menu and HUD for iPad dimensions alongside laptop dimensions. Check portrait and landscape, including representative CSS viewports of 810×1080, 820×1180 and 744×1133 and their rotations. Account for safe areas and orientation changes; verify readable text, unclipped controls, scrolling menus and touch targets without covering the player or current interaction. Desktop-only verification does not establish iPad layout acceptance; report any native or physical-device verification gap.
 
 Strongly optimize the village scene and interface for 13-inch laptop screens. Keep the world and the current interaction clearly visible; use compact, contextual controls placed away from the main action. Buttons and control panels must have translucent or partially transparent backgrounds with readable text, visible boundaries and clear keyboard focus. Avoid large opaque overlays, unnecessary panels and controls that cover the player, interaction target or too much of the scene. Verify layouts at representative 13-inch laptop viewport sizes and in smaller desktop windows.
 
 Reserve the bottom-right corner for minor actions and UI options. Active gameplay progress belongs in a dedicated, readable HUD: racing countdown, remaining time and checkpoints at the top center, and visible farm growth timers beside the current farming interaction. Keep these displays clear of the player and preserve keyboard access and the translucent village styling.
 
-On phones, refuse to open the village and show a simple message asking the visitor to use a laptop or PC. Check device identity before mounting the village scene, loading world assets, initializing game audio or connecting to the shared village. Do not use viewport width alone to block entry: narrow windows on laptops and PCs must still work.
+On phones, refuse to open the village and show a simple message asking the visitor to use an iPad, tablet, laptop or PC. Check device identity before mounting the village scene, loading world assets, initializing game audio or connecting to the shared village. Do not use viewport width alone to block entry: narrow windows on laptops and PCs must still work.
 
 # Village assets and the local layout editor
 
@@ -50,6 +52,8 @@ The outdoor village is one public shared world at all times. Treat every outdoor
 # Dialogue and animal action controls
 
 NPC conversation actions and nearby animal interaction buttons must show their real keyboard shortcuts in clear, square `kbd` keycaps inside the clickable button. Keep the keycaps visible on desktop and touch layouts, preserve a distinct button boundary and at least a 44 px touch target, and keep click/tap and keyboard actions equivalent. Do not show a keycap for an action without that shortcut.
+
+Always leave visible padding inside keyboard-hint borders. Grouped shortcuts such as **W A S D** need intrinsic-width rectangles with at least 8 px of horizontal padding on each side; never let their text touch the enclosing border. Keep single-key keycaps square with centered glyphs. Check padding and wrapping in bottom hints and action panels at laptop and iPad dimensions.
 
 # Button press feedback
 

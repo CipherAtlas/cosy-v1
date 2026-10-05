@@ -59,7 +59,7 @@ export function VillageSettings({ settings, sound, soundLoading, toggleSound, en
         <details className="v-settings-advanced"><summary>{t("River & wind", "川と風")}</summary>
           {(["river", "wind"] as const).map(key => <label className="v-settings-range" key={key}>
             <span>{key === "river" ? t("River", "川") : t("Wind", "風")}<output>{Math.round((mix[key] ?? 1) * 100)}%</output></span>
-            <input type="range" aria-label={`${key} volume`} min="0" max="1" step=".01" value={mix[key] ?? 1} onChange={event => setMix({ ...mix, [key]: Number(event.target.value) })} />
+            <input type="range" aria-label={t(`${key} volume`, key === "river" ? "川の音量" : "風の音量")} min="0" max="1" step=".01" value={mix[key] ?? 1} onChange={event => setMix({ ...mix, [key]: Number(event.target.value) })} />
           </label>)}
         </details>
       </div>}

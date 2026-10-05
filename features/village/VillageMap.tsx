@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { gameKey } from "./keybindings";
 import { Keycap, ShortcutButton, KeybindingContext } from "./KeybindingControls";
 import { memo, useEffect, useId, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, Bird, BookOpen, Coffee, Drop, EnvelopeSimple, Fire, Leaf, Timer } from "@phosphor-icons/react";
+import { ArrowUpRight, Bird, BookOpen, CastleTurret, Coffee, Drop, EnvelopeSimple, Fire, Leaf, Timer } from "@phosphor-icons/react";
 import { PLACES, JAPANESE_PLACE_NAMES, type PlaceId } from "./places";
 import { BIRD_CLEARING, HEARTH } from "./environment";
 import { BEDS, GARDEN_COURT, SUNFLOWER_BED } from "./garden";
@@ -195,7 +195,7 @@ export function VillageMap({ scenery, current, position, language, notice, trave
     ...PLACES.map((place, i) => ({ id: place.id as string, position: place.id === "compliment" ? scenery?.layout.items?.find(item => item.visible && item.asset === "postbox")?.position ?? place.position : place.position, name: place.name, japanese: JAPANESE_PLACE_NAMES[i], Icon: icons[i], outdoor: false })),
     ...outdoorMapDestinations(scenery?.layout).filter((place, i, list) => place.kind !== "swing" || i === list.findIndex(item => item.kind === "swing")).map(place => ({ ...place,
       name: place.kind === "swing" ? "Meadow Swings" : place.name, japanese: place.kind === "swing" ? "草原のブランコ" : place.japanese,
-      position: [place.x, 0, place.z], Icon: place.kind === "owls" ? Bird : place.kind === "circuit" ? Timer : Leaf, outdoor: true })),
+      position: [place.x, 0, place.z], Icon: place.kind === "tower" ? CastleTurret : place.kind === "owls" ? Bird : place.kind === "circuit" ? Timer : Leaf, outdoor: true })),
   ], [scenery]);
   const location = mapLocation(current, position);
   const labelOffsets = useMemo(() => placeMapLabels(destinations.map(place => ({

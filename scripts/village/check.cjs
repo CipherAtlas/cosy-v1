@@ -17,7 +17,7 @@ try {
   run(process.execPath, ['node_modules/typescript/bin/tsc', '-p', 'worker/tsconfig.json', '--noEmit']);
   run('python3', ['scripts/village/split_puppies.py', '--check']);
   run('python3', ['scripts/village/split_farm_props.py', '--check']);
-  for (const name of ['tower-lookout', 'device-gate', 'animal-art', 'shared-world-worker', 'shared-actions-worker', 'town-worker', 'town-layout', 'animal-motion', 'patrol-navigation', 'bird-circuits', 'chat-hour', 'chat-cooldown', 'chat-admin', 'player-kick', 'notes', 'write-cleanup'])
+  for (const name of ['tower-lookout', 'device-gate', 'animal-art', 'shared-world-worker', 'shared-actions-worker', 'town-worker', 'town-layout', 'animal-motion', 'patrol-navigation', 'bird-circuits', 'japanese', 'chat-hour', 'chat-cooldown', 'chat-admin', 'player-kick', 'notes', 'write-cleanup'])
     run(process.execPath, [`scripts/village/tests/${name}.cjs`]);
   fs.writeFileSync(path.join(temporary, 'tsconfig.json'), JSON.stringify({
     compilerOptions: { target: 'ES2022', module: 'CommonJS', moduleResolution: 'node', strict: true, skipLibCheck: true,

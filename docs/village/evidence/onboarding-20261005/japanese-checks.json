@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Fresh Japanese browser starts in Japanese with a title-screen language menu",
+    "Explicit English wins over Japanese browser locale",
+    "Chat room information and self label are Japanese",
+    "IME Enter, Escape and form submission preserve the draft and open chat",
+    "Native composition flag prevents implicit form submission",
+    "Safari-style composition Enter (229) does not submit",
+    "Confirmed Japanese message sends once and clears the accepted draft",
+    "English recipient sees the original Japanese message with English controls",
+    "Send cooldown announces Japanese seconds",
+    "1366×768: Japanese chat stays within the laptop window without horizontal overflow",
+    "1280×800: Japanese chat stays within the laptop window without horizontal overflow",
+    "1024×720: Japanese chat stays within the laptop window without horizontal overflow",
+    "900×640: Japanese chat stays within the laptop window without horizontal overflow",
+    "Closing chat during composition cannot leave the reopened composer stuck",
+    "Harvest basket translates every item",
+    "Language changes update chat and the live dialogue engine",
+    "Japanese selection survives reloading",
+    "No page errors ()"
+  ],
+  "errors": []
+}

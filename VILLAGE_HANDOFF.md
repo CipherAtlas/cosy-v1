@@ -1,5 +1,30 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-05 — onboarding/tablet/Japanese release in progress
+
+Release authorized for the title screen, padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower map destination. Fresh production build/check/export passes; matching Worker version `63198674-b21d-4a0a-b433-ff31a0549aed` is deployed. Pages publication and live verification remain pending. [Release ledger](VILLAGE_BUILD.md#2026-10-05--onboarding-tablet-and-japanese-release).
+
+## 2026-10-05 — title screen and first-use menus (local)
+
+Animated village backdrop with Enter Hearthwillow, separate English/Japanese Language menu and the existing Experience/Sound/Controls Settings before entry. Loading/retry, keyboard/modal focus, touch guidance, padded movement keycaps and reduced motion are included; shared joining waits for Enter. Final build/types/lint/contracts/export privacy, 57 onboarding, 18 two-client Japanese/chat and five actual-served checks pass with zero page errors. Main3051 serves the checked export, including pending tablet/Japanese/watch-tower map work; Worker2567 is unchanged. Reload local tabs. Native/physical-device acceptance remains open; no publication. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--animated-title-screen-and-first-use-menus-local).
+
+## 2026-10-05 — watch tower map destination (local)
+
+The atlas has a selectable Watch tower / 見張り塔 marker with a tower icon, anchored to the editable ground-level doorway. Travel uses existing Worker approval; gallery admission remains separate. Check/build/types/export and all 73 actual three-client atlas checks pass with zero page errors. Main3051/Worker2567 were preserved and require a coordinated refresh. No publication. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--watch-tower-map-destination-local).
+
+## 2026-10-05 — Japanese language and chat support (local)
+
+Welcome-screen/Settings language choices persist, with Japanese browser defaults. Chat UI/IME handling, farm/animal/race controls, inventory and shared-world notices are localized; authored resident/animal Japanese dialogue and original visitor messages are preserved. Japanese fonts/wrapping use system fallbacks. Lint/types/full contracts, 243 content/control checks, final isolated build/export privacy and 18 real two-client Japanese chat/laptop checks pass with zero page errors. Preview3068 serves the checked snapshot; main3051/Worker2567 are preserved. Native IME and Japanese-speaking editorial acceptance remain open. No publication. [Behavior and evidence](VILLAGE_BUILD.md#2026-10-05--japanese-language-and-chat-support-local).
+
+## 2026-10-05 — tablet controls (local)
+
+iPads and tablets now enter alongside PCs; phones remain blocked before scene mounting, audio and shared connection. Touch-capable devices use a left movement thumbstick and direct scene dragging to look with analog speed and a dead zone, Run and Jump (Canter/Brake on horseback), safe-area spacing, and contextual actions above the thumb areas. Menus, backgrounding, cancellation and orientation changes release held controls. Chat starts collapsed on tablets. Desktop keyboard/mouse controls remain available. Standard iPad, 11-inch Air and mini simulator checks are prioritized, one simulator at a time. Final build (including lint/types), typecheck, 43 device-gate checks, export privacy and 29 actual served two-client touch checks pass with zero page errors. Existing movement/physics/Worker contracts passed earlier and are reused for unchanged modules. Native iOS 26.2 Safari entry/rendering/shared connection/spacing were reviewed on mini, standard iPad and 11-inch Air, sequentially; all test simulators are now shut down. Native automated sustained drags were inconsistent outside the mini, so full native multi-touch, physical comfort, FPS/thermal/battery and long sessions remain unverified. Main preview3051 now serves the checked export with unchanged Worker2567. [Evidence](docs/village/evidence/tablet-controls-20261005/README.md). No deployment or Git writes.
+
+
+## 2026-10-05 — Luma offering shortcuts (local)
+
+Luma’s available offerings now show square shortcut keycaps: 1 carrot, 2 radish, 3 mint, C sunflower and B daisy; E drinks prepared mint tea. Click and keyboard use the existing activity dispatch and Worker validation, and saved keybindings update both shortcuts and keycaps. Unavailable inventory stays hidden. Gift keycaps use dark green text on the crop-colored buttons. Local build/types/export privacy and 23 focused offering-control checks pass; shared tea-flow, native Firefox and live verification remain open. No publication. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--luma-offering-shortcuts-local).
+
 ## 2026-10-05 — integrated release published
 
 All pending atlas, farmers/Rowan racing, crop HUD, watchtower and river/pond/path work is included in the user-authorized release. Fresh production build/types/contracts/export privacy, renderer/Worker parity, 61 actual SQLite/WebSocket town checks and 19 actual multiplayer browser checks pass with zero page errors. Editor support and existing feature evidence are included. Application `46db3d0` and matching Worker version `62da9998-6e96-48b0-a076-5d08580d8c14` are published. Pages run 37314257536 succeeded; ten fresh two-browser live checks, Worker health and public route boundaries pass with zero page errors. Reload existing tabs. Details are in the [release ledger](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release); earlier local-only entries are historical checkpoints. Native browser/device and long-session acceptance remain open.

@@ -16,6 +16,11 @@ export class VillageCamera {
   private collisionBox = new T.Box3();
   private cameraRay = new T.Ray();
   private cameraHit = new T.Vector3();
+  titleScreen(time: number) {
+    // Frame the existing village from above the entrance, without moving the visitor.
+    this.look.set(-4, 2, -13);
+    this.goal.set(27 + Math.sin(time * .055) * 4, 19 + Math.sin(time * .07) * .6, 42 + Math.cos(time * .055) * 2);
+  }
   animal(state: TownAnimal, player: T.Vector3, position: T.Vector3, colliders: Collider[], items: WorldItem[] = []) {
     const cow = state.species === "cow", distance = cow ? 4.1 : 3.4;
     const dx = position.x - player.x, dz = position.z - player.z, length = Math.hypot(dx, dz) || 1;

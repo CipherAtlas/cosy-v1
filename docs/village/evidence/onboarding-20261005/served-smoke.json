@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Checked title and three choices served on 3051",
+    "No shared socket before Enter",
+    "Starter Settings served with all three sections and focus return",
+    "Enter joins the actual Worker on 2567 and removes starter UI",
+    "Zero page errors"
+  ],
+  "errors": []
+}

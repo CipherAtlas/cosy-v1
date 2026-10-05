@@ -127,7 +127,11 @@ const full = new VillageSimulation(), ridden = full.actor('horse-juniper', 'hors
 const { outdoorMapDestinations, mapArrival } = require('../../../features/village/mapDestinations.ts');
 const mapDestinations = outdoorMapDestinations(full.authored);
 check(mapDestinations.filter(place => place.kind === 'swing').length === 2 && mapDestinations.filter(place => place.kind === 'farm').length === 3
-  && ['field', 'circuit', 'owls'].every(kind => mapDestinations.some(place => place.kind === kind)), 'The editable world exposes both swings, three farms, field, circuit and owl grove as map destinations');
+  && ['field', 'circuit', 'owls', 'tower'].every(kind => mapDestinations.some(place => place.kind === kind)), 'The editable world exposes both swings, three farms, field, circuit, owl grove and watch tower as map destinations');
+const movedTowerWorld = { ...full.authored, structures: { ...full.authored.structures, tower: { ...full.authored.structures.tower, x: 12, z: 24, yaw: Math.PI / 2 } } };
+const movedTower = outdoorMapDestinations(movedTowerWorld).find(place => place.kind === 'tower');
+check(Math.abs(movedTower.x - 15.5) < .001 && Math.abs(movedTower.z - 24) < .001, 'The watch tower map destination follows the edited tower position and doorway rotation');
+check(!outdoorMapDestinations({ ...full.authored, structures: { ...full.authored.structures, tower: null } }).some(place => place.kind === 'tower'), 'A hidden tower has no map destination');
 const traveller = { id: 'map-traveller', x: .3, z: 20, heading: 0, active: true, activity: 'focus' };
 check(!full.mapTravel(traveller, 'forged-destination', now, [traveller]).ok && traveller.activity === 'focus', 'Unknown map destinations cannot release an activity or move the visitor');
 traveller.active = false;

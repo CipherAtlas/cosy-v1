@@ -1,3 +1,4 @@
+import { villageName } from "./localization";
 import { Keycap, ShortcutButton } from "./KeybindingControls";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, X } from "@phosphor-icons/react";
 import type { VillageEngine } from "./VillageEngine";
@@ -24,7 +25,7 @@ export function HorseControls({ horse, riding, busy, engine, focus, t, town }: {
     },
   });
   return <section className="v-swing-controls v-horse-controls" aria-label={t("Horse riding", "乗馬")}>
-    <h2>{horse.name}</h2>
+    <h2>{t(horse.name, villageName(horse.name, "ja"))}</h2>
     {riding ? <>
       <ShortcutButton className="v-context-close" aria-label={t("Dismount", "馬を降りる")} aria-keyshortcuts="Escape" onClick={() => { engine?.leaveHorse(); focus(); }}><X size={18} aria-hidden="true" /></ShortcutButton>
       <div className="v-horse-directions">

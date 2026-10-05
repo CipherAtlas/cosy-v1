@@ -15,13 +15,13 @@ export class HorseRiding {
     return previous !== this.actor?.id;
   }
 
-  update(keys: Set<string>, enabled: boolean, time: number) {
+  update(keys: Set<string>, enabled: boolean, time: number, touch = { forward: 0, turn: 0, sprint: false, brake: false }) {
     if (!this.actor || !this.send) return;
     const input: SharedHorseInput = {
-      forward: enabled ? Number(keys.has("w") || keys.has("arrowup")) - Number(keys.has("s") || keys.has("arrowdown")) : 0,
-      turn: enabled ? Number(keys.has("a") || keys.has("arrowleft")) - Number(keys.has("d") || keys.has("arrowright")) : 0,
-      sprint: enabled && keys.has("shift"),
-      brake: !enabled || keys.has(" "),
+      forward: enabled ? Math.max(-1, Math.min(1, Number(keys.has("w") || keys.has("arrowup")) - Number(keys.has("s") || keys.has("arrowdown")) + touch.forward)) : 0,
+      turn: enabled ? Math.max(-1, Math.min(1, Number(keys.has("a") || keys.has("arrowleft")) - Number(keys.has("d") || keys.has("arrowright")) + touch.turn)) : 0,
+      sprint: enabled && (keys.has("shift") || touch.sprint),
+      brake: !enabled || keys.has(" ") || touch.brake,
     };
     const signature = JSON.stringify(input);
     if (signature !== this.lastInput || time - this.sentAt >= .1) {

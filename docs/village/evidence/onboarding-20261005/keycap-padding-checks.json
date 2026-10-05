@@ -1,0 +1,135 @@
+{
+  "keyboardViewports": [
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        1280,
+        800
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        810,
+        1080
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        1080,
+        810
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        744,
+        1133
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    },
+    {
+      "viewport": [
+        1133,
+        744
+      ],
+      "left": 8,
+      "right": 8,
+      "insetLeft": 9,
+      "insetRight": 9,
+      "singleWidth": 28,
+      "singleHeight": 28,
+      "contained": true
+    }
+  ],
+  "touchViewports": [
+    [
+      810,
+      1080
+    ],
+    [
+      1080,
+      810
+    ],
+    [
+      820,
+      1180
+    ],
+    [
+      1180,
+      820
+    ],
+    [
+      744,
+      1133
+    ],
+    [
+      1133,
+      744
+    ]
+  ],
+  "errors": []
+}

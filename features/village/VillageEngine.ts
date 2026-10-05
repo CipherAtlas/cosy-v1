@@ -150,6 +150,7 @@ export class VillageEngine {
   private resizeObserver: ResizeObserver;
   private disposed = false;
   private blocked = false;
+  private titleScreen = false;
   private mapOpen = false;
   private place: PlaceId | null = null;
   private near: PlaceId | null = null;
@@ -300,6 +301,9 @@ export class VillageEngine {
   private onKeyUp = (e: KeyboardEvent) => this.keys.delete(gameKey(this.keybindings, e.key));
   private clearKeys = () => {
     this.keys.clear();
+    this.touchMove.set(0, 0);
+    this.touchSprint = false;
+    this.touchBrakeUntil = 0;
     this.horseRiding.stop();
     this.swingPulse.direction = 0;
     this.swingBrakeUntil = 0;
@@ -803,6 +807,10 @@ export class VillageEngine {
     this.dialogue?.resize(w, h);
     this.birds?.resize(w, h);
     this.animalDialogue?.resize(w, h);
+  }
+  setTitleScreen(value: boolean) {
+    this.titleScreen = value;
+    this.renderer.domElement.tabIndex = value ? -1 : 0;
   }
   setBlocked(v: boolean) {
     this.blocked = v;
@@ -1523,6 +1531,16 @@ export class VillageEngine {
       if (key === " " && !this.seatedBench && !this.ridingSwing) this.movement?.jump();
     } else this.keys.delete(key);
   }
+  private touchMove = new T.Vector2();
+  private touchSprint = false;
+  private touchBrakeUntil = 0;
+  setTouchMovement(x: number, y: number) {
+    if (this.blocked || document.hidden || !Number.isFinite(x) || !Number.isFinite(y)) { this.touchMove.set(0, 0); return; }
+    this.touchMove.set(x, y).clampLength(0, 1);
+  }
+  setTouchSprint(value: boolean) { this.touchSprint = value && !this.blocked && !document.hidden; }
+  touchJump() { if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing && !this.horseRiding.actor && !this.lookoutPosition) this.movement?.jump(); }
+  brakeHorse() { if (!this.blocked && this.horseRiding.actor) this.touchBrakeUntil = this.elapsed + .5; }
   toggleRun() { this.running = !this.running; this.reportMovement(true); }
   rideSwing(id: string, index: 0 | 1, accepted = false) {
     const swing = this.world?.swings.find(value => value.placement.id === id);
@@ -1608,28 +1626,29 @@ export class VillageEngine {
     if (!this.blocked) this.cottageCat?.update(dt, this.elapsed, this.reducedMotion);
     const movement = this.movement!;
     const horse = this.horseRiding.actor;
-    this.horseRiding.update(this.keys, !this.blocked && !this.place && this.sharedConnected, this.elapsed);
+    this.horseRiding.update(this.keys, !this.blocked && !this.place && this.sharedConnected, this.elapsed,
+      { forward: -this.touchMove.y, turn: -this.touchMove.x, sprint: this.touchSprint, brake: this.elapsed < this.touchBrakeUntil });
     this.horses?.update(dt, this.elapsed, this.reducedMotion, this.player.position, this.place !== "focus" && !this.blocked);
     this.townAnimals?.update(dt, this.reducedMotion, this.camera.quaternion);
     this.townScene?.update(this.reducedMotion, this.camera.quaternion);
     this.direction.set(0, 0, 0);
     if (!this.blocked && !this.place && !this.seatedBench && !this.ridingSwing && !horse) {
-      const forward = Number(this.keys.has("w") || this.keys.has("arrowup")) - Number(this.keys.has("s") || this.keys.has("arrowdown"));
-      const side = Number(this.keys.has("d") || this.keys.has("arrowright")) - Number(this.keys.has("a") || this.keys.has("arrowleft"));
+      const forward = Number(this.keys.has("w") || this.keys.has("arrowup")) - Number(this.keys.has("s") || this.keys.has("arrowdown")) - this.touchMove.y;
+      const side = Number(this.keys.has("d") || this.keys.has("arrowright")) - Number(this.keys.has("a") || this.keys.has("arrowleft")) + this.touchMove.x;
       this.direction.set(side * Math.cos(this.yaw) - forward * Math.sin(this.yaw), 0,
         -forward * Math.cos(this.yaw) - side * Math.sin(this.yaw));
-      if (this.direction.lengthSq() > 0) this.direction.normalize();
+      if (this.direction.lengthSq() > 1) this.direction.normalize();
     }
     if (this.lookoutPosition && !this.blocked) {
       this.yaw -= (Number(this.keys.has("end")) - Number(this.keys.has("home"))) * dt * 1.25;
       this.pitch = T.MathUtils.clamp(this.pitch + (Number(this.keys.has("pagedown")) - Number(this.keys.has("pageup"))) * dt, -.85, 1.35);
-      const speed = this.keys.has("shift") ? 3.5 : 2.2;
+      const speed = this.keys.has("shift") || this.touchSprint ? 3.5 : 2.2;
       this.lookoutPosition = towerLookout(this.world.authored)!.constrain(
         this.lookoutPosition[0] + this.direction.x * dt * speed,
         this.lookoutPosition[2] + this.direction.z * dt * speed);
     }
     movement.update(dt, { x: this.direction.x, z: this.direction.z, run: this.running,
-      sprint: this.keys.has("shift"), blocked: (!!this.lookoutPosition || this.lookoutPending) || this.blocked || this.place !== null || !!this.seatedBench || !!this.ridingSwing || !!horse });
+      sprint: this.keys.has("shift") || this.touchSprint, blocked: (!!this.lookoutPosition || this.lookoutPending) || this.blocked || this.place !== null || !!this.seatedBench || !!this.ridingSwing || !!horse });
     const swingInput = Number(this.keys.has("w") || this.keys.has("arrowup")) - Number(this.keys.has("s") || this.keys.has("arrowdown"));
     const swingDirection = swingInput || (this.elapsed < this.swingPulse.until ? this.swingPulse.direction : 0);
     this.world.swings.forEach(swing => swing.update(dt, this.ridingSwing, swingDirection, this.keys.has(" ") || this.elapsed < this.swingBrakeUntil, this.blocked || !!this.place));
@@ -1704,7 +1723,7 @@ export class VillageEngine {
     if (now - this.statusTime > 100) {
       const context = !this.blocked && !this.place && !this.seatedBench && !this.ridingSwing && !this.lookoutPosition && this.sharedConnected
         ? this.townInteractions?.context(this.sharedActors?.town, this.sharedSelfId, this.player.position.x, this.player.position.z,
-          horse?.id ?? null, this.nearHorse?.id ?? null, this.gardenState.crumbPouch, Date.now() + this.sharedTimeOffset, this.forageInventory) ?? null : null;
+          horse?.id ?? null, this.nearHorse?.id ?? null, this.gardenState.crumbPouch, Date.now() + this.sharedTimeOffset, this.forageInventory, this.language) ?? null : null;
       const signature = JSON.stringify(context);
       if (signature !== this.townContextSignature) {
         this.townContext = context; this.townContextSignature = signature; this.callbacks.townContext?.(context);
@@ -1753,7 +1772,9 @@ export class VillageEngine {
       const turn = T.MathUtils.euclideanModulo(angle - this.player.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
       this.player.rotation.y += turn * (1 - Math.exp(-dt * 8));
     }
-    if (this.lookoutPosition) {
+    if (this.titleScreen) {
+      this.view.titleScreen(this.reducedMotion ? 0 : this.elapsed);
+    } else if (this.lookoutPosition) {
       this.view.goal.copy(this.player.position); this.view.goal.y += 1.35;
       this.view.look.copy(this.view.goal).add(this.temp.set(-Math.sin(this.yaw) * Math.cos(this.pitch), -Math.sin(this.pitch), -Math.cos(this.yaw) * Math.cos(this.pitch)));
     } else if (this.place) {

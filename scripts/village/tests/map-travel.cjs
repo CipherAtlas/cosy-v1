@@ -165,7 +165,7 @@ const check = (condition, label) => { assert(condition, label); checks.push(labe
       setTimeout(() => { e.renderer.render = render; resolve(count); }, 300);
     }));
     check(draws === 0, 'The hidden 3D scene stops drawing while shared map state continues');
-    check(destinations.length === 7, 'One Meadow Swings option, field, circuit, three farms and owl grove have clickable map buttons');
+    check(destinations.length === 8 && destinations.some(destination => destination.id === 'tower:watchtower'), 'One Meadow Swings option, field, circuit, three farms, owl grove and watch tower have clickable map buttons');
     for (const viewport of [{ width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 640 }, { width: 800, height: 640 }]) {
       await a.setViewportSize(viewport);
       await a.waitForFunction(({ width, height }) => {

@@ -1,7 +1,8 @@
 import type { AuthoredWorld } from "./worldLayout";
+import { towerLookout } from "./towerLookout";
 import { farmCrop, townItems, townPoint, trackPoint, TOWN_TRACK_START_ANGLE } from "./townShared";
 
-export type MapDestination = { id: string; name: string; japanese: string; x: number; z: number; kind: "swing" | "field" | "circuit" | "farm" | "owls" };
+export type MapDestination = { id: string; name: string; japanese: string; x: number; z: number; kind: "swing" | "field" | "circuit" | "farm" | "owls" | "tower" };
 
 /** Travel anchors come from the same editable objects as the map and Worker. */
 export function outdoorMapDestinations(world?: AuthoredWorld): MapDestination[] {
@@ -10,6 +11,9 @@ export function outdoorMapDestinations(world?: AuthoredWorld): MapDestination[] 
     id: `swing:${swing.id}`, name: `Meadow swings ${i + 1}`, japanese: `草原のブランコ ${i + 1}`, kind: "swing",
     x: swing.x + Math.sin(swing.yaw) * 3 * swing.scale[2], z: swing.z + Math.cos(swing.yaw) * 3 * swing.scale[2],
   }));
+  const lookout = towerLookout(world);
+  if (lookout) destinations.push({ id: "tower:watchtower", name: "Watch tower", japanese: "見張り塔", kind: "tower",
+    x: lookout.entrance[0], z: lookout.entrance[2] });
   for (const item of townItems(world, "horse-racetrack")) {
     const [x, z] = trackPoint(item, TOWN_TRACK_START_ANGLE, 4);
     destinations.push({ id: `circuit:${item.id}`, name: "Willow circuit", japanese: "ウィロー・サーキット", kind: "circuit", x, z });
