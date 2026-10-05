@@ -18,6 +18,7 @@ const check = (ok, name) => { assert(ok, name); checks.push(name); console.log(n
       });
       await page.goto(url);
       await page.getByRole('button', { name: 'Enter Hearthwillow', exact: true }).click({ timeout: 120000 });
+      await page.locator('[data-tutorial-done]').click();
       await page.waitForFunction(() => {
         for (let el = document.querySelector('canvas'); el; el = el.parentElement)
           for (let fiber = el[Object.keys(el).find(k => k.startsWith('__reactFiber'))]; fiber; fiber = fiber.return)

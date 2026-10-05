@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { SpeakerHigh, SpeakerSlash, X } from "@phosphor-icons/react";
 import { MixSliders, SoundtrackChoices } from "./Activities";
@@ -12,13 +12,14 @@ import type { useVillagePreferences } from "./useVillagePreferences";
 import type { RadioStationId } from "./radioCatalog";
 import { VillageSettings } from "./VillageSettings";
 import { Keycap } from "./KeybindingControls";
+import { VillageTutorial } from "./VillageTutorial";
 import { useVillageMenuNavigation } from "./useVillageMenuNavigation";
 
-export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | null;
+export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | "tutorial" | null;
 
-export function VillageMenus({ panel, setPanel, canvas, engine, settings, inventory, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
+export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings, inventory, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
   sound, soundLoading, toggleSound, radioPrefs, radioLoading, radioError, selectStation, nextRadioTrack, playVillageMusic, showStats, setShowStats, stats }: {
-  panel: VillagePanel; setPanel: Dispatch<SetStateAction<VillagePanel>>;
+  touch: boolean; panel: VillagePanel; setPanel: Dispatch<SetStateAction<VillagePanel>>;
   canvas: RefObject<HTMLDivElement | null>; engine: RefObject<VillageEngine | null>;
   settings: ReturnType<typeof useVillagePreferences>; inventory: ForageInventory;
   place: PlaceId | null; notice: string; entered: boolean; setEntered: (value: boolean) => void;
@@ -29,6 +30,14 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
   showStats: boolean; setShowStats: (value: boolean) => void; stats: { fps: number; draws: number; triangles: number };
 }) {
   useVillageMenuNavigation(entered && panel !== null);
+  const tutorialFromSettings = useRef(false);
+  const closePanel = () => {
+    if (panel === "tutorial" && tutorialFromSettings.current) {
+      tutorialFromSettings.current = false;
+      setPanel("settings");
+      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>("[data-show-tutorial]")?.focus());
+    } else setPanel(null);
+  };
   const { mix, setMix, language } = settings;
   const t = (en: string, jp: string) => language === "ja" ? jp : en;
   // Retain the map during Radix’s exit animation so travel reveals the arrival smoothly.
@@ -42,15 +51,18 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
       <Dialog.Root
         open={panel !== null}
         onOpenChange={(v) => {
-          if (!v) setPanel(null);
+          if (!v) closePanel();
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace || displayedPanel === "language" ? " v-settings-overlay" : ""}${!entered ? " v-start-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
+          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-overlay" : ""}${!entered ? " v-start-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace || displayedPanel === "language" ? " v-settings-dialog" : ""}${!entered ? " v-start-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-dialog" : ""}${!entered ? " v-start-dialog" : ""}${displayedPanel === "tutorial" ? " v-tutorial-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
             onOpenAutoFocus={event => {
-              if (panel === "places") {
+              if (panel === "tutorial") {
+                event.preventDefault();
+                requestAnimationFrame(() => document.querySelector<HTMLElement>(".v-tutorial-dialog h2")?.focus());
+              } else if (panel === "places") {
                 event.preventDefault();
                 requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(".v-map-marker.is-selected")?.focus());
               }
@@ -61,11 +73,13 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
               else document.querySelector<HTMLButtonElement>(`[data-start-panel="${displayedPanel}"]`)?.focus();
             }}
           >
-            <Dialog.Title>
+            <Dialog.Title tabIndex={displayedPanel === "tutorial" ? -1 : undefined}>
               {displayedPanel === "places"
                 ? t("Hearthwillow", "ハースウィロー")
                 : displayedPanel === "sound" && PERSONAL_RADIO_ENABLED
                   ? t("Sound", "音")
+                  : displayedPanel === "tutorial"
+                    ? t("Welcome to Hearthwillow", "ハースウィローへようこそ")
                   : displayedPanel === "language"
                     ? t("Language", "言語")
                   : displayedPanel === "basket"
@@ -79,6 +93,8 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
                 ? t("Full-screen village map. The gold diamond marks you; blue circles mark other players. Names appear above markers. Click a destination to travel, or use arrow keys and Enter. Press the map key again or Escape to close.", "全画面の村の地図。金色のひし形はあなた、青い丸は他のプレイヤーです。名前はマーカーの上に表示されます。クリック、または矢印キーとEnterで移動し、地図キーかEscapeで閉じます。")
                 : displayedPanel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? t("Choose a radio station and adjust all sound volumes.", "ラジオ局を選び、音量を調整します。") : t("Music and ambience controls.", "音楽と環境音の設定。")
+                  : displayedPanel === "tutorial"
+                    ? t("A short guide to moving, activities, chat and settings.", "移動、楽しめる場所、チャット、設定の短いガイドです。")
                   : displayedPanel === "language"
                     ? t("Choose the language for menus, controls and village conversations.", "メニュー・操作・村での会話の言語を選びます。")
                   : displayedPanel === "basket"
@@ -90,10 +106,13 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
             <Dialog.Close
               className="v-dialog-close"
               aria-label={t("Close", "閉じる")}
+              aria-keyshortcuts="Escape Backspace"
+              data-menu-back={displayedPanel === "places" ? true : undefined}
             >
-              {displayedPanel === "places" && <Keycap aria-hidden="true">Esc</Keycap>}
+              {displayedPanel === "places" && <><Keycap aria-hidden="true">Esc</Keycap><span>{t("Back", "戻る")}</span><kbd aria-label="Backspace">⌫</kbd></>}
               <X size={22} />
             </Dialog.Close>
+            {displayedPanel === "tutorial" && <VillageTutorial settings={settings} touch={touch} entered={entered} done={() => { tutorialFromSettings.current = false; setPanel(null); }} />}
             {displayedPanel === "language" && <div className="v-language-menu">
               <p>{t("Choose your language.", "言語を選んでください。")}</p>
               {([['en', 'English'], ['ja', '日本語']] as const).map(([id, name]) => <button key={id} lang={id}
@@ -169,9 +188,13 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
             )}
             {settingsWorkspace && !entered && notice && <p className="v-settings-help" role="status">{notice}</p>}
             {settingsWorkspace && <VillageSettings key={displayedPanel} settings={settings}
+              showTutorial={() => { tutorialFromSettings.current = true; setPanel("tutorial"); requestAnimationFrame(() => document.querySelector<HTMLElement>(".v-tutorial-dialog h2")?.focus()); }}
               initial={displayedPanel === "sound" ? "sound" : "experience"} sound={sound} soundLoading={soundLoading} toggleSound={toggleSound}
               engine={engine.current} showStats={showStats} setShowStats={setShowStats} stats={stats} />}
 
+            {displayedPanel !== "places" && <Dialog.Close className="v-menu-back" data-menu-back aria-keyshortcuts="Escape Backspace">
+              <Keycap>Esc</Keycap>{t("Back", "戻る")}<kbd aria-label="Backspace">⌫</kbd>
+            </Dialog.Close>}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

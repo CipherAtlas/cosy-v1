@@ -827,7 +827,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       {!entered && <VillageStartScreen language={language} ready={ready} progress={progress} error={error} touch={touchControls}
         enter={() => {
           if (!soundChosen.current) void enableSound();
-          setEntered(true); setPanel(null);
+          setEntered(true); setPanel(settings.dontShowTutorial ? null : "tutorial");
           requestAnimationFrame(() => canvas.current?.querySelector("canvas")?.focus());
         }}
         retry={() => { setError(""); setProgress(0); setEngineAttempt(value => value + 1); }}
@@ -1093,7 +1093,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           {Math.round(stats.triangles / 1000)}k triangles
         </output>
       )}
-      <VillageMenus panel={panel} setPanel={setPanel} canvas={canvas} engine={engine} settings={settings} inventory={inventory}
+      <VillageMenus touch={touchControls} panel={panel} setPanel={setPanel} canvas={canvas} engine={engine} settings={settings} inventory={inventory}
         place={place} notice={localizedNotice} entered={entered} setEntered={setEntered} enableSound={enableSound} openPlace={openPlace} travelOutdoor={id => {
           engine.current?.travelToMapDestination(id, () => {
             activityRequestRef.current++; pendingActivityRef.current = null;

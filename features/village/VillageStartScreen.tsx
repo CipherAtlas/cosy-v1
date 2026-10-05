@@ -19,8 +19,8 @@ export function VillageStartScreen({ language, ready, progress, error, touch, en
     return () => window.clearTimeout(timer);
   }, [ready, error]);
   useEffect(() => {
-    if (phase === "menu" && !touch) menu.current?.querySelector<HTMLButtonElement>("button")?.focus();
-  }, [phase, touch]);
+    if (phase === "menu") menu.current?.querySelector<HTMLButtonElement>("button")?.focus();
+  }, [phase]);
   useVillageMenuNavigation(phase === "menu", menu);
   return <main className={`v-start v-start-phase-${phase}`} lang={language}>
     {phase !== "menu" && <div className="v-title-loading" role="status" aria-label={t("Loading Hearthwillow", "ハースウィローを準備しています")}>

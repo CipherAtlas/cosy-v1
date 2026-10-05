@@ -8,15 +8,15 @@ import type { useVillagePreferences } from "./useVillagePreferences";
 import type { VillageEngine } from "./VillageEngine";
 import { withBasePath } from "@/lib/basePath";
 
-export function VillageSettings({ settings, sound, soundLoading, toggleSound, engine, showStats, setShowStats, stats, initial = "experience" }: {
+export function VillageSettings({ settings, sound, soundLoading, toggleSound, engine, showStats, setShowStats, stats, showTutorial, initial = "experience" }: {
   settings: ReturnType<typeof useVillagePreferences>; sound: boolean; soundLoading: boolean; toggleSound: () => void;
   engine: VillageEngine | null; showStats: boolean; setShowStats: (value: boolean) => void;
-  stats: { fps: number; draws: number; triangles: number }; initial?: "experience" | "sound";
+  stats: { fps: number; draws: number; triangles: number }; showTutorial: () => void; initial?: "experience" | "sound";
 }) {
   const [section, setSection] = useState<"experience" | "sound" | "controls">(initial);
   const [report, setReport] = useState("");
   const { mix, setMix, quality, setQuality, weather, setWeather, weatherMode, setWeatherMode,
-    language, setLanguage, mouseSensitivity, setMouseSensitivity, keybindings, setKeybindings } = settings;
+    language, setLanguage, dontShowTutorial, setDontShowTutorial, mouseSensitivity, setMouseSensitivity, keybindings, setKeybindings } = settings;
   const t = (en: string, ja: string) => language === "ja" ? ja : en;
   return <div className="v-settings-workspace">
     <nav className="v-settings-tabs" aria-label={t("Settings sections", "設定の種類")}>
@@ -42,6 +42,10 @@ export function VillageSettings({ settings, sound, soundLoading, toggleSound, en
           <option value="low">{t("Gentle on battery", "省電力")}</option><option value="high">{t("Detailed", "高画質")}</option><option value="auto">{t("Automatic", "自動")}</option>
         </select></label>
         <label><span>{t("Language", "言語")}</span><select aria-label={t("Language", "言語")} value={language} onChange={event => setLanguage(event.target.value as "en" | "ja")}><option value="en">English</option><option value="ja">日本語</option></select></label>
+        <div className="v-tutorial-preference">
+          <label className="v-check"><input type="checkbox" checked={dontShowTutorial} onChange={event => setDontShowTutorial(event.target.checked)} />{t("Don't show tutorial", "チュートリアルを表示しない")}</label>
+          <button className="v-settings-reset" data-show-tutorial onClick={showTutorial}>{t("Read the village guide", "村のガイドを読む")}</button>
+        </div>
         <details className="v-settings-advanced"><summary>{t("Performance", "パフォーマンス")}</summary>
           <label className="v-check"><input type="checkbox" checked={showStats} onChange={event => setShowStats(event.target.checked)} />{t("Show performance", "パフォーマンス表示")}</label>
           {engine && <button className="v-settings-reset" onClick={() => setReport(JSON.stringify({ ...engine.getPerformanceReport(), ...stats }, null, 2))}>{t("Get performance report", "パフォーマンスレポートを表示")}</button>}

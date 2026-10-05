@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-05 — welcome guide and menu back keys (local, verified)
+
+A short English/Japanese guide appears after entry with touch-aware instructions, saved “Don't show tutorial” and a Settings reopening action. Manual-guide Back returns to Settings; Escape/Backspace and visible Back buttons make menus easy to leave without taking over editing/key capture. Build/lint/types/contracts/export privacy and 57 guide/back, 70 onboarding and 18 two-client Japanese checks pass with zero page errors. Preview3051 is refreshed; publication/live smoke is pending. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--short-welcome-guide-and-keyboard-back-navigation). This addition is not deployed yet; the release below remains public.
+
 ## 2026-10-05 — onboarding/tablet/Japanese release complete
 
 Application `e263aba` is pushed to main and live at [cosy.sabarg.com](https://cosy.sabarg.com/) after successful [Pages run 37337902505](https://github.com/CipherAtlas/cosy-v1/actions/runs/37337902505). Full-screen number-free loading softly reveals the animated menu; WASD/E (including saved remappings) navigate/activate starter and in-game menus. The release also includes padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower travel. Build/lint/types/contracts/export privacy, 70 onboarding and 21 public smoke checks pass with zero page errors. The matching Worker version remains `63198674-b21d-4a0a-b433-ff31a0549aed`. Preview3051 serves the checked local-Worker export. Native/physical-device and assistive-technology acceptance retains its stated limits. [Current behavior and evidence](VILLAGE_BUILD.md#2026-10-05--full-screen-loading-and-game-key-menu-navigation). Earlier local sections below are development checkpoints.

@@ -12,6 +12,7 @@ export function useVillagePreferences() {
   const [weatherMode, setWeatherMode] = useState<"auto" | "manual">("auto");
   const [language, setLanguage] = useState<"en" | "ja">("en");
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
+  const [dontShowTutorial, setDontShowTutorial] = useState(false);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   useEffect(() => {
     setLanguage(readVillageLanguage());
@@ -20,6 +21,7 @@ export function useVillagePreferences() {
         localStorage.getItem("cosy-village-preferences") || "null",
       );
       if (p) {
+        setDontShowTutorial(p.dontShowTutorial === true);
         setKeybindings(readKeybindings(p.keybindings));
         if (["low", "high", "auto"].includes(p.quality)) setQuality(p.quality);
         const savedWeather: Weather | null = ["golden", "dusk", "night", "rain"].includes(p.weather) ? p.weather : null;
@@ -67,10 +69,10 @@ export function useVillagePreferences() {
     try {
       localStorage.setItem(
         "cosy-village-preferences",
-        JSON.stringify({ mix, weather, weatherMode, language, mouseSensitivity, keybindings, quality }),
+        JSON.stringify({ mix, weather, weatherMode, language, mouseSensitivity, keybindings, quality, dontShowTutorial }),
       );
     } catch {}
-  }, [mix, weather, weatherMode, language, mouseSensitivity, keybindings, quality, preferencesLoaded]);
-  return { keybindings, setKeybindings, mix, setMix, quality, setQuality, weather, setWeather,
+  }, [mix, weather, weatherMode, language, mouseSensitivity, keybindings, quality, dontShowTutorial, preferencesLoaded]);
+  return { dontShowTutorial, setDontShowTutorial, keybindings, setKeybindings, mix, setMix, quality, setQuality, weather, setWeather,
     weatherMode, setWeatherMode, language, setLanguage, mouseSensitivity, setMouseSensitivity };
 }

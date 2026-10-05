@@ -48,7 +48,7 @@ export function KeybindingControls({ bindings, setBindings, language }: {
   return <div className="v-keybindings">
     <div className="v-settings-section-heading"><h3>{ja ? "キーの割り当て" : "Keybindings"}</h3>
       <button className="v-settings-reset" disabled={!!capturing} onClick={() => { setBindings({ ...DEFAULT_KEYBINDINGS }); setMessage(ja ? "初期設定に戻しました。" : "Default keys restored."); }}>{ja ? "初期設定に戻す" : "Reset keys"}</button></div>
-    <p className="v-settings-help">{ja ? "キーを選んで新しいキーを押します。Escapeでキャンセル。矢印キー・Enter・Tab・Escapeは常に使用できます。" : "Select a key, then press its replacement. Escape cancels. Arrow keys, Enter, Tab and Escape keep their navigation roles."}</p>
+    <p className="v-settings-help">{ja ? "キーを選んで新しいキーを押します。Escapeでキャンセル。矢印キー・Enter・Tab・Escape・Backspaceは常に使用できます。" : "Select a key, then press its replacement. Escape cancels. Arrow keys, Enter, Tab, Escape and Backspace keep their navigation roles."}</p>
     {(capturing || message) && <div className="v-binding-status" role="status">
       <span>{message || (ja ? "新しいキーを押してください…" : "Press a new key…")}</span>
       {capturing && <div>

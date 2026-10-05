@@ -33,6 +33,7 @@ fs.mkdirSync(output, { recursive: true });
   }
   async function enter(page, japanese) {
     await page.getByRole('button', { name: japanese ? 'ハースウィローに入る' : 'Enter Hearthwillow', exact: true }).click({ timeout: 120000 });
+    await page.locator('[data-tutorial-done]').click();
     await page.locator('.v-shared-chat input:not([disabled])').waitFor({ timeout: 30000 });
     await page.waitForFunction(() => {
       for (let el = document.querySelector('canvas'); el; el = el.parentElement)
