@@ -4,8 +4,8 @@ A fresh local-Worker export passes 70 real Chrome onboarding checks with zero pa
 
 WASD/E navigate/activate Language choices and pre-entry/in-game Settings tabs; saved movement/interaction remapping works. Modal focus return, native arrow/Home/End behavior, persisted language/weather/graphics, sound choice preservation, reduced motion, actual shared Worker entry, WebGL failure and retry also pass. The loader and revealed title screenshots were visually reviewed. Build, lint/types, full contracts and export privacy pass; unchanged Japanese/chat/tablet/Worker evidence retains its prior scope.
 
-Main preview3051 serves the checked export using Worker2567. Follow-up public deployment/live checks are pending. Physical device comfort, native/complete Safari/Firefox, screen readers and sustained performance remain open.
+Main preview3051 serves the checked export using Worker2567. Application `e263aba` is pushed/published successfully by [Pages run 37337902505](https://github.com/CipherAtlas/cosy-v1/actions/runs/37337902505). All 21 public Chrome smoke checks pass with zero page errors: loading/fade, game-key menus before/during play, language persistence, keycap padding, Japanese iPad-sized reduced-motion/landscape menus, two-client shared entry/disconnect, Worker health and editor/admin/save-route 404s. The unchanged matching Worker remains version `63198674-b21d-4a0a-b433-ff31a0549aed`. Physical device comfort, native/complete Safari/Firefox, screen readers and sustained performance remain open.
 
-[Checks](checks.json) · [Loading](fullscreen-loading.png) · [Laptop menu](title-1366x768.png) · [Japanese touch](title-touch-japanese.png)
+[Local checks](checks.json) · [Live checks](live-checks.json) · [Live loading](live-loading.png) · [Live menu](live-menu.png) · [Loading](fullscreen-loading.png) · [Laptop menu](title-1366x768.png) · [Japanese touch](title-touch-japanese.png)
 
 Reproduce with `EXPORT_DIR=/absolute/path/to/local-worker/out PLAYWRIGHT_PATH=/absolute/path/to/playwright node scripts/village/tests/onboarding-browser.cjs`. Build with `NEXT_PUBLIC_SHARED_WORLD_URL=ws://127.0.0.1:2567` for the accepted local origin on 3051.

@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-05 — loading/menu follow-up release in progress
+## 2026-10-05 — onboarding/tablet/Japanese release complete
 
-Release authorized for the title screen, padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower map destination. Fresh production build/check/export passes; matching Worker version `63198674-b21d-4a0a-b433-ff31a0549aed` is deployed. Pages application `c6fc464` is published; the full-screen loading fade and WASD/E menu follow-up has passed build/contracts/export privacy and 70 actual onboarding checks with zero page errors. Preview3051 is refreshed; follow-up Pages publication/live smoke are pending. [Release ledger](VILLAGE_BUILD.md#2026-10-05--onboarding-tablet-and-japanese-release).
+Application `e263aba` is pushed to main and live at [cosy.sabarg.com](https://cosy.sabarg.com/) after successful [Pages run 37337902505](https://github.com/CipherAtlas/cosy-v1/actions/runs/37337902505). Full-screen number-free loading softly reveals the animated menu; WASD/E (including saved remappings) navigate/activate starter and in-game menus. The release also includes padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower travel. Build/lint/types/contracts/export privacy, 70 onboarding and 21 public smoke checks pass with zero page errors. The matching Worker version remains `63198674-b21d-4a0a-b433-ff31a0549aed`. Preview3051 serves the checked local-Worker export. Native/physical-device and assistive-technology acceptance retains its stated limits. [Current behavior and evidence](VILLAGE_BUILD.md#2026-10-05--full-screen-loading-and-game-key-menu-navigation). Earlier local sections below are development checkpoints.
 
 ## 2026-10-05 — title screen and first-use menus (local)
 

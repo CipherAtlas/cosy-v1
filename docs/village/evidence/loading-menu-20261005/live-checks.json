@@ -1,0 +1,28 @@
+{
+  "application": "e263abad8823fe022c9b3e04dbae199a2d4c9141",
+  "workflow": 37337902505,
+  "checks": [
+    "Live loading is full screen with only Hearthwillow and a number-free bar",
+    "Live loading keeps menus inert and has no shared connection",
+    "Live loader has the soft fade transition",
+    "Live S/E opens Language",
+    "Live D/E chooses Japanese",
+    "Live language survives reload",
+    "Live WASD/E activates pre-entry Settings tabs",
+    "Live WASD keycap keeps side padding",
+    "Live E enters and connects to the production Worker",
+    "Live S/E activates in-game Settings tabs",
+    "Live Japanese iPad-sized reduced-motion menu loads correctly",
+    "Live landscape iPad menu stays contained",
+    "Two fresh live clients enter the same shared village",
+    "Live observer is released on disconnect",
+    "Production Worker health is OK",
+    "Public private route is absent: /editor/",
+    "Public private route is absent: /village-editor/",
+    "Public private route is absent: /admin/",
+    "Public private route is absent: /tools/",
+    "Public private route is absent: /api/layout",
+    "No live page errors"
+  ],
+  "errors": []
+}
