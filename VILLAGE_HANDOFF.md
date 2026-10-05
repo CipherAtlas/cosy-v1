@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-05 — integrated release preparation
+## 2026-10-05 — integrated release published
 
-All pending atlas, farmers/Rowan racing, crop HUD, watchtower and river/pond/path work is included in the user-authorized release. Fresh production build/types/contracts/export privacy, renderer/Worker parity, 61 actual SQLite/WebSocket town checks and 19 actual multiplayer browser checks pass with zero page errors. Editor support and existing feature evidence are included. Publication/live status follows in the [release ledger](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release); earlier local-only entries are historical checkpoints. Native browser/device and long-session acceptance remain open.
+All pending atlas, farmers/Rowan racing, crop HUD, watchtower and river/pond/path work is included in the user-authorized release. Fresh production build/types/contracts/export privacy, renderer/Worker parity, 61 actual SQLite/WebSocket town checks and 19 actual multiplayer browser checks pass with zero page errors. Editor support and existing feature evidence are included. Application `46db3d0` and matching Worker version `62da9998-6e96-48b0-a076-5d08580d8c14` are published. Pages run 37314257536 succeeded; ten fresh two-browser live checks, Worker health and public route boundaries pass with zero page errors. Reload existing tabs. Details are in the [release ledger](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release); earlier local-only entries are historical checkpoints. Native browser/device and long-session acceptance remain open.
 
 ## 2026-10-05 — watchtower observer and late-join fixes (local)
 

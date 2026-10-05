@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Live browser 1 loads the scene and public shared Worker",
+    "Live browser 2 loads the scene and public shared Worker",
+    "Two public browsers observe one shared village",
+    "Live layout has the released physics and bench catalog",
+    "Live full-screen atlas shows the player marker",
+    "Live atlas has one Meadow Swings destination",
+    "Live atlas fits a smaller desktop window",
+    "Live accepted tower entry is visible to the other browser",
+    "Live tower exit releases shared admission",
+    "Live smoke has no page errors"
+  ],
+  "errors": []
+}

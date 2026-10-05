@@ -1,5 +1,7 @@
 # Village implementation evidence — updated 2026-10-05
 
+- [2026-10-05 integrated live release](../../../VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release): two-browser live checks, Worker health and public route boundaries; [checks](release-20261005/checks.json), [routes](release-20261005/routes.json), [atlas](release-20261005/atlas.png).
+
 ## Watchtower multiplayer perception — 2026-10-05 local
 
 [Observer views and reports](tower-lookout-20261005/README.md#multiplayer-perception-review--2026-10-05) record 19 four-client/capacity checks plus eight normal-preview checks, late-join metadata and floating entry/exit corrections. Visitors share walking positions; admission stops at eight. Body/name overlap remains possible. Local Chrome evidence; native Firefox visual acceptance remains open.

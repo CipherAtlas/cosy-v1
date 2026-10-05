@@ -1,6 +1,6 @@
 # Hearthwillow
 
-The 2026-10-05 integrated release includes the smooth full-screen atlas, farm residents and Rowan's race invitation, centered farm clocks, shared first-person watchtower walking, riverbank/pond stones and bridge/path polish. Matching local editor support is included in source; the public export excludes the editor and save API. [Release checks, publication status and remaining limits](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release). Older local-preview notes below describe development checkpoints.
+The 2026-10-05 integrated release is live at [cosy.sabarg.com](https://cosy.sabarg.com/) as application `46db3d0`, with the matching shared Worker. It includes the smooth full-screen atlas, farm residents and Rowan's race invitation, centered farm clocks, shared first-person watchtower walking, riverbank/pond stones and bridge/path polish. Matching local editor support is included in source; the public export excludes the editor and save API. [Release checks, publication status and remaining limits](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release). Older local-preview notes below describe development checkpoints.
 
 The working pond layout removes the bench beside the dock, adds a stone landing over the green entrance patch and dresses the pond edge with small rocks. These remain editable in Layout Studio. The main preview still needs a coordinated refresh; [local checks and limits](VILLAGE_BUILD.md#2026-10-05--pond-dock-landing-and-shoreline-stones-local).
 

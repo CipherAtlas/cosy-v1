@@ -1,0 +1,8 @@
+{
+  "/": 200,
+  "/editor/": 404,
+  "/village-editor/": 404,
+  "/admin/": 404,
+  "/tools/": 404,
+  "/api/layout": 404
+}
