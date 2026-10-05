@@ -12,6 +12,7 @@ import type { useVillagePreferences } from "./useVillagePreferences";
 import type { RadioStationId } from "./radioCatalog";
 import { VillageSettings } from "./VillageSettings";
 import { Keycap } from "./KeybindingControls";
+import { useVillageMenuNavigation } from "./useVillageMenuNavigation";
 
 export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | null;
 
@@ -27,6 +28,7 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
   selectStation: (station: RadioStationId) => void; nextRadioTrack: () => void; playVillageMusic: () => Promise<void>;
   showStats: boolean; setShowStats: (value: boolean) => void; stats: { fps: number; draws: number; triangles: number };
 }) {
+  useVillageMenuNavigation(entered && panel !== null);
   const { mix, setMix, language } = settings;
   const t = (en: string, jp: string) => language === "ja" ? jp : en;
   // Retain the map during Radix’s exit animation so travel reveals the arrival smoothly.

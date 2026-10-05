@@ -52,22 +52,30 @@ fs.mkdirSync(output, { recursive: true });
       return !!window.e;
     });
   }
-  async function ready(page) { await page.waitForFunction(() => document.querySelector('.v-enter-button')?.disabled === false, null, { timeout: 120000 }); await engine(page); }
+  async function ready(page) { await page.waitForFunction(() => document.querySelector('.v-start-phase-menu .v-enter-button')?.disabled === false, null, { timeout: 120000 }); await engine(page); }
   const tab = (page, name) => page.locator('.v-settings-tabs').getByRole('button', { name, exact: true });
   const prefs = page => page.evaluate(() => JSON.parse(localStorage.getItem('cosy-village-preferences')));
   try {
     const a = await visit({}, () => {
       if (!localStorage.getItem('cosy-village-preferences')) localStorage.setItem('cosy-village-preferences', JSON.stringify({ weather: 'golden', weatherMode: 'manual' }));
     }, true);
-    await a.locator('.v-start-loading').waitFor();
-    check(await a.locator('.v-enter-button').isDisabled(), 'Entry waits for the real village assets while progress is visible');
-    await a.locator('[data-start-panel="language"]').click();
-    await a.getByRole('button', { name: '日本語', exact: true }).click();
-    check(await a.locator('html').getAttribute('lang') === 'ja', 'Language works while world loading is held');
-    await a.getByRole('button', { name: 'English', exact: true }).click(); await a.keyboard.press('Escape');
-    await a.locator('[data-start-panel="settings"]').click();
-    check(await a.locator('.v-settings-tabs button').count() === 3 && await a.evaluate(() => socketCount === 0), 'All Settings sections remain available before loading completes');
-    await a.keyboard.press('Escape'); a.releaseLayout();
+    await a.locator('.v-title-loading').waitFor();
+    check(await a.locator('.v-title-loading').evaluate(element => {
+      const r = element.getBoundingClientRect();
+      return Math.abs(r.width - innerWidth) < 1 && Math.abs(r.height - innerHeight) < 1 && !/\d|%/.test(element.innerText);
+    }), 'Loading fills the screen with only Hearthwillow and a number-free progress bar');
+    check(await a.locator('.v-start-reveal').getAttribute('inert') !== null && await a.evaluate(() => socketCount === 0), 'Menu is inaccessible during loading and no shared connection starts');
+    await a.screenshot({ path: path.join(output, 'fullscreen-loading.png') });
+    for (const [width, height] of [[810,1080], [1080,810], [820,1180], [1180,820], [744,1133], [1133,744]]) {
+      await a.setViewportSize({ width, height });
+      check(await a.locator('.v-title-loading').evaluate(element => {
+        const r = element.getBoundingClientRect(); return Math.abs(r.width-innerWidth)<1 && Math.abs(r.height-innerHeight)<1;
+      }), `${width}×${height}: loading covers the iPad viewport`);
+    }
+    await a.setViewportSize({ width: 1366, height: 768 });
+    const fade = a.locator('.v-start-phase-fading').waitFor({ timeout: 120000 });
+    a.releaseLayout(); await fade;
+    check(await a.locator('.v-start-reveal').getAttribute('inert') !== null, 'The soft reveal keeps controls inert until the fade completes');
     await ready(a);
     check(await a.locator('.v-start-menu button').count() === 3 && await a.locator('.v-header').count() === 0, 'Title screen presents three menu choices without gameplay controls');
     check(await a.evaluate(() => socketCount === 0 && audioStarts === 0 && e.blocked && e.titleScreen), 'Title screen neither joins the shared world nor starts sound, and gameplay is blocked');
@@ -79,6 +87,14 @@ fs.mkdirSync(output, { recursive: true });
     check(await a.locator('[data-start-panel="language"]').evaluate(button => button === document.activeElement), 'ArrowDown selects Language');
     await a.keyboard.press('End'); await a.keyboard.press('Home');
     check(await a.locator('.v-enter-button').evaluate(button => button === document.activeElement), 'Home and End navigate the menu');
+    await a.keyboard.press('s'); await a.keyboard.press('e');
+    check(await a.locator('.v-language-menu').isVisible(), 'S navigates to Language and E opens it');
+    await a.getByRole('button', { name: 'English', exact: true }).focus();
+    await a.keyboard.press('d'); await a.keyboard.press('e');
+    check(await a.locator('html').getAttribute('lang') === 'ja', 'D navigates language choices and E selects Japanese');
+    await a.keyboard.press('a'); await a.keyboard.press('e');
+    check(await a.locator('html').getAttribute('lang') === 'en', 'A returns to English and E selects it');
+    await a.keyboard.press('Escape');
     await a.locator('[data-start-panel="language"]').click();
     await a.getByRole('button', { name: '日本語', exact: true }).click();
     check(await a.locator('html').getAttribute('lang') === 'ja' && (await prefs(a)).language === 'ja', 'Language applies and persists immediately before entry');
@@ -110,6 +126,9 @@ fs.mkdirSync(output, { recursive: true });
     }
     await a.setViewportSize({ width: 1366, height: 768 });
     await a.locator('[data-start-panel="settings"]').click();
+    await tab(a, 'Experience').focus(); await a.keyboard.press('d'); await a.keyboard.press('e');
+    check(await tab(a, 'Sound').getAttribute('aria-pressed') === 'true', 'D and E navigate and activate Settings tabs');
+    await tab(a, 'Experience').click();
     await a.getByLabel('Time & weather', { exact: true }).selectOption('night');
     await a.getByLabel('Graphics', { exact: true }).selectOption('high');
     await tab(a, 'Sound').click();
@@ -123,14 +142,17 @@ fs.mkdirSync(output, { recursive: true });
     await tab(a, 'Sound').click(); await a.getByRole('button', { name: 'Turn sound on', exact: true }).click();
     await a.getByRole('button', { name: 'Turn sound off', exact: true }).click({ timeout: 60000 });
     await a.keyboard.press('Escape');
+    await engine(a);
     const audioStarts = await a.evaluate(() => window.audioStarts);
     await a.locator('.v-enter-button').click();
-    await a.waitForFunction(() => e.sharedConnected, null, { timeout: 30000 });
+    await a.waitForFunction(() => e.sharedConnected, null, { timeout: 30000 }).catch(async error => { console.log(await a.evaluate(() => ({title:!!document.querySelector('.v-start'),connected:e.sharedConnected,blocked:e.blocked,sockets:socketCount,notice:document.querySelector('.v-notice')?.textContent}))); throw error; });
     check(await a.locator('.v-start').count() === 0 && await a.evaluate(() => !e.titleScreen && !e.blocked && socketCount > 0), 'Enter removes starter UI, enables gameplay and joins the actual shared Worker');
     check(await a.evaluate(count => audioStarts === count, audioStarts), 'Entering respects a deliberate pre-entry sound-off choice');
     check(await a.locator('canvas').evaluate(canvas => canvas === document.activeElement && canvas.tabIndex === 0), 'Entry gives keyboard focus to the gameplay canvas');
     await a.locator('canvas').focus(); await a.keyboard.press(',');
     check(await a.locator('.v-settings-dialog').isVisible(), 'The same settings remain available during gameplay');
+    await tab(a, 'Experience').focus(); await a.keyboard.press('s'); await a.keyboard.press('e');
+    check(await tab(a, 'Sound').getAttribute('aria-pressed') === 'true', 'Gameplay Settings also supports S and E');
     await a.keyboard.press('Escape');
     await a.context().close();
     const touch = await visit({ hasTouch: true, viewport: { width: 820, height: 1180 }, reducedMotion: 'reduce', locale: 'ja-JP' });
@@ -139,6 +161,13 @@ fs.mkdirSync(output, { recursive: true });
     const staticCamera = await touch.evaluate(() => e.camera.position.toArray()); await touch.waitForTimeout(1200);
     check(await touch.evaluate(previous => e.camera.position.toArray().every((value, index) => value === previous[index]), staticCamera), 'Reduced motion keeps the title camera still');
     await touch.screenshot({ path: path.join(output, 'title-touch-japanese.png') }); await touch.context().close();
+    const remapped = await visit({ reducedMotion: 'reduce' }, () => localStorage.setItem('cosy-village-preferences', JSON.stringify({ keybindings: { forward: '[', interact: ']' } })));
+    await ready(remapped); await remapped.locator('[data-start-panel="settings"]').focus();
+    await remapped.keyboard.press('[');
+    check(await remapped.locator('[data-start-panel="language"]').evaluate(button => button === document.activeElement), 'Saved movement bindings navigate the menu');
+    await remapped.keyboard.press(']');
+    check(await remapped.locator('.v-language-menu').isVisible(), 'Saved interaction binding opens the selected menu');
+    await remapped.context().close();
     const fail = await visit({}, () => {
       const getContext = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function (name, ...args) {

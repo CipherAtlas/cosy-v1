@@ -48,11 +48,16 @@ html:lang(ja) body {
 .v-start-option.v-start-enter:hover:not(:disabled) { background: #fff3d8; }
 .v-start-option svg { flex-shrink: 0; }
 .v-start-value { margin-left: auto; color: #d5dcbf; font-size: 14px; }
-.v-start-loading { display: grid; gap: 9px; width: min(340px, 100%); margin-top: 22px; color: #e9e0ca; font-size: 13px; }
-.v-start-loading progress { appearance: none; width: 100%; height: 3px; border: 0; background: #ffffff24; }
-.v-start-loading progress::-webkit-progress-bar { background: #ffffff24; }
-.v-start-loading progress::-webkit-progress-value { background: #efcf90; }
-.v-start-loading progress::-moz-progress-bar { background: #efcf90; }
+.v-start-reveal { width: 100%; opacity: 1; transition: opacity .55s ease; }
+.v-start-phase-loading .v-start-reveal { opacity: 0; }
+.v-title-loading { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(28px, env(safe-area-inset-top)) 28px; box-sizing: border-box; background: #182e24; opacity: 1; transition: opacity .55s ease; }
+.v-title-loading h1 { text-align: center; margin-bottom: 32px; font-size: clamp(40px, 6.5vw, 80px); }
+.v-title-loading progress { appearance: none; width: min(280px, 70vw); height: 4px; border: 0; border-radius: 4px; overflow: hidden; background: #ffffff24; }
+.v-title-loading progress::-webkit-progress-bar { background: #ffffff24; }
+.v-title-loading progress::-webkit-progress-value { background: #efcf90; }
+.v-title-loading progress::-moz-progress-bar { background: #efcf90; }
+.v-start-phase-fading .v-title-loading { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .v-title-loading, .v-start-reveal { transition: none; } }
 .v-start-error { max-width: 340px; font-size: 14px; line-height: 1.6; }
 .v-start-hint { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: clamp(28px, 7vw, 112px); right: 28px; margin: 0; color: #e1dfc8; font-size: 13px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px; }
 .v-start-hint kbd { box-sizing: border-box; min-width: 28px; height: 28px; padding-inline: 8px; white-space: nowrap; color: #fff3d8; font: 12px ui-monospace, monospace; }

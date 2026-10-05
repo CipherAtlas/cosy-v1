@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-05 — onboarding/tablet/Japanese release in progress
+## 2026-10-05 — loading/menu follow-up release in progress
 
-Release authorized for the title screen, padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower map destination. Fresh production build/check/export passes; matching Worker version `63198674-b21d-4a0a-b433-ff31a0549aed` is deployed. Pages publication and live verification remain pending. [Release ledger](VILLAGE_BUILD.md#2026-10-05--onboarding-tablet-and-japanese-release).
+Release authorized for the title screen, padded hints, iPad/touch controls, Japanese UI/chat, Luma shortcuts and watch-tower map destination. Fresh production build/check/export passes; matching Worker version `63198674-b21d-4a0a-b433-ff31a0549aed` is deployed. Pages application `c6fc464` is published; the full-screen loading fade and WASD/E menu follow-up has passed build/contracts/export privacy and 70 actual onboarding checks with zero page errors. Preview3051 is refreshed; follow-up Pages publication/live smoke are pending. [Release ledger](VILLAGE_BUILD.md#2026-10-05--onboarding-tablet-and-japanese-release).
 
 ## 2026-10-05 — title screen and first-use menus (local)
 
