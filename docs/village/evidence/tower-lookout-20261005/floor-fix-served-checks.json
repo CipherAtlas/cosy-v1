@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "The actual 3051 export and Worker2567 accept elevated first-person tower entry",
+    "A second served client sees the shared elevated visitor",
+    "The final served gallery control stays compact and below the view at 1366×768",
+    "The final served gallery control stays compact and below the view at 1280×720",
+    "The final served gallery control stays compact and below the view at 1024×640",
+    "The final served gallery control stays compact and below the view at 800×640",
+    "Both served visitors come down safely",
+    "The final served preview has no page errors"
+  ],
+  "errors": []
+}

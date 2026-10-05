@@ -128,6 +128,8 @@ try {
   const row = { ...home, id: 'row', asset: 'farm-row', position: [0, .04, 0] };
   const owlHomes = [-1, 0, 1].map((side, index) => ({ ...home, id: `owl-${index}`, position: [home.position[0] + side * .69, home.position[1], home.position[2]] }));
   const townScene = new TownScene({ items: [row, ...owlHomes, perch] }, cropKit, owlKit, event => calls.push(event));
+  check(townScene.clocks[0].sprite.position.x === row.position[0] && townScene.clocks[0].sprite.position.z === row.position[2]
+    && townScene.clocks[0].sprite.position.y > row.position[1], 'Farm growth countdown floats above the center of its authored row');
   const serverNow = now + 8000, bed = { id: 'row', crop: 'mint', plantedAt: serverNow, wateredAt: serverNow, growAt: serverNow + 120000 };
   townScene.applyShared({ beds: [bed], owlFeedAt: serverNow - 6000, owlUntil: serverNow + 6000 }, serverNow);
   townScene.update(false, new T.Quaternion());

@@ -1,0 +1,23 @@
+{
+  "benches": [
+    "pasture-oak-bench",
+    "bird-clearing-bench",
+    "bench-1",
+    "object-1a58c8e9-1dbb-49df-9fbc-44af753f543b",
+    "bench-2",
+    "bench-3",
+    "bench-4",
+    "bench-5"
+  ],
+  "colliders": 1890,
+  "stones": 0,
+  "heights": [],
+  "clearDock": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "bankMeshes": 1,
+  "errors": []
+}

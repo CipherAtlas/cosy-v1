@@ -1,0 +1,17 @@
+> a-peaceful-room@0.1.0 check
+> a-peaceful-room@0.1.0 lint
+> a-peaceful-room@0.1.0 typecheck
+> a-peaceful-room@0.1.0 test
+27 device-gate checks passed
+9746 actual animal GLB checks passed.
+98 shared-world Worker checks passed.
+112 shared town checks passed.
+418 focused town layout checks passed (Water/terrain movement; rendered colliders require --physics).
+53 focused animal motion/audio checks passed.
+121 patrol navigation checks passed.
+16 focused shared bird circuit checks passed
+11 contract checks passed.
+2165 rendering topology, placement, bounds and detail checks passed.
+Current village contract checks passed.
+
+Existing RoomScene image lint warning and Three.js CommonJS deprecation warnings remain. All commands exit 0.

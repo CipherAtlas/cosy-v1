@@ -31,18 +31,17 @@ export class TownInteractions {
       }
     }
     const track = townItems(this.layout, "horse-racetrack")[0];
-    if (track && (riding && near(track.position.filter((_, i) => i !== 1), 33 * Math.max(track.scale[0], track.scale[2]))
+    if (track && race && (riding && near(track.position.filter((_, i) => i !== 1), 33 * Math.max(track.scale[0], track.scale[2]))
       || near(trackPoint(track, TOWN_TRACK_START_ANGLE), 7) || raceActive && race?.owner === selfId)) {
       const mine = race?.owner === selfId;
       const active = race?.phase === "countdown" || race?.phase === "racing";
-      const atStart = near(trackPoint(track, TOWN_TRACK_START_ANGLE), 6);
       const detail = active ? race.phase === "countdown" ? `Starting in ${Math.max(1, Math.ceil((race.goAt - now) / 1000))}…`
         : `${mine ? "Your race" : "Race in progress"} · checkpoint ${Math.min(8, race.nextCheckpoint)} / 8.`
         : race?.phase === "finished" ? `${race.result === "visitor" ? mine ? "You won!" : "The visitor won!" : race.result === "tie" ? "A tie!" : "Rowan won this lap."} ${race.playerFinishAt ? `Lap time: ${((race.playerFinishAt - race.goAt) / 1000).toFixed(1)}s.` : ""}`
         : "";
       const gate = race ? trackPoint(track, TOWN_TRACK_START_ANGLE + race.nextCheckpoint * Math.PI * 2 / 8) : null;
       return { title: "Rowan’s racetrack", detail, kind: "race", minorOnly: mine && !!race, nextGateDistance: gate ? Math.round(Math.hypot(gate[0] - x, gate[1] - z)) : undefined, actions: active ? mine ? [{ label: "Leave race", key: "F", request: { kind: "town", action: "raceCancel", id: track.id } }] : []
-        : riding && atStart ? [{ label: "Race Rowan", key: "F", request: { kind: "town", action: "raceStart", id: track.id } }] : [] };
+        : [] };
     }
     if (riding) return null;
     const animal = town.animals.map(animal => ({ animal, d: Math.hypot(animal.x - x, animal.z - z) }))
@@ -85,18 +84,22 @@ export class TownInteractions {
     if (!bed || !bedItem) return null;
     const request = (action: TownAction["action"], crop?: TownAction["crop"]): TownAction => ({ kind: "town", action, id: bed.id, ...(crop ? { crop } : {}) });
     const grown = bed.growAt !== null && now >= bed.growAt;
-    const remaining = Math.max(0, Math.ceil(((bed.growAt ?? now) - now) / 1000));
     const required = farmCrop(bedItem);
-    return { kind: "farm", title: bedItem.name || "Town farm",
+    const crop = required ?? bed.crop;
+    const row = /-row-(\d+)$/.exec(bedItem.id)?.[1] ?? /\brow\s+(\d+)\b/i.exec(bedItem.name ?? "")?.[1];
+    const title = bedItem.asset === "farm-row" && crop
+      ? `${crop.charAt(0).toUpperCase() + crop.slice(1)} Farm${row ? ` - Row ${row}` : ""}`
+      : bedItem.name || "Town farm";
+    return { kind: "farm", title,
       growth: bed.crop ? { crop: bed.crop, readyAt: bed.growAt, duration: TOWN_GROW_MS } : undefined,
-      detail: bed.crop === null ? "" : grown ? "Ready to pick"
-        : bed.wateredAt === null ? "Needs water" : `${bed.crop} growing · ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`,
+      detail: bed.crop !== null && !grown && bed.wateredAt === null ? "Needs water" : "",
       actions: bed.crop === null ? required ? [{ label: `Plant ${required === "carrot" ? "carrots" : required === "radish" ? "radishes" : "mint"}`, key: "E", request: request("gardenPlant", required) }] : [
         { label: "Plant carrots", key: "E", request: request("gardenPlant", "carrot") },
         { label: "Plant radishes", key: "2", request: request("gardenPlant", "radish") },
         { label: "Plant mint", key: "3", request: request("gardenPlant", "mint") },
       ] : grown ? [{ label: "Harvest", key: "E", request: request("gardenHarvest") }]
-        : bed.wateredAt === null ? [{ label: "Water", key: "E", request: request("gardenWater") }] : [],
+        : bed.wateredAt === null ? [{ label: "Water", key: "E", request: request("gardenWater") }]
+        : [{ label: "Harvest", key: "E", request: request("gardenHarvest"), disabled: true }],
     };
   }
 }

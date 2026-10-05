@@ -1,0 +1,18 @@
+{
+  "durationMs": 5016.000000000373,
+  "frames": 302,
+  "fps": 60.20733652312152,
+  "frameP95Ms": 16.700000000000728,
+  "longestFrameMs": 16.80000000000109,
+  "markerUpdates": 19,
+  "markerUpdatesPerSecond": 3.787878787878506,
+  "landscapeMutations": 0,
+  "postboxOffset": {
+    "x": 120.67,
+    "y": 181.575
+  },
+  "mainThreadTaskMs": 2146.583,
+  "scriptMs": 1618.102,
+  "layoutMs": 25.296,
+  "recalcStyleMs": 59.808
+}

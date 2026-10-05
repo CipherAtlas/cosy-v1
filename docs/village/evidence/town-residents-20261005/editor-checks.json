@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "rusk is a named placeable asset on the Villagers shelf",
+    "rusk has a real rendered preview",
+    "poppy is a named placeable asset on the Villagers shelf",
+    "poppy has a real rendered preview",
+    "cress is a named placeable asset on the Villagers shelf",
+    "cress has a real rendered preview",
+    "rowan is a named placeable asset on the Villagers shelf",
+    "rowan has a real rendered preview",
+    "rusk supports real position, rotation and uniform scale controls",
+    "rusk is available in the saved route editor",
+    "poppy supports real position, rotation and uniform scale controls",
+    "poppy is available in the saved route editor",
+    "cress supports real position, rotation and uniform scale controls",
+    "cress is available in the saved route editor",
+    "rowan supports real position, rotation and uniform scale controls",
+    "rowan is available in the saved route editor",
+    "All four resident identities, transforms and routes survive named saving and actual reload",
+    "Local Apply accepts all four new residents in the isolated playable file",
+    "The real editor reports no page errors"
+  ],
+  "errors": [],
+  "savedId": "layout-9a819804-eae4-438a-ac18-3b5d4d329908"
+}

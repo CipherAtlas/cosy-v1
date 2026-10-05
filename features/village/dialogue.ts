@@ -4,7 +4,7 @@ import type { VillageLife } from "./life";
 import type { Collider } from "./environment";
 import type { Weather } from "./places";
 
-import { VILLAGERS, type Line } from "./villagers";
+import { VILLAGERS, TOWN_RESIDENT_IDS, type Line } from "./villagers";
 export { VILLAGERS } from "./villagers";
 const line = (en: string, ja: string): Line => ({ en, ja });
 
@@ -30,7 +30,7 @@ export class VillagerDialogue {
   private bubbles;
 
   constructor(host: HTMLElement, private life: VillageLife, colliders: Collider[], private onTalk: () => void,
-    private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void; talk?: (id: string) => void }) {
+    private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void; talk?: (id: string) => void; race?: () => void }) {
     this.layer.className = "v-villager-dialogue";
     this.layer.hidden = true;
     this.layer.setAttribute("role", "group");
@@ -164,13 +164,21 @@ export class VillagerDialogue {
     }
   }
   private actionLabels(b: typeof this.bubbles[number]) {
-    const state = `${this.language}:${b.resident.following}:${b.tea ? this.mintAvailable : ""}`;
+    const shared = this.life.sharedState(b.profile.id);
+    const raceInvitation = b.profile.id === "rowan" && shared?.mode === "talk" && !!shared.owner && this.life.available("rowan");
+    const state = `${this.language}:${b.resident.following}:${b.tea ? this.mintAvailable : ""}:${raceInvitation}`;
     if (b.actionState === state) return;
     b.actionState = state;
     const ja = this.language === "ja";
     b.companionLabel.textContent = b.resident.following ? (ja ? "またね" : "See you later") : (ja ? "一緒に歩く" : "Walk with me");
     b.companion.setAttribute("aria-label", b.resident.following ? (ja ? `${b.profile.name.ja}と別れる` : `Let ${b.profile.name.en} wander`) : (ja ? `${b.profile.name.ja}を誘う` : `Invite ${b.profile.name.en} to walk with you`));
     b.companion.setAttribute("aria-pressed", String(b.resident.following));
+    b.companion.hidden = TOWN_RESIDENT_IDS.includes(b.profile.id) && !raceInvitation;
+    if (b.profile.id === "rowan") {
+      b.companionLabel.textContent = ja ? "一緒に競走する" : "Race together";
+      b.companion.setAttribute("aria-label", ja ? "ローワンを競走に誘う" : "Invite Rowan to race");
+      b.companion.removeAttribute("aria-pressed");
+    }
     if (b.teaLabel) b.teaLabel.textContent = ja ? "収穫を持ってお茶をしよう" : "Share your harvest over tea";
     if (b.tea) b.tea.setAttribute("aria-label", this.mintAvailable
       ? ja ? "ミントの収穫があります。収穫を持ってお茶をしよう" : "Mint ready. Share your harvest over tea"
@@ -182,6 +190,11 @@ export class VillagerDialogue {
     const b = this.bubbles[index];
     if (!this.enabled || !b?.visible || b.distance > 4.5 || !this.actions) return;
     if (!this.life.available(b.profile.id)) return;
+    if (b.profile.id === "rowan") {
+      if (b.companion.hidden) return;
+      this.onTalk(); this.actions.race?.(); return;
+    }
+    if (TOWN_RESIDENT_IDS.includes(b.profile.id)) return;
     this.onTalk(); this.actions.companion(b.profile.id); this.actionLabels(b); b.measured = "";
     if (this.life.shared) return;
     this.say(index, b.resident.following ? line("A little company? I'd love that.", "一緒にお散歩？うれしいな。") : line("See you around. I'll be right here in the village.", "またね。村でのんびりしてるね。"), 4);
@@ -242,20 +255,21 @@ export class VillagerDialogue {
 
   talk(index = this.nearest) {
     const b = this.bubbles[index];
-    if (!this.enabled || !b?.visible || b.distance > 4.5 || index !== this.nearest) return;
-    if (!this.life.available(b.profile.id)) return;
+    if (!this.enabled || !b?.visible || b.distance > 4.5 || index !== this.nearest) return false;
+    if (!this.life.available(b.profile.id)) return false;
     if (this.life.shared) {
       this.onTalk();
       if (b.profile.id === "wren") this.actions?.crumbs(b.profile.id);
       else this.actions?.talk?.(b.profile.id);
-      return;
+      return true;
     }
-    if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 6; b.resident.chatting = true; return; }
+    if (b.profile.id === "wren" && this.actions) { this.bread(index); b.talkingUntil = this.clock + 6; b.resident.chatting = true; return true; }
     this.onTalk();
     this.say(index, b.profile.chat[b.chat++ % b.profile.chat.length], 6);
     b.talkingUntil = this.clock + 6;
     b.resident.chatting = true;
     this.announcement.textContent = `${b.profile.name[this.language]}: ${b.line[this.language]}`;
+    return true;
   }
 
   update(delta: number, camera: T.Camera, player: T.Vector3, weather: Weather) {
@@ -338,10 +352,11 @@ export class VillagerDialogue {
       b.button.hidden = !canChat;
       b.actions.hidden = !canChat || !this.actions;
       this.actionLabels(b);
+      if (TOWN_RESIDENT_IDS.includes(b.profile.id) && b.companion.hidden) b.actions.hidden = true;
       const compact = canChat && this.clock >= b.until && !(b.tea && this.mintAvailable);
       b.element.classList.toggle("is-compact", compact);
       b.element.hidden = false;
-      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}:${compact}:${b.attention && this.mintAvailable}`;
+      const measureKey = `${this.language}:${b.line.en}:${canChat}:${b.resident.following}:${compact}:${b.attention && this.mintAvailable}:${b.companion.hidden}`;
       if (b.measured !== measureKey) {
         b.width = b.element.offsetWidth; b.height = b.element.offsetHeight; b.measured = measureKey;
       }

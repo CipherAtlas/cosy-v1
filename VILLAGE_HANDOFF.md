@@ -1,5 +1,68 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-05 — integrated release preparation
+
+All pending atlas, farmers/Rowan racing, crop HUD, watchtower and river/pond/path work is included in the user-authorized release. Fresh production build/types/contracts/export privacy, renderer/Worker parity, 61 actual SQLite/WebSocket town checks and 19 actual multiplayer browser checks pass with zero page errors. Editor support and existing feature evidence are included. Publication/live status follows in the [release ledger](VILLAGE_BUILD.md#2026-10-05--integrated-atlas-residents-lookout-and-layout-release); earlier local-only entries are historical checkpoints. Native browser/device and long-session acceptance remain open.
+
+## 2026-10-05 — watchtower observer and late-join fixes (local)
+
+Multiplayer review confirmed coloured/named gallery spirits, independent walking, eight-person admission, ninth-person refusal, release, disconnect/reconnect and private-focus isolation. Fixed omitted welcome `lookout` metadata and floating remote entry/exit interpolation. Walking still smooths; claim changes place the observed spirit directly at the accepted floor/door position. Body/name overlap remains possible. Full contracts (122 Worker assertions), fresh build/types/export and all 19 actual served multiplayer perception checks plus eight final regular-preview smoke checks pass with zero page errors. Preview snapshot: `/tmp/cosy-lookout-multiplayer-path.txt`; Worker2567 retains its existing state with the welcome correction. [Evidence and limits](VILLAGE_BUILD.md#2026-10-05--watchtower-multiplayer-perception-local). No publication.
+
+## 2026-10-05 — pond dock landing and shoreline stones (local)
+
+The working layout hides `bench-5`, fills the dock entrance's green patch with an editable stone landing, widens two pond approaches and adds 97 independently editable shoreline stones using the existing Nature asset. Source physics matches 1,889 colliders/seven benches. Isolated build/types/contracts/export, actual-engine dock clearance/render checks, seven real shared-client checks and four editor save/reload API checks pass. Editor UI readiness/native Firefox acceptance remains open. The side chat preserved the main3051/Worker2567 services; include source layout/physics at the main chat's next coordinated refresh. [Checks and evidence](VILLAGE_BUILD.md#2026-10-05--pond-dock-landing-and-shoreline-stones-local). No publication.
+
+## 2026-10-05 — first-person watchtower walking (local)
+
+WASD/arrows now walk/strafe around the gallery; mouse look remains free, Home/End turn and PgUp/PgDn tilt. Client/Worker share a 3.05 m railing boundary and authored floor height; eight admission claims and observed walking poses remain shared. Build/types/contracts/export, 121 Worker assertions, 26 real three-client/capacity checks and eight final actual-served checks pass. Worker2567 uses `/tmp/cosy-lookout-walk-path.txt` with retained state; the later served map-smoothing build preserves this feature (`/tmp/cosy-town-final-preview-path.txt`). Reload the preview. Native Firefox gallery acceptance remains open after control-session interruptions. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--walking-in-the-watchtower-local). No publication.
+
+## 2026-10-05 — smooth map and anchored destinations (local)
+
+Map player motion now follows display frames instead of a four-Hz React pose poll. Hidden 3D draws stop while the map is open; simulation and shared authority continue. Little postbox is anchored to the actual saved object; one **Meadow Swings** map choice replaces the numbered options. Crowded destination names reveal above their icons on hover/focus, with player names kept above true gold/blue markers. Local profiling measures 60.1 FPS and 58.49 marker updates/s, versus 3.79 before; 120 Hz physical performance is not measured. Final build/types/export checks pass; All 71 three-client checks pass before the final hover-label spacing refinement; final served checks cover the refinement. Port 3051 now serves the checked export; 30 final actual-served map/basket checks pass, including postbox hover/name geometry at all four sizes, regular shared connection, rendering suspension/resumption and accepted private inventory. Reload existing tabs. [Behavior, evidence and remaining limits](VILLAGE_BUILD.md#2026-10-05--smooth-map-motion-and-accurate-destination-anchors-local). No publication.
+
+## 2026-10-05 — readable atlas labels and player markers (local)
+
+The atlas now shows only destination options, your gold compass marker and larger blue markers for other outdoor players. NPCs and dogs are omitted from both full-screen and corner maps. Player names sit directly above their true positions, without displaced glyphs or character callout lines. The atlas is zoomed in 18%; horizontal destination names remain above the controls, with the compact gold/blue legend. Private-focus visitors remain hidden. No world assets, placements or shared action rules change. Destination controls leave space around player names and use no guide lines. Players at the same coordinates can overlap; their markers retain true positions.
+
+Build/types/full contracts/export privacy, 65 actual three-client map checks at four desktop sizes and 20 served map/basket checks pass. Port 3051 serves the checked snapshot in `/tmp/cosy-map-final-preview-path.txt`, preserving the farm, bridge, riverbank and corrected watchtower work; regular Worker on 2567 is unchanged. Fresh served HTML/real-client smoke confirms the final map and accepted travel. Reload existing tabs. No publication; native Firefox/Safari appearance remains unverified. [Behavior and evidence](VILLAGE_BUILD.md#2026-10-05--readable-atlas-labels-and-player-markers-local).
+
+## 2026-10-05 — automatic riverbank stones (local)
+
+Smaller pale limestone stones follow both banks of every visible original/editor-drawn river, including saved shape/width/transforms. Paving crossings and water junctions remain open. Layout Studio updates the edging with each river and includes a placeable **Small riverbank stone** with a rendered Nature preview. Shared physics, protected presets and saved layout data remain unchanged. Seventeen focused editor checks, thirteen server checks, full contracts, fresh types/build/export privacy and final local scene review pass. Port 3051 serves the checked snapshot in `/tmp/cosy-riverbanks-preview-path.txt` (`final-out`); reload existing tabs. No publication. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--automatic-riverbank-stones-local).
+
+
+## 2026-10-05 — watchtower Firefox floor flicker fix (local)
+
+Reproduced flashing gallery-floor triangles in native Firefox. Separated coplanar stone/timber caps while retaining Y11.4 floor/standing height; runtime/editor share the fix. The regression fails before and passes after, and fresh contracts/build/types/export plus eight served checks pass. Port 3051 has the corrected snapshot (`/tmp/cosy-lookout-floor-fix-path.txt`); Worker2567 is unchanged. Native capture became stale after reload, so post-fix Firefox appearance still needs visual acceptance. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--watchtower-floor-flicker-fix-local). No publication.
+
+## 2026-10-05 — watchtower circular lookout (local)
+
+E at the tower door enters an open gallery with a first-person 360° camera; mouse or WASD/arrows look around, and Esc / Come down exits. Eight shared standing spots, observer height and the existing local editor tower asset stay aligned. Build/types/contracts/export, 116 Worker assertions, 22 browser and six editor checks pass. Port 3051 and its matching Worker2567 now serve the verified source snapshot, preserving local Worker state and the latest map/riverbank work. Eight fresh served two-client/laptop checks pass; reload Firefox. Native Firefox/Safari appearance remains unverified. [Behavior and verification](VILLAGE_BUILD.md#2026-10-05--watchtower-circular-lookout-local). No publication.
+
+## 2026-10-05 — paving beneath the farm bridge removed (local)
+
+The flat lane beneath the farm bridge is split at both entrances, leaving water below the arch and connected bank paths. The existing 3051 export receives only this saved-layout edit. Bridge physics/collisions stay unchanged; 421 actual-physics layout checks, 98 Worker checks, renderer parity and both-direction crossing checks pass. [Evidence and limits](VILLAGE_BUILD.md#2026-10-05--paving-beneath-the-farm-bridge-removed-local). No deployment.
+
+## 2026-10-05 — centered farm growth clocks (local)
+
+Kitchen-garden circular timers sit above each row's center, high enough to clear the nearby blob. Growing rows show their crop/row title and a disabled E Harvest button; countdown text is removed from the lower panel. Planting and watering remain available in their respective stages. Fresh full lint/types/contracts, 115 town checks, 54 focused animal checks and isolated build/export checks pass. Port 3051 serves the snapshot recorded in `/tmp/cosy-farm-visible-preview-path.txt`, using unchanged Worker2567. Twelve actual served crop/viewport checks and screenshot review pass for all three crops; disabled E changes neither the shared bed nor inventory, with zero page errors. Reload existing preview tabs. No publication. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--centered-farm-growth-clocks-local).
+
+## 2026-10-05 — farmers and horse caretaker (local)
+
+Three farm residents (Rusk/carrot, Poppy/radish, Cress/mint) and horse caretaker Rowan use the existing floating dialogue, with bilingual personalities and editor assets/routes. Rowan tends unclaimed horses; Chat F then Race together C requests shared automatic mounting and countdown. Direct race starts are refused. Fresh full lint/types/contracts, 30 authority, 61 SQLite/WebSocket, 27 two-client browser, 26 three-client regression and 19 editor checks plus isolated build/export/parity pass. Main previews and production still need a coordinated rebuild/release. [Behavior, evidence and limits](VILLAGE_BUILD.md#2026-10-05--farmers-and-horse-caretaker-local).
+
+## 2026-10-05 — single farm interaction panel (local)
+
+Farms use `Carrot Farm - Row x`, `Radish Farm - Row x` or `Mint Farm - Row x` in one bottom-center panel with centered actions. Mature rows show only the title and E Harvest; duplicate ready text and the top farm HUD are removed. Lower growth countdowns, in-world row clocks and racing remain. Lint, types, full contracts and focused component/CSS checks at four desktop sizes pass. Port 3051 now serves the verified atlas snapshot plus the farm UI change, recorded in `/tmp/cosy-farm-ui-preview-path.txt`, paired with the unchanged Worker2567. Fresh isolated build/types/export and 12 actual served crop/viewport checks pass; reload existing tabs. Later concurrent source work is preserved. No publication. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--single-farm-interaction-panel-local).
+
+## 2026-10-05 — radish bridge dead-end path removal (local)
+
+The Orchard lane spur south of the radish-farm bridge is trimmed back to the main lane in the playable layout, including its map/editor projection. Fresh engine visual review, 419 layout and 98 Worker checks pass; matching regenerated physics preserves all collisions/seats. Existing previews and the public site are not updated. [Checks and limits](VILLAGE_BUILD.md#2026-10-05--radish-bridge-dead-end-path-removal-local).
+
+## 2026-10-05 — full-screen village atlas (local)
+
+The map fills the screen with a custom cream-and-green cursor, destination hover/focus highlights and compact forest-green edge controls. M/the personal map key toggles it; Escape closes it. Existing Worker-approved destinations and private-focus behavior remain. Final isolated build/types/export checks and 49 actual two-client atlas assertions pass at four desktop sizes. The broader three-client regression stops on an unchanged dog-petting timeout before map opening; all 19 focused three-client seat/release/disconnect/reconnect checks pass. The 3051 preview serves the verified atlas snapshot recorded in `/tmp/cosy-fullscreen-map-build-path.txt`, paired with Worker2567; later concurrent source work is preserved. No publication; native browser/device review remains open. See [the ledger](VILLAGE_BUILD.md#2026-10-05--full-screen-village-atlas-local).
+
 ## 2026-10-04 — bench facing correction
 
 Published `818d59b` and matching Worker data retain saved-layout benches’ intrinsic facing offset, correcting backward birdwatching seating. Pages deployment succeeded; two live clients verified both approaches, observer heading and seat release. Reload existing village tabs. See the [verification ledger](VILLAGE_BUILD.md#2026-10-04--bench-facing-correction) for checks and release status.

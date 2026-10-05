@@ -2,6 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { freshGarden, readGarden, growGarden, gardenAction, gardenActionAllowed } from "../features/village/garden.ts";
 import { GARDEN_TARGETS } from "../features/village/garden.ts";
 import { VillageSimulation } from "./simulation.ts";
+import { towerLookout, LOOKOUT_CAPACITY } from "../features/village/towerLookout.ts";
 import { ACTIVITY_STAGES } from "../features/village/sharedActors.ts";
 
 const MAX_VISITORS = 64;
@@ -228,7 +229,7 @@ export class VillageWorld extends DurableObject {
       const dismounted = !!previousHorse && !horse;
       released ||= dismounted;
       if (dismounted || broadcastRiders && horse) {
-        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
           horse: visitor.horse ?? null, swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
       }
     }
@@ -239,6 +240,8 @@ export class VillageWorld extends DurableObject {
   interaction(visitor, request, now) {
     if (!request || typeof request !== "object") return { ok: false, reason: "That action is unavailable." };
     if (request.kind === "mapTravel") return this.simulation.mapTravel(visitor, request.id, now, this.visitors());
+    if (visitor.lookout != null && !["leave", "activity"].includes(request.kind))
+      return { ok: false, reason: "Come down from the lookout first." };
     if (request.kind === "town") return this.simulation.townInteraction(visitor, request, now, this.visitors());
     if (request.kind === "horse") return this.simulation.horseInteraction(visitor, request, now, this.visitors());
     if (this.simulation.mountedHorse(visitor.id)) {
@@ -255,7 +258,26 @@ export class VillageWorld extends DurableObject {
       }
       return result;
     }
+    if (request.kind === "lookout") {
+      const tower = towerLookout(this.simulation.authored);
+      if (!tower || visitor.activity || visitor.bench || visitor.swing || visitor.lookout != null || visitor.active === false
+        || Math.hypot(visitor.x - tower.entrance[0], visitor.z - tower.entrance[2]) > 3.5)
+        return { ok: false, reason: "Come closer to the watchtower door on foot." };
+      const index = Array.from({ length: LOOKOUT_CAPACITY }, (_, i) => i).find(i =>
+        !this.visitors().some(other => other.id !== visitor.id && other.lookout === i));
+      if (index === undefined) return { ok: false, reason: "The lookout is full. Wait for someone to come down." };
+      this.simulation.releaseVisitor(visitor.id, now);
+      visitor.lookout = index; visitor.holdingPuppy = null;
+      const position = tower.position(index);
+      [visitor.x, visitor.y, visitor.z] = position;
+      return { ok: true, lookoutIndex: index, position };
+    }
     if (request.kind === "leave") {
+      if (visitor.lookout != null) {
+        const position = towerLookout(this.simulation.authored)?.entrance;
+        visitor.lookout = null;
+        if (position) { [visitor.x, visitor.y, visitor.z] = position; }
+      }
       this.simulation.town.releaseVisitor(visitor.id, now);
       visitor.bench = visitor.swing = visitor.activity = null;
       visitor.activityPosition = null;
@@ -278,7 +300,7 @@ export class VillageWorld extends DurableObject {
       const position = ["garden", "breathe"].includes(request.id) ? this.simulation.activityPosition(visitor, request.id, this.visitors()) : null;
       if (["garden", "breathe"].includes(request.id) && !position) return { ok: false, reason: "That spot is occupied. Try again when there is room." };
       visitor.bench = visitor.swing = null;
-      visitor.holdingPuppy = null; visitor.activity = request.id; visitor.activityPosition = position;
+      visitor.lookout = null; visitor.holdingPuppy = null; visitor.activity = request.id; visitor.activityPosition = position;
       return { ok: true, ...(position ? { position } : {}) };
     }
     if (request.kind !== "bench" && request.kind !== "swing") return { ok: false, reason: "That action is unavailable." };
@@ -399,7 +421,7 @@ export class VillageWorld extends DurableObject {
       type: "welcome", selfId: visitor.id,
       protocol: 2, world: this.simulation.snapshot(Date.now()), hasCrumbs: visitor.crumbPouch,
       forageInventory: visitor.forageInventory, inventoryToken: visitor.inventoryToken,
-      visitors: this.visitors().map(({ id, name, color, slot, x, y, z, heading, horse, swing, bench, activity }) => ({ id, name, color, slot, x, y, z, heading, horse: horse ?? null, swing: swing ?? null, bench: bench ?? null, activity: activity ?? null })),
+      visitors: this.visitors().map(({ id, name, color, slot, x, y, z, heading, horse, swing, bench, activity, lookout }) => ({ id, name, color, slot, x, y, z, heading, horse: horse ?? null, swing: swing ?? null, bench: bench ?? null, activity: activity ?? null, lookout: lookout ?? null })),
       garden: this.garden, chatHour: this.chatHour, chat: this.chat,
       puppyTricks: [...this.puppyTricks.values()].filter(trick => Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000),
     });
@@ -431,17 +453,22 @@ export class VillageWorld extends DurableObject {
       visitor.active = message.active === true;
       if (visitor.horse && message.horse !== visitor.horse && now >= (visitor.reservationUntil ?? 0)) {
         this.simulation.dismount(visitor, now, this.visitors(), true);
-        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
           horse: null, swing: null, bench: null, activity: null });
       }
       visitor.holdingPuppy = validObjectId(message.holdingPuppy) ? message.holdingPuppy : null;
-      const seated = visitor.horse ? visitor.horse === message.horse : visitor.activity ? visitor.activity === message.activity
+      const seated = visitor.lookout != null ? visitor.lookout === message.lookout : visitor.horse ? visitor.horse === message.horse : visitor.activity ? visitor.activity === message.activity
         : visitor.bench ? visitor.bench.id === message.bench?.id && visitor.bench.index === message.bench.index
         : visitor.swing ? visitor.swing.id === message.swing?.id && visitor.swing.index === message.swing.index : true;
       if (seated) visitor.reservationUntil = 0;
       else if (now >= (visitor.reservationUntil ?? 0)) {
+        if (visitor.lookout != null) {
+          const position = towerLookout(this.simulation.authored)?.entrance;
+          if (position) [visitor.x, visitor.y, visitor.z] = position;
+          visitor.lookout = null;
+        }
         visitor.bench = visitor.swing = visitor.activity = visitor.activityPosition = null;
-        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
           swing: null, bench: null, activity: null });
       }
       socket.serializeAttachment(visitor);
@@ -453,7 +480,7 @@ export class VillageWorld extends DurableObject {
         send(socket, { type: "interaction_result", requestId: message.requestId, result: { ok: false, reason: "Give them a moment, then try again." } }); return;
       }
       visitor.lastInteraction = now;
-      const pose = message.pose;
+      const pose = visitor.lookout == null ? message.pose : null;
       if (!this.simulation.mountedHorse(visitor.id) && pose && [pose.x, pose.z, pose.heading].every(Number.isFinite) && (pose.y === undefined || Number.isFinite(pose.y))) {
         visitor.x = Math.max(-320, Math.min(320, pose.x)); visitor.z = Math.max(-320, Math.min(320, pose.z));
         visitor.y = pose.y === undefined ? undefined : Math.max(-20, Math.min(40, pose.y));
@@ -468,14 +495,16 @@ export class VillageWorld extends DurableObject {
       visitor.requestingActivity = message.request?.kind === "activity";
       const result = this.interaction(visitor, message.request, now);
       delete visitor.requestingActivity;
-      if (result.ok && (["activity", "bench", "swing"].includes(message.request.kind) || message.request.kind === "horse" && message.request.action === "mount")) visitor.reservationUntil = now + 4500;
+      if (result.ok && (["activity", "bench", "swing", "lookout"].includes(message.request.kind)
+        || message.request.kind === "horse" && message.request.action === "mount"
+        || message.request.kind === "town" && message.request.action === "raceInvite")) visitor.reservationUntil = now + 4500;
       socket.serializeAttachment(visitor);
       if (result.ok) {
         if (message.request.kind === "town" && ["owlFood", "owlFeed"].includes(message.request.action))
           send(socket, { type: "crumbs", hasCrumbs: visitor.crumbPouch });
         try { this.publishWorld(now, privateTownAction ? visitor : undefined); }
         catch (error) { if (beforeTown) Object.assign(this.simulation.town.state, beforeTown); throw error; }
-        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+        this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
           horse: visitor.horse ?? null, swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
       } else if (released) this.publishWorld(now);
       send(socket, { type: "interaction_result", requestId: message.requestId, result });
@@ -508,7 +537,11 @@ export class VillageWorld extends DurableObject {
       visitor.y = message.y === undefined ? undefined : Math.max(-20, Math.min(40, message.y));
       visitor.z = Math.max(-320, Math.min(320, message.z));
       visitor.heading = Math.atan2(Math.sin(message.heading), Math.cos(message.heading));
-      if (message.activity === "focus") { visitor.activity = "focus"; visitor.bench = visitor.swing = null; }
+      if (visitor.lookout != null) {
+        const position = towerLookout(this.simulation.authored)?.constrain(visitor.x, visitor.z);
+        if (position) [visitor.x, visitor.y, visitor.z] = position;
+      }
+      if (message.activity === "focus") { visitor.lookout = null; visitor.activity = "focus"; visitor.bench = visitor.swing = null; }
       else if (!message.activity && visitor.activity === "focus") visitor.activity = null;
       const ride = message.swing;
       const claimedSwing = visitor.swing;
@@ -525,8 +558,11 @@ export class VillageWorld extends DurableObject {
       if (!ride && claimedSwing && now >= (visitor.reservationUntil ?? 0)) visitor.swing = null;
       if (!message.bench && visitor.bench && !visitor.activity && now >= (visitor.reservationUntil ?? 0)) visitor.bench = null;
       socket.serializeAttachment(visitor);
-      this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, swing: visitor.swing,
+      this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null, swing: visitor.swing,
         horse: visitor.horse ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null }, socket);
+      if (visitor.lookout != null && (Math.hypot(visitor.x - message.x, visitor.z - message.z) > .0001 || visitor.y !== message.y))
+        send(socket, { type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading,
+          lookout: visitor.lookout, swing: null, horse: null, bench: null, activity: null });
     } else if (message.type === "puppy_trick") {
       const trick = message.trick, now = Date.now();
       if (!trick || !validObjectId(trick.id) || !Object.hasOwn(PUPPY_TRICK_SECONDS, trick.command)

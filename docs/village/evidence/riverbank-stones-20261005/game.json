@@ -1,0 +1,36 @@
+{
+  "count": 1345,
+  "report": {
+    "graphicsVersion": "spatial-batches-v2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+    "viewport": [
+      1366,
+      768
+    ],
+    "devicePixelRatio": 1,
+    "drawingBuffer": [
+      1366,
+      768
+    ],
+    "preference": "high",
+    "tier": "detailed",
+    "detailedRenderScale": 1,
+    "shadows": true,
+    "antialias": true,
+    "contextLost": false,
+    "weather": "golden",
+    "lowestFps": 51,
+    "longestFrameMs": 33,
+    "longestRenderSubmitMs": 21,
+    "lastSceneryPrepareMs": 0,
+    "shaderPrograms": 60
+  },
+  "rivers": [
+    {
+      "id": "town-brook",
+      "length": 273
+    }
+  ],
+  "errors": []
+}

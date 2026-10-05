@@ -1,0 +1,44 @@
+{
+  "connected": true,
+  "paths": [
+    {
+      "id": "town-farm-bridge-lane",
+      "points": [
+        [
+          34,
+          -54
+        ],
+        [
+          43,
+          -53
+        ],
+        [
+          51,
+          -53
+        ],
+        [
+          52.8,
+          -53
+        ]
+      ]
+    },
+    {
+      "id": "town-farm-bridge-east-approach",
+      "points": [
+        [
+          64.8,
+          -53
+        ],
+        [
+          66,
+          -53
+        ],
+        [
+          73,
+          -57.7
+        ]
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -40,5 +40,6 @@ export function riverGeometry(points: [number, number][], width: number, height:
   geometry.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2)); geometry.setIndex(indices); geometry.computeVertexNormals();
   geometry.userData.flatPositions = positions.slice();
   geometry.userData.plantingSurface = "water";
+  geometry.userData.riverSurface = true;
   return geometry;
 }

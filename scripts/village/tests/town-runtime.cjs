@@ -33,6 +33,12 @@ export class TownFixtureWorld extends VillageWorld {
       horse.movement.position = { x: horse.state.x, y: 0, z: horse.state.z };
       this.publishWorld(townTestNow()); return Response.json({ ok: true });
     }
+    if (route === '/__test/rowan-start') {
+      const rowan = this.simulation.actor('rowan', 'resident');
+      Object.assign(rowan.state, { x: 84, y: 0, z: 36, mode: 'idle', owner: null, speed: 0 });
+      rowan.movement.position = { x: 84, y: 0, z: 36 }; delete rowan.state.gesture;
+      this.simulation.town.state.hayFeeds = []; this.publishWorld(townTestNow()); return Response.json({ ok: true });
+    }
     if (route === '/__test/state') return Response.json(this.simulation.snapshot(townTestNow()));
     if (route === '/__test/debug') {
       const horse = this.simulation.actor('horse-juniper', 'horse');
@@ -81,6 +87,13 @@ async function interact(client, action, id, pose, extra = {}, kind = 'town') {
   return client.messages.find(message => message.type === 'interaction_result' && message.requestId === requestId).result;
 }
 const at = (x, z) => ({ x, z });
+async function inviteRace(client) {
+  const mounted = (await state()).actors.find(actor => actor.kind === 'horse' && actor.owner === client.welcome.selfId);
+  if (mounted) assert((await interact(client, 'dismount', mounted.id, at(mounted.x, mounted.z), {}, 'horse')).ok);
+  await control('rowan-start');
+  assert((await interact(client, 'talk', 'rowan', at(84, 38), {}, 'resident')).ok, 'Claim Rowan through the actual dialogue action');
+  return interact(client, 'raceInvite', 'rowan', at(84, 38));
+}
 async function awaitGift(food, collector) {
   for (let i = 0; i < 300; i++) {
     const animal = (await state()).town.animals.find(animal => animal.species === 'hedgehog');
@@ -192,9 +205,9 @@ async function awaitGift(food, collector) {
   await control('horse-start', { id: 'horse-juniper' }); await control('horse-start', { id: 'horse-willow', offset: 3.5 });
   check((await interact(a, 'mount', 'horse-juniper', at(86.5, 34), {}, 'horse')).ok, 'A real visitor mounts the course horse');
   check((await interact(b, 'mount', 'horse-willow', at(86.5, 37.5), {}, 'horse')).ok, 'A second real visitor mounts a distinct shared horse');
-  const start = await interact(a, 'raceStart', 'horse-racetrack', at(85, 34));
+  const start = await inviteRace(a);
   check(start.ok, `The actual Worker accepts a clear course countdown: ${start.reason || ''}`);
-  check(!(await interact(b, 'raceStart', 'horse-racetrack', at(85, 37.5))).ok, 'An actual second mounted rider cannot steal the race');
+  check(!(await interact(b, 'raceInvite', 'rowan', at(85, 37.5))).ok, 'An actual second mounted rider cannot steal the race');
   check(!(await interact(b, 'raceCancel', 'horse-racetrack', at(85, 37.5))).ok, 'Spectators cannot cancel another rider race');
   const d = await connect();
   check(d.welcome.world.town.race.owner === a.welcome.selfId && d.welcome.world.town.race.phase === 'countdown', 'A late real join sees the race owner and original countdown');
@@ -235,7 +248,7 @@ async function awaitGift(food, collector) {
   await interact(a, undefined, undefined, at(85, 34), {}, 'leave');
   await interact(b, undefined, undefined, at(85, 37.5), {}, 'leave');
   await control('horse-start', { id: 'horse-juniper' }); await interact(a, 'mount', 'horse-juniper', at(86.5, 34), {}, 'horse');
-  await interact(a, 'raceStart', 'horse-racetrack', at(85, 34));
+  assert((await inviteRace(a)).ok, 'Rowan accepts the disconnect race invitation');
   a.socket.close(1000, 'Synthetic local disconnect'); await new Promise(resolve => setTimeout(resolve, 20));
   check((await state()).town.race.phase === 'cancelled' && (await state()).actors.find(actor => actor.id === 'horse-juniper').owner === null,
     'Actual socket departure cancels the race and releases its horse');
@@ -247,7 +260,7 @@ async function awaitGift(food, collector) {
     'A real petting disconnect releases the shared animal for reconnecting visitors');
   await control('horse-start', { id: 'horse-juniper' });
   await interact(f, 'mount', 'horse-juniper', at(86.5, 34), {}, 'horse');
-  await interact(f, 'raceStart', 'horse-racetrack', at(85, 34));
+  assert((await inviteRace(f)).ok, 'Rowan accepts the presence-expiry race invitation');
   await tick(16000, false);
   check((await state()).town.race.phase === 'cancelled' && (await state()).actors.find(actor => actor.id === 'horse-juniper').owner === null,
     'Missed real visitor renewals cancel the race and cannot reserve the horse forever');

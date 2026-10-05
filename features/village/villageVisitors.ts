@@ -39,7 +39,7 @@ export function glowSpirit(spirit: T.Object3D, night: number) {
   }
 
 export class VillageVisitors {
-  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null }>();
+  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null; lookout: number | null }>();
   private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private visitorLabelPoint = new T.Vector3();
   private temp = new T.Vector3();
@@ -102,7 +102,7 @@ export class VillageVisitors {
         group.position.set(visitor.x, height, visitor.z);
         group.rotation.y = visitor.heading;
         this.scene.add(group);
-        remote = { name: visitor.name, slot: visitor.slot, group, spirit, fins, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: elapsed, bench: null, activity: null };
+        remote = { name: visitor.name, slot: visitor.slot, group, spirit, fins, target: group.position.clone(), heading: visitor.heading, label, swing: null, swingReceivedAt: elapsed, bench: null, activity: null, lookout: visitor.lookout ?? null };
         this.entries.set(visitor.id, remote);
       }
       if (remote.label.textContent !== visitor.name) remote.label.textContent = visitor.name;
@@ -110,6 +110,10 @@ export class VillageVisitors {
       remote.slot = visitor.slot;
       remote.label.style.setProperty("--visitor-color", visitor.color);
       remote.target.set(visitor.x, height, visitor.z);
+      const lookout = visitor.lookout ?? null;
+      // Tower entry/exit teleports between floors; smoothing would float through the shaft.
+      if (remote.lookout !== lookout) remote.group.position.copy(remote.target);
+      remote.lookout = lookout;
       remote.heading = visitor.heading;
       remote.bench = visitor.bench ?? null; remote.activity = visitor.activity ?? null;
       const ride = visitor.swing;

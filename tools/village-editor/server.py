@@ -98,7 +98,7 @@ def validate(doc):
             raise ValueError('Keep town activity objects upright. Turn them with Y rotation.')
     routes = doc.get('routes')
     if routes is not None:
-        if not isinstance(routes, dict) or any(name not in ('pip', 'maple', 'moss', 'luma', 'wren') for name in routes):
+        if not isinstance(routes, dict) or any(name not in ('pip', 'maple', 'moss', 'luma', 'wren', 'rusk', 'poppy', 'cress', 'rowan') for name in routes):
             raise ValueError('Invalid resident routes.')
         for route in routes.values():
             if not isinstance(route, dict) or not isinstance(route.get('points'), list) or not 2 <= len(route['points']) <= 100:
@@ -119,12 +119,13 @@ SCENE_ASSETS = {item['asset'] for item in json.loads((STUDIO / 'presets/current-
 SCENE_ASSETS.update(('pond-rest-paving', 'lamp-moon-bridge', 'lamp-moon-garden', 'lamp-moon-birds', 'lamp-moon-pond',
     'edge-lantern-garden-1', 'edge-lantern-garden-2', 'edge-lantern-garden-3', 'edge-lantern-pond-1', 'edge-lantern-pond-2', 'edge-lantern-pond-3',
     'bird-clearing-flowers', 'activity-furnishings'))
-SCENE_ASSETS.update(('land-tile-20', 'land-tile-40', 'land-hill', 'meadow-island', 'boulder', 'raised-bed', 'coffee-cup',
+SCENE_ASSETS.update(('land-tile-20', 'land-tile-40', 'land-hill', 'meadow-island', 'boulder', 'riverbank-stone', 'raised-bed', 'coffee-cup',
     'writing-journal', 'kind-note', 'desk-inkwell', 'desk-quill', 'focus-hourglass', 'village-window-vista', 'cottage-cat',
     'cottage-couch', 'cottage-reading-lamp', 'cottage-fern', 'cottage-botanical-print', 'cottage-cat-cushion',
     'cottage-writing-chair', 'cottage-books', 'cottage-pottery', 'cottage-book-shelf', 'cottage-pottery-shelf'))
 SCENE_ASSETS.update(f'garden-{name}' for name in ('sunflower', 'daisy', 'iris', 'mint', 'reeds', 'lily', 'carrot', 'radish', 'basket', 'wateringcan', 'swan', 'duck', 'duckling', 'fish'))
 SCENE_ASSETS.update(('horse-racetrack', 'horse-stable', 'farm-row', 'hay-bale', 'owl-feeding-perch', 'owl-brown', 'cow-highland', 'cow-highland-girl', 'sheep', 'lamb', 'hedgehog', 'forage-apple', 'forage-mushroom', 'apple-tree', 'mushroom-patch'))
+SCENE_ASSETS.update(('villager-rusk', 'villager-poppy', 'villager-cress', 'villager-rowan'))
 SCENE_ASSETS.update(('grass-meadow', 'flower-meadow'))
 SCENE_ASSETS.update(f'animal-{name}' for name in ('horse-bay', 'horse-grey', 'highland-copper', 'highland-flower',
     'dog-corgi', 'dog-shiba', 'dog-beagle', 'dog-samoyed', 'dog-collie', 'dog-shepherd',

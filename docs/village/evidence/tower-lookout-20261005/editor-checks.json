@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "The complete watchtower gallery is registered in Buildings",
+    "The tower has a rendered gallery preview",
+    "The complete tower can be selected, moved and rotated",
+    "Saving preserves the tower transform and asset identity",
+    "Reloading the saved working copy retains the gallery placement",
+    "Editor has no page errors"
+  ],
+  "errors": []
+}

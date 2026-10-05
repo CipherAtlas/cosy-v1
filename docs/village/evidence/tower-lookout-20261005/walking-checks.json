@@ -1,0 +1,31 @@
+{
+  "checks": [
+    "Entering places a first-person camera above the gallery floor",
+    "A real observer sees the elevated visitor",
+    "A second real visitor receives a distinct shared gallery spot",
+    "W walks across the deck in first person without turning or tilting",
+    "A real observer receives the walking gallery position",
+    "Arrow keys strafe across the gallery",
+    "Held movement stops at the railing and stays on the deck",
+    "A full keyboard rotation leaves the viewpoint anchored in the tower",
+    "The gallery camera can look steeply down into town",
+    "The gallery camera can look up under the spire",
+    "Actual canvas mouse input rotates the lookout camera",
+    "Lookout exit is visible and usable at 1366×768",
+    "Lookout exit is visible and usable at 1280×720",
+    "Lookout exit is visible and usable at 1024×640",
+    "Lookout exit is visible and usable at 800×640",
+    "Escape returns the visitor to clear ground beside the door",
+    "A released lookout spot can be re-entered with the keyboard",
+    "The visible exit button matches Escape",
+    "Losing the connection safely returns the local camera to ground",
+    "Reconnection permits a fresh accepted tower entry",
+    "A late-joining real client sees both visitors at the tower",
+    "Eight real WebSocket visitors fill the gallery; a ninth receives visible refusal without local entry",
+    "Closing a real full-gallery connection frees its position for the waiting visitor",
+    "Both tower visitors can enter their independent private focus cottages",
+    "Private focus hides the shared outdoor tower visitors",
+    "No page errors (0)"
+  ],
+  "errors": []
+}

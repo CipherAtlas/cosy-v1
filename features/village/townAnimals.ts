@@ -58,7 +58,7 @@ export class TownAnimals {
   private timeOffset = 0;
   private petVisitors = new WeakSet<T.Object3D>();
 
-  constructor(layout: AuthoredWorld, source: T.Object3D, spirit: T.Object3D, private sound: (event: TownAnimalSoundEvent) => void = () => {}) {
+  constructor(layout: AuthoredWorld, source: T.Object3D, spirit: T.Object3D, private sound: (event: TownAnimalSoundEvent) => void = () => {}, rider?: T.Object3D) {
     this.group.name = "Shared pasture animals and Rowan";
     const heartGeometry = animalHeartGeometry();
     const heartMaterial = new T.MeshBasicMaterial({ color: "#ffb8c0", transparent: true, side: T.DoubleSide, depthWrite: false });
@@ -103,8 +103,8 @@ export class TownAnimals {
       this.group.add(root, ...hearts); this.animals.push({ id: item.id, root, model, body, bodyBase: body?.position.clone() ?? new T.Vector3(), head, legs, tail, hearts, apple, mushroom, speech, distance: 0, speed: 0, lastCall: "" });
     }
     this.rival.add(this.rivalHorse);
-    const jockey = cloneSkeleton(spirit); jockey.position.set(0, 0, 0); jockey.rotation.set(0, 0, 0);
-    tintSpirit(jockey, "#adc8a0", true);
+    const jockey = cloneSkeleton(rider ?? spirit); jockey.position.set(0, 0, 0); jockey.rotation.set(0, 0, 0);
+    if (!rider) tintSpirit(jockey, "#adc8a0", true);
     this.rivalHorse.getObjectByName("HorseSeat")!.add(jockey);
     this.rival.name = "Rowan and Bramble"; this.rival.visible = false; this.group.add(this.rival);
   }

@@ -507,15 +507,16 @@ fs.mkdirSync(output, { recursive: true });
       await visitor.bringToFront();
       await visitor.waitForFunction(id => e.townContext?.growth?.readyAt === e.sharedActors.town.beds.find(b => b.id === id)?.growAt
         && e.townContext.growth.readyAt !== null, empty.id);
-      await visitor.locator('.v-farm-progress [role="timer"]').waitFor();
+      await visitor.locator('.v-town-controls[data-activity="farm"] button:disabled').waitFor();
       await visitor.waitForFunction(id => e.townScene.clocks.find(clock => clock.row.id === id)?.sprite.visible, empty.id);
       check(await visitor.evaluate(id => {
         const bed = e.sharedActors.town.beds.find(b => b.id === id), clock = e.townScene.clocks.find(clock => clock.row.id === id);
         const remaining = Math.max(0, Math.ceil((bed.growAt - Date.now()) / 1000));
-        const text = document.querySelector('.v-farm-progress [role="timer"]')?.textContent;
-        const shown = text?.split(':').map(Number);
-        return clock?.sprite.visible && shown?.length === 2 && Math.abs(shown[0] * 60 + shown[1] - remaining) <= 1;
-      }, empty.id), 'Farm progress has an accepted countdown in the top HUD and an in-world row timer');
+        const shown = clock?.text.split(':').map(Number);
+        return clock?.sprite.visible && shown?.length === 2 && Math.abs(shown[0] * 60 + shown[1] - remaining) <= 1
+          && !document.querySelector('.v-town-controls[data-activity="farm"] [role="status"]')
+          && document.querySelector('.v-town-controls[data-activity="farm"] button')?.disabled;
+      }, empty.id), 'Farm progress uses only the in-world row timer while the lower Harvest button is disabled');
       await visitor.screenshot({ path: `${output}/farm-growth.png` });
       await fit(visitor, 'farm-growth');
       const ripe = await visitor.evaluate(() => {
@@ -657,7 +658,7 @@ fs.mkdirSync(output, { recursive: true });
     await visitor.waitForFunction(()=>!e.horseRiding.actor);
     check(true,'Escape safely dismounts after a race');
     await move(visitor, empty.point);
-    await visitor.locator('.v-farm-progress [role="timer"]').waitFor();
+    await visitor.locator('.v-town-controls[data-activity="farm"]').waitFor();
     check(await visitor.locator('.v-race-progress').count() === 0, 'A completed race yields to the current farm timer when the rider returns to the fields');
     await visitor.screenshot({ path: `${output}/farm-after-race.png` });
     await approachAnimal(visitor,'cow-highland-2'); await key(visitor,'e');

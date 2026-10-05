@@ -9,6 +9,7 @@ import type { Collider } from "./environment";
 import { loadAnimalArt } from "./animalArt";
 import { ANIMAL_RIG_ASSETS, makeAnimalRig } from "./animalRig";
 import { batchStaticProp } from "./spatialRendering";
+import { makeRiverbankStone } from "./riverbankStones";
 
 export type PlaceableAsset = { id: string; name: string; category: string; template: T.Object3D; shelf: boolean; surface?: boolean; solid?: boolean; localColliders?: Collider[] };
 
@@ -16,6 +17,7 @@ export type PlaceableAsset = { id: string; name: string; category: string; templ
 export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource: T.Object3D = new T.Group(), townSource?: T.Object3D) {
   const assets = new Map<string, PlaceableAsset>();
   const sourceGround = surfaces.ground;
+  assets.set("riverbank-stone", { id: "riverbank-stone", name: "Small riverbank stone", category: "Nature", template: makeRiverbankStone(surfaces.stone), shelf: true });
     const raisedBed = new T.Group();
     const bedWood = surfaces.wood, soil = new T.MeshStandardMaterial({ color: "#80634b", roughness: 1 });
     const bedPart = (material: T.Material, position: [number, number, number], size: [number, number, number]) => {
@@ -85,7 +87,7 @@ export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource:
 export async function addSupplementalLayout(world: World, models: T.Object3D, cat?: T.Object3D, townSource?: T.Object3D) {
   if (world.authored.sceneVersion !== 1) return;
   const requested = new Set((world.authored.items ?? []).filter(item => item.visible).map(item => item.asset));
-  if (![...requested].some(id => TOWN_ASSET_IDS.includes(id) || /^(animal-|land-|cottage-(cat|couch|reading|fern|botanical|writing|books|pottery|book))/.test(id) || /^garden-(sunflower|daisy|iris|mint|reeds|lily|carrot|radish|basket|wateringcan|swan|duck|duckling|fish)$/.test(id) || ["meadow-island", "boulder", "raised-bed", "coffee-cup", "writing-journal", "kind-note", "desk-inkwell", "desk-quill", "focus-hourglass", "village-window-vista"].includes(id))) return;
+  if (![...requested].some(id => TOWN_ASSET_IDS.includes(id) || /^(animal-|land-|cottage-(cat|couch|reading|fern|botanical|writing|books|pottery|book))/.test(id) || /^garden-(sunflower|daisy|iris|mint|reeds|lily|carrot|radish|basket|wateringcan|swan|duck|duckling|fish)$/.test(id) || ["riverbank-stone", "meadow-island", "boulder", "raised-bed", "coffee-cup", "writing-journal", "kind-note", "desk-inkwell", "desk-quill", "focus-hourglass", "village-window-vista"].includes(id))) return;
   if (!townSource && [...requested].some(id => TOWN_ASSET_IDS.includes(id))) townSource = await loadTownAssetKit();
   const assets = supplementalAssets(world.gardenSurfaces, cat, townSource);
   const animalIds = new Set((world.authored.items ?? []).filter(item => item.visible && item.asset.startsWith("animal-")).map(item => item.asset));

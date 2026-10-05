@@ -1,6 +1,9 @@
 export type Line = { en: string; ja: string };
 const line = (en: string, ja: string): Line => ({ en, ja });
 
+export const FARM_RESIDENT_IDS = ["rusk", "poppy", "cress"];
+export const TOWN_RESIDENT_IDS = [...FARM_RESIDENT_IDS, "rowan"];
+
 export const VILLAGERS = [
   {
     id: "pip", name: line("Pip", "ピップ"), color: "#a5dfef", ink: "#3f607e",
@@ -89,5 +92,33 @@ export const VILLAGERS = [
     chat: [line("Here, some sourdough crumbs. Scatter a little and watch their wings!", "サワードウのパンくずをどうぞ。少し撒いて、羽を見ていてね！")],
     rain: line("A little rain makes their feathers look like pearls.", "雨にぬれると、羽が真珠みたいね。"),
     dusk: line("One last picnic before the stars come out.", "星が出る前に、もう一度ピクニック。"),
+  },
+  {
+    id: "rusk", name: line("Rusk", "ラスク"), color: "#e8bd83", ink: "#79603f",
+    greeting: line("Mind the carrots. ...You can stay, though.", "ニンジンを踏むなよ。…いてもいいけどな。"),
+    ambient: [line("Crooked carrot. Excellent character.", "曲がったニンジン。いい根性だ。"), line("Rain better be on time today.", "今日の雨は遅れるなよ。")],
+    chat: [line("Grumpy? I'm concentrating. The carrots understand.", "不機嫌？集中してるんだ。ニンジンはわかってる。"), line("That patch is yours if you want it. Don't make a fuss about it.", "育てたいなら、あの畝は使っていい。大げさに礼は言うなよ。"), line("I saved the sweetest one for you. Allegedly.", "一番甘いのは、お前にとっといた。…たぶんな。")],
+    rain: line("Finally. Sensible weather.", "やっとか。まともな天気だ。"), dusk: line("Good day's work. Even yours.", "よく働いたな。お前もだ。"),
+  },
+  {
+    id: "poppy", name: line("Poppy", "ポピー"), color: "#f2aeba", ink: "#945369",
+    greeting: line("Hello! Want to meet my extremely impressive radishes?", "こんにちは！自慢のラディッシュ、見ていって！"),
+    ambient: [line("Another round little champion!", "また丸い小さなチャンピオンだ！"), line("Rusk pretends he doesn't like my singing.", "ラスクは、私の歌が嫌いなふりをするの。")],
+    chat: [line("I name the radishes. It makes harvesting rather emotional.", "ラディッシュに名前をつけるの。収穫のとき、ちょっと泣きそう。"), line("This one is Radley. Excellent listener, terrible dancer.", "この子はラドリー。聞き上手だけど、踊りは苦手。"), line("Plant something! I'll cheer for both of you.", "何か植えてみて！あなたも芽も、私が応援するよ。")],
+    rain: line("Free watering! Everybody wins!", "無料の水やり！みんな得したね！"), dusk: line("Goodnight, radishes. Goodnight, favourite visitor!", "おやすみ、ラディッシュ。おやすみ、大好きなお客さん！"),
+  },
+  {
+    id: "cress", name: line("Cress", "クレス"), color: "#b1d8c3", ink: "#4c7964",
+    greeting: line("Oh, hello. I was listening to the mint grow.", "あ、こんにちは。ミントが育つ音を聞いていたの。"),
+    ambient: [line("A breeze with excellent taste.", "この風、いい趣味をしてるね。"), line("I think that cloud needs a cup of tea.", "あの雲には、お茶が必要みたい。")],
+    chat: [line("Mint grows wherever it likes. I respect the ambition.", "ミントは好きなところに育つ。その意気込み、いいよね。"), line("I meant to count the leaves. Then a butterfly happened.", "葉っぱを数えるつもりだったけど、チョウが来たの。"), line("Pick a little for Luma. She makes the afternoon feel longer.", "ルマに少し摘んでいって。あの人のお茶は、午後を長くしてくれる。")],
+    rain: line("The mint is having a very quiet party.", "ミントが、とても静かなパーティーをしてる。"), dusk: line("Everything smells like the last good thought of the day.", "一日の最後の、いい考えみたいな香り。"),
+  },
+  {
+    id: "rowan", name: line("Rowan", "ローワン"), color: "#adc8a0", ink: "#596d49",
+    greeting: line("Easy there. The horses like a gentle hello.", "ゆっくりね。馬たちは、やさしい挨拶が好きなんだ。"),
+    ambient: [line("A little hay, a little scratch. That's the routine.", "少しの干し草、少しのなでなで。それが日課さ。"), line("Bramble reckons he's the fastest. We can check later.", "ブランブルは一番速いと思ってる。あとで確かめよう。")],
+    chat: [line("Fancy a friendly race? I'll saddle us both. The horses set the pace.", "仲良く競走しない？二人の馬を用意するよ。馬のペースで走ろう。"), line("Win or lose, everyone gets a pat afterwards. Horses included.", "勝っても負けても、最後はみんなをなでるよ。馬もね。")],
+    rain: line("Wet manes, warm stable. We'll take it easy.", "濡れたたてがみに、暖かい厩舎。のんびりしよう。"), dusk: line("One last brush before bed, old friends.", "寝る前に、もう一度ブラシをかけよう。"),
   },
 ];

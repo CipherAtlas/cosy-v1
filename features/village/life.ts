@@ -3,7 +3,7 @@ import * as T from "three";
 import { RESIDENT_ROUTES, COMPANION_STAGES, type SharedActor, type SharedActors } from "./sharedActors";
 import { VillageMovement } from "./movement";
 import { BIRD_CLEARING, floorHeight, type Collider } from "./environment";
-import { VILLAGERS } from "./villagers";
+import { VILLAGERS, TOWN_RESIDENT_IDS } from "./villagers";
 import { VillageNavigation } from "./navigation";
 import { ACTIVITY_STAGES } from "./activityScene";
 import type { PlaceId } from "./places";
@@ -101,7 +101,7 @@ export class VillageLife {
         node.material = Array.isArray(node.material) ? node.material.map(tint) : tint(node.material);
       });
       this.dressSpirit(root, i);
-      const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1,.96][i]);
+      const actor = new T.Group(); actor.add(root); actor.scale.setScalar([.96,1.07,.92,1,.96,1.06,.94,.97,1.02][i]);
       const placement = authored?.sceneVersion === 1 ? authored.items?.find(item => item.visible && item.asset === (i === 4 ? "wren-caretaker" : `villager-${RESIDENT_IDS[i]}`)) : undefined;
       if (placement) actor.scale.multiply(new T.Vector3(...placement.scale));
       actor.visible = residentInLayout(authored, RESIDENT_IDS[i]);
@@ -112,13 +112,13 @@ export class VillageLife {
       this.group.add(actor);
       actor.name = VILLAGERS[i].name.en;
       const cup = new T.Group(); cup.visible = false; actor.add(cup);
-      const porcelain = new T.MeshStandardMaterial({ color: ["#a5dfef", "#ffdab9", "#c8e6a6", "#d6c7fa", "#f4c3d4"][i], roughness: .5 });
+      const porcelain = new T.MeshStandardMaterial({ color: VILLAGERS[i].color, roughness: .5 });
       const bowl = new T.Mesh(new T.CylinderGeometry(.105, .08, .14, 16), porcelain); cup.add(bowl);
       const handle = new T.Mesh(new T.TorusGeometry(.054, .012, 6, 12), porcelain); handle.position.x = .11; cup.add(handle);
       const wateringCan = props?.getObjectByName("WateringCan")?.clone(true);
       if (wateringCan) { wateringCan.scale.multiplyScalar(.5); wateringCan.visible = false; actor.add(wateringCan); }
       this.residents.push({ root: actor, spirit: root, fins, phase: i * 1.7, movement, route, routePauses: authored?.routes[RESIDENT_IDS[i]]?.pauses, waypoint: route.length > 1 ? 1 : 0,
-        pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38, .32][i],
+        pause: i * 2, walking: false, chatting: false, pace: [.48, .4, .34, .38, .32,.32,.43,.3,.4][i],
         following: false, companionPath: [], replan: 0, goal: [0, 0], returning: false, cup, wateringCan,
         encounter: { state: "roam", path: [], time: 0, noticed: false, cooldown: 0, checkIn: 0 } });
     });
@@ -146,7 +146,7 @@ export class VillageLife {
   setCompanions(ids: string[]) {
     if (this.sharedStates) return;
     this.residents.forEach((r, i) => {
-      const following = ids.includes(VILLAGERS[i].id);
+      const following = !TOWN_RESIDENT_IDS.includes(VILLAGERS[i].id) && ids.includes(VILLAGERS[i].id);
       if (r.following === following) return;
       r.following = following; r.replan = 0; r.companionPath = []; r.chatting = false;
       r.encounter.state = "roam"; r.encounter.path = []; r.encounter.cooldown = 15;
@@ -251,7 +251,7 @@ export class VillageLife {
         resident.movement.position = { x: resident.root.position.x, y: floorHeight(resident.root.position.x, resident.root.position.z), z: resident.root.position.z };
         resident.root.rotation.y = pose.heading;
         resident.walking = pose.speed > .1;
-        resident.root.visible = residentInLayout(this.authored, RESIDENT_IDS[index]) && (this.activity !== "focus" || state.owner === this.selfId && state.mode === "activity");
+        resident.root.visible = state.mode !== "ride" && residentInLayout(this.authored, RESIDENT_IDS[index]) && (this.activity !== "focus" || state.owner === this.selfId && state.mode === "activity");
         resident.spirit.position.y = .55 + (reduced ? 0 : Math.sin(elapsed * 2.5 + resident.phase) * .065);
         resident.spirit.rotation.x = reduced ? 0 : pose.speed * .025;
         resident.spirit.rotation.z = reduced ? 0 : Math.sin(elapsed * 1.6 + resident.phase) * .035;
@@ -270,6 +270,12 @@ export class VillageLife {
         if (tending && !reduced) resident.spirit.rotation.x = .09 + Math.sin(gestureAge * 3 + index) * .035;
         if (activity === "music" && !reduced) resident.spirit.rotation.z = Math.sin(elapsed * 1.8 + index) * .055;
         resident.fins.forEach(fin => relaxBlobArm(fin, elapsed + resident.phase, resident.walking, reduced));
+        const caring = ["horseFeed", "horsePet"].includes(state.gesture?.kind ?? "") && gestureAge >= 0 && gestureAge < 3;
+        if (caring) {
+          resident.spirit.rotation.x = .12;
+          const fin = resident.fins[0];
+          if (fin) fin.rotation.z = reduced ? -.3 : -.3 + Math.sin(gestureAge * 4) * .12;
+        }
       });
       this.updateRituals(elapsed, reduced, cameraRotation);
       return;
@@ -279,7 +285,7 @@ export class VillageLife {
     if (canApproach && this.approachScan <= 0) {
       this.approachScan = .4;
       if (!this.residents.some(r => r.encounter.state === "approach" || r.encounter.state === "visit" || r.chatting)) {
-        const nearby = this.residents.filter(r => r !== this.residents[4] && !r.following && !r.returning && r.encounter.state === "roam" && !r.encounter.noticed
+        const nearby = this.residents.filter(r => r !== this.residents[4] && !TOWN_RESIDENT_IDS.includes(VILLAGERS[this.residents.indexOf(r)].id) && !r.following && !r.returning && r.encounter.state === "roam" && !r.encounter.noticed
           && r.encounter.cooldown === 0 && r.root.position.distanceTo(player) < 6)
           .sort((a, b) => a.root.position.distanceToSquared(player) - b.root.position.distanceToSquared(player));
         const r = nearby.find(r => r.movement.canWalkTo(player.x, player.z));
@@ -386,7 +392,7 @@ export class VillageLife {
   private dressSpirit(root: T.Object3D, index: number) {
     const cream = new T.MeshStandardMaterial({ color: "#fff2d1", roughness: .75 });
     const gold = new T.MeshStandardMaterial({ color: "#ffd36f", roughness: .55 });
-    const accent = new T.MeshStandardMaterial({ color: ["#318c9b", "#de8e9b", "#6f9d52", "#7772b5", "#6c9290"][index], roughness: .8 });
+    const accent = new T.MeshStandardMaterial({ color: ["#318c9b", "#de8e9b", "#6f9d52", "#7772b5", "#6c9290", "#846339", "#b66179", "#538e70", "#62764b"][index], roughness: .8 });
     const sphere = new T.SphereGeometry(1, 16, 10);
     const add = (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number, sx=1, sy=1, sz=1) => {
       const mesh = new T.Mesh(geometry, material); mesh.position.set(x,y,z); mesh.scale.set(sx,sy,sz);
@@ -418,6 +424,15 @@ export class VillageLife {
       add(sphere,gold,-.28,.2,.35,.065,.035,.025);
       for(let i=0;i<5;i++) { const a=i*Math.PI*2/5; add(sphere,cream,.2+Math.cos(a)*.067,.91+Math.sin(a)*.067,.2,.055,.055,.025); }
       add(sphere,gold,.2,.91,.235,.033,.033,.02);
+    } else if (index >= 5) {
+      const straw = new T.MeshStandardMaterial({ color: index === 8 ? "#8d9476" : "#e0c38a", roughness: .9 });
+      add(new T.CylinderGeometry(.4,.4,.045,24),straw,0,.99,0);
+      add(new T.CylinderGeometry(.23,.29,.21,20),straw,0,1.1,0);
+      add(new T.CylinderGeometry(.235,.27,.045,20),accent,0,1.025,0);
+      add(sphere,accent,0,.27,.29,.25,.23,.055);
+      if (index === 5) { add(sphere,accent,-.1,.75,.3,.1,.022,.022).rotation.z=-.2; add(sphere,accent,.1,.75,.3,.1,.022,.022).rotation.z=.2; }
+      if (index === 6) add(starGeometry,gold,.25,1.075,.18).scale.setScalar(.65);
+      if (index === 7) for (const side of [-1,1]) add(sphere,accent,.26+side*.04,1.08,.16,.1,.03,.06).rotation.z=side*.45;
     } else {
       const crescent = new T.Shape();
       crescent.absarc(0,0,.15,Math.PI*.32,Math.PI*1.68,false);

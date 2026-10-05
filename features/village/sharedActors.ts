@@ -10,9 +10,9 @@ export type SharedActor = {
   owner: string | null; following: boolean;
   mode: "roam" | "follow" | "hold" | "petApproach" | "pet" | "trick" | "talk" | "approach" | "visit" | "return" | "activity" | "idle" | "ride";
   action: PuppyCommand | null; startedAt: number; until: number; speech: Line | null;
-  activity?: PlaceId | null; gesture?: { kind: "water" | "tea"; at: number };
+  activity?: PlaceId | null; gesture?: { kind: "water" | "tea" | "horseFeed" | "horsePet"; at: number; horseId?: string };
 };
-export type MapActor = { id: string; kind: "resident" | "puppy"; name: string; color: string; x: number; z: number };
+export type MapActor = { id: string; kind: "visitor"; name: string; color: string; x: number; z: number };
 
 export type SharedBirds = {
   phase: "flight" | "ground"; since: number; mealAt: number | null; flightCount?: number;
@@ -21,6 +21,7 @@ export type SharedBirds = {
 export type SharedActors = { time: number; epoch: number; actors: SharedActor[]; birds: SharedBirds; pondFeedAt: number | null; gift: { crop: Crop; at: number } | null; town?: SharedTown };
 export type SharedInteraction =
   | TownAction
+  | { kind: "lookout" }
   | { kind: "mapTravel"; id: string }
   | { kind: "horse"; id: string; action: "mount" | "dismount" }
   | { kind: "puppy"; id: string; action: "hold" | "release" | "pet" | "walk" | "home" | PuppyCommand }
@@ -29,7 +30,7 @@ export type SharedInteraction =
   | { kind: "swing"; id: string; index: 0 | 1 }
   | { kind: "activity"; id: PlaceId }
   | { kind: "leave" };
-export type InteractionResult = { ok: boolean; reason?: string; index?: 0 | 1; position?: [number, number, number] };
+export type InteractionResult = { ok: boolean; reason?: string; lookoutIndex?: number; index?: 0 | 1; position?: [number, number, number] };
 export type SharedHorseInput = { forward: number; turn: number; sprint: boolean; brake: boolean };
 export const PUPPY_TRICK_SECONDS: Record<PuppyCommand, number> = { sit: 7, dance: 5.2, spin: 3.2, bow: 3.8, wave: 4.2, roll: 4.6 };
 
@@ -69,6 +70,10 @@ export const RESIDENT_ROUTES: [number, number][][] = [
       [[13.8, -6.8], [12.8, -7.5], [9, -7.8], [6.5, -7.8], [4, -3], [.5, 1],
         [-1.2, -3], [-.8, -9], [4, -10], [8, -10], [12, -14.5], [18, -14.5], [19, -7.5], [17, -5.8]],
       [[-38, 1.5], [-38.8, 1.8], [-37.5, 2], [-36, 1.5]],
+      [[20, -81], [20, -77], [20, -72], [20, -77]],
+      [[63, -69], [63, -65], [63, -60], [63, -65]],
+      [[88, -55], [88, -51], [88, -46], [88, -51]],
+      [[80, 36], [84, 36], [89, 36], [84, 36]],
     ];
 
 export const PUPPY_PATROLS: Record<PuppyBreed, [number, number][]> = {

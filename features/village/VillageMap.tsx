@@ -9,15 +9,14 @@ import { BIRD_CLEARING, HEARTH } from "./environment";
 import { BEDS, GARDEN_COURT, SUNFLOWER_BED } from "./garden";
 import type { World } from "./world";
 
-import { MapActors, MapCrossings, MapTown, MapWater } from "./VillageMapLandmarks";
+import { MapActors, MapCrossings, MapTown, MapWater, useMapActors } from "./VillageMapLandmarks";
 import type { MapActor } from "./sharedActors";
 import { outdoorMapDestinations } from "./mapDestinations";
+import { mapLabelWidth, placeMapLabels } from "./mapLabels";
 
 type MapScenery = World["mapScenery"];
 type MapPose = { x: number; z: number; heading: number } | null;
 const icons = [Timer, Fire, Drop, Coffee, BookOpen, EnvelopeSimple, Leaf, Bird];
-// Callouts separate neighbouring controls without moving their true ground anchors.
-const pinOffsets = [[6, 24], [0, -10], [-8, -8], [-7, -17], [-12, 18], [-6, -8], [21, 12], [-17, 7]];
 function mapBounds(scenery?: MapScenery) {
   const positions = [...(scenery?.buildings ?? []), ...(scenery?.trees ?? []), ...(scenery?.layout.swings ?? []),
     ...(scenery?.layout.items?.filter(item => item.visible && ["horse-racetrack", "farm-row", "owl-feeding-perch", "cow-highland", "cow-highland-girl", "sheep", "lamb"].includes(item.asset)).map(item => ({ x: item.position[0], z: item.position[2] })) ?? [])];
@@ -38,13 +37,12 @@ function mapView(bounds: ReturnType<typeof mapBounds>, x: number, y: number, min
   return `${left} ${top} ${width} ${height}`;
 }
 
-const MapLandscape = memo(function MapLandscape({ scenery, bounds, language, mini }: {
-  scenery?: MapScenery; bounds: ReturnType<typeof mapBounds>; language: "en" | "ja"; mini: boolean;
+const MapLandscape = memo(function MapLandscape({ scenery, bounds }: {
+  scenery?: MapScenery; bounds: ReturnType<typeof mapBounds>;
 }) {
   const id = useId();
   const width = bounds.width * 10, height = bounds.height * 10;
   const at = (x: number, z: number) => point(x, z, bounds);
-  const ja = language === "ja";
   return <g>
     <defs>
       <pattern id={`${id}-grain`} width="13" height="13" patternUnits="userSpaceOnUse"><circle cx="3" cy="4" r=".6" fill="#315f44" opacity=".09" /><circle cx="10" cy="11" r=".6" fill="#fff9e9" opacity=".3" /></pattern>
@@ -57,7 +55,7 @@ const MapLandscape = memo(function MapLandscape({ scenery, bounds, language, min
     <MapWater world={scenery?.layout} bounds={bounds} />
     {scenery?.paths.map((path, i) => <g key={i}><polyline points={path.spine.map(([x, z]) => at(x, z).join(",")).join(" ")} fill="none" stroke="#b2af89" strokeWidth={path.width * 10 + 4} strokeLinecap="round" strokeLinejoin="round" /><polyline points={path.spine.map(([x, z]) => at(x, z).join(",")).join(" ")} fill="none" stroke="#eee5bf" strokeWidth={path.width * 10} strokeLinecap="round" strokeLinejoin="round" /></g>)}
     <MapCrossings world={scenery?.layout} bounds={bounds} />
-    <MapTown world={scenery?.layout} bounds={bounds} mini={mini} language={language} />
+    <MapTown world={scenery?.layout} bounds={bounds} />
     <rect x={at(GARDEN_COURT.left, GARDEN_COURT.back)[0]} y={at(GARDEN_COURT.left, GARDEN_COURT.back)[1]} width={(GARDEN_COURT.right - GARDEN_COURT.left) * 10} height={(GARDEN_COURT.front - GARDEN_COURT.back) * 10} rx="10" fill="#e7dfbb" stroke="#c4ba95" strokeWidth="2" />
     {BEDS.map((bed, i) => <g key={i} transform={`translate(${at(bed.x, bed.z).join(" ")})`}><rect x={i === SUNFLOWER_BED ? -49 : -18} y="-13" width={i === SUNFLOWER_BED ? 98 : 36} height="26" rx="3" fill={`url(#${id}-plot)`} stroke="#ab9572" strokeWidth="3" />{i === SUNFLOWER_BED && [-36, -18, 0, 18, 36].map(x => <circle key={x} cx={x} r="5" fill="#d3b66a" />)}</g>)}
     <g transform={`translate(${at(HEARTH.x, HEARTH.z).join(" ")})`}><circle r={HEARTH.pavingRadius * 10} fill="#ded8b0" /><circle r="16" fill="#b5a78e" /><path d="M-5 8q-11-13 2-24q0 9 7 12q9 9 1 15Z" fill="#da9671" /></g>
@@ -76,27 +74,61 @@ const MapLandscape = memo(function MapLandscape({ scenery, bounds, language, min
     {scenery?.trees.map((tree, i) => { const [x, y] = at(tree.x, tree.z); return <g key={tree.id} transform={`translate(${x} ${y})`}><ellipse cx="5" cy="7" rx="15" ry="12" fill="#4163421c" /><circle r={12 + tree.scale[0] * 2} fill={i % 3 ? "#7ca275" : "#94b386"} stroke="#678960" strokeWidth="1.5" /><circle cx="-4" cy="-4" r="7" fill="#afc69a" opacity=".6" /></g>; })}
     {scenery?.layout.swings.map(swing => <g key={swing.id} data-map-swing={swing.id} transform={`translate(${at(swing.x, swing.z).join(" ")}) rotate(${-swing.yaw * 180 / Math.PI}) scale(${swing.scale[0]})`}><rect x="-34" y="-22" width="68" height="44" rx="11" fill="#e8e4bd" stroke="#c1c49b" strokeWidth="2" /><path d="M-25-13V13M25-13V13" stroke="#6d8c78" strokeWidth="4" /><path d="M-27 0H27" stroke="#af8864" strokeWidth="5" />{[-10, 10].map(x => <g key={x}><path d={`M${x - 3} 0V12M${x + 3} 0V12`} stroke="#718977" strokeWidth="1.5" /><rect x={x - 5} y="9" width="10" height="5" rx="2" fill="#406c56" /></g>)}</g>)}
     <rect width={width} height={height} fill={`url(#${id}-grain)`} />
-    {!!scenery?.layout.swings.length && <text x={at(scenery.layout.swings.reduce((sum, swing) => sum + swing.x, 0) / scenery.layout.swings.length, 0)[0]} y={at(0, Math.max(...scenery.layout.swings.map(swing => swing.z)))[1] + 62} textAnchor="middle" fill="#4b7159" fontSize="42" fontFamily="Georgia, serif">{ja ? "草原のブランコ" : "Meadow swings"}</text>}
-    <text x={at(43, 39)[0]} y={at(43, 39)[1]} fill="#719068" fontSize="31" fontFamily="Georgia, serif" fontStyle="italic" transform={`rotate(-7 ${at(43, 39).join(" ")})`}>{ja ? "日の出の草原" : "Sunrise meadow"}</text>
+
   </g>;
 });
 
-function MapArtwork({ scenery, current, position, language, readActors, mini = false }: {
-  scenery?: MapScenery; current: PlaceId | null; position: MapPose; language: "en" | "ja"; mini?: boolean; readActors?: () => MapActor[];
+function MapArtwork({ scenery, current, position, language, readActors, mini = false, viewportBounds }: {
+  scenery?: MapScenery; current: PlaceId | null; position: MapPose; language: "en" | "ja"; mini?: boolean; readActors?: () => MapActor[]; viewportBounds?: ReturnType<typeof mapBounds>;
 }) {
-  const bounds = useMemo(() => mapBounds(scenery), [scenery]);
+  const actors = useMapActors(mini ? readActors : undefined);
+  const bounds = useMemo(() => viewportBounds ?? mapBounds(scenery), [scenery, viewportBounds]);
   const location = mapLocation(current, position);
   const [x, y] = point(location[0], location[2], bounds);
   return <svg viewBox={mapView(bounds, x, y, mini)} aria-hidden="true" className="v-map-art">
-    <MapLandscape scenery={scenery} bounds={bounds} language={language} mini={mini} />
-    {mini && <MapActors readActors={readActors} bounds={bounds} mini />}
+    <MapLandscape scenery={scenery} bounds={bounds} />
+    {mini && <MapActors actors={actors} readActors={readActors} bounds={bounds} mini />}
     {PLACES.map(place => <circle key={place.id} cx={point(place.position[0], place.position[2], bounds)[0]} cy={point(place.position[0], place.position[2], bounds)[1]} r={mini ? 6 : 4} fill="#476e58" stroke="#fff9e9" strokeWidth="2" />)}
-    <g className="v-map-player" data-x={location[0]} data-z={location[2]} transform={`translate(${x} ${y})`}>
-      <circle r="19" fill="#bc985840" /><circle r="13" fill="#fff9e9" stroke="#96784e" strokeWidth="2" />
-      {!current && position && <path className="v-map-heading" d="M0-26-5-17H5Z" fill="#315646" transform={`rotate(${180 - position.heading * 180 / Math.PI})`} />}
-      <path d="M0-10C-10-1-12 7-5 10H5C12 7 10-1 0-10Z" fill="#fff9e9" stroke="#96784e" strokeWidth="2" /><circle cx="-3" cy="3" r="1.2" fill="#426953" /><circle cx="3" cy="3" r="1.2" fill="#426953" />
-    </g>
+    {mini && <MapPlayer x={location[0]} z={location[2]} bounds={bounds} heading={!current ? position?.heading : undefined} mini language={language} />}
   </svg>;
+}
+
+function MapPlayer({ x, z, bounds, heading, mini = false, scale = 1, language, readPose, current = null }: {
+  x: number; z: number; bounds: ReturnType<typeof mapBounds>; heading?: number; mini?: boolean; scale?: number; language: "en" | "ja"; readPose?: () => MapPose; current?: PlaceId | null;
+}) {
+  const marker = useRef<SVGGElement>(null);
+  useEffect(() => {
+    if (!readPose || !marker.current) return;
+    const node = marker.current, arrow = node.querySelector(".v-map-heading");
+    let frame = 0;
+    const update = () => {
+      frame = requestAnimationFrame(update);
+      if (document.hidden) return;
+      const pose = readPose(), location = mapLocation(current, pose);
+      const transform = `translate(${point(location[0], location[2], bounds).join(" ")})`;
+      if (node.getAttribute("transform") !== transform) {
+        node.setAttribute("transform", transform);
+        node.dataset.x = String(location[0]); node.dataset.z = String(location[2]);
+      }
+      if (arrow && pose) {
+        const rotation = `rotate(${180 - pose.heading * 180 / Math.PI})`;
+        if (arrow.getAttribute("transform") !== rotation) arrow.setAttribute("transform", rotation);
+      }
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, [bounds, current, readPose]);
+  const label = language === "ja" ? "あなた" : "You", width = mapLabelWidth(label);
+  return <g ref={marker} className="v-map-player" data-x={x} data-z={z} transform={`translate(${point(x, z, bounds).join(" ")})`}>
+    <g transform={`scale(${mini ? 1 : scale})`}>
+      <title>{label}</title>
+      <circle r={mini ? 24 : 22} fill="#fff9e9" opacity=".8" />
+      <path className="v-map-self-icon" d="M0-18 16 0 0 18-16 0Z" fill="#b17b29" stroke="#fff9e9" strokeWidth="2.5" />
+      <path d="M0-10 5 5 0 2-5 5Z" fill="#fff9e9" />
+      {heading !== undefined && <path className="v-map-heading" d="M0-29-5-22H5Z" fill="#805817" transform={`rotate(${180 - heading * 180 / Math.PI})`} />}
+      {!mini && <g className="v-map-self-label"><rect x={-width / 2} y="-56" width={width} height="24" rx="5" /><text data-map-self-label y="-40" textAnchor="middle">{label}</text></g>}
+    </g>
+  </g>;
 }
 
 export function VillageMinimap({ scenery, current, language, readPose, readActors, expand }: {
@@ -107,12 +139,10 @@ export function VillageMinimap({ scenery, current, language, readPose, readActor
     const svg = button.current?.querySelector("svg.v-map-art");
     const marker = svg?.querySelector(".v-map-player"), heading = svg?.querySelector(".v-map-heading");
     if (!svg || !marker) return;
-    const bounds = mapBounds(scenery), step = 1000 / 60;
-    let frameId = 0, lastFrame = 0, previous: MapPose = null;
-    const update = (time: number) => {
+    const bounds = mapBounds(scenery);
+    let frameId = 0, previous: MapPose = null;
+    const update = () => {
       frameId = requestAnimationFrame(update);
-      if (time - lastFrame < step - .5) return;
-      lastFrame = time - (time - lastFrame) % step;
       if (document.hidden) return;
       const pose = readPose(), location = mapLocation(current, pose);
       const next = { x: location[0], z: location[2], heading: pose?.heading ?? 0 };
@@ -137,10 +167,11 @@ export function VillageMinimap({ scenery, current, language, readPose, readActor
   </ShortcutButton>;
 }
 
-export function VillageMap({ scenery, current, position, language, notice, travel, travelOutdoor, readActors }: {
-  scenery?: MapScenery; current: PlaceId | null; position: MapPose; language: "en" | "ja"; notice: string; travel: (id: PlaceId) => void; travelOutdoor: (id: string) => void; readActors?: () => MapActor[];
+export function VillageMap({ scenery, current, position, language, notice, travel, travelOutdoor, readActors, readPose }: {
+  scenery?: MapScenery; current: PlaceId | null; position: MapPose; language: "en" | "ja"; notice: string; travel: (id: PlaceId) => void; travelOutdoor: (id: string) => void; readActors?: () => MapActor[]; readPose?: () => MapPose;
 }) {
   const ja = language === "ja";
+  const actors = useMapActors(readActors);
   const [selected, setSelected] = useState<string>(current ?? "focus");
   const buttons = useRef(new Map<string, HTMLButtonElement>());
   const canvas = useRef<HTMLDivElement>(null);
@@ -152,33 +183,34 @@ export function VillageMap({ scenery, current, position, language, notice, trave
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  const bounds = useMemo(() => mapBounds(scenery), [scenery]);
+  const bounds = useMemo(() => {
+    const world = mapBounds(scenery);
+    if (!canvasSize.width || !canvasSize.height) return world;
+    // Zoom in 18% while keeping the map geography and markers on one shared projection.
+    const scale = Math.max(world.width / Math.max(1, canvasSize.width - 48), world.height / Math.max(1, canvasSize.height - 176)) / 1.18;
+    const width = canvasSize.width * scale, height = canvasSize.height * scale;
+    return { x: world.x - (width - world.width) / 2, z: world.z - (height - world.height) / 2, width, height };
+  }, [scenery, canvasSize]);
   const destinations = useMemo(() => [
-    ...PLACES.map((place, i) => ({ id: place.id as string, position: place.position, name: place.name, japanese: JAPANESE_PLACE_NAMES[i], Icon: icons[i], offset: pinOffsets[i], outdoor: false })),
-    ...outdoorMapDestinations(scenery?.layout).map(place => ({ ...place, position: [place.x, 0, place.z], Icon: place.kind === "owls" ? Bird : place.kind === "circuit" ? Timer : Leaf, offset: [0, 0], outdoor: true })),
+    ...PLACES.map((place, i) => ({ id: place.id as string, position: place.id === "compliment" ? scenery?.layout.items?.find(item => item.visible && item.asset === "postbox")?.position ?? place.position : place.position, name: place.name, japanese: JAPANESE_PLACE_NAMES[i], Icon: icons[i], outdoor: false })),
+    ...outdoorMapDestinations(scenery?.layout).filter((place, i, list) => place.kind !== "swing" || i === list.findIndex(item => item.kind === "swing")).map(place => ({ ...place,
+      name: place.kind === "swing" ? "Meadow Swings" : place.name, japanese: place.kind === "swing" ? "草原のブランコ" : place.japanese,
+      position: [place.x, 0, place.z], Icon: place.kind === "owls" ? Bird : place.kind === "circuit" ? Timer : Leaf, outdoor: true })),
   ], [scenery]);
-  const offsets = useMemo(() => {
-    const placed: { x: number; y: number }[] = [];
-    return destinations.map(place => {
-      if (!canvasSize.width || !canvasSize.height) return place.offset;
-      const x = (place.position[0] - bounds.x) / bounds.width * canvasSize.width;
-      const y = (place.position[2] - bounds.z) / bounds.height * canvasSize.height;
-      const candidates: { x: number; y: number; distance: number }[] = [];
-      for (let radius = 0; radius <= 200; radius += 8) {
-        for (let step = 0; step < (radius ? 32 : 1); step++) {
-          const angle = step * Math.PI / 16;
-          const cx = Math.max(24, Math.min(canvasSize.width - 24, x + place.offset[0] + Math.sin(angle) * radius));
-          const cy = Math.max(24, Math.min(canvasSize.height - 24, y + place.offset[1] + Math.cos(angle) * radius));
-          if (placed.every(other => Math.abs(other.x - cx) >= 48 || Math.abs(other.y - cy) >= 48))
-            candidates.push({ x: cx, y: cy, distance: Math.hypot(cx - x - place.offset[0], cy - y - place.offset[1]) });
-        }
-        if (candidates.length) break;
-      }
-      const position = candidates.sort((a, b) => a.distance - b.distance)[0] ?? { x, y };
-      placed.push(position);
-      return [position.x - x, position.y - y];
-    });
-  }, [bounds, canvasSize, destinations]);
+  const location = mapLocation(current, position);
+  const labelOffsets = useMemo(() => placeMapLabels(destinations.map(place => ({
+    x: (place.position[0] - bounds.x) / bounds.width * canvasSize.width,
+    y: (place.position[2] - bounds.z) / bounds.height * canvasSize.height,
+    name: ja ? place.japanese : place.name,
+  })), canvasSize, destinations.findIndex(place => place.id === selected), [
+    { x: location[0], z: location[2], name: ja ? "あなた" : "You", self: true },
+    ...(readActors?.() ?? actors).map(actor => ({ ...actor, self: false })),
+  ].map(player => {
+    const width = Math.max(player.self ? 44 : 28, mapLabelWidth(player.name));
+    return { x: (player.x - bounds.x) / bounds.width * canvasSize.width - width / 2,
+      y: (player.z - bounds.z) / bounds.height * canvasSize.height - (player.self ? 56 : 44),
+      width, height: player.self ? 78 : 58 };
+  })), [actors, bounds, canvasSize, destinations, ja, location[0], location[2], readActors, selected]);
   const destination = destinations.find(place => place.id === selected) ?? destinations[0];
   const name = (id: string) => { const place = destinations.find(place => place.id === id) ?? destinations[0]; return ja ? place.japanese : place.name; };
   const go = (id: string) => {
@@ -201,27 +233,29 @@ export function VillageMap({ scenery, current, position, language, notice, trave
     const direction = ({ w: [0, -1], ArrowUp: [0, -1], a: [-1, 0], ArrowLeft: [-1, 0], s: [0, 1], ArrowDown: [0, 1], d: [1, 0], ArrowRight: [1, 0] } as Record<string, number[]>)[event.key.startsWith("Arrow") ? event.key : gameKey(keybindings, event.key)];
     if (direction) { event.preventDefault(); move(direction[0], direction[1]); }
   }}>
-    <div ref={canvas} className="v-map-canvas" role="group" aria-label={ja ? "村の目的地" : "Village destinations"} style={{ aspectRatio: `${bounds.width} / ${bounds.height}`, "--map-ratio": bounds.width / bounds.height } as React.CSSProperties}>
-      <MapArtwork scenery={scenery} current={current} position={position} language={language} readActors={readActors} />
+    <div ref={canvas} className="v-map-canvas" role="group" aria-label={ja ? "村の目的地" : "Village destinations"}>
+      <MapArtwork scenery={scenery} current={current} position={position} language={language} readActors={readActors} viewportBounds={bounds} />
       <span className="v-map-north" aria-hidden="true">N ↑</span>
       {destinations.map((place, i) => {
-        const Icon = place.Icon, [dx, dy] = offsets[i];
+        const Icon = place.Icon, label = labelOffsets[i];
         return <div className="v-map-pin" key={place.id} style={{ left: `${(place.position[0] - bounds.x) / bounds.width * 100}%`, top: `${(place.position[2] - bounds.z) / bounds.height * 100}%` }}>
-          <span className="v-map-leader" style={{ width: Math.hypot(dx, dy), rotate: `${Math.atan2(dy, dx)}rad` }} />
           <button ref={button => { if (button) buttons.current.set(place.id, button); else buttons.current.delete(place.id); }}
-            className={`v-map-marker v-map-marker-${place.id}${selected === place.id ? " is-selected" : ""}`} style={{ left: dx, top: dy }}
+            className={`v-map-marker v-map-marker-${place.id}${selected === place.id ? " is-selected" : ""}`} style={{ left: 0, top: 0 }}
             aria-label={name(place.id)} aria-current={current === place.id ? "location" : undefined}
-            data-map-destination={place.id} onFocus={() => setSelected(place.id)} onPointerMove={() => setSelected(place.id)} onClick={() => go(place.id)}>
-            <span className="v-map-marker-icon"><Icon size={22} aria-hidden="true" /></span><span className="v-map-marker-name">{name(place.id)}</span>
+            data-map-destination={place.id} data-map-x={place.position[0]} data-map-z={place.position[2]} onFocus={() => setSelected(place.id)} onPointerMove={() => setSelected(place.id)} onClick={() => go(place.id)}>
+            <span className="v-map-marker-icon"><Icon size={22} aria-hidden="true" /></span><span className="v-map-marker-name" style={{ marginBottom: label.rise, visibility: label.visible ? "visible" : "hidden" }}>{name(place.id)}</span>
           </button>
         </div>;
       })}
-      <svg className="v-map-actors" viewBox={`0 0 ${bounds.width * 10} ${bounds.height * 10}`} aria-hidden="true"><MapActors readActors={readActors} bounds={bounds} mini={false} /></svg>
+      <svg className="v-map-actors" viewBox={`0 0 ${bounds.width * 10} ${bounds.height * 10}`} aria-hidden="true">
+        <MapActors actors={actors} readActors={readActors} bounds={bounds} mini={false} size={canvasSize} />
+        <MapPlayer x={location[0]} z={location[2]} bounds={bounds} heading={!current ? position?.heading : undefined} scale={canvasSize.width ? bounds.width * 10 / canvasSize.width : 1} language={language} readPose={readPose} current={current} />
+      </svg>
     </div>
     <div className="v-map-footer">
       <div className="v-map-destination" aria-live="polite"><strong>{name(selected)}</strong>{notice && <span className="v-map-notice" role="status">{notice}</span>}</div>
       <button className="v-button v-primary" onClick={() => go(destination.id)}><Keycap aria-hidden="true">↵</Keycap>{ja ? "ここへ行く" : "Go here"}<ArrowUpRight size={18} /></button>
     </div>
-    <p className="v-map-help"><span><Keycap>W</Keycap><Keycap>A</Keycap><Keycap>S</Keycap><Keycap>D</Keycap>{ja ? "目的地を選ぶ" : "Choose a place"}</span><span><Keycap>↵</Keycap>{ja ? "移動" : "Go"}</span><span><Keycap>Esc</Keycap>{ja ? "閉じる" : "Close"}</span></p>
+    <p className="v-map-help"><span className="v-map-legend"><i className="v-map-legend-self" />{ja ? "あなた" : "You"}<i className="v-map-legend-visitors" />{ja ? "プレイヤー" : "Players"}</span><span className="v-map-direction-help"><Keycap>W</Keycap><Keycap>A</Keycap><Keycap>S</Keycap><Keycap>D</Keycap>{ja ? "目的地を選ぶ" : "Choose a place"}</span><span><Keycap>M</Keycap>{ja ? "閉じる" : "Close map"}</span></p>
   </div>;
 }

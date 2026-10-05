@@ -11,6 +11,7 @@ const { HorseRiding } = require('../../../worker/horseRiding.ts');
 const { VillageMovement } = require('../../../features/village/movement.ts');
 const environment = require('../../../features/village/environment.ts');
 const garden = require('../../../features/village/garden.ts');
+const { towerLookout, LOOKOUT_CAPACITY } = require('../../../features/village/towerLookout.ts');
 const { ACTIVITY_STAGES } = require('../../../features/village/sharedActors.ts');
 const physics = require('../../../worker/world-physics.json');
 assert.equal(physics.layoutHash, createHash('sha256').update(fs.readFileSync('public/village/world-layout.json')).digest('hex'), 'Worker physics must match the current saved layout');
@@ -32,7 +33,7 @@ const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');
 vm.runInNewContext(`${source}\nmodule.exports = VillageWorld;`, { module: mod, crypto: webcrypto,
   Date: class extends Date { static now() { return now; } }, DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
-  VillageSimulation, ACTIVITY_STAGES, GARDEN_TARGETS: garden.GARDEN_TARGETS, ...garden,
+  VillageSimulation, towerLookout, LOOKOUT_CAPACITY, ACTIVITY_STAGES, GARDEN_TARGETS: garden.GARDEN_TARGETS, ...garden,
   WebSocketPair: class { constructor() { this.client = {}; this.server = makeSocket('joining'); sockets.pop(); } },
   URL, TextEncoder, Uint8Array, Response: class { constructor(body, options) { Object.assign(this, options); } } });
 const World = mod.exports; let world = new World(ctx);
@@ -226,6 +227,8 @@ const puppy = () => world.simulation.actors.find(actor => actor.state.kind === '
   const rider = makeSocket('rider'), contender = makeSocket('contender');
   const horse = world.simulation.actors.find(actor => actor.state.kind === 'horse');
   check(!!horse, 'Authored horse placements create shared horse actors');
+  const careMeal = world.simulation.town.state.hayFeeds.find(meal => meal.horseId === horse.state.id && meal.until > now);
+  if (careMeal) { now = careMeal.until + 1; await tick(rider); }
   const mount = socket => interact(socket, { kind: 'horse', id: horse.state.id, action: 'mount' });
   const horsePose = () => ({ ...horse.state });
   await move(rider, horse.state.x + 2, horse.state.z); await move(contender, horse.state.x - 2, horse.state.z);
@@ -327,6 +330,48 @@ const puppy = () => world.simulation.actors.find(actor => actor.state.kind === '
     'Two tabs for the same local user receive the same accepted resource deduction');
   check(otherBasket.visitor.forageInventory.apples === 0,
     'Updating one local basket never changes a different visitor basket');
+  const tower = towerLookout(world.simulation.authored);
+  const watchers = Array.from({ length: LOOKOUT_CAPACITY + 1 }, (_, i) => makeSocket(`watcher-${i}`));
+  check(!(await interact(watchers[0], { kind: 'lookout' })).ok, 'Remote visitors cannot enter the tower from across the village');
+  for (const socket of watchers) await move(socket, tower.entrance[0], tower.entrance[2]);
+  for (const [index, socket] of watchers.slice(0, LOOKOUT_CAPACITY).entries()) {
+    const result = await interact(socket, { kind: 'lookout' });
+    check(result.ok && result.lookoutIndex === index && JSON.stringify(result.position) === JSON.stringify(tower.position(index)), `Gallery visitor ${index + 1} receives a distinct authoritative elevated spot`);
+    await tick(socket, { lookout: index });
+  }
+  check(!(await interact(watchers.at(-1), { kind: 'lookout' })).ok, 'A full tower refuses overlapping occupancy');
+  const center = world.simulation.authored.structures.tower;
+  await move(watchers[0], center.x + .7, center.z - .4, { y: tower.position(0)[1], lookout: 0 });
+  check(watchers[0].visitor.x === center.x + .7 && watchers[0].visitor.z === center.z - .4, 'Claimed visitors can walk freely across the gallery');
+  check(watchers[1].messages.findLast(v => v.type === 'move' && v.id === watchers[0].visitor.id)?.x === center.x + .7,
+    'Other visitors receive the accepted walking pose');
+  await world.fetch({ url: 'http://local/', headers: { get: () => 'websocket' } });
+  const galleryWelcome = sockets.at(-1).messages.find(message => message.type === 'welcome');
+  check(watchers.slice(0, LOOKOUT_CAPACITY).every(socket => {
+    const visitor = galleryWelcome.visitors.find(v => v.id === socket.visitor.id);
+    return visitor?.lookout === socket.visitor.lookout && visitor.x === socket.visitor.x
+      && visitor.y === socket.visitor.y && visitor.z === socket.visitor.z;
+  }), 'Late joiners receive all gallery claims and current walking positions');
+  await move(watchers[0], center.x + 20, center.z, { y: 0, lookout: 0 });
+  const bounded = tower.constrain(center.x + 20, center.z);
+  check(watchers[0].visitor.y === bounded[1] && watchers[0].visitor.x === bounded[0], 'Worker keeps gallery walking inside the railing at the authoritative height');
+  check(watchers[0].messages.findLast(v => v.type === 'move' && v.id === watchers[0].visitor.id)?.x === bounded[0],
+    'The requesting client receives its corrected railing pose');
+  world = new World(ctx);
+  check(watchers[1].visitor.lookout === 1, 'Gallery claims survive Worker reconstruction');
+  check(watchers[0].visitor.x === bounded[0], 'Gallery walking positions survive Worker reconstruction');
+  await tick(watchers[1], { lookout: 1 });
+  check(watchers[1].visitor.lookout === 1, 'Heartbeat renews a gallery claim');
+  check((await interact(watchers[0], { kind: 'leave' })).ok && watchers[0].visitor.lookout === null && watchers[0].visitor.y === tower.entrance[1], 'Coming down releases the spot and returns to the real door');
+  check((await interact(watchers.at(-1), { kind: 'lookout' })).lookoutIndex === 0, 'A released gallery spot is reusable');
+  await world.webSocketClose(watchers[1]);
+  const newcomer = makeSocket('new-watcher'); await move(newcomer, tower.entrance[0], tower.entrance[2]);
+  check((await interact(newcomer, { kind: 'lookout' })).lookoutIndex === 1, 'Disconnect frees an elevated gallery spot');
+  now += 5000; await tick(newcomer);
+  check(newcomer.visitor.lookout === null && newcomer.visitor.y === tower.entrance[1], 'Unacknowledged tower entry expires and returns to ground');
+  const transformed = towerLookout({ ...world.simulation.authored, structures: { tower: { x: 30, y: 2, z: 40, yaw: Math.PI / 2 } } });
+  check(Math.abs(transformed.entrance[0] - 33.5) < .001 && transformed.position(0)[1] === 13.4, 'Gallery and doorway follow editor position, height and rotation');
+  check(JSON.stringify(transformed.constrain(30, 40)) === JSON.stringify([30, 13.4, 40]), 'Free gallery walking follows the editor tower center and height');
 console.log(`${checks.length} shared-world Worker checks passed.`);
   if (process.env.OUTPUT_FILE) fs.writeFileSync(process.env.OUTPUT_FILE, JSON.stringify({ checks }, null, 2) + '\n');
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -1,4 +1,24 @@
-# Village implementation evidence — updated 2026-10-04
+# Village implementation evidence — updated 2026-10-05
+
+## Watchtower multiplayer perception — 2026-10-05 local
+
+[Observer views and reports](tower-lookout-20261005/README.md#multiplayer-perception-review--2026-10-05) record 19 four-client/capacity checks plus eight normal-preview checks, late-join metadata and floating entry/exit corrections. Visitors share walking positions; admission stops at eight. Body/name overlap remains possible. Local Chrome evidence; native Firefox visual acceptance remains open.
+
+## Smooth map and accurate anchors — 2026-10-05 local
+
+[Map profiling and visual evidence](map-smoothness-20261005/README.md) records display-frame player motion (58.49 updates/s versus 3.79), zero hidden-world draws, actual postbox placement, one Meadow Swings option, contextual upright destination names and 71 passing three-client plus 30 actual-served checks at four desktop sizes. The browser measures 60.1 FPS; physical 120 Hz is unverified. Local preview only.
+
+## Farmers and horse caretaker — 2026-10-05 local
+
+[Resident evidence](town-residents-20261005/README.md) records floating farmer/Rowan dialogue, automatic invited mounting, owner contention and reconnect checks, real editor previews/transforms/save/reload/Apply and SQLite/WebSocket race completion. Isolated local builds/services only; existing previews and production are untouched.
+
+## Simpler atlas and player markers — 2026-10-05 local
+
+[Map evidence](map-labels-20261005/README.md) records destination-only options, gold self/blue other-player markers, direct names without callout lines, a closer view, real shared positions and four desktop sizes. Sixty-five three-client checks plus twenty served map/basket checks pass. Local export/QA Worker checks; no deployment.
+
+## Full-screen village atlas — 2026-10-05 local
+
+[Atlas evidence](fullscreen-map-20261005/README.md) records full-screen geometry, the custom cursor, eight accepted destinations, observer broadcasts, map-key rebinding, Japanese labels and reduced motion. Four desktop-size captures and real-client reports cover the local preview; no deployment or physical-browser acceptance.
 
 ## Settings and personal keybindings — 2026-10-04 local
 

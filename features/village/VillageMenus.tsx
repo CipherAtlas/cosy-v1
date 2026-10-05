@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { SpeakerHigh, SpeakerSlash, X } from "@phosphor-icons/react";
 import { MixSliders, SoundtrackChoices } from "./Activities";
@@ -29,8 +29,12 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
 }) {
   const { mix, setMix, language } = settings;
   const t = (en: string, jp: string) => language === "ja" ? jp : en;
-  const settingsWorkspace = panel === "settings" || panel === "sound" && !PERSONAL_RADIO_ENABLED;
-  const readMapPose = () => engine.current?.getPlayerPose() ?? null;
+  // Retain the map during Radix’s exit animation so travel reveals the arrival smoothly.
+  const [lastPanel, setLastPanel] = useState(panel);
+  useEffect(() => { if (panel !== null) setLastPanel(panel); }, [panel]);
+  const displayedPanel = panel ?? lastPanel;
+  const settingsWorkspace = displayedPanel === "settings" || displayedPanel === "sound" && !PERSONAL_RADIO_ENABLED;
+  const readMapPose = useCallback(() => engine.current?.getPlayerPose() ?? null, [engine]);
   const readMapActors = useCallback(() => engine.current?.getMapActors() ?? [], [engine]);
   return (
       <Dialog.Root
@@ -40,9 +44,9 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace ? " v-settings-overlay" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-overlay" : ""}`} />
+          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace ? " v-settings-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${panel === "places" ? " v-map-dialog" : ""}${settingsWorkspace ? " v-settings-dialog" : ""}${PERSONAL_RADIO_ENABLED && panel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace ? " v-settings-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
             onOpenAutoFocus={event => {
               if (panel === "places") {
                 event.preventDefault();
@@ -55,24 +59,24 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
             }}
           >
             <Dialog.Title>
-              {panel === "places"
+              {displayedPanel === "places"
                 ? t("Hearthwillow", "ハースウィロー")
-                : panel === "sound" && PERSONAL_RADIO_ENABLED
+                : displayedPanel === "sound" && PERSONAL_RADIO_ENABLED
                   ? t("Sound", "音")
-                  : panel === "basket"
+                  : displayedPanel === "basket"
                     ? t("Harvest basket", "収穫かご")
-                  : panel === "controls"
+                  : displayedPanel === "controls"
                     ? t("Getting around", "移動と操作")
                     : t("Settings", "設定")}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              {panel === "places"
-                ? t("Village map. Use arrow keys to choose a destination, Enter to travel and Escape to close. You can also click a place on the map.", "村の地図。矢印キーで選び、Enterで移動、Escapeで閉じます。地図の場所をクリックしても移動できます。")
-                : panel === "sound"
+              {displayedPanel === "places"
+                ? t("Full-screen village map. The gold diamond marks you; blue circles mark other players. Names appear above markers. Click a destination to travel, or use arrow keys and Enter. Press the map key again or Escape to close.", "全画面の村の地図。金色のひし形はあなた、青い丸は他のプレイヤーです。名前はマーカーの上に表示されます。クリック、または矢印キーとEnterで移動し、地図キーかEscapeで閉じます。")
+                : displayedPanel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? "Choose a radio station and adjust all sound volumes." : "Music and ambience controls."
-                  : panel === "basket"
+                  : displayedPanel === "basket"
                     ? t("Your saved harvests and woodland treats.", "庭で収穫して保存したもの。")
-                  : panel === "controls"
+                  : displayedPanel === "controls"
                     ? "Gliding, camera and interaction controls."
                     : t("Village appearance, sound and personal keyboard settings.", "村の環境・音・個人のキー設定。")}
             </Dialog.Description>
@@ -80,10 +84,11 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
               className="v-dialog-close"
               aria-label={t("Close", "閉じる")}
             >
+              {displayedPanel === "places" && <Keycap aria-hidden="true">Esc</Keycap>}
               <X size={22} />
             </Dialog.Close>
-            {panel === "basket" && <VillageInventory inventory={inventory} />}
-            {panel === "controls" && (
+            {displayedPanel === "basket" && <VillageInventory inventory={inventory} />}
+            {displayedPanel === "controls" && (
               <div className="v-control-guide">
                 <dl>
                   {[
@@ -113,19 +118,19 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
                     ["F", t("Chat with a villager", "村人とおしゃべり")],
                     ["C", t("Invite a nearby villager / say goodbye", "近くの村人を誘う / またね")],
                     ["B", t("Ask Maple for bread crumbs nearby", "近くのメープルにパンくずをもらう")],
-                    ["M", t("Village map (WASD / arrows to choose; Enter to go)", "村の地図（WASD / 矢印で選ぶ・Enterで移動）")],
+                    ["M", t("Open / close the full-screen map (click to travel; WASD / arrows and Enter also work)", "全画面の地図を開く / 閉じる（クリックで移動・WASD / 矢印とEnterでも操作）")],
                     ["I", t("Your inventory", "持ち物")],
                     ["O / ,", t("Sound / settings", "音 / 設定")],
                   ].map(([key, description]) => <div key={key}><dt><Keycap>{key}</Keycap></dt><dd>{description}</dd></div>)}
                 </dl>
               </div>
             )}
-            {panel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} readActors={readMapActors} language={language} notice={notice} travelOutdoor={travelOutdoor} travel={id => {
+            {displayedPanel === "places" && <VillageMap scenery={engine.current?.mapScenery} current={place} position={readMapPose()} readPose={readMapPose} readActors={readMapActors} language={language} notice={notice} travelOutdoor={travelOutdoor} travel={id => {
               if (!entered) void enableSound();
               setEntered(true);
               openPlace(id);
             }} />}
-            {panel === "sound" && PERSONAL_RADIO_ENABLED && (
+            {displayedPanel === "sound" && PERSONAL_RADIO_ENABLED && (
               <>
                 <button className="v-button v-primary" disabled={soundLoading} aria-busy={soundLoading} onClick={toggleSound}>
                   {sound ? (
@@ -147,8 +152,8 @@ export function VillageMenus({ panel, setPanel, canvas, engine, settings, invent
                 </>}
               </>
             )}
-            {settingsWorkspace && <VillageSettings key={panel} settings={settings}
-              initial={panel === "sound" ? "sound" : "experience"} sound={sound} soundLoading={soundLoading} toggleSound={toggleSound}
+            {settingsWorkspace && <VillageSettings key={displayedPanel} settings={settings}
+              initial={displayedPanel === "sound" ? "sound" : "experience"} sound={sound} soundLoading={soundLoading} toggleSound={toggleSound}
               engine={engine.current} showStats={showStats} setShowStats={setShowStats} stats={stats} />}
 
           </Dialog.Content>

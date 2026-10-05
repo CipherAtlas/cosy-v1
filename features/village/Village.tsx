@@ -104,6 +104,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [birdStatus, setBirdStatus] = useState<BirdStatus>("flying");
   const [nearBench, setNearBench] = useState<string | null>(null);
   const [seatedBench, setSeatedBench] = useState<string | null>(null);
+  const [lookout, setLookout] = useState({ nearby: false, inside: false, pending: false });
   const [nearSwing, setNearSwing] = useState<import("./swings").SwingSeat | null>(null);
   const [ridingSwing, setRidingSwing] = useState<import("./swings").SwingSeat | null>(null);
   const [nearHorse, setNearHorse] = useState<NearbyHorse | null>(null);
@@ -472,6 +473,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           near: setNear,
           nearBench: setNearBench,
           seat: setSeatedBench,
+          lookout: setLookout,
           nearSwing: setNearSwing,
           ridingSwing: setRidingSwing,
           nearHorse: setNearHorse,
@@ -532,6 +534,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   }, [engineAttempt, openPlace, scatterBenchCrumbs]);
   useEffect(() => {
     engine.current?.setBlocked(!entered || panel !== null || sceneryLoading !== null);
+    engine.current?.setMapOpen(panel === "places");
     enterRef.current = entered;
   }, [entered, panel, sceneryLoading]);
   useEffect(() => {
@@ -612,7 +615,14 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         (e.target instanceof HTMLElement && e.target.isContentEditable)
       )
         return;
-      if (e.metaKey || e.ctrlKey || e.altKey || !entered || panel || sceneryLoading) return;
+      if (e.metaKey || e.ctrlKey || e.altKey || !entered || sceneryLoading) return;
+      const key = gameKey(keybindings, e.key);
+      if (panel === "places" && key === "m") {
+        e.preventDefault();
+        setPanel(null);
+        return;
+      }
+      if (panel) return;
       if (e.target instanceof Element && e.target.closest("button, summary, a[href]") && (e.key === "Enter" || e.key === " ")) return;
       if (e.key === "Enter" && !(e.target instanceof HTMLButtonElement) && sharedTrialEnabled && entered && !panel && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
@@ -622,7 +632,6 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         requestAnimationFrame(() => chatInput.current?.focus());
         return;
       }
-      const key = gameKey(keybindings, e.key);
       if (key === "m" || key === "o" || key === "i" || key === ",") {
         e.preventDefault();
         setPanel(key === "m" ? "places" : key === "o" ? "sound" : key === "i" ? "basket" : "settings");
@@ -685,10 +694,11 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const birdMealBusy = birdStatus === "crumbs" || birdStatus === "eating" || birdStatus === "happy";
   const showActivityPanel = entered && place && !activityCompact;
   const nearbyAction = nearGarden ? nearbyGardenAction(nearGarden, garden) : null;
-  const showHorseActions = showWorldInteraction && !!(nearHorse || ridingHorse) && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
-  const showTownActions = showWorldInteraction && !!townContext && !showHorseActions && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
-  const showSwingActions = showWorldInteraction && !showHorseActions && !showTownActions && !!(nearSwing || ridingSwing) && !panel && !sceneryLoading;
-  const showPuppyActions = showWorldInteraction && !showHorseActions && !showTownActions && !!nearPuppy && !nearBench && !seatedBench && !showSwingActions && !nearbyAction && !nearBirds && !panel && !sceneryLoading;
+  const showLookout = showWorldInteraction && (lookout.nearby || lookout.inside || lookout.pending) && !panel && !sceneryLoading;
+  const showHorseActions = showWorldInteraction && !showLookout && !!(nearHorse || ridingHorse) && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
+  const showTownActions = showWorldInteraction && !showLookout && !!townContext && !showHorseActions && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
+  const showSwingActions = showWorldInteraction && !showLookout && !showHorseActions && !showTownActions && !!(nearSwing || ridingSwing) && !panel && !sceneryLoading;
+  const showPuppyActions = showWorldInteraction && !showLookout && !showHorseActions && !showTownActions && !!nearPuppy && !nearBench && !seatedBench && !showSwingActions && !nearbyAction && !nearBirds && !panel && !sceneryLoading;
   const puppyIsFollowing = followingPuppies.some(puppy => puppy.id === nearPuppy?.id);
   const puppyBusy = !!nearPuppy?.owner && nearPuppy.owner !== sharedSelfId;
   const puppyTricksOpen = !puppyBusy && showPuppyActions && tricksPuppyId === nearPuppy?.id;
@@ -821,7 +831,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             <span><Keycap>Shift</Keycap>{t("Hold to run", "押して走る")}</span>
             <span><Keycap>E</Keycap>{t("Interact", "調べる")}</span>
             <span><Keycap>R</Keycap>{t("Recover", "安全な場所へ")}</span>
-            <span><Keycap>Tab</Keycap>{t("Choose controls", "操作を選ぶ")}</span>
+            <span><Keycap>Tab</Keycap>{t("Focus next button", "次のボタンにフォーカス")}</span>
             <span>{mouseLook === "locked" ? t("Mouse to look · Esc to leave / release", "マウスで見回す · Escで終了 / 解除")
               : mouseLook === "drag" ? t("Mouse capture unavailable · drag to look", "マウスを固定できません · ドラッグで見回す")
                 : t("Click to look · Esc to release", "クリックで見回す · Escで解除")}</span>
@@ -933,6 +943,14 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       )}
       {!showActivityPanel && <div className={`v-world-feedback${showWorldInteraction ? " is-walking" : ""}${showPuppyActions ? " has-puppy-actions" : ""}${showSwingActions || showHorseActions || showTownActions ? " has-swing-actions" : ""}${ridingSwing ? " is-swinging" : ""}`}>
         {notice && !showPuppyActions && <div className="v-notice" role="status">{notice}</div>}
+        {showLookout && <section className="v-lookout-controls" aria-label={t("Watchtower lookout", "見張り塔の展望台")}>
+          <h2>{t("Watchtower lookout", "見張り塔の展望台")}</h2>
+          {lookout.inside && <p>{t("WASD / arrows to walk · Mouse to look · Home/End turn, PgUp/PgDn tilt", "WASD・矢印で歩く · マウスで見回す · Home/Endで回転、PgUp/PgDnで上下")}</p>}
+          <ShortcutButton className="v-interact" aria-keyshortcuts={lookout.inside ? "Escape" : "E"} disabled={lookout.pending}
+            onClick={() => { if (lookout.inside) engine.current?.leaveLookout(); else engine.current?.enterLookout(); canvas.current?.querySelector("canvas")?.focus(); }}>
+            <Keycap aria-hidden="true">{lookout.inside ? "Esc" : "E"}</Keycap>{lookout.pending ? t("Entering…", "入場中…") : lookout.inside ? t("Come down", "下に戻る") : t("Go up to the lookout", "展望台へ上がる")}
+          </ShortcutButton>
+        </section>}
         {showHorseActions && <HorseControls horse={(ridingHorse ?? nearHorse)!} riding={!!ridingHorse}
           busy={!!nearHorse?.owner && nearHorse.owner !== sharedSelfId} engine={engine.current}
           t={t} town={townContext} focus={() => canvas.current?.querySelector("canvas")?.focus()} />}

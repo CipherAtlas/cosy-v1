@@ -97,14 +97,18 @@ const { TownInteractions } = require('../../../features/village/townInteractions
 const cropRows = [item('farm-2-row-4', 'farm-row', 180, 120), item('farm-3-row-4', 'farm-row', 210, 120)];
 const cropSim = new TownSimulation(world), cropControls = new TownInteractions(world);
 for (const [row, crop] of [[items.find(item => item.id === 'farm-1-row-4'), 'carrot'], [cropRows[0], 'radish'], [cropRows[1], 'mint']]) {
-  const visitor = { id: `crop-${crop}`, x: row.position[0], z: row.position[2] + 1.6, active: true };
+  const visitor = { id: `crop-${crop}`, x: row.position[0], z: row.position[2] + .8, active: true };
   const context = cropControls.context(cropSim.snapshot(), visitor.id, visitor.x, visitor.z, null, null, false, now, { apples: 0, mushrooms: 0 });
   check(context?.actions.length === 1 && context.actions[0].request.crop === crop && context.actions[0].key === 'E', `${crop} farm offers only its crop with the E shortcut`);
+  check(context.title === `${crop.charAt(0).toUpperCase() + crop.slice(1)} Farm - Row 4`, `${crop} farm uses its crop and stable row number in the heading`);
   const wrong = crop === 'mint' ? 'radish' : 'mint';
   check(!cropSim.action(visitor, { kind: 'town', action: 'gardenPlant', id: row.id, crop: wrong }, now, []).ok, `${crop} farm rejects a forged ${wrong} planting request`);
-  check(cropSim.action(visitor, { kind: 'town', action: 'gardenPlant', id: row.id, crop }, now, []).ok
-    && cropSim.action(visitor, { kind: 'town', action: 'gardenWater', id: row.id }, now, []).ok
-    && cropSim.action(visitor, { kind: 'town', action: 'gardenHarvest', id: row.id }, now + TOWN_GROW_MS, []).ok
+  const planted = cropSim.action(visitor, { kind: 'town', action: 'gardenPlant', id: row.id, crop }, now, []).ok;
+  const watered = cropSim.action(visitor, { kind: 'town', action: 'gardenWater', id: row.id }, now, []).ok;
+  const growing = cropControls.context(cropSim.snapshot(), visitor.id, visitor.x, visitor.z, null, null, false, now, { apples: 0, mushrooms: 0 });
+  check(growing.detail === '' && growing.actions.length === 1 && growing.actions[0].label === 'Harvest'
+    && growing.actions[0].key === 'E' && growing.actions[0].disabled, `${crop} growth has a disabled E Harvest button and no bottom countdown`);
+  check(planted && watered && cropSim.action(visitor, { kind: 'town', action: 'gardenHarvest', id: row.id }, now + TOWN_GROW_MS, []).ok
     && visitor.forageInventory[crop === 'carrot' ? 'carrots' : crop === 'radish' ? 'radishes' : 'mint'] === 1, `${crop} farm grants exactly its own mature crop`);
 }
 const ordered = new TownSimulation({ ...world, items: [...items].reverse() });

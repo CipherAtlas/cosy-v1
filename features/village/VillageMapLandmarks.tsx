@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BRIDGE, POND, POND_DOCK, riverX } from "./environment";
 import { layoutWorldPoint } from "./layoutTransforms";
 import type { AuthoredWorld, WorldItem } from "./worldLayout";
 
 import type { MapActor } from "./sharedActors";
-import { farmCrop } from "./townShared";
+import { mapLabelWidth } from "./mapLabels";
 export type MapBounds = { x: number; z: number; width: number; height: number };
 const at = (x: number, z: number, bounds: MapBounds) => [(x - bounds.x) * 10, (z - bounds.z) * 10];
 const items = (world: AuthoredWorld | undefined, asset: string) => world?.items?.filter(item => item.visible && item.asset === asset) ?? [];
@@ -33,38 +33,69 @@ export function MapCrossings({ world, bounds }: { world?: AuthoredWorld; bounds:
   </g>)}{items(world, "dock").map(item => <rect key={item.id} transform={transform(item, bounds)} x={-POND_DOCK.w * 5} y={-POND_DOCK.d * 5} width={POND_DOCK.w * 10} height={POND_DOCK.d * 10} rx="3" fill="#c6b593" stroke="#847e62" strokeWidth="2" />)}</g>;
 }
 
-export function MapTown({ world, bounds, mini, language }: { world?: AuthoredWorld; bounds: MapBounds; mini: boolean; language: "en" | "ja" }) {
+export function MapTown({ world, bounds }: { world?: AuthoredWorld; bounds: MapBounds }) {
   const farms = items(world, "farm-row"), herd = world?.items?.filter(item => item.visible && ["cow-highland", "cow-highland-girl", "sheep", "lamb"].includes(item.asset)) ?? [];
-  const farmLabels = farms.filter(item => /row-3$/.test(item.id));
-  const ja = language === "ja";
   const pasture = herd.length ? { x: herd.reduce((n, item) => n + item.position[0], 0) / herd.length,
     z: herd.reduce((n, item) => n + item.position[2], 0) / herd.length } : null;
   return <g>
-    {pasture && <g data-map-landmark="grazing-field"><ellipse cx={at(pasture.x, pasture.z, bounds)[0]} cy={at(pasture.x, pasture.z, bounds)[1]} rx="125" ry="95" fill="#a7c98b" fillOpacity=".5" stroke="#86a576" strokeWidth="3" strokeDasharray="8 6" />
-      {!mini && <text x={at(pasture.x, pasture.z, bounds)[0]} y={at(pasture.x, pasture.z, bounds)[1] + 130} textAnchor="middle" fill="#385840" fontSize="42">{ja ? "放牧地" : "Grazing field"}</text>}</g>}
+    {pasture && <g data-map-landmark="grazing-field"><ellipse cx={at(pasture.x, pasture.z, bounds)[0]} cy={at(pasture.x, pasture.z, bounds)[1]} rx="125" ry="95" fill="#a7c98b" fillOpacity=".5" stroke="#86a576" strokeWidth="3" strokeDasharray="8 6" /></g>}
     {items(world, "horse-racetrack").map(item => <g key={item.id} data-map-landmark="racetrack" transform={transform(item, bounds)}>
       <ellipse rx="240" ry="140" fill="none" stroke="#b8966f" strokeWidth="53" /><ellipse rx="240" ry="140" fill="none" stroke="#e4c78c" strokeWidth="3" strokeDasharray="12 8" /><path d="M0 115V165" stroke="#fff8dc" strokeWidth="5" strokeDasharray="5 5" />
-      {!mini && <text y="8" textAnchor="middle" fill="#385840" fontSize="42">{ja ? "柳のサーキット" : "Willow circuit"}</text>}
     </g>)}
-    {items(world, "horse-stable").map(item => <g key={item.id} data-map-landmark="stable" transform={transform(item, bounds)}><rect x="-55" y="-34" width="110" height="68" rx="5" fill="#719887" stroke="#426750" strokeWidth="3" /><path d="M-50 0H50" stroke="#e3d0a0" strokeWidth="3" />{!mini && <text y="67" textAnchor="middle" fill="#385840" fontSize="38">{ja ? "馬小屋" : "Hay stable"}</text>}</g>)}
+    {items(world, "horse-stable").map(item => <g key={item.id} data-map-landmark="stable" transform={transform(item, bounds)}><rect x="-55" y="-34" width="110" height="68" rx="5" fill="#719887" stroke="#426750" strokeWidth="3" /><path d="M-50 0H50" stroke="#e3d0a0" strokeWidth="3" /></g>)}
     {farms.map(item => <g key={item.id} data-map-landmark="farm-row" transform={transform(item, bounds)}><rect x="-83.5" y="-11" width="167" height="22" rx="4" fill="#ad9972" stroke="#806f51" strokeWidth="2" />{[-45, -25, -5, 15, 35, 50].map(x => <path key={x} d={`M${x} -6V6`} stroke="#65834f" strokeWidth="5" />)}</g>)}
-    {!mini && farmLabels.map(item => { const crop = farmCrop(item); return <text key={item.id} x={at(item.position[0], item.position[2], bounds)[0]} y={at(item.position[0], item.position[2], bounds)[1] - 96} textAnchor="middle" fill="#385840" fontSize="42">{ja ? crop === "carrot" ? "ニンジン畑" : crop === "radish" ? "ラディッシュ畑" : crop === "mint" ? "ミント畑" : "畑" : crop ? `${crop[0].toUpperCase()}${crop.slice(1)} farm` : "Farm"}</text>; })}
-    {items(world, "owl-feeding-perch").map(item => <g key={item.id} data-map-landmark="owl-grove" transform={transform(item, bounds)}><circle r="26" fill="#ede2bd" stroke="#706e4d" strokeWidth="3" /><path d="M-15-11-7-19 0-13 7-19 15-11V11Q0 23-15 11Z" fill="#846f50" /><circle cx="-6" cy="-2" r="4" fill="#fff5cc" /><circle cx="6" cy="-2" r="4" fill="#fff5cc" />{!mini && <text y="-40" textAnchor="middle" fill="#385840" fontSize="42">{ja ? "フクロウの木立" : "Owl grove"}</text>}</g>)}
+    {items(world, "owl-feeding-perch").map(item => <g key={item.id} data-map-landmark="owl-grove" transform={transform(item, bounds)}><circle r="26" fill="#ede2bd" stroke="#706e4d" strokeWidth="3" /><path d="M-15-11-7-19 0-13 7-19 15-11V11Q0 23-15 11Z" fill="#846f50" /><circle cx="-6" cy="-2" r="4" fill="#fff5cc" /><circle cx="6" cy="-2" r="4" fill="#fff5cc" /></g>)}
   </g>;
 }
 
-export function MapActors({ readActors, bounds, mini }: { readActors?: () => MapActor[]; bounds: MapBounds; mini: boolean }) {
+export function useMapActors(readActors?: () => MapActor[]) {
   const [actors, setActors] = useState<MapActor[]>(() => readActors?.() ?? []);
   useEffect(() => {
     if (!readActors) return;
-    const update = () => { if (!document.hidden) setActors(readActors()); };
+    const update = () => {
+      if (document.hidden) return;
+      const next = readActors();
+      setActors(previous => previous.length === next.length && previous.every((actor, i) =>
+        actor.id === next[i].id && actor.name === next[i].name && actor.color === next[i].color) ? previous : next);
+    };
     update(); const timer = window.setInterval(update, 250);
     return () => window.clearInterval(timer);
   }, [readActors]);
-  return <g>{actors.map(actor => <g key={actor.id} data-map-actor={actor.id} data-map-kind={actor.kind} transform={`translate(${at(actor.x, actor.z, bounds).join(" ")})`}>
-    <title>{actor.name}</title>
-    <circle r={mini ? 12 : 13} fill={actor.color} stroke="#fff9e9" strokeWidth="3" />
-    {actor.kind === "puppy" ? <g fill="#4c5d44"><ellipse cy="3" rx="5" ry="4" />{[-6, 0, 6].map((x, i) => <circle key={x} cx={x} cy={i === 1 ? -6 : -3} r="2.5" />)}</g> : <path d="M-4 3Q0 7 4 3M-4-3h.1M4-3h.1" stroke="#426953" fill="none" strokeWidth="2" strokeLinecap="round" />}
-    {!mini && <text y="-21" textAnchor="middle" fill="#284637" stroke="#e8edcf" strokeWidth="3" paintOrder="stroke" fontSize="34">{actor.name}</text>}
-  </g>)}</g>;
+  return actors;
+}
+
+export function MapActors({ actors, readActors, bounds, mini, size }: { actors: MapActor[]; readActors?: () => MapActor[]; bounds: MapBounds; mini: boolean; size?: { width: number; height: number } }) {
+  const root = useRef<SVGGElement>(null);
+  useEffect(() => {
+    if (!readActors || !root.current) return;
+    const nodes = new Map([...root.current.querySelectorAll<SVGGElement>("[data-map-actor]")].map(node => [node.dataset.mapActor!, node]));
+    let frame = 0;
+    const update = () => {
+      frame = requestAnimationFrame(update);
+      if (document.hidden) return;
+      for (const actor of readActors()) {
+        const node = nodes.get(actor.id);
+        if (!node) continue;
+        const transform = `translate(${at(actor.x, actor.z, bounds).join(" ")})`;
+        if (node.getAttribute("transform") !== transform) node.setAttribute("transform", transform);
+      }
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, [actors, bounds, readActors]);
+  const scale = size?.width ? bounds.width * 10 / size.width : 1;
+  return <g ref={root}>{actors.map(actor => {
+    const width = mapLabelWidth(actor.name);
+    return <g key={actor.id} data-map-actor={actor.id} data-map-kind={actor.kind} transform={`translate(${at(actor.x, actor.z, bounds).join(" ")})`}>
+      <title>{actor.name}</title>
+      <g transform={`scale(${mini ? 1 : scale})`}>
+        <circle className="v-map-actor-dot" r={mini ? 21 : 14} fill={actor.color} stroke="#fff9e9" strokeWidth="2.5" />
+        <path d="M0-8C-8-1-9 6-4 8H4C9 6 8-1 0-8ZM-3 2h.1M3 2h.1" fill="#fff9e9" stroke="#184d83" strokeWidth="1.5" strokeLinecap="round" />
+        {!mini && <g className="v-map-actor-label is-visitor">
+          <rect x={-width / 2} y="-44" width={width} height="24" rx="5" />
+          <text data-map-label={actor.id} y="-28" textAnchor="middle">{actor.name}</text>
+        </g>}
+      </g>
+    </g>;
+  })}</g>;
 }

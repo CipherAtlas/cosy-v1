@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "Rusk uses the floating villager dialogue and a real F keycap",
+    "Rusk responds with their own personality",
+    "Rusk cannot be taken from another visitor",
+    "Rusk's accepted dialogue is shared with the observer",
+    "Rusk's chat stays reachable at 1366×768",
+    "Rusk's chat stays reachable at 1024×640",
+    "Poppy uses the floating villager dialogue and a real F keycap",
+    "Poppy responds with their own personality",
+    "Poppy cannot be taken from another visitor",
+    "Poppy's accepted dialogue is shared with the observer",
+    "Poppy's chat stays reachable at 1366×768",
+    "Poppy's chat stays reachable at 1024×640",
+    "Cress uses the floating villager dialogue and a real F keycap",
+    "Cress responds with their own personality",
+    "Cress cannot be taken from another visitor",
+    "Cress's accepted dialogue is shared with the observer",
+    "Cress's chat stays reachable at 1366×768",
+    "Cress's chat stays reachable at 1024×640",
+    "Rowan offers no race before a conversation",
+    "Rowan offers the race inside the same dialogue with its real C keycap",
+    "Rowan’s invitation remains with the speaking visitor",
+    "The dialogue invitation automatically mounts the visitor and Rowan for both real clients",
+    "Rowan has no duplicate standing blob while mounted",
+    "Leaving the race releases both racers and restores Rowan’s care routine",
+    "Disconnect releases Rowan’s accepted conversation for other visitors",
+    "The visitor reconnects to the same shared residents",
+    "Two real clients report no page errors"
+  ],
+  "errors": []
+}

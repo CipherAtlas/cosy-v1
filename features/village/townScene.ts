@@ -78,7 +78,7 @@ export class TownScene {
       const texture = new T.CanvasTexture(canvas); texture.colorSpace = T.SRGBColorSpace;
       const sprite = new T.Sprite(new T.SpriteMaterial({ map: texture, depthWrite: false }));
       sprite.name = `${row.name || row.id} growth timer`; sprite.scale.set(.65, .65, 1); sprite.visible = false;
-      const [x, z] = townPoint(row, -7.35, .9); sprite.position.set(x, row.position[1] + 1.05 * row.scale[1], z);
+      const [x, z] = townPoint(row, 0, 0); sprite.position.set(x, row.position[1] + 2.2 * row.scale[1], z);
       this.clocks.push({ row, sprite, canvas, texture, text: "" }); this.group.add(sprite);
     }
     this.crumbs = new T.InstancedMesh(new T.IcosahedronGeometry(.022, 0), new T.MeshStandardMaterial({ color: "#d5b56f", roughness: 1 }), 36);

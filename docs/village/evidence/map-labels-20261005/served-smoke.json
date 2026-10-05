@@ -1,0 +1,14 @@
+{
+  "pass": true,
+  "entrySha256": "4551fc43002da9aa027bc59aa71a6673265ae1ec57f5ee13931b5fa2ebfdac27",
+  "sharedConnected": true,
+  "onlyOutdoorPlayers": true,
+  "npcMarkers": 0,
+  "guideLines": 0,
+  "selfLabel": "You",
+  "goldSelf": "#b17b29",
+  "readableNames": true,
+  "customCursor": true,
+  "acceptedMapTravel": true,
+  "errors": []
+}

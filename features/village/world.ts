@@ -1,3 +1,5 @@
+import { buildTower } from "./towerScene";
+import { LOOKOUT_HEIGHT } from "./towerLookout";
 import { sampleTerrainHeight } from "./terrain";
 import { spatialMesh, spatialBatch } from "./spatialRendering";
 import { optimizeGeometry } from "./geometryOptimization";
@@ -8,13 +10,14 @@ import { inRiver } from "./environment";
 import { makeFlame } from "./flame";
 import { makeWater } from "./water";
 import { conformRiverBank, riverGeometry } from "./riverGeometry";
+import { buildRiverbankStones } from "./riverbankStones";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { loadVillageLayout } from "./villageAssets";
 import { buildWorldLandscape } from "./worldLandscape";
-import { PlantingSurfaceMask, plantingRadius, clearPavingBorders } from "./plantingClearance";
+import { clearPavingBorders } from "./plantingClearance";
 import { buildWayfinding } from "./wayfinding";
 import { BIRD_CLEARING, BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, landscapeHeight, riverX, roadX, type Collider } from "./environment";
 import { GARDEN_COURT, HARVEST_BASKET } from "./garden";
@@ -56,7 +59,7 @@ export type World = {
     trees: AuthoredWorld["trees"];
     benches: VillageBench[];
   };
-  gardenSurfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial };
+  gardenSurfaces: { paving: T.MeshStandardMaterial; wood: T.MeshStandardMaterial; ground: T.MeshStandardMaterial; stone: T.MeshStandardMaterial };
   dispose: () => void;
 };
 let seed = 62025;
@@ -501,6 +504,7 @@ export async function buildWorld(
   }
   wg.computeVertexNormals();
   wg.userData.plantingSurface = "water";
+  wg.userData.riverSurface = true;
   const water = add(wg, waterMat, 0, 0, 0);
   water.castShadow = false;
   water.userData.time = waterUniform.time;
@@ -519,28 +523,14 @@ export async function buildWorld(
     stream.name = `Authored river ${river.id}`; stream.castShadow = false;
   }
   let layoutStart = group.children.length;
-  // River stones, a shallow arch bridge, and rustic railings.
-  const bankPaving = new PlantingSurfaceMask(group, "paving");
+  // Preserve the original random sequence used by later captured assets and saved layouts.
   for (let i = 0; i < 240; i++) {
-    let z = -65 + rnd() * 125,
-      s = rnd() > 0.5 ? 1 : -1,
-      x = riverX(z) + s * (3.4 + rnd() * 0.6);
+    const z = -65 + rnd() * 125, side = rnd() > .5 ? 1 : -1, x = riverX(z) + side * (3.4 + rnd() * .6);
     if (Math.abs(z - BRIDGE.z) < BRIDGE.width / 2 + 1 && Math.abs(x - BRIDGE.x) < BRIDGE.length / 2 + 1) continue;
-    const o = add(
-      sphereGeo,
-      mat.stone,
-      x,
-      -0.02 + rnd() * 0.13,
-      z,
-      0.3 + rnd() * 0.5,
-      0.2 + rnd() * 0.35,
-      0.4 + rnd() * 0.4,
-    );
-    o.rotation.set(rnd(), rnd(), rnd());
-    o.updateMatrixWorld(true);
-    if (bankPaving.covers(x, z, plantingRadius(o.geometry, o.matrixWorld))) o.removeFromParent();
+    for (let draw = 0; draw < 7; draw++) rnd();
   }
-  record("river-stones", "Riverbank stones", "Landscape", group.children.slice(layoutStart));
+  // Retain the legacy layout asset ID; bank dressing now follows each visible river.
+  record("river-stones", "Automatic riverbank stones", "Landscape", [new T.Group()]);
   const bridge = buildBridge(mat.stone, mat.path, colliders); group.add(bridge);
   record("bridge", "Stone arch bridge", "Bridges", [bridge], [BRIDGE.x, 0, BRIDGE.z]);
   const haloCanvas = document.createElement("canvas");
@@ -616,42 +606,14 @@ export async function buildWorld(
   house(1, -38, 6.5, 6, 4.6, 0, mat.terra);
   house(21, -24, 6.5, 6, 4.4, 0.25);
   house(-31, 25, 5.5, 5.2, 4.3, -0.3);
-  // A tall village landmark.
-  const tower = new T.Group();
+  const tower = buildTower(mat);
   const savedTower = authored.structures.tower;
   tower.position.set(savedTower?.x ?? 4, savedTower?.y ?? 0, savedTower?.z ?? -57);
   tower.rotation.y = savedTower?.yaw ?? 0;
-  mapBuildings.push({ id: "tower", x: tower.position.x, z: tower.position.z, yaw: tower.rotation.y, width: 5.2, depth: 5.2 });
+  mapBuildings.push({ id: "tower", x: tower.position.x, z: tower.position.z, yaw: tower.rotation.y, width: 7.7, depth: 7.7 });
   group.add(tower);
-  add(
-    new T.CylinderGeometry(2.3, 2.6, 14, 12),
-    mat.plaster,
-    0,
-    7,
-    0,
-    1,
-    1,
-    1,
-    tower,
-  );
-  add(new T.LatheGeometry([new T.Vector2(3.2,13.7),new T.Vector2(2.75,14.1),new T.Vector2(1.55,16),new T.Vector2(.65,18.6),new T.Vector2(.05,20.5)],24),mat.roof,0,0,0,1,1,1,tower);
-  for(const y of [1,8,13.65]) add(new T.CylinderGeometry(2.48,2.48,.16,12),mat.trim,0,y,0,1,1,1,tower);
-  add(sphereGeo,mat.trim,0,20.6,0,.22,.34,.22,tower);
-  for (let i = 0; i < 4; i++) {
-    const a = (i * Math.PI) / 2;
-    box(
-      mat.glass,
-      Math.sin(a) * 2.33,
-      11,
-      Math.cos(a) * 2.33,
-      0.6,
-      1.8,
-      0.1,
-      tower,
-    ).rotation.y = a;
-  }
-  colliders.push({ x: tower.position.x, z: tower.position.z, w: 5.2, d: 5.2, top: tower.position.y + 14 });
-  record("tower", "Village spire", "Buildings", [tower], tower.position.toArray() as [number, number, number]);
+  colliders.push({ x: tower.position.x, z: tower.position.z, w: 5.2, d: 5.2, top: tower.position.y + LOOKOUT_HEIGHT });
+  record("tower", "Watchtower · circular lookout", "Buildings", [tower], tower.position.toArray() as [number, number, number]);
   let benchIndex = 0;
   function bench(x: number, z: number, rot: number, scaleX = 1, authoredId?: string, y = 0, scaleY = 1, scaleZ = 1) {
     const b = new T.Group();
@@ -969,9 +931,11 @@ export async function buildWorld(
     }
   });
   clearPavingBorders(group);
+  const riverStones = buildRiverbankStones(group, mat.stone, landscapeHeight); group.add(riverStones);
   const batches = new Map<T.Material, Map<string, T.BufferGeometry[]>>();
   const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh, shoreMesh]);
   groundBatch.traverse(object => keep.add(object));
+  riverStones.traverse(object => keep.add(object));
   swings.forEach(swing => swing.dynamicMeshes.forEach(mesh => keep.add(mesh)));
   const remove: T.Object3D[] = [];
   group.traverseVisible((o) => {
@@ -1085,7 +1049,7 @@ export async function buildWorld(
     authored,
     mapScenery: { layout: authored, buildings: mapBuildings, trees: treeRecords, benches,
       paths: pathSurfaces.map(path => ({ width: path.width, spine: path.spine.map(point => [point.x, point.z]) })) },
-    gardenSurfaces: { paving: mat.path, wood: mat.wood, ground: mat.ground },
+    gardenSurfaces: { paving: mat.path, wood: mat.wood, ground: mat.ground, stone: mat.stone },
     dispose() {
       const geometries = new Set<T.BufferGeometry>(),
         materials = new Set<T.Material>();
@@ -1093,6 +1057,7 @@ export async function buildWorld(
         if (o instanceof T.Mesh || o instanceof T.Points || o instanceof T.Sprite) {
           if (o instanceof T.BatchedMesh) o.dispose();
           else if (!(o instanceof T.Sprite)) geometries.add(o.geometry);
+          if (o instanceof T.InstancedMesh && o.userData.riverbankStones) o.dispose();
           if (o instanceof T.Mesh && o.customDepthMaterial) materials.add(o.customDepthMaterial);
           (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
             materials.add(m),

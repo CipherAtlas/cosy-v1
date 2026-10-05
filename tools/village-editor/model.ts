@@ -19,6 +19,7 @@ import { pondDistance, setAuthoredWorld } from "../../features/village/environme
 import { projectWorldLayout } from "../../features/village/worldLayout";
 import { makeHorseModel } from "../../features/village/horseModel";
 import { conformRiverBank, riverGeometry } from "../../features/village/riverGeometry";
+import { buildRiverbankStones, disposeRiverbankStones } from "../../features/village/riverbankStones";
 import type { Collider } from "../../features/village/environment";
 import { loadTownAssetKit } from "../../features/village/townAssets";
 import { meadowFlowers, MEADOW_WIDTH, MEADOW_GRASS_COUNT } from "../../features/village/meadowVegetation";
@@ -121,6 +122,7 @@ export class LayoutScene {
   private pathMaterial!: T.Material;
   readonly defaultRoutes: Partial<Record<ResidentId, ResidentRoute>> = {};
   private generated = new Set<T.BufferGeometry>();
+  private riverStones = new T.Group();
 
   async load(renderer: T.WebGLRenderer, progress: (n: number) => void) {
     await loadAnimalRigs(ANIMAL_RIG_SLUGS);
@@ -211,7 +213,7 @@ export class LayoutScene {
       const id = index === 4 ? "wren-caretaker" : `villager-${name.toLowerCase()}`;
       actor.removeFromParent(); actor.position.set(0, 0, 0); actor.rotation.y = 0;
       const template = new T.Group(); template.add(actor);
-      this.assets.set(id, { id, name: index === 4 ? "Wren · bird caretaker" : name, category: "Villagers", template, shelf: true });
+      this.assets.set(id, { id, name: index === 4 ? "Wren · bird caretaker" : ({ Rusk: "Rusk · carrot farmer", Poppy: "Poppy · radish farmer", Cress: "Cress · mint farmer", Rowan: "Rowan · horse caretaker" } as Record<string, string>)[name] ?? name, category: "Villagers", template, shelf: true });
       originals.push({ id: `resident-${name.toLowerCase()}`, asset: id, name, position, rotation: [0, 0, 0], scale: [1, 1, 1], visible: true, locked: false });
     });
     for (let i = 0; i < 12; i++) {
@@ -348,6 +350,7 @@ export class LayoutScene {
     }
   }
   conformPaths(height: (x: number, z: number) => number) {
+    disposeRiverbankStones(this.riverStones);
     for (const root of this.roots.values()) {
       if (root.userData.asset === "fence-line" || /^fence-/.test(root.userData.asset)) {
         root.updateMatrixWorld(true);
@@ -394,6 +397,8 @@ export class LayoutScene {
         attribute.needsUpdate = true; object.geometry.computeVertexNormals(); object.geometry.computeBoundingBox(); object.geometry.computeBoundingSphere();
       });
     }
+    this.riverStones = buildRiverbankStones(this.group, this.world.gardenSurfaces.stone, height);
+    this.group.add(this.riverStones);
   }
   conformGrass(height: (x: number, z: number) => number, blocked: (point: T.Vector3) => boolean, cleared: (x: number, z: number, radius: number) => boolean) {
     for (const root of this.roots.values()) {

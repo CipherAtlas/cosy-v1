@@ -7,12 +7,7 @@ function clock(seconds: number) {
 }
 
 export function TownActivityHUD({ state }: { state: TownActivityHUDState | null }) {
-  if (!state) return null;
-  if (state.kind === "farm") return <section className="v-town-progress v-farm-progress" aria-label={`${state.title} growth`}>
-    <strong>{state.crop.charAt(0).toUpperCase() + state.crop.slice(1)}</strong>
-    <span role="timer">{state.remaining === null ? "Needs water" : state.remaining === 0 ? "Ready to pick" : clock(state.remaining)}</span>
-    <progress max={1} value={state.progress} aria-label={`${state.crop} growth`} />
-  </section>;
+  if (!state || state.kind === "farm") return null;
   const title = state.phase === "countdown" ? "Ready for your lap?" : state.phase === "cancelled" ? "Race ended"
     : state.phase === "finished" ? state.result === "visitor" ? "You won!" : state.result === "tie" ? "A tie!" : "Lap complete!" : "Race Rowan";
   return <section className="v-town-progress v-race-progress" aria-label="Race progress">

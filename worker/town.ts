@@ -229,7 +229,10 @@ export class TownSimulation {
     }
     if (race?.phase === "finished" && now >= race.goAt + TOWN_RIVAL_LAP_MS) race.npcFinishAt = race.goAt + TOWN_RIVAL_LAP_MS;
     if (race && now >= race.until) this.state.race = null;
-    const moving = !!race && ["racing", "finished"].includes(race.phase) && now < race.goAt + TOWN_RIVAL_LAP_MS;
+    if (!race || !["countdown", "racing", "finished"].includes(race.phase) || now >= race.goAt + TOWN_RIVAL_LAP_MS) {
+      this.state.rival = null; return;
+    }
+    const moving = ["racing", "finished"].includes(race.phase) && now < race.goAt + TOWN_RIVAL_LAP_MS;
     const progress = race && ["racing", "finished"].includes(race.phase)
       ? Math.min(1, Math.max(0, (now - race.goAt) / TOWN_RIVAL_LAP_MS)) : 0;
     const angle = TOWN_TRACK_START_ANGLE + progress * Math.PI * 2, [x, z] = trackPoint(track, angle, TOWN_RIVAL_LANE);

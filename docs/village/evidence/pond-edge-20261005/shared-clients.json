@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "The removed dock bench refuses a real client seat claim",
+    "The removed dock bench refuses a real client seat claim",
+    "An unchanged hearth seat remains claimable",
+    "A second real client cannot take the occupied hearth seat",
+    "Leaving releases the retained seat",
+    "The released seat is reusable",
+    "A newly joined real client sees no removed-bench occupant"
+  ]
+}

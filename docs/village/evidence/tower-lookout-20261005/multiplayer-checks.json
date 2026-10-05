@@ -1,0 +1,68 @@
+{
+  "checks": [
+    "Simultaneous real browser entry receives distinct shared admission claims",
+    "A ground-level observer sees both coloured spirits and their names on the elevated gallery",
+    "Simultaneous entries appear directly on the deck without spirits floating through the tower",
+    "An upstairs first-person visitor sees the other visitor as a visible named spirit",
+    "One visitor walking changes the ground observer pose without moving the other visitor",
+    "A late joiner immediately receives both current elevated gallery positions",
+    "Late-join snapshots include the shared gallery admission claims",
+    "The late-joining rendered client places both tower visitors on the deck",
+    "The Worker corrects a walking request that tries to leave the gallery floor height",
+    "The ground observer renders all eight shared gallery occupants",
+    "Crowded gallery arrivals also use immediate accepted positions",
+    "A ninth rendered visitor is refused and remains on the ground",
+    "An exit appears on the ground to observers and leaves the other visitor upstairs",
+    "Coming down places the observed spirit at the door without floating through the shaft",
+    "The ninth visitor can enter as soon as another visitor releases admission",
+    "Disconnect removes the remote gallery spirit and restores the disconnected local camera to ground",
+    "A reconnecting browser requests fresh shared admission successfully",
+    "Two private focus interiors hide outdoor visitors and release both gallery claims",
+    "The multiplayer observer review has no page errors"
+  ],
+  "observations": {
+    "overlapAllowed": true,
+    "welcome": [
+      {
+        "id": "e620fd08-8a59-4325-89e2-a1f686490c1d",
+        "x": 10.5,
+        "y": 11.4,
+        "z": -69.82673999999999,
+        "lookout": 0
+      },
+      {
+        "id": "b1834bfd-cc65-419a-8057-0d20ac273cdb",
+        "x": 12.409188309203678,
+        "y": 11.4,
+        "z": -69.59081169079631,
+        "lookout": 1
+      }
+    ],
+    "occupants": [
+      {
+        "id": "b1834bfd-cc65-419a-8057-0d20ac273cdb",
+        "index": 1,
+        "position": [
+          12.409188309203678,
+          11.4,
+          -69.59081169079631
+        ]
+      },
+      {
+        "id": "e620fd08-8a59-4325-89e2-a1f686490c1d",
+        "index": 0,
+        "position": [
+          10.5,
+          11.4,
+          -68.8
+        ]
+      }
+    ],
+    "moved": [
+      10.5,
+      11.4,
+      -69.82673999999999
+    ]
+  },
+  "errors": []
+}

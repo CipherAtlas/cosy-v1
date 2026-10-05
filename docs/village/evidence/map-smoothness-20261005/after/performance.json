@@ -1,0 +1,20 @@
+{
+  "durationMs": 5009.29999999702,
+  "frames": 301,
+  "fps": 60.088235881296605,
+  "frameP95Ms": 16.700000000000728,
+  "longestFrameMs": 16.80000000000291,
+  "markerUpdates": 293,
+  "markerUpdatesPerSecond": 58.49120635621231,
+  "landscapeMutations": 0,
+  "postboxOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "mapOpen": true,
+  "worldRenders": 0,
+  "mainThreadTaskMs": 1340.642,
+  "scriptMs": 538.76,
+  "layoutMs": 13.200999999999999,
+  "recalcStyleMs": 56.289
+}

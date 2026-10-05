@@ -39,7 +39,7 @@ export type SharedTown = {
   animals: TownAnimal[];
 };
 export type TownAction = {
-  kind: "town"; action: "raceStart" | "raceCancel" | "hay" | "owlFood" | "owlFeed" | "gardenPlant" | "gardenWater" | "gardenHarvest" | "animalPet" | "animalGift" | "animalApple" | "animalMushroom" | "applePick";
+  kind: "town"; action: "raceInvite" | "raceStart" | "raceCancel" | "hay" | "owlFood" | "owlFeed" | "gardenPlant" | "gardenWater" | "gardenHarvest" | "animalPet" | "animalGift" | "animalApple" | "animalMushroom" | "applePick";
   id: string; crop?: TownCrop;
 };
 export const TOWN_GROW_MS = 180_000;

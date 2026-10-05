@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Current editor validation accepts the pond layout",
+    "Named save/reload preserves all 97 stones and landing",
+    "A stone position, rotation and scale edit survives reload",
+    "The removed dock-side bench stays hidden after reload"
+  ],
+  "savedLayout": "pond-edge-qa-1791204008811281000",
+  "scope": "Temporary editor directory only; protected presets and user drafts untouched"
+}

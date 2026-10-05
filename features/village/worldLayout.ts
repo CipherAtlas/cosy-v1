@@ -2,8 +2,8 @@ import * as T from "three";
 import { validateTerrain, type TerrainElevation } from "./terrain";
 
 export type WorldPoint = [number, number];
-export type ResidentId = "pip" | "maple" | "moss" | "luma" | "wren";
-export const RESIDENT_IDS: ResidentId[] = ["pip", "maple", "moss", "luma", "wren"];
+export type ResidentId = "pip" | "maple" | "moss" | "luma" | "wren" | "rusk" | "poppy" | "cress" | "rowan";
+export const RESIDENT_IDS: ResidentId[] = ["pip", "maple", "moss", "luma", "wren", "rusk", "poppy", "cress", "rowan"];
 export type ResidentRoute = { points: WorldPoint[]; pauses?: number[] };
 export type PuppyBreed = "corgi" | "shiba" | "beagle" | "samoyed" | "collie" | "shepherd";
 export type PuppyPlacement = { id: string; name: string; breed: PuppyBreed; x: number; y: number; z: number; yaw: number; scale: [number, number, number] };

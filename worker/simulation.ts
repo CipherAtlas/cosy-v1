@@ -10,15 +10,16 @@ import { Vector3 } from "three";
 import { HorseRiding } from "./horseRiding";
 import { TownSimulation } from "./town";
 import { mapArrival, outdoorMapDestinations } from "../features/village/mapDestinations";
-import { trackPoint, TOWN_TRACK_START_ANGLE, TOWN_RIVAL_LANE, type TownAction, type ForageInventory } from "../features/village/townShared";
+import { trackPoint, TOWN_TRACK_START_ANGLE, TOWN_RIVAL_LANE, TOWN_RIVAL_LAP_MS, type TownAction, type ForageInventory } from "../features/village/townShared";
 import type { PlaceId } from "../features/village/places";
-import { VILLAGERS } from "../features/village/villagers";
+import { VILLAGERS, TOWN_RESIDENT_IDS } from "../features/village/villagers";
+import { horseCareTarget } from "./horseCaretaker";
 import type { GardenAction } from "../features/village/garden";
 import { ACTIVITY_STAGES, COMPANION_STAGES, PUPPY_PATROLS, PUPPY_TRICK_SECONDS, RESIDENT_ROUTES,
   type SharedActor, type SharedActors, type SharedBirds, type SharedHorseInput, type SharedInteraction, type InteractionResult } from "../features/village/sharedActors";
 
 type Visitor = { id: string; x: number; y?: number; z: number; heading: number; active?: boolean; lastSeen?: number;
-  horse?: string | null; activity?: PlaceId | null; activityPosition?: [number, number, number] | null; bench?: { id: string; index: 0 | 1 } | null; swing?: { id: string; index: 0 | 1 } | null; holdingPuppy?: string | null; forageInventory?: ForageInventory };
+  lookout?: number | null; horse?: string | null; activity?: PlaceId | null; activityPosition?: [number, number, number] | null; bench?: { id: string; index: 0 | 1 } | null; swing?: { id: string; index: 0 | 1 } | null; holdingPuppy?: string | null; forageInventory?: ForageInventory };
 type Actor = { state: SharedActor; movement: VillageMovement; route: [number, number][]; waypoint: number;
   pause: number; path: [number, number][]; goal: [number, number] | null; nextPath: number;
   followOwner: string | null; hold: boolean; cooldown: number; chat: number; petOrigin: [number, number] | null; height: number; activity: PlaceId | null };
@@ -40,7 +41,7 @@ export class VillageSimulation {
       if (!result.ok) return result;
     }
     this.releaseVisitor(visitor.id, now);
-    visitor.bench = visitor.swing = visitor.activity = null;
+    visitor.lookout = null; visitor.bench = visitor.swing = visitor.activity = null;
     visitor.activityPosition = null; visitor.holdingPuppy = null;
     const [x, z] = arrival, y = floorHeight(x, z);
     Object.assign(visitor, { x, y, z });
@@ -121,30 +122,42 @@ export class VillageSimulation {
     return !!horse && visitor.active !== false && !visitor.activity && !this.town.countdownHorse(horse.state.id, now) && this.riding.input(horse, input, now);
   }
   townInteraction(visitor: Visitor & { crumbPouch?: boolean }, request: TownAction, now: number, visitors: Visitor[]): InteractionResult {
-    if (request.action === "raceStart") {
-      const track = this.town.track(request.id), horse = this.mountedHorse(visitor.id);
-      if (track && horse) {
-        const [startX, startZ] = trackPoint(track, TOWN_TRACK_START_ANGLE);
-        if (this.horseOccupied(horse, visitor, visitors, startX, startZ))
-          return { ok: false, reason: "Give the starting ribbon a little room before racing." };
-        // Editor changes cannot launch a race through water, buildings or steep land.
-        for (let index = 0; index < 48; index++) for (const lane of [0, TOWN_RIVAL_LANE]) {
-          const angle = index * Math.PI * 2 / 48, [x, z] = trackPoint(track, angle, lane), next = trackPoint(track, angle + .01, lane);
-          if (!this.riding.clear(horse, x, z, Math.atan2(next[0] - x, next[1] - z), this.horseScale(horse)))
-            return { ok: false, reason: "This track needs clear, level ground before racing." };
-        }
-      }
+    if (request.action === "raceInvite") return request.id === "rowan" ? this.inviteRace(visitor, now, visitors)
+      : { ok: false, reason: "That race invitation is unavailable." };
+    if (request.action === "raceStart") return { ok: false, reason: "Talk to Rowan and invite him through his conversation." };
+    return this.town.action(visitor, request, now, this.actors.filter(actor => actor.state.kind === "horse").map(actor => actor.state));
+  }
+  private inviteRace(visitor: Visitor, now: number, visitors: Visitor[]): InteractionResult {
+    const rowan = this.actor("rowan", "resident"), track = this.authored.items?.find(item => item.visible && item.asset === "horse-racetrack");
+    if (!rowan || !track || !residentInLayout(this.authored, "rowan") || !this.available(visitor)
+      || visitor.horse || rowan.state.mode !== "talk" || rowan.state.owner !== visitor.id || this.gap(rowan, visitor) > 4.5)
+      return { ok: false, reason: "Talk to Rowan beside the horses before inviting him to race." };
+    if (this.town.state.race && ["countdown", "racing"].includes(this.town.state.race.phase))
+      return { ok: false, reason: "A race is underway. Watch this lap, then join the next." };
+    const horse = this.actors.find(actor => actor.state.kind === "horse" && !actor.state.owner && actor.state.mode !== "ride"
+      && Math.hypot(actor.state.x - rowan.state.x, actor.state.z - rowan.state.z) < 14
+      && !this.town.state.hayFeeds.some(meal => meal.horseId === actor.state.id && meal.owner && meal.until > now));
+    if (!horse) return { ok: false, reason: "The horses are busy with visitors. Let's wait for one to be free." };
+    const [x, z] = trackPoint(track, TOWN_TRACK_START_ANGLE);
+    if (this.horseOccupied(horse, visitor, visitors, x, z)) return { ok: false, reason: "Give the starting ribbon a little room before racing." };
+    for (let index = 0; index < 48; index++) for (const lane of [0, TOWN_RIVAL_LANE]) {
+      const angle = index * Math.PI * 2 / 48, point = trackPoint(track, angle, lane), next = trackPoint(track, angle + .01, lane);
+      if (!this.riding.clear(horse, ...point, Math.atan2(next[0] - point[0], next[1] - point[1]), this.horseScale(horse)))
+        return { ok: false, reason: "This track needs clear, level ground before racing." };
     }
-    const result = this.town.action(visitor, request, now, this.actors.filter(actor => actor.state.kind === "horse").map(actor => actor.state));
-    if (result.ok && request.action === "raceStart") {
-      const track = this.town.track(request.id)!, horse = this.mountedHorse(visitor.id)!;
-      this.riding.stop(horse);
-      const [x, z] = trackPoint(track, TOWN_TRACK_START_ANGLE), next = trackPoint(track, TOWN_TRACK_START_ANGLE + .01);
-      Object.assign(horse.state, { x, y: floorHeight(x, z), z, heading: Math.atan2(next[0] - x, next[1] - z) });
-      horse.movement.position = { x, y: horse.state.y, z };
-      this.syncRider(visitor, horse);
-    }
-    return result;
+    const result = this.town.action({ ...visitor, x, z }, { kind: "town", action: "raceStart", id: track.id }, now,
+      [{ ...horse.state, owner: visitor.id, mode: "ride" }]);
+    if (!result.ok) return result;
+    this.town.state.hayFeeds = this.town.state.hayFeeds.filter(meal => meal.horseId !== horse.state.id || !!meal.owner);
+    this.riding.stop(horse);
+    const next = trackPoint(track, TOWN_TRACK_START_ANGLE + .01);
+    Object.assign(horse.state, { x, y: floorHeight(x, z), z, heading: Math.atan2(next[0] - x, next[1] - z),
+      owner: visitor.id, mode: "ride", startedAt: now, until: 0, speed: 0 });
+    horse.movement.settle(x, z);
+    delete rowan.state.gesture;
+    Object.assign(rowan.state, { mode: "ride", speed: 0, until: 0, speech: null });
+    this.syncRider(visitor, horse);
+    return { ok: true, position: [visitor.x, visitor.y!, visitor.z] };
   }
   private horseScale(actor: Actor) { return this.authored.horses?.find(horse => horse.id === actor.state.id)?.scale[0] ?? 1; }
   private horseOccupied(actor: Actor, visitor: Visitor, visitors: Visitor[], x: number, z: number) {
@@ -291,6 +304,8 @@ export class VillageSimulation {
     actor.movement.position = { x: actor.state.x, y: floorHeight(actor.state.x, actor.state.z), z: actor.state.z };
     if (!actor.movement.canWalkTo(visitor.x, visitor.z)) return { ok: false, reason: "Come around to the same side." };
     if (request.action === "walk") {
+      if (request.kind === "resident" && TOWN_RESIDENT_IDS.includes(request.id))
+        return { ok: false, reason: "They are looking after their farm or horses today." };
       actor.followOwner = visitor.id; actor.state.following = true;
       actor.hold = false; actor.state.action = null; actor.state.speech = null;
       actor.state.mode = "follow"; actor.state.until = 0;
@@ -387,6 +402,7 @@ export class VillageSimulation {
         actor.followOwner = null; this.release(actor, now); owner = undefined;
       }
       if (actor.state.kind === "horse") {
+        if (!actor.state.owner && actor.state.mode === "hold" && now >= actor.state.until) actor.state.mode = "idle";
         if (actor.state.mode !== "ride" || this.town.feedingHorse(actor.state.id, now)) {
           actor.state.speed = 0; continue;
         }
@@ -399,6 +415,15 @@ export class VillageSimulation {
           this.syncRider(owner, actor);
         } else actor.state.speed = 0;
         continue;
+      }
+      if (actor.state.id === "rowan" && actor.state.mode === "ride") {
+        const rival = this.town.state.rival, race = this.town.state.race;
+        if (race && ["countdown", "racing", "finished"].includes(race.phase) && now < race.goAt + TOWN_RIVAL_LAP_MS) {
+          if (rival) Object.assign(actor.state, { x: rival.x, y: rival.y, z: rival.z, heading: rival.heading, speed: rival.speed });
+          continue;
+        }
+        this.release(actor, now);
+        actor.movement.settle(...actor.route[0]); Object.assign(actor.state, actor.movement.position);
       }
       if (actor.hold && owner) {
         if (this.available(owner) && owner.holdingPuppy === actor.state.id && this.gap(actor, owner) < 3) actor.state.until = Math.max(actor.state.until, now + 3000);
@@ -464,7 +489,15 @@ export class VillageSimulation {
         else if (!actor.state.speed) actor.state.heading = Math.atan2(visitor.x - actor.state.x, visitor.z - actor.state.z);
         continue;
       }
-      if (actor.state.kind === "resident" && actor.state.id !== "wren" && actor.state.mode === "roam" && now >= actor.cooldown) {
+      if (actor.state.id === "rowan" && !actor.state.owner) {
+        const target = horseCareTarget(actor.state, this.actors.filter(value => value.state.kind === "horse").map(value => value.state), this.town, now, actor.route[0]);
+        if (target) {
+          if (Math.hypot(actor.state.x - target[0], actor.state.z - target[1]) > .45) this.walk(actor, target, 1.1, delta, now, visitors);
+          else actor.state.speed = 0;
+          continue;
+        }
+      }
+      if (actor.state.kind === "resident" && actor.state.id !== "wren" && !TOWN_RESIDENT_IDS.includes(actor.state.id) && actor.state.mode === "roam" && now >= actor.cooldown) {
         const visitor = visitors.filter(visitor => this.available(visitor) && this.gap(actor, visitor) < 6
           && !this.actors.some(other => other.state.kind === "resident" && other.state.owner === visitor.id))
           .sort((a, b) => this.gap(actor, a) - this.gap(actor, b)).find(visitor => actor.movement.canWalkTo(visitor.x, visitor.z));
