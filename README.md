@@ -1,5 +1,7 @@
 # Hearthwillow
 
+The October 7 picnic, owl, water/terrain, rendering and horse-response release `f801a1f` is live with the matching Worker. [Pages deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/37631095808) succeeded. Live scene/shared connection, private cottage entry/exit, villager speech, layout/owl byte identity and private-route boundaries pass. A transient music 503 recovered on focused retries with byte-identical audio. Physical-device, sustained-performance and live riding-feel acceptance remain open. Earlier local-only notes below describe development checkpoints; see the integrated release entry in `VILLAGE_BUILD.md`.
+
 Multiplayer horse controls now accept rapid steering changes and render bounded, reconciled motion for the accepted rider. Ownership and race outcomes stay with the Worker. [Local verification status](VILLAGE_BUILD.md#2026-10-07--responsive-multiplayer-horse-controls-local).
 
 The active north pond bank now has grass in place of the old circular paving, lamppost and low lantern. [Local checks](VILLAGE_BUILD.md#2026-10-07--north-pond-clearing-cleanup-local).

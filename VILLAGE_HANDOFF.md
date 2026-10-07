@@ -1,5 +1,11 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-07 — integrated release published
+
+Release `f801a1f` is published: [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37631095808) succeeded, and matching Worker version `d4fb57ee-79f0-436d-b511-17dd41dd45e6` is deployed with healthy `/health`. Fresh live Chrome checks confirm scene entry, production shared connection, picnic snapshots/two horses, private cottage/cat, activity exit and Worker-accepted villager speech, with no captured page errors. Live layout and owl bytes match source; editor/admin/layout-API and AGENTS paths return 404. One music request returned 503 during browser verification; focused full/range retries returned 200/206, and the full MP3 is byte-identical to source. This records recovery, not a claim of an entirely failure-free resource session. Physical devices, native Firefox/Safari, sustained performance and live riding feel remain unverified.
+
+The local-only entries below are development checkpoints for the now-published release. Fresh release checks and reused unchanged-source multi-client evidence are recorded in `VILLAGE_BUILD.md`.
+
 ## 2026-10-07 — multiplayer horse response fix verified locally
 
 Rapid changed inputs are no longer dropped by the Worker. An accepted rider uses at most 350 ms of provisional display motion with the same horse solver/collisions and snapshot reconciliation; observers, ownership and race/resource outcomes remain authoritative. Countdown, stale delivery and ownership loss stop prediction. Final build/lint/types/contracts/export privacy, focused regressions, 30 real three-client checks and five actual-served smoke checks pass. With 100 ms added to outgoing controls and incoming snapshots, final steering is visible at 35.4 ms versus 411.7 ms for the accepted heading update. Laptop/all six iPad CSS orientations, full seats, disconnection/reconnection and private focus pass; native/physical-device, sustained performance and live network feel remain open.
