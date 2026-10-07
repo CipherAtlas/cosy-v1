@@ -1,8 +1,10 @@
 # Cosy Village — implementation and evidence ledger
 
-## 2026-10-08 — riverbank repair release preparation
+## 2026-10-08 — riverbank repair published
 
-Publication is authorized for the radish-bank shoreline/paving repair and restored rock collisions, including matching Worker physics and local editor support. The isolated production-endpoint/root-path build passes lint/types and export privacy; compiled chunks contain the public Worker URL and no local Worker endpoint. All 120 village/Worker sources and physics/layout files match the checked snapshot, so the preceding full contracts, parity, editor and real three-client evidence is reused. Worker/site deployment and fresh live checks are pending.
+Release `da23d2d` restores solid riverside/pond stones and repairs the radish-bank shoreline and paving, including matching Worker physics and local editor support. The isolated production-endpoint/root-path build passes lint/types and export privacy; compiled chunks contain the public Worker URL and no local endpoint. All 120 village/Worker sources and physics/layout files match the checked snapshot, so the preceding full contracts, parity, editor and real three-client evidence is reused.
+
+[Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37670619730) succeeded after one unchanged retry: the first build failed in the existing Google font loader before application compilation. Matching Worker version `b2844b37-1245-46fc-85f2-edb44d57c286` is deployed and `/health` is healthy. Live layout bytes match source; editor/admin/save-API and AGENTS paths return 404. Nine fresh live Chrome checks pass: shared entry, 3,323 colliders/seven benches, all 1,366 automatic rocks matching saved bounds within 0.1 mm, Worker-approved farm travel, private cottage/cat, button exit, accepted return travel and farmer conversation, with no page errors or failed resource responses. The released radish-bank capture shows restored edging and no green terrain cutting into the water. Initial smoke fixtures used an unsupported map call for focus, checked before cottage loading finished, and did not wait for return travel; the final fixture uses the actual map/leave controls and accepted Worker results. Live keyboard exit is not established by this button-exit check. Native Firefox/Safari, physical devices and sustained performance remain unverified.
 
 ## 2026-10-08 — radish-bank paving, shoreline and solid rocks (local)
 

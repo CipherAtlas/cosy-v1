@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-08 — radish-bank repair (local)
+## 2026-10-08 — radish-bank repair published
 
-Solid riverside/pond stones are restored with matching 3,323-collider Worker physics. Locally refined stream terrain removes ground intruding into the river; narrow-bank rocks and overlapping paving shoulders are corrected beside the radish farm. Bridge side access remains clear and the local editor shares the changes. Build/lint/types/contracts/export privacy, 498 layout/physics, 56 rendered bridge/water, 23 isolated editor and 27 fresh real three-client checks pass. Port3051 serves the final local-Worker export; its corrected radish-bank capture and all 1,366 rendered automatic-rock bounds match the saved physics. See the newest build ledger entry and [evidence](docs/village/evidence/riverbank-repair-20261008/README.md). This is a local repair after the published October 7 release; native/physical-device and live acceptance remain open. No publication or Git writes.
+Release `da23d2d` is pushed and published. Solid riverside/pond stones have matching 3,323-collider Worker physics; refined stream terrain, narrow-bank edging and paving joins correct the radish-bank scene. Local editor support and bridge side access are preserved. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37670619730) succeeded after one unchanged Google-font build retry. Worker version `b2844b37-1245-46fc-85f2-edb44d57c286` is healthy. Local full contracts/build/export, 498 layout/physics, 56 rendered bridge/water, 23 editor and 27 real three-client checks remain applicable to unchanged source. Nine fresh live Chrome checks pass for shared entry, rock bounds, farm travel, private cottage/cat, button exit and accepted farmer speech, with no page errors or failed resource responses. Live layout bytes match and editor/admin/save routes stay private. See [evidence](docs/village/evidence/riverbank-repair-20261008/README.md) and the newest build ledger entry for fresh browser checks and native/physical-device limits.
 
 ## 2026-10-07 — integrated release published
 
