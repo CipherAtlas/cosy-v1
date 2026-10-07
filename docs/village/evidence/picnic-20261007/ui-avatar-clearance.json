@@ -1,0 +1,632 @@
+[
+  {
+    "label": "Recipe selection leaves world space at 1366×768",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "panel": {
+      "x": 968,
+      "y": 178.359375,
+      "width": 380,
+      "height": 503.640625
+    },
+    "avatar": {
+      "left": 630.1167202850866,
+      "right": 741.0913741213255,
+      "top": 358.74635857434123,
+      "bottom": 451.26797882855135,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 1024×640",
+    "viewport": {
+      "width": 1024,
+      "height": 640
+    },
+    "panel": {
+      "x": 626,
+      "y": 102,
+      "width": 380,
+      "height": 452
+    },
+    "avatar": {
+      "left": 466.27274364778793,
+      "right": 558.9317218535421,
+      "top": 299.4474684172966,
+      "bottom": 376.68339189931544,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 810×1080",
+    "viewport": {
+      "width": 810,
+      "height": 1080
+    },
+    "panel": {
+      "x": 492,
+      "y": 165.359375,
+      "width": 300,
+      "height": 828.640625
+    },
+    "avatar": {
+      "left": 327.09558859840496,
+      "right": 483.5379662008835,
+      "top": 505.5372255944865,
+      "bottom": 635.9328677796851,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 1080×810",
+    "viewport": {
+      "width": 1080,
+      "height": 810
+    },
+    "panel": {
+      "x": 682,
+      "y": 220.359375,
+      "width": 380,
+      "height": 503.640625
+    },
+    "avatar": {
+      "left": 481.39874349524695,
+      "right": 598.7493144066914,
+      "top": 379.20427349575243,
+      "bottom": 477.015037989769,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 820×1180",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "panel": {
+      "x": 502,
+      "y": 265.359375,
+      "width": 300,
+      "height": 828.640625
+    },
+    "avatar": {
+      "left": 324.55610767859116,
+      "right": 495.5193165827554,
+      "top": 552.4430615991425,
+      "bottom": 694.9388344476331,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 1180×820",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "panel": {
+      "x": 782,
+      "y": 230.359375,
+      "width": 380,
+      "height": 503.640625
+    },
+    "avatar": {
+      "left": 530.6046499581615,
+      "right": 649.4116650765969,
+      "top": 383.90677797621436,
+      "bottom": 482.9308127499899,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 744×1133",
+    "viewport": {
+      "width": 744,
+      "height": 1133
+    },
+    "panel": {
+      "x": 462,
+      "y": 218.359375,
+      "width": 264,
+      "height": 828.640625
+    },
+    "avatar": {
+      "left": 289.9248025259903,
+      "right": 454.0822162556038,
+      "top": 530.4492414126989,
+      "bottom": 667.2721407673178,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Recipe selection leaves world space at 1133×744",
+    "viewport": {
+      "width": 1133,
+      "height": 744
+    },
+    "panel": {
+      "x": 735,
+      "y": 154.359375,
+      "width": 380,
+      "height": 503.640625
+    },
+    "avatar": {
+      "left": 512.6025159581058,
+      "right": 620.3989170940303,
+      "top": 348.3272732049779,
+      "bottom": 438.1740441500932,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 1366×768",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "panel": {
+      "x": 518,
+      "y": 82,
+      "width": 330,
+      "height": 122.1875
+    },
+    "avatar": {
+      "left": 626.4974898427414,
+      "right": 737.2861253125652,
+      "top": 366.233142256298,
+      "bottom": 458.08624999139727,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 1024×640",
+    "viewport": {
+      "width": 1024,
+      "height": 640
+    },
+    "panel": {
+      "x": 347,
+      "y": 82,
+      "width": 330,
+      "height": 122.1875
+    },
+    "avatar": {
+      "left": 464.766540548209,
+      "right": 557.130032836133,
+      "top": 305.2690571690584,
+      "bottom": 381.7558892687878,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 810×1080",
+    "viewport": {
+      "width": 810,
+      "height": 1080
+    },
+    "panel": {
+      "x": 265,
+      "y": 90,
+      "width": 280,
+      "height": 118.1875
+    },
+    "avatar": {
+      "left": 325.2737928531104,
+      "right": 481.05187399196745,
+      "top": 513.3306581045198,
+      "bottom": 642.506459307039,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 1080×810",
+    "viewport": {
+      "width": 1080,
+      "height": 810
+    },
+    "panel": {
+      "x": 375,
+      "y": 82,
+      "width": 330,
+      "height": 122.1875
+    },
+    "avatar": {
+      "left": 480.2490048716499,
+      "right": 597.037881770294,
+      "top": 382.4757796252681,
+      "bottom": 479.5658639798885,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 820×1180",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "panel": {
+      "x": 270,
+      "y": 90,
+      "width": 280,
+      "height": 118.1875
+    },
+    "avatar": {
+      "left": 323.05959246784835,
+      "right": 493.2936701957901,
+      "top": 553.0694461479807,
+      "bottom": 694.8935170507202,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 1180×820",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "panel": {
+      "x": 425,
+      "y": 82,
+      "width": 330,
+      "height": 122.1875
+    },
+    "avatar": {
+      "left": 529.6963497346738,
+      "right": 648.2116008566751,
+      "top": 381.136685099778,
+      "bottom": 480.02945398899095,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 744×1133",
+    "viewport": {
+      "width": 744,
+      "height": 1133
+    },
+    "panel": {
+      "x": 232,
+      "y": 90,
+      "width": 280,
+      "height": 118.1875
+    },
+    "avatar": {
+      "left": 288.9135030967134,
+      "right": 453.0731555894761,
+      "top": 523.0861361926032,
+      "bottom": 660.1587009272305,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Ready cooking HUD fits at 1133×744",
+    "viewport": {
+      "width": 1133,
+      "height": 744
+    },
+    "panel": {
+      "x": 401.5,
+      "y": 82,
+      "width": 330,
+      "height": 122.1875
+    },
+    "avatar": {
+      "left": 512.1122015922999,
+      "right": 620.2117013317485,
+      "top": 342.24128394366204,
+      "bottom": 432.4728037384195,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 1366×768",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "panel": {
+      "x": 968,
+      "y": 102,
+      "width": 380,
+      "height": 580
+    },
+    "avatar": {
+      "left": 625.1428934039043,
+      "right": 736.5070921005496,
+      "top": 359.5283784959715,
+      "bottom": 452.3497688110301,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 1024×640",
+    "viewport": {
+      "width": 1024,
+      "height": 640
+    },
+    "panel": {
+      "x": 626,
+      "y": 102,
+      "width": 380,
+      "height": 452
+    },
+    "avatar": {
+      "left": 465.0602253786143,
+      "right": 557.8118261964236,
+      "top": 299.6273555114336,
+      "bottom": 376.9347306196105,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 810×1080",
+    "viewport": {
+      "width": 810,
+      "height": 1080
+    },
+    "panel": {
+      "x": 492,
+      "y": 102,
+      "width": 300,
+      "height": 892
+    },
+    "avatar": {
+      "left": 326.45800207274715,
+      "right": 482.94909134723304,
+      "top": 505.6318545623409,
+      "bottom": 636.0650718614415,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 1080×810",
+    "viewport": {
+      "width": 1080,
+      "height": 810
+    },
+    "panel": {
+      "x": 682,
+      "y": 131.515625,
+      "width": 380,
+      "height": 592.484375
+    },
+    "avatar": {
+      "left": 481.249804894938,
+      "right": 598.6117570273431,
+      "top": 379.22638946603706,
+      "bottom": 477.04593286296716,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 820×1180",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "panel": {
+      "x": 502,
+      "y": 199.515625,
+      "width": 300,
+      "height": 894.484375
+    },
+    "avatar": {
+      "left": 324.48418131175447,
+      "right": 495.4530275300823,
+      "top": 552.4543918434124,
+      "bottom": 694.9545013845816,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 1180×820",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "panel": {
+      "x": 782,
+      "y": 141.515625,
+      "width": 380,
+      "height": 592.484375
+    },
+    "avatar": {
+      "left": 530.5882289759021,
+      "right": 649.3964987412837,
+      "top": 383.90921556166444,
+      "bottom": 482.93421811541043,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 744×1133",
+    "viewport": {
+      "width": 744,
+      "height": 1133
+    },
+    "panel": {
+      "x": 462,
+      "y": 152.515625,
+      "width": 264,
+      "height": 894.484375
+    },
+    "avatar": {
+      "left": 289.91773378897335,
+      "right": 454.0756876070688,
+      "top": 530.4502907240544,
+      "bottom": 667.273606679106,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Picnic basket at 1133×744",
+    "viewport": {
+      "width": 1133,
+      "height": 744
+    },
+    "panel": {
+      "x": 735,
+      "y": 102,
+      "width": 380,
+      "height": 556
+    },
+    "avatar": {
+      "left": 512.6010698162576,
+      "right": 620.3975814450379,
+      "top": 348.32748787629026,
+      "bottom": 438.174344050704,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 810×1080",
+    "viewport": {
+      "width": 810,
+      "height": 1080
+    },
+    "panel": {
+      "x": 492,
+      "y": 125.515625,
+      "width": 300,
+      "height": 868.484375
+    },
+    "avatar": {
+      "left": 331.7924459269644,
+      "right": 488.0707129765643,
+      "top": 505.72108833340377,
+      "bottom": 635.9745943240607,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 1080×810",
+    "viewport": {
+      "width": 1080,
+      "height": 810
+    },
+    "panel": {
+      "x": 682,
+      "y": 208.359375,
+      "width": 380,
+      "height": 515.640625
+    },
+    "avatar": {
+      "left": 481.78311561318765,
+      "right": 599.1237555152098,
+      "top": 379.23527904926505,
+      "bottom": 477.03682711488426,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 820×1180",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "panel": {
+      "x": 502,
+      "y": 225.515625,
+      "width": 300,
+      "height": 868.484375
+    },
+    "avatar": {
+      "left": 324.752105281445,
+      "right": 495.710247706923,
+      "top": 552.4588605114473,
+      "bottom": 694.9499320000155,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 1180×820",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "panel": {
+      "x": 782,
+      "y": 218.359375,
+      "width": 380,
+      "height": 515.640625
+    },
+    "avatar": {
+      "left": 530.6185842675034,
+      "right": 649.4256376723607,
+      "top": 383.9097185747611,
+      "bottom": 482.93369420299274,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 744×1133",
+    "viewport": {
+      "width": 744,
+      "height": 1133
+    },
+    "panel": {
+      "x": 462,
+      "y": 178.515625,
+      "width": 264,
+      "height": 868.484375
+    },
+    "avatar": {
+      "left": 289.9307940475129,
+      "right": 454.08822452921595,
+      "top": 530.4505071423482,
+      "bottom": 667.2733812650359,
+      "vertices": 11647
+    },
+    "clear": true
+  },
+  {
+    "label": "Japanese kitchen at 1133×744",
+    "viewport": {
+      "width": 1133,
+      "height": 744
+    },
+    "panel": {
+      "x": 735,
+      "y": 142.359375,
+      "width": 380,
+      "height": 515.640625
+    },
+    "avatar": {
+      "left": 512.6027421170927,
+      "right": 620.3991865106859,
+      "top": 348.3275153852753,
+      "bottom": 438.1743148045004,
+      "vertices": 11647
+    },
+    "clear": true
+  }
+]

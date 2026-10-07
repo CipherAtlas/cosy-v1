@@ -1,0 +1,234 @@
+[
+  {
+    "id": "horse-bay",
+    "meshes": 2,
+    "bones": 15,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "trot",
+      "canter"
+    ]
+  },
+  {
+    "id": "horse-grey",
+    "meshes": 2,
+    "bones": 15,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "trot",
+      "canter"
+    ]
+  },
+  {
+    "id": "highland-copper",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet"
+    ]
+  },
+  {
+    "id": "highland-flower",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet"
+    ]
+  },
+  {
+    "id": "dog-corgi",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "dog-shiba",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "dog-beagle",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "dog-samoyed",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "dog-collie",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "dog-shepherd",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "run",
+      "sit",
+      "dance",
+      "spin",
+      "bow",
+      "wave",
+      "roll"
+    ]
+  },
+  {
+    "id": "sheep",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet"
+    ]
+  },
+  {
+    "id": "lamb",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet"
+    ]
+  },
+  {
+    "id": "cat",
+    "meshes": 2,
+    "bones": 14,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "nap",
+      "stretch",
+      "ask",
+      "up",
+      "down"
+    ]
+  },
+  {
+    "id": "swan",
+    "meshes": 2,
+    "bones": 10,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "fly",
+      "swim"
+    ]
+  },
+  {
+    "id": "duck",
+    "meshes": 2,
+    "bones": 10,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "fly",
+      "swim"
+    ]
+  },
+  {
+    "id": "duckling",
+    "meshes": 2,
+    "bones": 10,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "fly",
+      "swim"
+    ]
+  },
+  {
+    "id": "owl",
+    "meshes": 2,
+    "bones": 12,
+    "clips": [
+      "idle",
+      "walk",
+      "pet",
+      "fly",
+      "swim",
+      "glide",
+      "land",
+      "feed"
+    ]
+  }
+]

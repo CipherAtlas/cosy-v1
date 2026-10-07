@@ -71,7 +71,8 @@ export class SceneLayout {
           const box = new T.Box3(new T.Vector3(collider.x - collider.w / 2, collider.bottom ?? 0, collider.z - collider.d / 2),
             new T.Vector3(collider.x + collider.w / 2, collider.top ?? 6, collider.z + collider.d / 2)).applyMatrix4(delta);
           const center = box.getCenter(new T.Vector3()), size = box.getSize(new T.Vector3());
-          this.colliders.push({ x: center.x, z: center.z, w: size.x, d: size.z, bottom: box.min.y, top: box.max.y });
+          this.colliders.push({ x: center.x, z: center.z, w: size.x, d: size.z, bottom: box.min.y, top: box.max.y,
+            ...(collider.bridgeRail ? { bridgeRail: true } : {}) });
         }
       }
       replacedFenceGeometry.forEach(geometry => geometry.dispose());

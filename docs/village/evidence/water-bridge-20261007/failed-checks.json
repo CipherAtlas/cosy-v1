@@ -1,0 +1,6 @@
+{
+  "checks": [
+    "Three real browser clients join one Worker"
+  ],
+  "errors": []
+}

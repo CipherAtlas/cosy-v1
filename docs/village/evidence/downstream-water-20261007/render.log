@@ -1,0 +1,8 @@
+Actual W key crosses the bridge bank opening in the rendered engine
+Bridge retains its editor asset ID, name and category
+Revised bridge has a rendered editor library preview
+Bridge supports selection, placement, rotation and scaling
+Bridge transforms persist in isolated saved JSON
+Bridge transforms survive editor reload
+No captured runtime or editor page errors
+{"passed":62,"keyboard":{"position":{"x":-5.3338958995983825,"y":0,"z":1.0493171117039313},"keys":["w"]},"errors":[]}

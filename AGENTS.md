@@ -62,3 +62,7 @@ Every village button, including NPC conversation/actions, animal interactions, s
 # Documentation after code changes
 
 After every code change, update the relevant existing documentation in the same change. For village work, record the behavior, checks actually run, and remaining limits in `VILLAGE_BUILD.md`; keep `VILLAGE_HANDOFF.md`, `README.md`, and affected village or layout-editor guides aligned with current behavior. For other features, update their corresponding docs. Distinguish local verification from live or deployed results.
+
+# Functional UI copy only
+
+Do not use decorative text, flavor copy, mood-setting slogans, poetic introductions or filler anywhere in the UI. Every label or sentence must identify an action, explain a required control, show state, communicate a limit or report an error. Keep it direct and concise in English and Japanese. Remove existing filler instead of rewriting it as another decorative phrase. For example, never add copy such as “A little cooking, a lovely picnic.”

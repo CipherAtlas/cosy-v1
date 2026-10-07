@@ -1,7 +1,7 @@
 import * as T from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { relaxBlobArm } from "./companionWalk";
-import { SWING_MAX_ANGLE, type SwingSeat, type VillageSwingSet } from "./swings";
+import { SWING_MAX_ANGLE, type VillageSwingSet } from "./swings";
 import type { SharedChatEntry, SharedVisitor, SharedSwingRide } from "./sharedWorld";
 import type { PlaceId } from "./places";
 import type { World } from "./world";
@@ -39,7 +39,7 @@ export function glowSpirit(spirit: T.Object3D, night: number) {
   }
 
 export class VillageVisitors {
-  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: SwingSeat | null; activity: PlaceId | null; lookout: number | null }>();
+  readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: { id: string; index: number } | null; activity: PlaceId | null; lookout: number | null }>();
   private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
   private visitorLabelPoint = new T.Vector3();
   private temp = new T.Vector3();
@@ -126,6 +126,7 @@ export class VillageVisitors {
   }
   update(dt: number, elapsed: number, reducedMotion: boolean, swings: VillageSwingSet[]) {
     for (const remote of this.entries.values()) {
+      remote.spirit.rotation.x = remote.bench ? -.08 : 0;
       const ride = remote.swing, swing = ride && swings.find(value => value.placement.id === ride.id);
       if (ride && swing) {
         // Predict only a short gap between packets, then hold if the rider stops sending.

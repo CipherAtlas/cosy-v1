@@ -31,7 +31,7 @@ fs.mkdirSync(output, { recursive: true });
     const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
     pages.push(page); page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(localWorker => {
-      localStorage.setItem('cosy-village-preferences', JSON.stringify({ weather: 'golden', weatherMode: 'manual', mix: { enabled: false } }));
+      localStorage.setItem('cosy-village-preferences', JSON.stringify({ dontShowTutorial: true, language: 'en', weather: 'golden', weatherMode: 'manual', mix: { enabled: false } }));
       window.testSockets = []; window.testMessages = []; window.testSocketClosures = []; window.testInventoryUpdates = 0; const Native = window.WebSocket;
       window.WebSocket = class extends Native { constructor(...args) { super(localWorker || args[0], ...args.slice(1)); window.testSockets.push(this);
         this.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'interaction_result') window.testMessages.push(message); if (message.type === 'forageInventory') window.testInventoryUpdates++; });
@@ -453,6 +453,31 @@ fs.mkdirSync(output, { recursive: true });
       console.log(`${checks.length} animal bubble browser checks passed.`); return;
     }
     if (process.env.ANIMAL_ONLY === '1') {
+      if (process.env.OWL_ONLY === '1') {
+        check(await visitor.evaluate(() => e.townScene.owls.every(owl => owl.root.userData.animalRigSlug === 'owl'
+          && ['fly','glide','land','feed'].every(name => owl.root.animations.some(clip => clip.name === name))
+          && owl.root.getObjectByName('WingTipLeft')?.isBone && owl.root.getObjectByName('WingTipRight')?.isBone)),
+          'All three shared owls use the revised shoulder/wrist skin and flight/glide/landing/feed clips');
+        const sample = page => page.evaluate(() => { e.townScene.update(false); return e.townScene.owls.map(owl => owl.root.position.toArray()); });
+        const first = await sample(visitor), other = await sample(observer);
+        check(first.every((point, index) => Math.hypot(...point.map((value, axis) => value - other[index][axis])) < .3),
+          'Independent real clients agree on the current shared-clock circuit positions');
+        await visitor.waitForTimeout(500);
+        const next = await sample(visitor);
+        check(next.some((point, index) => Math.hypot(...point.map((value, axis) => value - first[index][axis])) > .05),
+          'The real shared clock advances at least one ordinary owl flight');
+        await move(visitor, [-48, -26.4]);
+        await visitor.evaluate(() => {
+          window.owlCamera = { position: e.camera.position.clone(), quaternion: e.camera.quaternion.clone() };
+          e.renderer.setAnimationLoop(null); e.townScene.update(false);
+          const owl = e.townScene.owls.find(owl => owl.root.position.y > owl.home.position[1] + .3) ?? e.townScene.owls[0];
+          e.camera.position.copy(owl.root.position).add({x:1.3,y:.6,z:1.8});
+          e.camera.lookAt(owl.root.position.clone().add({x:0,y:.25,z:0})); e.renderer.render(e.scene,e.camera);
+        });
+        await visitor.screenshot({path:`${output}/owl-flight-in-village.png`});
+        await visitor.evaluate(() => { e.camera.position.copy(owlCamera.position); e.camera.quaternion.copy(owlCamera.quaternion);
+          e.renderer.setAnimationLoop(time=>e.frame(time)); delete window.owlCamera; });
+      }
       await move(visitor, [-48, -26.4]); await move(observer, [-46.8, -26.5]);
       await visitor.waitForFunction(() => e.townContext?.actions.some(action => action.request.action === 'owlFood' && !action.disabled));
       await key(visitor, 'e'); await visitor.waitForFunction(() => e.gardenState.crumbPouch);
@@ -482,6 +507,21 @@ fs.mkdirSync(output, { recursive: true });
         }
         check(!overlap, 'Rendered owl responses stay readable with at most one speech sprite throughout the meal');
         check(speakers.size === 3, 'The real shared meal gives all three owls distinct speech turns');
+        const mealAt = await visitor.evaluate(() => e.sharedActors.town.owlFeedAt);
+        await visitor.evaluate(() => testSockets.at(-1).close(1000));
+        await visitor.waitForFunction(() => testSockets.length > 1 && e.sharedConnected, null, {timeout:20000});
+        check(await visitor.evaluate(mealAt => e.sharedActors.town.owlFeedAt === mealAt, mealAt)
+          && await observer.evaluate(mealAt => e.sharedActors.town.owlFeedAt === mealAt, mealAt),
+          'Disconnect/reconnect retains the accepted meal clock without restarting the flight or feeding');
+        await visitor.emulateMedia({reducedMotion:'no-preference'});
+        for (const [width,height] of [[1366,768],[1024,640],[810,1080],[1080,810],[820,1180],[1180,820],[744,1133],[1133,744]]) {
+          await visitor.setViewportSize({width,height}); await visitor.waitForTimeout(150);
+          check(await visitor.evaluate(() => {
+            const canvas=e.renderer.domElement.getBoundingClientRect(); e.townScene.update(false);
+            return canvas.width>0&&canvas.height>0&&Math.abs(e.camera.aspect-canvas.width/canvas.height)<.01
+              && e.townScene.owls.every(owl=>owl.root.visible&&[...owl.root.position.toArray(),...owl.root.quaternion.toArray()].every(Number.isFinite));
+          }), `Owl scene remains visible with finite poses and correct camera aspect at ${width}x${height}`);
+        }
       }
       check(errors.length === 0, `No animal browser page errors (${errors.length})`);
       fs.writeFileSync(`${output}/browser-checks.json`, JSON.stringify({ scope: 'Shared animal/pond/owl rendering and petting', checks, errors }, null, 2));

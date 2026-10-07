@@ -1,0 +1,12 @@
+Loading isolated editor
+Editor ready
+hill-waterfall has a named Landscape registration
+hill-waterfall shows a rendered geometry preview
+Waterfall shelf preview renders colored water as well as rocks
+hill-waterfall accepts placement, yaw and scale controls
+hill-waterfall can be selected from the Scene list
+hill-waterfall placement, yaw and scale survive file save
+Complete layout and terrain survive browser reload
+Apply saves all new props and terrain into the isolated playable file
+Protected layouts remain byte-identical with no page errors
+9 editor checks passed.

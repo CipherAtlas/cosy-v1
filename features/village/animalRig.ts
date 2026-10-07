@@ -34,7 +34,7 @@ export async function loadAnimalRigs(slugs: Iterable<AnimalRigSlug>) {
   await Promise.all([...new Set(slugs)].map(slug => {
     if (templates.has(slug)) return Promise.resolve();
     const pending = loading.get(slug); if (pending) return pending;
-    const promise = new GLTFLoader().loadAsync(withBasePath(`/village/models/animals-v2/${slug}.glb?v=rig1`)).then(kit => {
+    const promise = new GLTFLoader().loadAsync(withBasePath(`/village/models/animals-v2/${slug}.glb?v=${slug === "owl" ? "owl2" : "rig1"}`)).then(kit => {
       let skinned = false;
       kit.scene.traverse(object => {
         if (object instanceof T.Mesh) object.castShadow = object.receiveShadow = true;
@@ -69,9 +69,10 @@ export function makeAnimalRig(slug: AnimalRigSlug): T.Group {
 export function animalRigClips(model: T.Object3D): readonly T.AnimationClip[] | undefined { return stateFor(model)?.clips; }
 
 /** Native deformation never changes the accepted outer world pose or its action clocks. */
-export function animateAnimalRig(model: T.Object3D, options: { action: string; time: number; reduced: boolean; phase?: number }): boolean {
+export function animateAnimalRig(model: T.Object3D, options: { action: string; time: number; reduced: boolean; phase?: number; stillAction?: string }): boolean {
   const state = stateFor(model); if (!state) return false;
-  const name = options.reduced ? "idle" : state.actions.has(options.action) ? options.action : "idle";
+  const requested = options.reduced ? options.stillAction ?? "idle" : options.action;
+  const name = state.actions.has(requested) ? requested : "idle";
   const delta = Number.isFinite(state.time) ? Math.max(0, Math.min(.1, options.time - state.time)) : 1;
   const blend = options.reduced || !state.action || options.time < state.time ? 1 : 1 - Math.exp(-delta * 14);
   for (const [key, action] of state.actions) {

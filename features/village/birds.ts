@@ -1,6 +1,6 @@
 import type { AuthoredWorld } from "./worldLayout";
 import * as T from "three";
-import { BIRD_CLEARING } from "./environment";
+import { BIRD_CLEARING, floorHeight } from "./environment";
 import type { SharedBirds } from "./sharedActors";
 
 export type BirdStatus = "flying" | "crumbs" | "waiting" | "sad" | "eating" | "happy";
@@ -94,6 +94,27 @@ export class BirdFlock {
       this.birds.push({ root, head: root.getObjectByName("DoveHead")!,
         wings: [root.getObjectByName("DoveWingLeft")!, root.getObjectByName("DoveWingRight")!],
         landing: new T.Vector3(x, y, z) });
+    }
+    const picnic = authored?.items?.find(item => item.visible && item.asset === "picnic-mat");
+    if (picnic && this.birds.length) {
+      const origin = this.birds.reduce((sum, bird) => sum.add(bird.landing), new T.Vector3()).divideScalar(this.birds.length);
+      const [x, y, z] = picnic.position;
+      const ground = Math.max(y, ...Array.from({ length: 8 }, (_, i) =>
+        floorHeight(x + Math.cos(i * Math.PI / 4) * 14, z + Math.sin(i * Math.PI / 4) * 14)));
+      const nearbyTrees = (authored?.trees ?? []).filter(tree => Math.hypot(tree.x - x, tree.z - z) < 28);
+      // Climb near the clearing before crossing the hill. Keep the circuit close
+      // enough to the blanket to see the existing doves, above its tree crowns.
+      const height = Math.max(ground + 14, ...nearbyTrees.map(tree => tree.y + 8.6 * tree.scale[1] + 3));
+      const points = [
+        origin.clone(), new T.Vector3(origin.x + 6, origin.y + 9, origin.z + 1),
+        new T.Vector3(origin.x - 2, origin.y + 27, origin.z + 6),
+        new T.Vector3(x + 20, height, z + 10), new T.Vector3(x + 8, height, z + 6),
+        new T.Vector3(x - 7, height + 2, z + 2), new T.Vector3(x - 10, height + 3, z - 9),
+        new T.Vector3(x + 3, height + 2, z - 12), new T.Vector3(x + 24, height, z - 4),
+        new T.Vector3(origin.x - 10, origin.y + 23, origin.z - 8),
+        new T.Vector3(origin.x - 5, origin.y + 8, origin.z - 1), origin.clone(),
+      ];
+      this.flightRoutes.push(new T.CatmullRomCurve3(points.map(point => point.sub(origin))));
     }
     template.traverse(node => {
       if (!(node instanceof T.Mesh)) return;

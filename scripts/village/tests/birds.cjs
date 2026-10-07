@@ -28,7 +28,8 @@ const path = require('node:path');
       check(flock.birds.length===12 && flock.parts.length===4,'Twelve Blender doves use four instanced mesh draws');
       check(flock.crumbs.count===96 && flock.thrownCrumbs.count===18,'A fuller 96-crumb serving accompanies the 18 thrown crumbs');
       const routeSamples=[],flightPeaks=[];
-      for(let pattern=0;pattern<3;pattern++) {
+      check(flock.flightRoutes.length===4,'Saved picnic hill adds a fourth circuit to the existing flock');
+      for(let pattern=0;pattern<4;pattern++) {
         flock.flightCount=pattern;
         let peak=0,maxStep=0;
         for(let i=0;i<12;i++) {
@@ -38,7 +39,7 @@ const path = require('node:path');
           previous.copy(start);
           for(let sample=1;sample<=1800;sample++) {
             flock.flightPosition(i,sample/60,point);
-            if(!point.toArray().every(Number.isFinite) || point.y<.12)throw Error('Invalid flight position');
+            if(!point.toArray().every(Number.isFinite) || point.y<flock.birds[i].landing.y-1e-8)throw Error('Invalid flight position');
             peak=Math.max(peak,point.y);maxStep=Math.max(maxStep,point.distanceTo(previous));previous.copy(point);
           }
         }
@@ -46,8 +47,9 @@ const path = require('node:path');
         flightPeaks.push(peak);
         const midpoint=new T.Vector3();flock.flightPosition(0,15,midpoint);routeSamples.push(midpoint.toArray());
       }
-      check(Math.max(...flightPeaks)>39 && Math.max(...flightPeaks)<43,'Higher circuits rise above 39 m while remaining bounded');
-      check(routeSamples.every((point,index)=>routeSamples.every((other,j)=>index===j||new T.Vector3(...point).distanceTo(new T.Vector3(...other))>5)),'The three circuits have distinct sky paths');
+      check(Math.max(...flightPeaks.slice(0,3))>39 && Math.max(...flightPeaks.slice(0,3))<43,'Existing higher circuits rise above 39 m while remaining bounded');
+      check(flightPeaks[3]>40&&flightPeaks[3]<45,'Picnic circuit clears the high hill within 45 m');
+      check(routeSamples.every((point,index)=>routeSamples.every((other,j)=>index===j||new T.Vector3(...point).distanceTo(new T.Vector3(...other))>5)),'The four circuits have distinct sky paths');
       flock.flightCount=0;
       check(life.residents.length===5 && life.residents[4].root.name==='Wren','Wren joins the four existing residents');
       check(life.caretakerPresent,'Wren starts at her clearing');

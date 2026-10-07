@@ -60,14 +60,14 @@ export function buildBridge(stone: T.MeshStandardMaterial, paving: T.Material, c
     }
     for (let i = 0; i < 24; i++) {
       const x = wallStart + (i + .5) * wallLength / 24;
-      colliders.push({ x, z: wallZ, w: wallLength / 24, d: .54, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91 });
+      colliders.push({ x, z: wallZ, w: wallLength / 24, d: .54, bottom: bridgeHeight(x), top: bridgeHeight(x) + .91, bridgeRail: true });
     }
     // Matching openings on both banks keep every approach clear of projecting end stones.
     for (const end of [-1, 1]) {
       const postX = center + end * (wallLength / 2 - .17);
       const postFloor = bridgeHeight(postX);
       block(postX, postFloor + .47, wallZ, .5, .94, .64);
-      colliders.push({ x: postX, z: wallZ, w: .5, d: .64, bottom: postFloor, top: postFloor + .94 });
+      colliders.push({ x: postX, z: wallZ, w: .5, d: .64, bottom: postFloor, top: postFloor + .94, bridgeRail: true });
     }
   }
   return bridge;

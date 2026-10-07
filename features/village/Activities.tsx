@@ -182,7 +182,7 @@ export function Activities(p: Props) {
         </ShortcutButton>
         {p.radioEnabled ? <button className="v-button" onClick={p.openRadio}>{t("Open your radio", "ラジオを開く")}</button> : <>
           <SoundtrackChoices mix={p.mix} setMix={p.setMix} language={p.language} />
-          <details className="v-mix-details"><summary>{t("Balance the sounds", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
+          <details className="v-mix-details"><summary>{t("Sound levels", "音のバランス")}</summary><MixSliders mix={p.mix} setMix={p.setMix} language={p.language} /></details>
         </>}
       </section>
     );
@@ -230,7 +230,7 @@ export function MixSliders({
           <span>
             {language === "ja"
               ? (extended ? ["全体", "音楽", "暖炉", "川", "風", "雨", "環境音", "効果音"] : ["音楽", "環境音", "効果音", "雨", "暖炉", "全体"])[i]
-              : (extended ? ["Master", "Music", "Fire", "River", "Wind", "Rain", "Nature", "Effects"] : ["Music", "World", "Spirit & details", "Rain", "Fire", "Volume"])[i]}
+              : (extended ? ["Master", "Music", "Fire", "River", "Wind", "Rain", "Nature", "Effects"] : ["Music", "World", "Effects", "Rain", "Fire", "Volume"])[i]}
           </span>
           <input
             aria-label={key + " volume"}
@@ -268,7 +268,7 @@ function Breathing({ language, onMoment, gardenControls }: { language: "en" | "j
   const label = (
     ja
       ? ["吸って", "止めて", "吐いて", "止めて"]
-      : ["Breathe in", "Hold gently", "Breathe out", "Rest"]
+      : ["Breathe in", "Hold", "Breathe out", "Rest"]
   )[phase];
   useEffect(() => {
     if (!running) return;

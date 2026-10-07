@@ -1,0 +1,17 @@
+# Multiplayer horse response — local evidence, October 7, 2026
+
+Rapid changed controls previously failed within 50 ms, and the local rider inherited the observer's 180 ms playback buffer. Newer inputs are accepted; only an accepted rider projects a display pose for up to 350 ms using the shared horse solver, acknowledgement/replay and conservative collision probes. Shared state, observers and all outcomes remain Worker-owned.
+
+Changed code: client `horseRiding.ts`, `horses.ts`, `VillageEngine.ts`, `sharedActors.ts`; shared `horseMotion.ts`; Worker `horseRiding.ts` and `simulation.ts`. The existing contract runner and horse-browser suite include the new regression/latency checks; village build/handoff/readme/movement documentation is updated.
+
+Final delayed-network response: **35.4 ms visual steering**, **411.7 ms accepted heading update**. The harness adds 100 ms to outgoing horse-input messages and 100 ms to incoming actor snapshots. Other traffic is not delayed. This measures the response advantage within the fixed app, not a live-user before/after benchmark. The original dropped-input/buffer regression was independently red before the fix.
+
+- Production build/lint/types, full required contracts (including 122 Worker and 2,177 rendering checks) and export privacy pass. See `build.log`, `contracts.log` and `export.log`.
+- Focused source regressions cover rapid reversals, next-frame keyboard/analog touch response, acknowledgement reconciliation, countdown, full-footprint solids/occupied ground, the projection horizon, stale delivery, older Workers and ownership loss. The expanded regression was rerun after the full contracts; it is included in the contract runner.
+- All 30 actual three-client Chrome checks pass without page errors (`checks.json`, `browser.log`). These include canter/braking/steering, competing mounts, attached observers, late joining, keyboard dismount, disconnect/reconnection, abandoned claims, full seats/release and simultaneous private focus.
+- Horse controls retain 44 px targets/keycaps at 1366×768, 1280×720, 1024×640 and all six prescribed iPad CSS orientations. Touch capability was enabled; these checks do not prove native iPad gestures/comfort. `riding-1133x744.png` is the final control capture.
+- Five fresh actual-served smoke checks pass (`served-checks.json`, `served.log`). Preview3051 uses the checked export and existing Worker2567/persistence. All 212 checked village/runtime/public/Worker files and served HTML match (`source-sha256.json`). Reload the local village.
+
+The three-client suite used a matching isolated Worker on 2579 with separate synthetic persistence; it was stopped after verification. Repeated fixture attempts respected shared ownership and meals. Fixtures were corrected for nearby horses, completion of accepted dismounts and the real twelve-metre acceleration/braking footprint, rather than assuming a 30 m empty pasture. A concurrent layout/physics edit caused the initial root check to fail; final verification froze matching source/data. Existing RoomScene image lint and Three CommonJS deprecation warnings remain.
+
+No dependencies, world layout, editor assets, deployment configuration, Git history or live infrastructure were changed by the horse fix. The local preview includes the completed concurrent water/terrain/rendering work. Native/physical iPad, Firefox/Safari, sustained target-device performance and the user's live network experience remain unverified. No deployment is claimed.

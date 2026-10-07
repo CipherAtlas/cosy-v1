@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "The served app includes the bounded rider controller",
+    "The served app connects to the existing local Worker",
+    "The existing Worker provides both shared horses",
+    "The served scene retains the current 1957-collider layout",
+    "No browser page errors: "
+  ],
+  "errors": []
+}

@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Asset library heading identifies the panel",
+    "Empty selection reports state",
+    "Search placeholder identifies searchable content",
+    "Cottage shortcut names its real selection action",
+    "picnic-mat preview decoded before the final screenshot",
+    "picnic-basket preview decoded before the final screenshot",
+    "Editor copy review has no page errors"
+  ],
+  "errors": [],
+  "limits": "Read-only local Chrome review after functional-copy changes; no layout save or Apply."
+}

@@ -1,0 +1,286 @@
+{
+  "checks": [
+    "Entry loads only authored dog breeds",
+    "dog-corgi: ten native clips bind to the independent skin",
+    "dog-corgi: sit preserves the accepted 7s clock",
+    "dog-corgi: dance preserves the accepted 5.2s clock",
+    "dog-corgi: spin preserves the accepted 3.2s clock",
+    "dog-corgi: bow preserves the accepted 3.8s clock",
+    "dog-corgi: wave preserves the accepted 4.2s clock",
+    "dog-corgi: roll preserves the accepted 4.6s clock",
+    "dog-corgi: walking deforms finite real skin vertices",
+    "dog-corgi: late arrival samples the accepted action age",
+    "dog-corgi: another placement retains its independent pose",
+    "dog-corgi: reduced motion rests the native skeleton",
+    "dog-shiba: ten native clips bind to the independent skin",
+    "dog-shiba: sit preserves the accepted 7s clock",
+    "dog-shiba: dance preserves the accepted 5.2s clock",
+    "dog-shiba: spin preserves the accepted 3.2s clock",
+    "dog-shiba: bow preserves the accepted 3.8s clock",
+    "dog-shiba: wave preserves the accepted 4.2s clock",
+    "dog-shiba: roll preserves the accepted 4.6s clock",
+    "dog-shiba: walking deforms finite real skin vertices",
+    "dog-shiba: late arrival samples the accepted action age",
+    "dog-shiba: another placement retains its independent pose",
+    "dog-shiba: reduced motion rests the native skeleton",
+    "dog-beagle: ten native clips bind to the independent skin",
+    "dog-beagle: sit preserves the accepted 7s clock",
+    "dog-beagle: dance preserves the accepted 5.2s clock",
+    "dog-beagle: spin preserves the accepted 3.2s clock",
+    "dog-beagle: bow preserves the accepted 3.8s clock",
+    "dog-beagle: wave preserves the accepted 4.2s clock",
+    "dog-beagle: roll preserves the accepted 4.6s clock",
+    "dog-beagle: walking deforms finite real skin vertices",
+    "dog-beagle: late arrival samples the accepted action age",
+    "dog-beagle: another placement retains its independent pose",
+    "dog-beagle: reduced motion rests the native skeleton",
+    "dog-samoyed: ten native clips bind to the independent skin",
+    "dog-samoyed: sit preserves the accepted 7s clock",
+    "dog-samoyed: dance preserves the accepted 5.2s clock",
+    "dog-samoyed: spin preserves the accepted 3.2s clock",
+    "dog-samoyed: bow preserves the accepted 3.8s clock",
+    "dog-samoyed: wave preserves the accepted 4.2s clock",
+    "dog-samoyed: roll preserves the accepted 4.6s clock",
+    "dog-samoyed: walking deforms finite real skin vertices",
+    "dog-samoyed: late arrival samples the accepted action age",
+    "dog-samoyed: another placement retains its independent pose",
+    "dog-samoyed: reduced motion rests the native skeleton",
+    "dog-collie: ten native clips bind to the independent skin",
+    "dog-collie: sit preserves the accepted 7s clock",
+    "dog-collie: dance preserves the accepted 5.2s clock",
+    "dog-collie: spin preserves the accepted 3.2s clock",
+    "dog-collie: bow preserves the accepted 3.8s clock",
+    "dog-collie: wave preserves the accepted 4.2s clock",
+    "dog-collie: roll preserves the accepted 4.6s clock",
+    "dog-collie: walking deforms finite real skin vertices",
+    "dog-collie: late arrival samples the accepted action age",
+    "dog-collie: another placement retains its independent pose",
+    "dog-collie: reduced motion rests the native skeleton",
+    "dog-shepherd: ten native clips bind to the independent skin",
+    "dog-shepherd: sit preserves the accepted 7s clock",
+    "dog-shepherd: dance preserves the accepted 5.2s clock",
+    "dog-shepherd: spin preserves the accepted 3.2s clock",
+    "dog-shepherd: bow preserves the accepted 3.8s clock",
+    "dog-shepherd: wave preserves the accepted 4.2s clock",
+    "dog-shepherd: roll preserves the accepted 4.6s clock",
+    "dog-shepherd: walking deforms finite real skin vertices",
+    "dog-shepherd: late arrival samples the accepted action age",
+    "dog-shepherd: another placement retains its independent pose",
+    "dog-shepherd: reduced motion rests the native skeleton",
+    "bay: native horse exposes the correct rider saddle attachment",
+    "bay: trot and canter clips are available",
+    "bay: accepted travel selects a real native gait",
+    "bay: native clips preserve the outer accepted world pose",
+    "bay: eating lowers the actual skinned head while hooves stay on the ground",
+    "bay: eating visibly chews on the accepted meal clock",
+    "bay: late arrivals sample the same meal pose despite a different local clock",
+    "bay: the meal pose releases without accumulating bone rotations",
+    "bay: reduced motion holds the resting skin",
+    "bay: disposal preserves the cached skin for another rider",
+    "grey: native horse exposes the correct rider saddle attachment",
+    "grey: trot and canter clips are available",
+    "grey: accepted travel selects a real native gait",
+    "grey: native clips preserve the outer accepted world pose",
+    "grey: eating lowers the actual skinned head while hooves stay on the ground",
+    "grey: eating visibly chews on the accepted meal clock",
+    "grey: late arrivals sample the same meal pose despite a different local clock",
+    "grey: the meal pose releases without accumulating bone rotations",
+    "grey: reduced motion holds the resting skin",
+    "grey: disposal preserves the cached skin for another rider",
+    "highland-copper: helper samples finite native pet deformation",
+    "highland-copper: native deformation leaves outer placement unchanged",
+    "owl: helper samples finite native fly deformation",
+    "owl: native deformation leaves outer placement unchanged",
+    "owl/fly: a late observer samples the same finite skin pose",
+    "owl/fly: wings spread outward beyond the perched silhouette",
+    "owl/fly: reduced motion freezes the appropriate resting or spread-wing pose",
+    "owl/glide: a late observer samples the same finite skin pose",
+    "owl/glide: wings spread outward beyond the perched silhouette",
+    "owl/glide: reduced motion freezes the appropriate resting or spread-wing pose",
+    "owl/land: a late observer samples the same finite skin pose",
+    "owl/land: wings spread outward beyond the perched silhouette",
+    "owl/land: reduced motion freezes the appropriate resting or spread-wing pose",
+    "owl/feed: a late observer samples the same finite skin pose",
+    "owl/feed: reduced motion freezes the appropriate resting or spread-wing pose",
+    "Repeated entry preload fetches each placed dog model only once"
+  ],
+  "placed": [
+    "dog-beagle",
+    "dog-corgi",
+    "dog-samoyed",
+    "dog-shiba"
+  ],
+  "dogs": [
+    "dog-corgi",
+    "dog-shiba",
+    "dog-beagle",
+    "dog-samoyed",
+    "dog-collie",
+    "dog-shepherd"
+  ],
+  "nativeBounds": {
+    "dog-corgi": {
+      "low": 1.7856534397709212e-8,
+      "high": 0.8022486512298421,
+      "min": [
+        -0.20100000384351394,
+        1.7856534397709212e-8,
+        -0.5675894768439216
+      ],
+      "max": [
+        0.20100000294366674,
+        0.8022486512298421,
+        0.6802499352569842
+      ],
+      "vertices": 4857
+    },
+    "dog-shiba": {
+      "low": 2.299081747972923e-8,
+      "high": 0.8772483768061174,
+      "min": [
+        -0.20099999970682852,
+        2.299081747972923e-8,
+        -0.5675894814926736
+      ],
+      "max": [
+        0.2009999988074819,
+        0.8772483768061174,
+        0.6802499975432841
+      ],
+      "vertices": 4753
+    },
+    "dog-beagle": {
+      "low": 2.7073590756661582e-8,
+      "high": 0.8202935740056687,
+      "min": [
+        -0.26321261142039054,
+        2.7073590756661582e-8,
+        -0.8593013541208798
+      ],
+      "max": [
+        0.2632126114203926,
+        0.8202935740056687,
+        0.7074599429512252
+      ],
+      "vertices": 4407
+    },
+    "dog-samoyed": {
+      "low": 8.266978238618785e-9,
+      "high": 1.0281277671993276,
+      "min": [
+        -0.2846184520103083,
+        8.266978238618785e-9,
+        -0.6659718232162906
+      ],
+      "max": [
+        0.2850576146010048,
+        1.0281277671993276,
+        0.7981600239647342
+      ],
+      "vertices": 5176
+    },
+    "dog-collie": {
+      "low": 2.2210960769873513e-8,
+      "high": 0.952305847927381,
+      "min": [
+        -0.27168123368467106,
+        2.2210960769873513e-8,
+        -0.9254015765659391
+      ],
+      "max": [
+        0.27210042998119527,
+        0.952305847927381,
+        0.761879945521923
+      ],
+      "vertices": 5041
+    },
+    "dog-shepherd": {
+      "low": 1.061933608313578e-8,
+      "high": 1.1516981237445698,
+      "min": [
+        -0.24120003213875726,
+        1.061933608313578e-8,
+        -0.9915015057254066
+      ],
+      "max": [
+        0.24120003213947278,
+        1.1516981237445698,
+        0.8162999925567543
+      ],
+      "vertices": 4686
+    },
+    "horse-bay": {
+      "low": 2.0360618260701518e-8,
+      "high": 2.498883811030449,
+      "min": [
+        -0.4299999836313776,
+        2.0360618260701518e-8,
+        -1.2842577504169825
+      ],
+      "max": [
+        0.42999998066226003,
+        2.498883811030449,
+        1.7101024165905463
+      ],
+      "vertices": 9433
+    },
+    "horse-grey": {
+      "low": 2.0360618260701518e-8,
+      "high": 2.4994951283527063,
+      "min": [
+        -0.4269116393061514,
+        2.0360618260701518e-8,
+        -1.2842577504169825
+      ],
+      "max": [
+        0.42751761609611905,
+        2.4994951283527063,
+        1.7102203129861144
+      ],
+      "vertices": 7457
+    },
+    "highland-copper": {
+      "low": 6.421459630464465e-8,
+      "high": 1.615709335705836,
+      "min": [
+        -0.7918998239639093,
+        6.421459630464465e-8,
+        -1.085908116768893
+      ],
+      "max": [
+        0.7918998239640869,
+        1.615709335705836,
+        1.312999923774708
+      ],
+      "vertices": 8024
+    },
+    "owl": {
+      "low": 0.000011370218683750908,
+      "high": 0.6184000764048883,
+      "min": [
+        -0.21740924209908383,
+        0.000011370218683750908,
+        -0.21853106419137952
+      ],
+      "max": [
+        0.21740924209908605,
+        0.6184000764048883,
+        0.17857026965989448
+      ],
+      "vertices": 5089
+    }
+  },
+  "requests": [
+    "dog-corgi",
+    "dog-shiba",
+    "dog-beagle",
+    "dog-samoyed",
+    "dog-collie",
+    "dog-shepherd",
+    "horse-bay",
+    "horse-grey",
+    "highland-copper",
+    "owl"
+  ],
+  "errors": []
+}

@@ -1,0 +1,110 @@
+{
+  "beds": [
+    {
+      "id": "farm-1-row-1",
+      "crop": "carrot",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-1-row-2",
+      "crop": "carrot",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-1-row-3",
+      "crop": "carrot",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791188371765,
+      "growAt": 1791188551765
+    },
+    {
+      "id": "farm-1-row-4",
+      "crop": null,
+      "plantedAt": null,
+      "wateredAt": null,
+      "growAt": null
+    },
+    {
+      "id": "farm-1-row-5",
+      "crop": "carrot",
+      "plantedAt": 1791188544495,
+      "wateredAt": 1791188544764,
+      "growAt": 1791188724764
+    },
+    {
+      "id": "farm-2-row-1",
+      "crop": "radish",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-2-row-2",
+      "crop": "radish",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-2-row-3",
+      "crop": "radish",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791188218278,
+      "growAt": 1791188398278
+    },
+    {
+      "id": "farm-2-row-4",
+      "crop": "radish",
+      "plantedAt": 1791190636633,
+      "wateredAt": 1791190636974,
+      "growAt": 1791190816974
+    },
+    {
+      "id": "farm-2-row-5",
+      "crop": "radish",
+      "plantedAt": 1791190637989,
+      "wateredAt": 1791190638406,
+      "growAt": 1791190818406
+    },
+    {
+      "id": "farm-3-row-1",
+      "crop": "mint",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-3-row-2",
+      "crop": "mint",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791186060108,
+      "growAt": 1791186240108
+    },
+    {
+      "id": "farm-3-row-3",
+      "crop": "mint",
+      "plantedAt": 1791186060108,
+      "wateredAt": 1791188478250,
+      "growAt": 1791188658250
+    },
+    {
+      "id": "farm-3-row-4",
+      "crop": "mint",
+      "plantedAt": 1791188210982,
+      "wateredAt": 1791188211565,
+      "growAt": 1791188391565
+    },
+    {
+      "id": "farm-3-row-5",
+      "crop": "mint",
+      "plantedAt": 1791190646987,
+      "wateredAt": 1791190649131,
+      "growAt": 1791190829131
+    }
+  ],
+  "now": 1791371974839
+}

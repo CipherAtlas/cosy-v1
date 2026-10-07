@@ -12,7 +12,7 @@ const { createHash } = require('node:crypto');
       const engine = new VillageEngine(document.querySelector('#scene'), { progress: () => {}, ready: () => {}, near: () => {},
         interact: () => {}, error: message => { throw Error(message); }, stats: () => {}, movement: () => {}, contact: () => {}, environment: () => {} });
       await engine.load();
-      const result = { colliders: engine.world.colliders, benches: engine.world.benches.map(({ id, x, z, facing, seatHeight }) => ({ id, x, z, facing, seatHeight })) };
+      const result = { colliders: engine.world.colliders, benches: engine.world.benches.map(({ id, x, z, facing, seatHeight, seatSpacing, seatCount }) => ({ id, x, z, facing, seatHeight, ...(seatSpacing === undefined ? {} : { seatSpacing }), ...(seatCount === undefined ? {} : { seatCount }) })) };
       engine.dispose(); return result;
     });
     physics.layoutHash = createHash('sha256').update(fs.readFileSync('public/village/world-layout.json')).digest('hex');

@@ -2,7 +2,7 @@ import type { AuthoredWorld } from "./worldLayout";
 import { towerLookout } from "./towerLookout";
 import { farmCrop, townItems, townPoint, trackPoint, TOWN_TRACK_START_ANGLE } from "./townShared";
 
-export type MapDestination = { id: string; name: string; japanese: string; x: number; z: number; kind: "swing" | "field" | "circuit" | "farm" | "owls" | "tower" };
+export type MapDestination = { id: string; name: string; japanese: string; x: number; z: number; kind: "swing" | "field" | "circuit" | "farm" | "owls" | "tower" | "kitchen" | "picnic" };
 
 /** Travel anchors come from the same editable objects as the map and Worker. */
 export function outdoorMapDestinations(world?: AuthoredWorld): MapDestination[] {
@@ -21,6 +21,11 @@ export function outdoorMapDestinations(world?: AuthoredWorld): MapDestination[] 
   for (const item of townItems(world, "owl-feeding-perch")) {
     const [x, z] = townPoint(item, 0, 1.8);
     destinations.push({ id: `owls:${item.id}`, name: "Owl grove", japanese: "フクロウの木立", kind: "owls", x, z });
+  }
+  for (const asset of ["garden-kitchen", "picnic-mat"]) for (const item of townItems(world, asset)) {
+    const [x, z] = townPoint(item, 0, asset === "garden-kitchen" ? 1.9 : 2.8);
+    destinations.push({ id: `${asset === "garden-kitchen" ? "kitchen" : "picnic"}:${item.id}`, name: asset === "garden-kitchen" ? "Garden kitchen" : "Picnic hill",
+      japanese: asset === "garden-kitchen" ? "畑のキッチン" : "ピクニックの丘", kind: asset === "garden-kitchen" ? "kitchen" : "picnic", x, z });
   }
   const farms = new Map<string, ReturnType<typeof townItems>>();
   for (const item of townItems(world, "farm-row")) {

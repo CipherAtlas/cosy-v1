@@ -566,41 +566,58 @@ def swan(stage='blockout'):
 
 def owl(stage='blockout'):
     root=pivot('Animal_Owl');body=pivot('OwlBody',parent=root)
-    sweep('Owl_ContinuousSkin',[(0,.02,.07,.07,.07),(0,.025,.20,.21,.16),(0,.015,.37,.249,.19),(0,-.005,.55,.25,.194),(0,-.005,.66,.20,.16),(0,-.004,.725,.095,.08),(0,0,.74,.003,.003)],'owl',body,plane='vertical',sides=36,steps=6)
+    skin=sweep('Owl_ContinuousSkin',[(0,.035,.07,.075,.075),(0,.04,.20,.19,.15),(0,.035,.35,.23,.17),(0,.025,.48,.205,.155),(0,0,.57,.27,.19),(0,.005,.69,.255,.18),(0,.015,.755,.17,.13),(0,.015,.78,.003,.003)],'owl',body,plane='vertical',sides=48,steps=5)
     for side in (-1,1):
         foot=pivot('OwlFoot',parent=body)
-        sweep('Owl_Leg',[(side*.10,.015,.14,.035,.035),(side*.105,-.005,.045,.025,.025)],'gold',foot,sides=12)
-        for toe in range(3):
-            x=side*.10+(toe-1)*.025
-            sweep('Owl_Toe',[(side*.10,-.015,.038,.012,.012),(x,-.083,.023,.011,.010),(x,-.111,.014,.006,.006),(x,-.12,.012,.002,.002)],'bill',foot,sides=8,steps=2)
-    if stage=='blockout':
-        return root
+        sweep('Owl_FeatheredLeg',[(side*.10,.015,.14,.04,.04),(side*.105,-.005,.045,.027,.027)],'owlface',foot,sides=10)
+        for toe in range(4):
+            x=side*.105+(toe%2-.5)*.05;direction=-1 if toe<2 else 1
+            sweep('Owl_Talon',[(side*.105,0,.035,.012,.012),(x,direction*.06,.022,.010,.010),(x,direction*.10,.014,.007,.007),(x,direction*.115,.009,.002,.002)],'ink',foot,sides=8,steps=2)
+    if stage=='blockout':return root
+    # Broad layered remiges unfold around the shoulder, with a flexible wrist.
     for side in (-1,1):
         wing=pivot('OwlWing'+('L' if side<0 else 'R'),parent=body)
-        parts=[sweep('Owl_Wing',[(side*.16,-.02,.48,.035,.03),(side*.22,.01,.38,.085,.066),(side*.22,.04,.23,.073,.067),(side*.16,.06,.12,.03,.036),(side*.13,.07,.09,.002,.002)],'owldark',wing,sides=18,steps=4,plane='vertical')]
-        for i in range(3):
-            parts.append(sweep('Owl_FlightFeather',[(side*.21,-.025+i*.037,.36,.034,.025),(side*.24,-.02+i*.035,.23,.03,.02),(side*.17,-.01+i*.035,.11-i*.018,.025,.018),(side*.135,-.01+i*.035,.09-i*.016,.002,.002)],'owldark',wing,sides=10))
-        union('Owl_WingSculpt',parts,'owldark',wing,voxel=.007,target=750)
-    sweep('Owl_Tail',[(0,.13,.19,.06,.035),(0,.22,.105,.07,.023),(0,.25,.075,.04,.018),(0,.26,.066,.003,.003)],'owldark',body,sides=14,plane='vertical')
-    if stage=='secondary':
-        return root
+        cover=sweep('Owl_WingCover',[(side*.18,-.01,.465,.035,.04),(side*.245,.03,.40,.045,.13),(side*.26,.055,.29,.035,.15),(side*.26,.09,.17,.022,.11),(side*.245,.12,.115,.002,.002)],'owldark',wing,sides=12,steps=3,plane='vertical')
+        for i in range(6):
+            y=-.075+i*.044;tip=.065+abs(i-2.5)*.013
+            feather=sweep('Owl_Primary',[(side*.25,y,.31,.024,.031),(side*.28,y+.04,.19,.025,.031),(side*.29,y+.075,tip+.035,.019,.027),(side*.29,y+.09,tip,.002,.002)],'owl',wing,sides=8,steps=2,plane='vertical')
+            paint(feather,lambda p: tuple(Vector(rgba('owl')).lerp(Vector(rgba('owldark')),smoothstep(.35,.75,math.sin(p.z*100+p.y*9))*.65)))
+        paint(cover,lambda p: tuple(Vector(rgba('owl')).lerp(Vector(rgba('owldark')),smoothstep(.15,.65,math.sin(p.z*76+p.y*12))*.7)))
+    for i in range(5):
+        x=(i-2)*.024
+        sweep('Owl_TailFeather',[(x,.12,.20,.025,.020),(x*1.25,.25,.11,.025,.014),(x*1.3,.30,.08,.018,.010),(x*1.3,.31,.078,.002,.002)],'owldark',body,sides=8,steps=2,plane='vertical')
+    if stage=='secondary':return root
+    # Shallow feather discs sit into the broad head instead of protruding eye plates.
     for side in (-1,1):
-        eye('Owl_Iris',(side*.098,-.183,.542),(.036,.012,.038),body,'gold')
-        eye('Owl_Pupil',(side*.098,-.194,.544),(.027,.007,.031),body)
-    sweep('Owl_Beak',[(0,-.187,.511,.035,.025),(0,-.22,.479,.028,.025),(0,-.226,.438,.009,.012),(0,-.22,.422,.002,.002)],'bill',body,sides=12,plane='vertical')
-    skin=next(ob for ob in root.children_recursive if ob.name.startswith('Owl_ContinuousSkin'))
+        eye('Owl_EyeRim',(side*.105,-.185,.637),(.048,.012,.049),body,'owldark')
+        eye('Owl_AmberIris',(side*.105,-.195,.637),(.036,.011,.038),body,'#d8a43a')
+        eye('Owl_Pupil',(side*.105,-.206,.637),(.017,.006,.022),body)
+        eye('Owl_Catchlight',(side*.105-.007,-.212,.651),(.004,.002,.004),body,'cream')
+        sweep('Owl_Brow',[(side*.025,-.176,.674,.002,.002),(side*.09,-.185,.690,.013,.009),(side*.17,-.154,.710,.016,.012),(side*.218,-.115,.72,.002,.002)],'owldark',body,sides=8,steps=2)
+        sweep('Owl_EarTuft',[(side*.175,.006,.713,.045,.030),(side*.219,.016,.80,.026,.020),(side*.247,.025,.863,.014,.013),(side*.258,.03,.89,.002,.002)],'owldark',body,sides=10,steps=3,plane='vertical')
+        sweep('Owl_OuterTuft',[(side*.207,.024,.72,.024,.023),(side*.253,.05,.785,.018,.015),(side*.267,.065,.833,.002,.002)],'owldark',body,sides=8,steps=2,plane='vertical')
+        sweep('Owl_TuftEdge',[(side*.175,-.029,.739,.025,.012),(side*.217,-.014,.817,.017,.010),(side*.253,.01,.879,.002,.002)],'owlface',body,sides=8,steps=2,plane='vertical')
+    sweep('Owl_HookedBeak',[(0,-.188,.605,.029,.025),(0,-.23,.563,.027,.024),(0,-.234,.535,.012,.014),(0,-.222,.519,.002,.002)],'ink',body,sides=10,steps=3,plane='vertical')
     def owl_color(p):
-        result=Vector(rgba('owl'))
-        front=1-smoothstep(-.15,-.11,p.y)
-        breast=(1-smoothstep(.75,1.15,(p.x/.14)**2+((p.z-.275)/.16)**2))
-        result=result.lerp(Vector(rgba('owlface')),breast*.6*front)
-        fleck=math.sin(p.x*64+p.z*11)*math.cos(p.z*70)
-        result=result.lerp(Vector(rgba('owldark')),smoothstep(.70,.97,fleck)*front*breast*.4)
-        disk=min(((p.x-side*.098)/.118)**2+((p.z-.544)/.146)**2 for side in (-1,1))
-        face=(1-smoothstep(.55,1.4,disk))*front
-        result=result.lerp(Vector(rgba('owlface')),face)
-        return tuple(result)
+        front=1-smoothstep(-.11,-.07,p.y)
+        breast=(1-smoothstep(.55,1.2,(p.x/.20)**2+((p.z-.33)/.235)**2))*front
+        result=Vector(rgba('owl')).lerp(Vector(rgba('owlface')),breast*.92)
+        streak=smoothstep(.76,.97,math.cos(p.x*90+math.sin(p.z*18)*.85))
+        barring=smoothstep(.5,.93,math.sin(p.z*130+p.x*14))
+        result=result.lerp(Vector(rgba('owldark')),front*breast*(streak*.68+barring*.17))
+        mottling=smoothstep(.45,.88,math.sin(p.x*61+p.z*27)*math.cos(p.z*91+p.y*38))
+        result=result.lerp(Vector(rgba('owldark')),mottling*(1-breast)*.50)
+        disk=min(((p.x-side*.105)/.14)**2+((p.z-.628)/.125)**2 for side in (-1,1))
+        face=(1-smoothstep(.6,1.15,disk))*(1-smoothstep(-.14,-.09,p.y))
+        return tuple(result.lerp(Vector(rgba('owlface')),face))
     paint(skin,owl_color)
+    # Tapered breast streaks remain readable at game distance without a texture.
+    for side in (-1,1):
+        for row in range(3):
+            for col in range(2):
+                z=.445-row*.082;x=side*(.052+col*.068)
+                y=-.137 if col else -.155
+                sweep('Owl_BreastStreak',[(x,y,z,.002,.002),(x+side*.008,y-.006,z-.016,.008,.003),(x+side*.016,y-.004,z-.045,.005,.003),(x+side*.022,y+.002,z-.067,.001,.001)],'owldark',body,sides=6,steps=2,plane='vertical')
     return root
 
 def webfoot(name,x,y,z,size,color,parent):

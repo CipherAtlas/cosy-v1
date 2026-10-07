@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Three real browser clients join one Worker",
+    "Real keyboard crossing stays grounded on client 1",
+    "Real keyboard crossing stays grounded on client 2",
+    "A third real client observes both accepted bank-to-bank crossings",
+    "The bridge observer reconnects to the same shared world",
+    "Reduced motion freezes the actual exported-app water clock",
+    "No page errors during shared bridge movement"
+  ],
+  "errors": [],
+  "limits": "Local exported app and real Worker; native keyboard at laptop/iPad CSS dimensions. Placement at each bank is a QA fixture; no inventory or claims are changed. No native or physical-device acceptance."
+}

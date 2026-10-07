@@ -94,7 +94,7 @@ def validate(doc):
             raise ValueError('A path needs control points.')
         if item['asset'] in ('horse-bay', 'horse-grey') and (any(n < .5 or n > 2 or abs(n - item['scale'][0]) > .001 for n in item['scale']) or abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
             raise ValueError('Horses need upright rotation and uniform scale between 0.5 and 2.')
-        if item['asset'] in ('horse-racetrack', 'horse-stable', 'farm-row', 'owl-feeding-perch', 'owl-brown', 'cow-highland', 'cow-highland-girl', 'sheep', 'lamb', 'hedgehog', 'apple-tree', 'mushroom-patch') and (abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
+        if item['asset'] in ('garden-kitchen', 'picnic-mat', 'horse-racetrack', 'horse-stable', 'farm-row', 'owl-feeding-perch', 'owl-brown', 'cow-highland', 'cow-highland-girl', 'sheep', 'lamb', 'hedgehog', 'apple-tree', 'mushroom-patch') and (abs(item['rotation'][0]) > .001 or abs(item['rotation'][2]) > .001):
             raise ValueError('Keep town activity objects upright. Turn them with Y rotation.')
     routes = doc.get('routes')
     if routes is not None:
@@ -126,7 +126,8 @@ SCENE_ASSETS.update(('land-tile-20', 'land-tile-40', 'land-hill', 'meadow-island
 SCENE_ASSETS.update(f'garden-{name}' for name in ('sunflower', 'daisy', 'iris', 'mint', 'reeds', 'lily', 'carrot', 'radish', 'basket', 'wateringcan', 'swan', 'duck', 'duckling', 'fish'))
 SCENE_ASSETS.update(('horse-racetrack', 'horse-stable', 'farm-row', 'hay-bale', 'owl-feeding-perch', 'owl-brown', 'cow-highland', 'cow-highland-girl', 'sheep', 'lamb', 'hedgehog', 'forage-apple', 'forage-mushroom', 'apple-tree', 'mushroom-patch'))
 SCENE_ASSETS.update(('villager-rusk', 'villager-poppy', 'villager-cress', 'villager-rowan'))
-SCENE_ASSETS.update(('grass-meadow', 'flower-meadow'))
+SCENE_ASSETS.update(('hill-waterfall', 'hill-rock-outcrop', 'grass-meadow', 'flower-meadow', 'garden-kitchen', 'picnic-mat', 'picnic-basket',
+    'picnic-food-gardenSoup', 'picnic-food-crispSalad', 'picnic-food-bakedApples', 'picnic-food-roastRoots'))
 SCENE_ASSETS.update(f'animal-{name}' for name in ('horse-bay', 'horse-grey', 'highland-copper', 'highland-flower',
     'dog-corgi', 'dog-shiba', 'dog-beagle', 'dog-samoyed', 'dog-collie', 'dog-shepherd',
     'sheep', 'lamb', 'cat', 'swan', 'owl', 'duck', 'duckling'))

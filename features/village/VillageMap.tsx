@@ -88,7 +88,7 @@ function MapArtwork({ scenery, current, position, language, readActors, mini = f
   return <svg viewBox={mapView(bounds, x, y, mini)} aria-hidden="true" className="v-map-art">
     <MapLandscape scenery={scenery} bounds={bounds} />
     {mini && <MapActors actors={actors} readActors={readActors} bounds={bounds} mini />}
-    {PLACES.map(place => <circle key={place.id} cx={point(place.position[0], place.position[2], bounds)[0]} cy={point(place.position[0], place.position[2], bounds)[1]} r={mini ? 6 : 4} fill="#476e58" stroke="#fff9e9" strokeWidth="2" />)}
+    {PLACES.filter(place => place.id !== "mood").map(place => <circle key={place.id} cx={point(place.position[0], place.position[2], bounds)[0]} cy={point(place.position[0], place.position[2], bounds)[1]} r={mini ? 6 : 4} fill="#476e58" stroke="#fff9e9" strokeWidth="2" />)}
     {mini && <MapPlayer x={location[0]} z={location[2]} bounds={bounds} heading={!current ? position?.heading : undefined} mini language={language} />}
   </svg>;
 }
@@ -192,7 +192,7 @@ export function VillageMap({ scenery, current, position, language, notice, trave
     return { x: world.x - (width - world.width) / 2, z: world.z - (height - world.height) / 2, width, height };
   }, [scenery, canvasSize]);
   const destinations = useMemo(() => [
-    ...PLACES.map((place, i) => ({ id: place.id as string, position: place.id === "compliment" ? scenery?.layout.items?.find(item => item.visible && item.asset === "postbox")?.position ?? place.position : place.position, name: place.name, japanese: JAPANESE_PLACE_NAMES[i], Icon: icons[i], outdoor: false })),
+    ...PLACES.map((place, i) => ({ id: place.id as string, position: place.id === "compliment" ? scenery?.layout.items?.find(item => item.visible && item.asset === "postbox")?.position ?? place.position : place.position, name: place.name, japanese: JAPANESE_PLACE_NAMES[i], Icon: icons[i], outdoor: false })).filter(place => place.id !== "mood"),
     ...outdoorMapDestinations(scenery?.layout).filter((place, i, list) => place.kind !== "swing" || i === list.findIndex(item => item.kind === "swing")).map(place => ({ ...place,
       name: place.kind === "swing" ? "Meadow Swings" : place.name, japanese: place.kind === "swing" ? "草原のブランコ" : place.japanese,
       position: [place.x, 0, place.z], Icon: place.kind === "tower" ? CastleTurret : place.kind === "owls" ? Bird : place.kind === "circuit" ? Timer : Leaf, outdoor: true })),

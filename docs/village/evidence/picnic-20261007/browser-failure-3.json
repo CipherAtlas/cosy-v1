@@ -1,0 +1,17 @@
+{
+  "self": "6f708611-94db-41c2-8780-6e66af8e3b4e",
+  "connected": true,
+  "blocked": false,
+  "context": {
+    "id": "picnic-hill-mat",
+    "kind": "picnic"
+  },
+  "bench": "picnic-hill-mat",
+  "seat": 3,
+  "pose": [
+    -99.50761978272662,
+    23.619999999999997,
+    -21.40034794194355
+  ],
+  "text": "Cloudy Wren\nRosy Kitten\nHearthwillow\nN\n↑\nM\nMap\nI\n,\nW\nA\nS\nD\nMove\nShift\nHold to run\nE\nInteract\nR\nRecover\nTab\nFocus next button\nClick to look · Esc to release\nEsc\nStand up\nB\nShare & eat\n4 blobs here\nHearthwillow chat\nSee everyone here (4)\n\nEveryone is in Hearthwillow. Messages clear each hour, next at 2:30 PM your time.\n\nNo messages yet."
+}

@@ -1,3 +1,4 @@
+import { RECIPES } from "./picnic";
 import type { TownActivityHUDState } from "./townProgress";
 import type { ForageInventory } from "./townShared";
 import { readInventory } from "./townShared";
@@ -33,6 +34,7 @@ export function VillageInventory({ inventory, language }: { inventory: ForageInv
     <dl>{([
       ["apples", t("Apples", "リンゴ")], ["mushrooms", t("Mushrooms", "キノコ")], ["carrots", t("Carrots", "ニンジン")], ["radishes", t("Radishes", "ラディッシュ")], ["mint", t("Mint leaves", "ミントの葉")],
       ["daisies", t("Daisies", "デイジー")], ["sunflowers", t("Sunflowers", "ヒマワリ")], ["mintTea", t("Mint tea", "ミントティー")],
+      ...RECIPES.map(recipe => [recipe.id, language === "ja" ? recipe.japanese : recipe.name] as const),
     ] as const).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{items[key]}</dd></div>)}</dl>
   </div>;
 }

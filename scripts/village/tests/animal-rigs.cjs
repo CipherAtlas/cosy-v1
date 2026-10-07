@@ -200,6 +200,23 @@ fs.mkdirSync(output, { recursive: true });
           `${slug}: native deformation leaves outer placement unchanged`);
         rigs.disposeAnimalRig(model);
       }
+      const restingOwl = rigs.makeAnimalRig('owl'), owlRest = skinBounds(restingOwl);
+      rigs.disposeAnimalRig(restingOwl);
+      for (const action of ['fly', 'glide', 'land', 'feed']) {
+        const model = rigs.makeAnimalRig('owl'), late = rigs.makeAnimalRig('owl');
+        const time = action === 'fly' ? 0 : .25;
+        rigs.animateAnimalRig(model, { action, time, reduced: false });
+        rigs.animateAnimalRig(late, { action, time, reduced: false });
+        const bounds = skinBounds(model);
+        check(JSON.stringify(bounds) === JSON.stringify(skinBounds(late)), `owl/${action}: a late observer samples the same finite skin pose`);
+        if (action !== 'feed') check(bounds.max[0] - bounds.min[0] > (owlRest.max[0] - owlRest.min[0]) * 1.6,
+          `owl/${action}: wings spread outward beyond the perched silhouette`);
+        rigs.animateAnimalRig(model, { action, time: 5, reduced: true, stillAction: action === 'feed' ? 'idle' : 'glide' });
+        const still = skinBounds(model);
+        rigs.animateAnimalRig(model, { action, time: 6, reduced: true, stillAction: action === 'feed' ? 'idle' : 'glide' });
+        check(JSON.stringify(still) === JSON.stringify(skinBounds(model)), `owl/${action}: reduced motion freezes the appropriate resting or spread-wing pose`);
+        rigs.disposeAnimalRig(model); rigs.disposeAnimalRig(late);
+      }
       const scene = new T.Scene(); scene.background = new T.Color('#dce3cb');
       scene.add(new T.HemisphereLight('#fff9df', '#71866b', 2.5));
       const sun = new T.DirectionalLight('#fff2d6', 3); sun.position.set(-4, 7, 5); scene.add(sun);
@@ -315,6 +332,19 @@ fs.mkdirSync(output, { recursive: true });
         await page.evaluate(action => rigPreview.render(action), action);
         await page.screenshot({ path: `${output}/horses-dogs-native-${action}.png` });
       }
+      await page.evaluate(async () => {
+        const T = await import('three'), rigs = await import('/modules/features/village/animalRig.js');
+        const { renderer, scene, camera, dogs, horses } = rigPreview;
+        dogs.forEach(dog => scene.remove(dog.model)); horses.forEach(horse => scene.remove(horse));
+        for (const [index, action] of ['idle', 'fly', 'glide'].entries()) {
+          const owl = rigs.makeAnimalRig('owl'); owl.position.set((index - 1) * 1.25, index ? .4 : 0, 0);
+          rigs.animateAnimalRig(owl, { action, time: .25, reduced: false }); scene.add(owl);
+        }
+        camera.position.set(1.8, 1.55, 5); camera.lookAt(0, .65, 0); scene.updateMatrixWorld(true); renderer.render(scene, camera);
+      });
+      await page.screenshot({ path: `${output}/owl-native-poses.png` });
+      await page.evaluate(() => { const { renderer, scene, camera } = rigPreview; camera.position.set(4.5, 1.5, 1.7); camera.lookAt(0, .65, 0); renderer.render(scene, camera); });
+      await page.screenshot({ path: `${output}/owl-native-side.png` });
     }
     report.requests = requests;
     for (const slug of report.placed) if (requests.filter(value => value === slug).length !== 1) throw Error(`${slug} was not cached after selective preload`);

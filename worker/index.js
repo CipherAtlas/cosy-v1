@@ -7,7 +7,7 @@ import { ACTIVITY_STAGES } from "../features/village/sharedActors.ts";
 
 const MAX_VISITORS = 64;
 const PRIVATE_CROP_KEYS = ["carrots", "radishes", "mint", "daisies", "sunflowers", "mintTea"];
-const INVENTORY_KEYS = ["apples", "mushrooms", ...PRIVATE_CROP_KEYS];
+const INVENTORY_KEYS = ["apples", "mushrooms", ...PRIVATE_CROP_KEYS, "gardenSoup", "crispSalad", "bakedApples", "roastRoots"];
 /** @param {import("../features/village/townShared").ForageInventory} [value] @returns {Required<import("../features/village/townShared").ForageInventory>} */
 function inventoryValue(value) {
   return /** @type {Required<import("../features/village/townShared").ForageInventory>} */ (Object.fromEntries(INVENTORY_KEYS.map(key => [key, Number.isFinite(value?.[key]) ? Math.max(0, Math.min(9999, Math.floor(value?.[key] ?? 0))) : 0])));
@@ -121,6 +121,7 @@ export class VillageWorld extends DurableObject {
       record = { inventory: inventoryValue(visitor.forageInventory), usedAt: Date.now() };
       this.inventories.set(token, record);
     }
+    this.simulation.picnic.resume(token, visitor.id);
     visitor.inventoryToken = token;
     visitor.forageInventory = { ...record.inventory };
     return token;
@@ -242,6 +243,7 @@ export class VillageWorld extends DurableObject {
     if (request.kind === "mapTravel") return this.simulation.mapTravel(visitor, request.id, now, this.visitors());
     if (visitor.lookout != null && !["leave", "activity"].includes(request.kind))
       return { ok: false, reason: "Come down from the lookout first." };
+    if (request.kind === "picnic") return this.simulation.picnic.action(visitor, request, now);
     if (request.kind === "town") return this.simulation.townInteraction(visitor, request, now, this.visitors());
     if (request.kind === "horse") return this.simulation.horseInteraction(visitor, request, now, this.visitors());
     if (this.simulation.mountedHorse(visitor.id)) {
@@ -311,13 +313,13 @@ export class VillageWorld extends DurableObject {
       return { ok: false, reason: "Come a little closer to the swing." };
     if (request.kind === "bench" && !visitor.requestingActivity && Math.hypot(item.x - visitor.x, item.z - visitor.z) > 3)
       return { ok: false, reason: "Come a little closer to the bench." };
-    /** @type {(0 | 1)[]} */
-    const choices = request.index === undefined ? [0, 1] : [request.index];
-    const index = choices.find(index => [0, 1].includes(index) && !this.visitors().some(other => other.id !== visitor.id
+    const capacity = request.kind === "bench" && "seatCount" in item ? Number(item.seatCount) : 2;
+    const choices = request.index === undefined ? Array.from({ length: capacity }, (_, index) => index) : [request.index];
+    const index = choices.find(index => Number.isInteger(index) && index >= 0 && index < capacity && !this.visitors().some(other => other.id !== visitor.id
       && other[request.kind]?.id === request.id && other[request.kind]?.index === index));
     if (index === undefined) return { ok: false, reason: "That seat is occupied. Try a free seat." };
     visitor.bench = visitor.swing = visitor.activity = visitor.activityPosition = null; visitor.holdingPuppy = null;
-    if (request.kind === "swing") visitor.swing = { id: request.id, index, angle: 0, velocity: 0 };
+    if (request.kind === "swing") visitor.swing = { id: request.id, index: /** @type {0 | 1} */ (index), angle: 0, velocity: 0 };
     else visitor.bench = { id: request.id, index };
     return { ok: true, index };
   }
@@ -491,6 +493,8 @@ export class VillageWorld extends DurableObject {
       visitor = socket.deserializeAttachment();
       this.restoreInventory(visitor);
       const privateTownAction = message.request?.kind === "town" && ["animalGift", "animalApple", "animalMushroom", "applePick", "gardenHarvest"].includes(message.request.action);
+      const privatePicnicAction = message.request?.kind === "picnic";
+      const beforePicnic = privatePicnicAction ? this.simulation.picnic.save() : null;
       const beforeTown = privateTownAction ? this.simulation.town.snapshot() : null;
       visitor.requestingActivity = message.request?.kind === "activity";
       const result = this.interaction(visitor, message.request, now);
@@ -502,8 +506,16 @@ export class VillageWorld extends DurableObject {
       if (result.ok) {
         if (message.request.kind === "town" && ["owlFood", "owlFeed"].includes(message.request.action))
           send(socket, { type: "crumbs", hasCrumbs: visitor.crumbPouch });
-        try { this.publishWorld(now, privateTownAction ? visitor : undefined); }
-        catch (error) { if (beforeTown) Object.assign(this.simulation.town.state, beforeTown); throw error; }
+        try { this.publishWorld(now, privateTownAction || privatePicnicAction ? visitor : undefined); }
+        catch (error) {
+          if (beforePicnic) {
+            this.simulation.picnic.state = beforePicnic.state; this.simulation.picnic.tokens = beforePicnic.tokens;
+            send(socket, { type: "interaction_result", requestId: message.requestId, result: { ok: false, reason: "Your basket couldn't be saved. Try again." } });
+            return;
+          }
+          if (beforeTown) Object.assign(this.simulation.town.state, beforeTown);
+          throw error;
+        }
         this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
           horse: visitor.horse ?? null, swing: visitor.swing ?? null, bench: visitor.bench ?? null, activity: visitor.activity ?? null });
       } else if (released) this.publishWorld(now);

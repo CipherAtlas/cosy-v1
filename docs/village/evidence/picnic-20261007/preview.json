@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Regular preview connects to the existing Worker on 2567",
+    "Regular Worker accepts kitchen:farm-kitchen travel",
+    "Regular Worker accepts picnic:picnic-hill-mat travel",
+    "Regular Worker and exported terrain agree on the 24 m summit",
+    "Regular export and Worker expose five actual picnic cushions",
+    "Regular Worker accepts a cushion and character/camera face the village",
+    "Regular-preview smoke releases its cushion",
+    "No page errors"
+  ],
+  "errors": [],
+  "limits": "Regular static export3051 and existing local Worker2567. No ingredient grants, private inventory modifications, Git writes or deployment."
+}

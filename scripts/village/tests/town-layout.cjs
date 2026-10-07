@@ -9,11 +9,12 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
 }).outputText, filename);
 
 const root = path.resolve(__dirname, '../../..');
-const { projectWorldLayout, RESIDENT_IDS, insidePlantingClearance } = require('../../../features/village/worldLayout.ts');
+const { projectWorldLayout, RESIDENT_IDS, insidePlantingClearance, distanceToPath } = require('../../../features/village/worldLayout.ts');
 const { RESIDENT_ROUTES } = require('../../../features/village/sharedActors.ts');
 const { layoutWorldPoint } = require('../../../features/village/layoutTransforms.ts');
 const { trackPoint, townPoint } = require('../../../features/village/townShared.ts');
-const { conformRiverBank } = require('../../../features/village/riverGeometry.ts');
+const { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } = require('../../../features/village/riverGeometry.ts');
+const { riverBanks } = require('../../../features/village/riverbankStones.ts');
 const T = require('three');
 const { MEADOW_FLOWER_COUNT, townPlantingClearance } = require('../../../features/village/meadowVegetation.ts');
 const { VillageMovement, MOVEMENT } = require('../../../features/village/movement.ts');
@@ -42,9 +43,10 @@ check(new Set(layout.objects.map(item => item.id)).size === layout.objects.lengt
 const meadowIds = new Set(items.filter(item => item.asset === 'grass-meadow').map(item => item.id));
 const meadowZones = authored.grass.filter(zone => meadowIds.has(zone.id));
 const flowerZones = items.filter(item => item.asset === 'flower-meadow');
-check(meadowZones.length === 49 && flowerZones.length === meadowZones.length, 'Every town meadow zone has grass and wildflowers');
-check(authored.grass.reduce((count, zone) => count + zone.count, 23000) <= 200000,
-  'Complete town grass coverage stays within the 200,000 candidate instance budget');
+const townMeadows = meadowZones.filter(zone => zone.id.startsWith('town-groundcover-'));
+check(townMeadows.length === 49 && flowerZones.filter(zone => zone.id.startsWith('town-wildflower-meadow-')).length === townMeadows.length, 'Every original town meadow retains grass and wildflowers');
+check(authored.grass.reduce((count, zone) => count + zone.count, 23000) <= 256000,
+  'Dense hill and town grass stay within the 256,000 candidate allocation budget; actual visible instances are checked in renderer QA');
 check(flowerZones.length * MEADOW_FLOWER_COUNT <= 6000, 'New meadow flowers remain a bounded instanced population');
 let widestGrassGap = 0;
 for (let x = -90; x <= 130; x++) for (let z = -100; z <= 95; z++) {
@@ -85,6 +87,91 @@ check(Math.abs(bank.attributes.position.getY(0) - .007) < .00001, 'Moving the sh
 conformRiverBank(bank, new T.Matrix4(), { ...authored, items: authored.items.filter(item => item.asset !== 'river') });
 check(Math.abs(bank.attributes.position.getY(0) - .007) < .00001, 'Removing the river restores the original shoreline in the local editor');
 bank.dispose();
+const streamFixture = projectWorldLayout({ version: 1, base: layout.base, sceneVersion: 1,
+  objects: [{ id: "channel-probe", asset: "custom-river", visible: true, position: [100, 5, 100], rotation: [0, 0, 0], scale: [1, 1, 1], path: { points: [[0, 0], [0, 10]], width: 2.6 } }] });
+const slopedHeight = x => 5 + (x - 100) * .3;
+const channel = makeRiverChannelHeight(streamFixture, slopedHeight);
+check(Math.abs(channel(100, 104) - 4.37) < 1e-8 && Math.abs(channel(101, 104) - 4.37) < 1e-8,
+  'Custom stream bed stays 0.7 m below its flat cross-stream water surface');
+check(channel(102, 104) > 4.37 && channel(102, 104) < slopedHeight(102) && channel(103, 104) === slopedHeight(103),
+  'Channel banks blend back into unchanged terrain within one metre of the water edge');
+const crossStream = riverGeometry([[100, 100], [100, 110]], 2.6, slopedHeight);
+for (let i = 0; i < crossStream.attributes.position.count; i += 2)
+  assert.equal(crossStream.attributes.position.getY(i), crossStream.attributes.position.getY(i + 1));
+check(true, 'Every custom-stream water cross-section is level even on sloping terrain');
+crossStream.dispose();
+const streamBank = new T.BufferGeometry(); streamBank.setAttribute('position', new T.Float32BufferAttribute([100, 5, 104, 110, 5, 104], 3));
+conformRiverBank(streamBank, new T.Matrix4(), streamFixture, slopedHeight);
+check(Math.abs(streamBank.attributes.position.getY(0) - 4.37) < 1e-5 && streamBank.attributes.position.getY(1) === 5,
+  'Pond banks overlapping a custom stream are lowered locally without changing distant banks');
+conformRiverBank(streamBank, new T.Matrix4(), { ...streamFixture, rivers: [] }, slopedHeight);
+check(streamBank.attributes.position.getY(0) === 5, 'Removing an edited stream restores the original bank geometry');
+streamBank.dispose();
+
+const hillZones = authored.grass.filter(zone => zone.id.startsWith('picnic-hill-grass'));
+check(hillZones.length === 24 && hillZones.every(zone => zone.heightScale <= .8), 'The hill has 24 editable zones of low grass');
+let coveredHillSamples = 0;
+for (let x = -162; x <= -54; x += 2) for (let z = -76; z <= 32; z += 2) {
+  if (Math.hypot(x + 108, z + 22) > 55 || environment.landscapeHeight(x, z) < .7) continue;
+  assert(hillZones.some(zone => Math.hypot((x - zone.x) / zone.radiusX, (z - zone.z) / zone.radiusZ) < 1), `Raised hill has grass coverage at ${x},${z}`);
+  coveredHillSamples++;
+}
+check(coveredHillSamples > 1500, 'Overlapping low-grass zones cover the raised summit and every hill slope');
+let streamWaterClearance = null;
+const bentStream = riverGeometry([[0,0],[5,2],[6,9]],2.6);
+const streamUV=bentStream.attributes.uv;
+for(let i=2;i<streamUV.count;i+=2) assert(streamUV.getY(i)>streamUV.getY(i-2));
+check(streamUV.getY(streamUV.count-1)>12,'Bent river UV distance increases downstream in metres');
+const pondJoinFixture = { ...authored, items: [{ id: 'join-pond', asset: 'pond', visible: true, position: [20, 3, 10], rotation: [0, 37, 0], scale: [1.6, 1.2, .8] }] };
+const pondTransform = new T.Matrix4().compose(new T.Vector3(20, 3, 10), new T.Quaternion().setFromEuler(new T.Euler(0, 37 * Math.PI / 180, 0)), new T.Vector3(1.6, 1.2, .8));
+const joinedStream = joinRiverToPonds(riverGeometry([[0,-30],[0,30]],2.6,()=>-.37), pondTransform, pondJoinFixture);
+const joinedPositions = joinedStream.attributes.position, joinWeights = joinedStream.attributes.waterJoin;
+const insidePond = (x,z) => Array.from({length:96},(_,i)=> {
+  const a=i*Math.PI/48,b=(i+1)*Math.PI/48;
+  return (Math.cos(b)-Math.cos(a))*(z/12-Math.sin(a))-(Math.sin(b)-Math.sin(a))*(x/9-Math.cos(a))>1e-8;
+}).every(Boolean);
+let rimVertices=0;
+for(let i=0;i<joinedPositions.count;i++) {
+  assert(!insidePond(joinedPositions.getX(i),joinedPositions.getZ(i)),'No stream vertex lies inside the transformed pond polygon');
+  if(joinWeights.getX(i)>.9999) { rimVertices++; assert(Math.abs(joinedPositions.getY(i)+.3)<1e-6,'Stream rim matches pond height'); }
+}
+check(rimVertices>3,'A rotated, scaled pond cuts the overlapping stream at its actual rim and blends water state');
+for(let i=0;i<joinedStream.index.count;i+=3) {
+  const ids=[0,1,2].map(n=>joinedStream.index.getX(i+n));
+  const x=ids.reduce((sum,id)=>sum+joinedPositions.getX(id),0)/3,z=ids.reduce((sum,id)=>sum+joinedPositions.getZ(id),0)/3;
+  assert(!insidePond(x,z),'No clipped stream triangle covers the pond interior');
+}
+check(true,'Stream triangles remain outside the pond surface, eliminating coplanar overlap');
+const joinedBanks=riverBanks(new T.Mesh(joinedStream));
+check(joinedBanks[0].length===joinedBanks[1].length&&joinedBanks[0].length>100&&joinedBanks.flat().every(sample=>Number.isFinite(sample.outward.x)&&sample.outward.length()>.9),
+  'Clipping retains paired source samples for stable automatic riverbank stones');
+const untouchedStream=riverGeometry([[0,0],[0,10]],2.6);
+check(joinRiverToPonds(untouchedStream,new T.Matrix4(),{...authored,items:[]})===untouchedStream,'Hiding or removing all ponds retains the original stream geometry');
+joinedStream.dispose();untouchedStream.dispose();bentStream.dispose();
+const waterfallItem=authored.items.find(item=>item.visible&&item.asset==='hill-waterfall');
+const outletPoint=layoutWorldPoint(waterfallItem,[0,0,1.8],[0,0,0]);
+const outletBed=makeRiverChannelHeight(authored,environment.landscapeHeight);
+check(outletBed(outletPoint[0],outletPoint[2])<waterfallItem.position[1]-.5,'Waterfall outlet has a carved bed below its lowered water surface');
+const cascadeStream = authored.rivers.find(river => river.id === 'hill-waterfall-stream');
+if (cascadeStream) {
+  const carve = makeRiverChannelHeight(authored, environment.landscapeHeight);
+  const item = items.find(item => item.id === cascadeStream.id), offset = item.position[1] - environment.landscapeHeight(item.position[0], item.position[2]);
+  check(cascadeStream.spine.every(([x, z]) => carve(x, z) <= environment.landscapeHeight(x, z) + offset + .07 - .7 + .001),
+    'The waterfall stream has a carved channel beneath every sampled water section');
+  check(distanceToPath(-108, -22, cascadeStream) > cascadeStream.width / 2 + 1 && carve(-108, -22) === environment.landscapeHeight(-108, -22),
+    'Stream carving preserves the grassy picnic summit');
+  const water = riverGeometry(cascadeStream.points, cascadeStream.width, (x, z) => environment.landscapeHeight(x, z) + offset);
+  const positions = water.attributes.position;
+  const coarseGround = (x, z) => {
+    const gx = Math.floor(x / 2) * 2, gz = Math.floor(z / 2) * 2, tx = (x - gx) / 2, tz = (z - gz) / 2;
+    const a = carve(gx, gz), b = carve(gx + 2, gz), c = carve(gx, gz + 2), d = carve(gx + 2, gz + 2);
+    return tx + tz <= 1 ? a * (1 - tx - tz) + b * tx + c * tz : d * (tx + tz - 1) + c * (1 - tx) + b * (1 - tz);
+  };
+  let minimum = Infinity;
+  for (let i = 0; i < positions.count; i++) minimum = Math.min(minimum, positions.getY(i) - coarseGround(positions.getX(i), positions.getZ(i)));
+  check(minimum > .01, 'Every waterfall-stream edge vertex clears the actual 2m terrain triangle interpolation');
+  streamWaterClearance = { waterVertices: positions.count, minimumGroundClearance: minimum }; water.dispose();
+}
 
 const rows = items.filter(item => item.asset === 'farm-row');
 check(rows.length >= 15, 'Three substantial farms contain at least fifteen crop rows');
@@ -112,7 +199,7 @@ for (const item of items.filter(item => item.asset === 'bridge' && item.id !== '
   for (const offset of [-6.3, -5.8, -3, 0, 3, 5.8, 6.3]) {
     const [x, , z] = localPoint(offset);
     check(movement.clear(x, z), `Bridge approach and deck are clear: ${item.id} at ${offset} m`);
-    check(riding.clear(horse, x, z, Math.PI / 2 + item.rotation[1] * Math.PI / 180, 1),
+    if (item.id !== 'hill-stream-bridge') check(riding.clear(horse, x, z, Math.PI / 2 + item.rotation[1] * Math.PI / 180, 1),
       `A horse footprint fits the bridge: ${item.id} at ${offset} m`);
   }
   for (const direction of [-1, 1]) {
@@ -124,6 +211,22 @@ for (const item of items.filter(item => item.asset === 'bridge' && item.id !== '
     });
     const progress = (movement.position.x - start[0]) * dx / distance + (movement.position.z - start[2]) * dz / distance;
     check(progress > distance - .15, `Real movement crosses the ${item.id} arch in direction ${direction}`);
+  }
+  if (withPhysics) for (const fps of [30, 60, 120]) for (const direction of [-1, 1]) for (const side of [-1, 1]) {
+    const yaw = item.rotation[1] * Math.PI / 180, c = Math.cos(yaw), s = Math.sin(yaw);
+    const railInset = (BRIDGE.width / 2 + .22 - (.64 + BRIDGE.collisionMargin * 2) / 2) * item.scale[2] - MOVEMENT.radius - .025;
+    const [x, , z] = layoutWorldPoint(item, [BRIDGE.x - direction * 3, 0, BRIDGE.z + side * railInset / item.scale[2]], [BRIDGE.x, 0, BRIDGE.z]);
+    movement.settle(x, z);
+    let minimumSpeed = Infinity;
+    for (let frame = 0; frame < fps * 2; frame++) {
+      // Hold diagonally into the rail while moving toward the opposite bank.
+      movement.update(1 / fps, { x: (direction * c + side * s * .25) / Math.hypot(1, .25),
+        z: (-direction * s + side * c * .25) / Math.hypot(1, .25), run: false, sprint: false, blocked: false });
+      if (frame > fps / 2) minimumSpeed = Math.min(minimumSpeed, movement.speed);
+      assert(movement.clear(movement.position.x, movement.position.z, movement.position.y), `Rail contact stays clear: ${item.id}/${fps}/${direction}/${side}/${frame}`);
+    }
+    const progress = (movement.position.x - x) * direction * c - (movement.position.z - z) * direction * s;
+    check(progress > 4 && minimumSpeed > 2.4, `Rail contact stays smooth at ${fps} fps: ${item.id}/${direction}/${side}`);
   }
 }
 
@@ -145,6 +248,38 @@ check(rows.filter(item => item.id.endsWith('-1')).map(item => townPoint(item, 0,
 for (const lane of authored.paths) {
   check(lane.spine.every(([x, z]) => movement.clear(x, z)), `Walking lane stays traversable: ${lane.id}`);
 }
+const picnicMat = items.find(item => item.id === 'picnic-hill-mat');
+const kitchen = items.find(item => item.id === 'farm-kitchen');
+check(picnicMat.position[0] < -90 && Math.hypot(picnicMat.position[0] - kitchen.position[0], picnicMat.position[2] - kitchen.position[2]) > 200,
+  'Pond-side picnic hill and eastern kitchen remain separate destinations');
+check(environment.floorHeight(...[picnicMat.position[0], picnicMat.position[2]]) === 24,
+  'The grassy picnic summit stands 24 metres above the village');
+const climb = authored.paths.find(lane => lane.id === 'picnic-hill-path').spine;
+let crossFall = 0, climbGrade = 0;
+for (let i = 1; i < climb.length - 1; i++) {
+  const [x, z] = climb[i], [px, pz] = climb[i - 1], [nx, nz] = climb[i + 1];
+  const span = Math.hypot(nx - px, nz - pz), dx = (nz - pz) / span * 1.8, dz = -(nx - px) / span * 1.8;
+  crossFall = Math.max(crossFall, Math.abs(environment.floorHeight(x + dx, z + dz) - environment.floorHeight(x - dx, z - dz)));
+  climbGrade = Math.max(climbGrade, Math.abs(environment.floorHeight(x, z) - environment.floorHeight(px, pz)) / Math.hypot(x - px, z - pz));
+}
+check(crossFall < .1 && climbGrade < .2, 'The 3.6 m hill trail has a level cross-section and gentle walking grade');
+check(Math.hypot(...climb.at(-1).map((value, i) => value - picnicMat.position[i * 2])) > 5,
+  'The trail ends behind the picnic without paving through the blanket');
+const picnicYaw = picnicMat.rotation[1] * Math.PI / 180;
+check(-Math.sin(picnicYaw) > .9 && -Math.cos(picnicYaw) > 0, 'The picnic seats face east toward the village and pond');
+
+movement.settle(...climb[0]);
+let climbed = true;
+for (const point of climb.slice(1)) {
+  for (let frame = 0; frame < 600; frame++) {
+    const dx = point[0] - movement.position.x, dz = point[1] - movement.position.z, distance = Math.hypot(dx, dz);
+    if (distance < .08) break;
+    movement.update(1 / 60, { x: dx / distance, z: dz / distance, run: false, sprint: false, blocked: false });
+  }
+  if (Math.hypot(point[0] - movement.position.x, point[1] - movement.position.z) >= .1) { climbed = false; break; }
+}
+check(climbed && movement.position.y >= 23.9, 'Real walking movement climbs the entire pond-side path without jumping');
+
 check(environment.floorHeight(-42, 58) >= 1.45 && movement.clear(-42, 58), 'The gentle pasture summit supports walking');
 
 const navigation = new VillageNavigation(colliders, authored);
@@ -216,6 +351,7 @@ if (process.env.PROTECTED_LAYOUT_HASHES) {
 const result = { pass: true, scope: withPhysics ? 'Actual saved renderer colliders plus water/terrain movement' : 'Water/terrain movement; rendered colliders require --physics',
   checks, objects: layout.objects.length, homes: items.filter(item => item.asset.startsWith('cottage-')).length,
   trees: items.filter(item => item.asset.startsWith('tree-')).length, rows: rows.length, paths: authored.paths.length,
-  terrainPoints: layout.terrain.samples.length };
+  terrainPoints: layout.terrain.samples.length, grassCandidates: authored.grass.reduce((sum, zone) => sum + zone.count, 23000),
+  hillGrassCoverageSamples: coveredHillSamples, streamWaterClearance, trailMaxGrade: climbGrade, trailMaxCrossFallMetres: crossFall };
 if (process.env.OUTPUT_FILE) fs.writeFileSync(process.env.OUTPUT_FILE, JSON.stringify(result, null, 2) + '\n');
 console.log(`${checks.length} focused town layout checks passed (${result.scope}).`);

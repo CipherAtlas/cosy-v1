@@ -33,6 +33,9 @@ const fs = require('fs');
   }
   const original=engine.frame.bind(engine);window.cpu=[];engine.frame=t=>{const start=performance.now();original(t);cpu.push(performance.now()-start)};
  });
+ if(process.env.FARM_STATE){const state=JSON.parse(fs.readFileSync(process.env.FARM_STATE,'utf8'));await page.evaluate(state=>{
+  engine.townScene.applyShared({beds:state.beds,owlFeedAt:null,owlOwner:null,owlUntil:0,harvest:{carrot:0,radish:0,mint:0},hayFeeds:[],race:null,rival:null,animals:[]},state.now);
+ },state);}
  let checks;
  if(process.env.CHECKS){checks=await page.evaluate(async()=>{engine.renderer.setAnimationLoop(null);engine.setBlocked(false);try{
   const tests=await import('/graphics-tests.js');
@@ -47,7 +50,7 @@ const fs = require('fs');
  const cases=process.env.CASES?process.env.CASES.split(','):['high','low'];
  for(const view of (process.env.VIEWS||'entry').split(',')) for(const variant of cases){
   await page.evaluate(view=>{
-   const views={entry:[.3,20,0,.25],pond:[-22,-3,.4,.28],pasture:[-47,-50,0,.25],stable:[25,-66,0,.25],orchard:[14,-26,0,.25],overhead:[.3,20,0,1.1]};
+   const views={entry:[.3,20,0,.25],pond:[-22,-3,.4,.28],pasture:[-47,-50,0,.25],stable:[25,-66,0,.25],orchard:[14,-26,0,.25],overhead:[.3,20,0,1.1],picnic:[-96,-20,-Math.PI/2,.15]};
    if(!views[view])throw Error(`Unknown profile view: ${view}`);
    engine.movement.settle(...views[view].slice(0,2));engine.yaw=views[view][2];engine.pitch=views[view][3];
   },view);

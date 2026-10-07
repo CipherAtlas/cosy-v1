@@ -1,0 +1,178 @@
+{
+  "checks": [
+    "Small riverbank stone has a rendered Nature shelf preview",
+    "2 m river has continuous rocks on both banks through its full length",
+    "2 m river keeps small, grounded, deterministic stones after transforms",
+    "6 m river has continuous rocks on both banks through its full length",
+    "6 m river keeps small, grounded, deterministic stones after transforms",
+    "18 m river has continuous rocks on both banks through its full length",
+    "18 m river keeps small, grounded, deterministic stones after transforms",
+    "All path and bridge paving crossings stay clear",
+    "Joined waterways have no stone rows across open water",
+    "Hidden rivers produce no stones",
+    "Editor width, bend and position changes regenerate bank rocks",
+    "River dressing and independently placed stone transforms survive JSON save/reload",
+    "Limestone stones provide a white vertex tint for the shared architecture material",
+    "Every rotated rock embeds 5.5–10 cm into the rendered transformed slope despite an incorrect original height callback",
+    "Clipped water joins support unequal bank samples without losing outward directions",
+    "Editor clips a stream at the pond rim and blends its surface state",
+    "Moving the pond restores the complete stream and JSON reload retains the new join",
+    "Named layout file persists the river and independent stone",
+    "Browser reload restores the saved river and stone transforms",
+    "Editor has no page errors"
+  ],
+  "result": {
+    "reports": [
+      {
+        "width": 2,
+        "count": 255,
+        "distances": [
+          {
+            "length": 113.24251314641083,
+            "first": 0.3958352779221732,
+            "last": 113.24251314641083,
+            "maxGap": 1.4057532176884138
+          },
+          {
+            "length": 113.15103976829823,
+            "first": 0,
+            "last": 112.48923369698673,
+            "maxGap": 1.4057353869611262
+          }
+        ],
+        "deterministic": true,
+        "small": true,
+        "elevated": true
+      },
+      {
+        "width": 6,
+        "count": 255,
+        "distances": [
+          {
+            "length": 113.33397886958943,
+            "first": 0.38304915869111567,
+            "last": 113.33397886958943,
+            "maxGap": 1.4074729731869837
+          },
+          {
+            "length": 113.0595740329164,
+            "first": 0,
+            "last": 112.40802948633775,
+            "maxGap": 1.4080766688273343
+          }
+        ],
+        "deterministic": true,
+        "small": true,
+        "elevated": true
+      },
+      {
+        "width": 18,
+        "count": 218,
+        "distances": [
+          {
+            "length": 96.73213200872445,
+            "first": 0.28533030971784595,
+            "last": 96.73213200872445,
+            "maxGap": 1.4926698452110827
+          },
+          {
+            "length": 96.05701210427812,
+            "first": 0.3805885474484028,
+            "last": 96.05701210427812,
+            "maxGap": 1.2767062145395514
+          }
+        ],
+        "deterministic": true,
+        "small": true,
+        "elevated": true
+      }
+    ],
+    "clearPaths": true,
+    "openJunction": true,
+    "hidden": true,
+    "updates": true,
+    "restored": true,
+    "transforms": true,
+    "whiteTint": true,
+    "groundedSlopes": true,
+    "independentBanks": true,
+    "joinedPondCut": true,
+    "pondMoveRestores": true,
+    "joinReload": true,
+    "contact": {
+      "groundedCount": 91,
+      "minimumContact": -0.0994451987952687,
+      "maximumContact": -0.05545550549155398
+    },
+    "fixture": {
+      "version": 1,
+      "base": "cosy-village-2026-09-27",
+      "sceneVersion": 1,
+      "name": "Riverbank working copy",
+      "objects": [
+        {
+          "id": "test-river",
+          "asset": "custom-river",
+          "name": "Test river",
+          "position": [
+            45,
+            2,
+            10
+          ],
+          "rotation": [
+            0,
+            32,
+            0
+          ],
+          "scale": [
+            1.2,
+            1,
+            1.2
+          ],
+          "visible": true,
+          "locked": false,
+          "path": {
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                -8,
+                -30
+              ],
+              [
+                0,
+                -50
+              ]
+            ],
+            "width": 12
+          }
+        },
+        {
+          "id": "test-stone",
+          "asset": "riverbank-stone",
+          "name": "Small riverbank stone",
+          "position": [
+            8,
+            1,
+            2
+          ],
+          "rotation": [
+            0,
+            43,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.9,
+            1.2
+          ],
+          "visible": true,
+          "locked": false
+        }
+      ]
+    }
+  },
+  "errors": []
+}

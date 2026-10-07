@@ -97,7 +97,7 @@ export function BirdActivity(p: GardenControls) {
 export function PondFeeding(p: GardenControls) {
   const ja = p.language === "ja";
   return <div className="v-garden-ritual">
-    {p.garden.crumbPouch && <ShortcutButton className="v-button" aria-keyshortcuts="F" onClick={() => p.onGardenAction({ kind: "feed" })}><Keycap aria-hidden="true">F</Keycap>{ja ? "アヒルたちにパンくずをあげる" : "Feed the little duckies"}</ShortcutButton>}
+    {p.garden.crumbPouch && <ShortcutButton className="v-button" aria-keyshortcuts="F" onClick={() => p.onGardenAction({ kind: "feed" })}><Keycap aria-hidden="true">F</Keycap>{ja ? "アヒルたちにパンくずをあげる" : "Feed the ducks"}</ShortcutButton>}
   </div>;
 }
 

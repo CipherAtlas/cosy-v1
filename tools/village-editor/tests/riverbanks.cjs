@@ -12,10 +12,10 @@ fs.mkdirSync(output, { recursive: true });
   const check = (ok, label) => { assert(ok, label); checks.push(label); console.log(label); };
   page.on('pageerror', error => errors.push(error.message));
   try {
-    await page.goto(url); await page.waitForFunction(() => window.cosyStudio, null, { timeout: 120000 });
+    await page.goto(url); await page.waitForFunction(() => window.cosyStudio, null, { timeout: Number(process.env.STUDIO_READY_TIMEOUT || 120000) });
     await page.locator('#search').fill('Small riverbank stone');
     const card = page.locator('[data-asset="riverbank-stone"]'); await card.waitFor();
-    await page.waitForFunction(() => document.querySelector('[data-asset="riverbank-stone"] img')?.src.startsWith('data:image'), null, { timeout: 120000 });
+    await page.waitForFunction(() => document.querySelector('[data-asset="riverbank-stone"] img')?.src.startsWith('data:image'), null, { timeout: Number(process.env.STUDIO_READY_TIMEOUT || 120000) });
     check(await card.locator('img').evaluate(image => image.naturalWidth === 240 && image.naturalHeight === 192), 'Small riverbank stone has a rendered Nature shelf preview');
     const result = await page.evaluate(async () => {
       const T = await import('/three/build/three.module.js');
@@ -24,23 +24,30 @@ fs.mkdirSync(output, { recursive: true });
       const { PlantingSurfaceMask } = await import('/modules/features/village/plantingClearance.js');
       const { LayoutScene, validateLayout } = await import('/modules/tools/village-editor/model.js');
       const material = new T.MeshStandardMaterial();
+      const clippedGeometry = riverGeometry([[0, 0], [0, 20]], 4);
+      for (let i = 0; i < clippedGeometry.attributes.uv.count; i++)
+        if (clippedGeometry.attributes.uv.getX(i) > .5 && i > 40) clippedGeometry.attributes.uv.setX(i, .5);
+      const clippedBanks = riverBanks(new T.Mesh(clippedGeometry, material));
+      const independentBanks = clippedBanks[0].length !== clippedBanks[1].length && clippedBanks.every(bank => bank.every(sample => sample.outward.toArray().every(Number.isFinite) && sample.outward.length() > .99));
+      clippedGeometry.dispose();
       const read = root => { const samples = [], matrix = new T.Matrix4(); root.traverse(mesh => { if (mesh instanceof T.InstancedMesh) for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); samples.push({ position: new T.Vector3().setFromMatrixPosition(matrix), scale: new T.Vector3().setFromMatrixScale(matrix), id: mesh.userData.layoutId }); } }); return samples; };
       const reports = [];
       for (const width of [2, 6, 18]) {
         const group = new T.Group(), ribbon = new T.Mesh(riverGeometry([[0, 0], [5, -30], [-6, -60], [0, -110]], width), material); group.add(ribbon);
         if (width === 18) { ribbon.rotation.y = .7; ribbon.scale.set(1.5, 1, .8); ribbon.position.set(30, 3, 10); }
-        const root = buildRiverbankStones(group, material, () => 0), samples = read(root), banks = riverBanks(ribbon);
+        const groundHeight = () => width === 18 ? 3 : 0;
+        const root = buildRiverbankStones(group, material, groundHeight), samples = read(root), banks = riverBanks(ribbon);
         const distances = banks.map(bank => {
           let total = 0; const chain = bank.map((sample, i) => { if (i) total += sample.point.distanceTo(bank[i - 1].point); return { ...sample, distance: total }; });
           const covered = [];
           for (const sample of samples) {
             const near = chain.reduce((best, entry) => Math.hypot(entry.point.x - sample.position.x, entry.point.z - sample.position.z) < Math.hypot(best.point.x - sample.position.x, best.point.z - sample.position.z) ? entry : best);
-            if (Math.hypot(near.point.x - sample.position.x, near.point.z - sample.position.z) < .7) covered.push(near.distance);
+            if (Math.hypot(near.point.x - sample.position.x, near.point.z - sample.position.z) < 1.5) covered.push(near.distance);
           }
           covered.sort((a, b) => a - b);
           return { length: total, first: covered[0], last: covered.at(-1), maxGap: Math.max(...covered.slice(1).map((d, i) => d - covered[i])) };
         });
-        const repeat = buildRiverbankStones(group, material, () => 0);
+        const repeat = buildRiverbankStones(group, material, groundHeight);
         reports.push({ width, count: samples.length, distances, deterministic: JSON.stringify(read(repeat)) === JSON.stringify(samples), small: samples.every(sample => sample.scale.x <= .5 && sample.scale.y <= .38), elevated: width !== 18 || samples.every(sample => sample.position.y > 3) });
         disposeRiverbankStones(root); disposeRiverbankStones(repeat); ribbon.geometry.dispose();
       }
@@ -71,7 +78,48 @@ fs.mkdirSync(output, { recursive: true });
       const transforms = placed.position.toArray().every((v, i) => v === saved.objects[1].position[i]) && placed.scale.toArray().every((v, i) => v === saved.objects[1].scale[i]) && Math.abs(placed.rotation.y - 43 * Math.PI / 180) < 1e-9;
       const tint = makeRiverbankStone(material).children[0].geometry.getAttribute('color');
       const whiteTint = Array.from(tint.array).every(value => value === 1);
-      return { reports, clearPaths, openJunction, hidden, updates, restored, transforms, whiteTint, fixture: saved };
+      const sloped = new T.Group(), terrainGeometry = new T.PlaneGeometry(60, 60, 4, 4); terrainGeometry.rotateX(-Math.PI / 2);
+      const terrainPositions = terrainGeometry.attributes.position;
+      for (let i = 0; i < terrainPositions.count; i++) terrainPositions.setY(i, -.8 + terrainPositions.getX(i) * .06 + terrainPositions.getZ(i) * .02);
+      terrainGeometry.computeVertexNormals();
+      const terrain = new T.Mesh(terrainGeometry, material); terrain.name = 'Valley ground'; terrain.position.set(5, .3, 0); terrain.rotation.y = .4;
+      sloped.add(terrain, new T.Mesh(riverGeometry([[0, -20], [2, 0], [0, 20]], 6), material));
+      const grounded = buildRiverbankStones(sloped, material, () => 8), ray = new T.Raycaster(), vertex = new T.Vector3(), matrix = new T.Matrix4();
+      let groundedCount = 0, minimumContact = Infinity, maximumContact = -Infinity;
+      grounded.traverse(mesh => { if (!(mesh instanceof T.InstancedMesh)) return;
+        for (let instance = 0; instance < mesh.count; instance++) {
+          mesh.getMatrixAt(instance, matrix); let contact = Infinity;
+          for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
+            vertex.fromBufferAttribute(mesh.geometry.attributes.position, i).applyMatrix4(matrix);
+            if (vertex.y > matrix.elements[13]) continue;
+            ray.set(new T.Vector3(vertex.x, 20, vertex.z), new T.Vector3(0, -1, 0));
+            const hit = ray.intersectObject(terrain)[0]; if (hit) contact = Math.min(contact, vertex.y - hit.point.y);
+          }
+          minimumContact = Math.min(minimumContact, contact); maximumContact = Math.max(maximumContact, contact); groundedCount++;
+        }
+      });
+      const groundedSlopes = groundedCount > 70 && minimumContact >= -.101 && maximumContact <= -.054;
+      disposeRiverbankStones(grounded); terrainGeometry.dispose();
+      scene.assets.set('pond', { template: new T.Group() });
+      const joinLayout = { ...saved, objects: [
+        { ...saved.objects[0], position: [0,0,0], rotation: [0,0,0], scale: [1,1,1], path: { points: [[0,-30],[0,30]], width: 2.6 } },
+        { ...saved.objects[1], id: 'join-pond', asset: 'pond', position: [0,0,0], rotation: [0,0,0], scale: [1,1,1] },
+      ] };
+      scene.apply(joinLayout); scene.conformPaths(() => 0);
+      const joinGeometry = scene.roots.get('test-river').children[0].geometry, joinedPosition = joinGeometry.attributes.position;
+      const joinedPondCut = Array.from({length:joinedPosition.count},(_,i)=>Math.hypot(joinedPosition.getX(i)/9,joinedPosition.getZ(i)/12)).every(radius=>radius>.999)
+        && Math.max(...joinGeometry.attributes.waterJoin.array)>.99;
+      joinLayout.objects[1].position[0] = 40;
+      scene.apply(joinLayout); scene.conformPaths(() => 0);
+      const fullPosition = scene.roots.get('test-river').children[0].geometry.attributes.position;
+      const pondMoveRestores = Array.from({length:fullPosition.count},(_,i)=>Math.abs(fullPosition.getZ(i))).some(z=>z<1);
+      const reloadedJoin = validateLayout(JSON.parse(JSON.stringify(joinLayout)), scene.assets);
+      scene.apply(reloadedJoin); scene.conformPaths(() => 0);
+      const restoredPosition = scene.roots.get('test-river').children[0].geometry.attributes.position;
+      const joinReload = JSON.stringify(Array.from(restoredPosition.array))===JSON.stringify(Array.from(fullPosition.array));
+      return { reports, clearPaths, openJunction, hidden, updates, restored, transforms, whiteTint, groundedSlopes, independentBanks,
+        joinedPondCut, pondMoveRestores, joinReload,
+        contact: { groundedCount, minimumContact, maximumContact }, fixture: saved };
     });
     for (const report of result.reports) {
       check(report.count > 200 && report.distances.every(bank => bank.first < 1 && bank.length - bank.last < 1.3 && bank.maxGap < 1.9), `${report.width} m river has continuous rocks on both banks through its full length`);
@@ -83,6 +131,10 @@ fs.mkdirSync(output, { recursive: true });
     check(result.updates, 'Editor width, bend and position changes regenerate bank rocks');
     check(result.restored && result.transforms, 'River dressing and independently placed stone transforms survive JSON save/reload');
     check(result.whiteTint, 'Limestone stones provide a white vertex tint for the shared architecture material');
+    check(result.groundedSlopes, 'Every rotated rock embeds 5.5–10 cm into the rendered transformed slope despite an incorrect original height callback');
+    check(result.independentBanks, 'Clipped water joins support unequal bank samples without losing outward directions');
+    check(result.joinedPondCut, 'Editor clips a stream at the pond rim and blends its surface state');
+    check(result.pondMoveRestores && result.joinReload, 'Moving the pond restores the complete stream and JSON reload retains the new join');
     await page.locator('#search').fill('');
     await page.screenshot({ path: path.join(output, 'editor.png') });
     await page.locator('#import-file').setInputFiles({ name: 'riverbank-working-copy.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(result.fixture)) });
@@ -91,7 +143,7 @@ fs.mkdirSync(output, { recursive: true });
     const saved = await page.evaluate(() => cosyStudio.snapshot());
     const disk = await (await page.request.get(`${url}/api/layouts/${saved.fileId}`)).json();
     check(JSON.stringify(disk.layout) === JSON.stringify(saved.layout), 'Named layout file persists the river and independent stone');
-    await page.reload(); await page.waitForFunction(() => window.cosyStudio, null, { timeout: 120000 });
+    await page.reload(); await page.waitForFunction(() => window.cosyStudio, null, { timeout: Number(process.env.STUDIO_READY_TIMEOUT || 120000) });
     check(JSON.stringify((await page.evaluate(() => cosyStudio.snapshot())).layout) === JSON.stringify(saved.layout), 'Browser reload restores the saved river and stone transforms');
     if (process.env.APPLY_TEST === '1') {
       const playable = await (await page.request.get(`${url}/api/playable`)).json();

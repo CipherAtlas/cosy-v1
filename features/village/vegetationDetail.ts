@@ -1,6 +1,18 @@
 import * as T from "three";
+import { optimizeGeometry } from "./geometryOptimization";
 
 const distantGeometry = new WeakMap<T.BufferGeometry, T.BufferGeometry>();
+
+export async function registerPlantDetail(meshes: T.InstancedMesh[]) {
+  const geometries = new Set(meshes.map(mesh => mesh.geometry));
+  await Promise.all([...geometries].map(async geometry => {
+    if (distantGeometry.has(geometry) || (geometry.index?.count ?? 0) < 600) return;
+    const distant = geometry.clone();
+    await optimizeGeometry(distant, .02);
+    if (distant.index!.count < geometry.index!.count) distantGeometry.set(geometry, distant);
+    else distant.dispose();
+  }));
+}
 
 /** The same blade tips, colors and wind; distant blades need only their outer contour. */
 export function registerGrassDetail(geometry: T.BufferGeometry) {

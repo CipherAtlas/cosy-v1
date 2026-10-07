@@ -13,8 +13,8 @@ export function farmCrop(item: WorldItem): TownCrop | null {
 }
 export type TownBed = { id: string; crop: TownCrop | null; plantedAt: number | null; wateredAt: number | null; growAt: number | null };
 export type TownFood = "apple" | "mushroom";
-export type ForageInventory = { apples: number; mushrooms: number; carrots?: number; radishes?: number; mint?: number; daisies?: number; sunflowers?: number; mintTea?: number };
-export const INVENTORY_KEYS = ["apples", "mushrooms", "carrots", "radishes", "mint", "daisies", "sunflowers", "mintTea"] as const;
+export type ForageInventory = { apples: number; mushrooms: number; carrots?: number; radishes?: number; mint?: number; daisies?: number; sunflowers?: number; mintTea?: number; gardenSoup?: number; crispSalad?: number; bakedApples?: number; roastRoots?: number };
+export const INVENTORY_KEYS = ["apples", "mushrooms", "carrots", "radishes", "mint", "daisies", "sunflowers", "mintTea", "gardenSoup", "crispSalad", "bakedApples", "roastRoots"] as const;
 export function readInventory(value?: ForageInventory | null): Required<ForageInventory> {
   return Object.fromEntries(INVENTORY_KEYS.map(key => [key, Number.isFinite(value?.[key]) ? Math.max(0, Math.min(9999, Math.floor(value![key]!))) : 0])) as Required<ForageInventory>;
 }

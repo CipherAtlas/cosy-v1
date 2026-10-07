@@ -1,0 +1,16 @@
+{
+  "self": "583e7014-4b3a-4e5e-87c4-81a0210f1940",
+  "connected": true,
+  "blocked": false,
+  "context": {
+    "id": "picnic-hill-mat",
+    "kind": "picnic"
+  },
+  "seat": null,
+  "pose": [
+    -100.64099852198129,
+    24,
+    -22.561361565207953
+  ],
+  "text": "Rosy Kitten\nGentle Turtle\nRosy Sparrow\nHearthwillow\nR\nN\n↑\nM\nMap\nI\n,\n✦\nMove\nRun\nJump\nDrag to look\nE\nOpen the picnic basket\n4 blobs here"
+}

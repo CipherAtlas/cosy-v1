@@ -1,0 +1,205 @@
+{
+  "status": "passed",
+  "checks": [
+    "All seventeen animals appear in the editor catalog",
+    "animal-horse-bay: rendered preview",
+    "animal-horse-bay: placement and transforms",
+    "animal-horse-grey: rendered preview",
+    "animal-horse-grey: placement and transforms",
+    "animal-highland-copper: rendered preview",
+    "animal-highland-copper: placement and transforms",
+    "animal-highland-flower: rendered preview",
+    "animal-highland-flower: placement and transforms",
+    "animal-dog-corgi: rendered preview",
+    "animal-dog-corgi: placement and transforms",
+    "animal-dog-shiba: rendered preview",
+    "animal-dog-shiba: placement and transforms",
+    "animal-dog-beagle: rendered preview",
+    "animal-dog-beagle: placement and transforms",
+    "animal-dog-samoyed: rendered preview",
+    "animal-dog-samoyed: placement and transforms",
+    "animal-dog-collie: rendered preview",
+    "animal-dog-collie: placement and transforms",
+    "animal-dog-shepherd: rendered preview",
+    "animal-dog-shepherd: placement and transforms",
+    "animal-sheep: rendered preview",
+    "animal-sheep: placement and transforms",
+    "animal-lamb: rendered preview",
+    "animal-lamb: placement and transforms",
+    "animal-cat: rendered preview",
+    "animal-cat: placement and transforms",
+    "animal-swan: rendered preview",
+    "animal-swan: placement and transforms",
+    "animal-owl: rendered preview",
+    "animal-owl: placement and transforms",
+    "animal-duck: rendered preview",
+    "animal-duck: placement and transforms",
+    "animal-duckling: rendered preview",
+    "animal-duckling: placement and transforms",
+    "Three.js loads every GLB with two independent colored skins and a ground pivot",
+    "Selective runtime loading returns only the requested animal",
+    "A layout containing only new animal art renders with its saved transform",
+    "All seventeen transforms survive named save",
+    "All seventeen transforms survive reload",
+    "Animal shelf fits 1280×800",
+    "Animal shelf fits 1024×700",
+    "Playable layout, protected presets and existing named designs remain byte-identical",
+    "No editor application page errors"
+  ],
+  "models": [
+    {
+      "id": "animal-horse-bay",
+      "triangles": 12148,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 2.0360618260701518e-8,
+      "height": 2.498883811030449
+    },
+    {
+      "id": "animal-horse-grey",
+      "triangles": 10692,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 2.0360618260701518e-8,
+      "height": 2.4994951283527063
+    },
+    {
+      "id": "animal-highland-copper",
+      "triangles": 10472,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 6.421459630464465e-8,
+      "height": 1.615709335705836
+    },
+    {
+      "id": "animal-highland-flower",
+      "triangles": 11480,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 6.421459630464465e-8,
+      "height": 1.615709335705836
+    },
+    {
+      "id": "animal-dog-corgi",
+      "triangles": 6660,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 1.7856534397709212e-8,
+      "height": 0.8022486512298421
+    },
+    {
+      "id": "animal-dog-shiba",
+      "triangles": 6660,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 2.299081747972923e-8,
+      "height": 0.8772483768061174
+    },
+    {
+      "id": "animal-dog-beagle",
+      "triangles": 6100,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 2.7073590756661582e-8,
+      "height": 0.8202935740056687
+    },
+    {
+      "id": "animal-dog-samoyed",
+      "triangles": 7060,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 8.266978238618785e-9,
+      "height": 1.0281277671993276
+    },
+    {
+      "id": "animal-dog-collie",
+      "triangles": 6932,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 2.2210960769873513e-8,
+      "height": 0.952305847927381
+    },
+    {
+      "id": "animal-dog-shepherd",
+      "triangles": 6532,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 1.061933608313578e-8,
+      "height": 1.1516981237445698
+    },
+    {
+      "id": "animal-sheep",
+      "triangles": 9496,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 4.5471110779284935e-8,
+      "height": 1.178812971537821
+    },
+    {
+      "id": "animal-lamb",
+      "triangles": 5800,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 3.0324377614709616e-8,
+      "height": 0.742652172068827
+    },
+    {
+      "id": "animal-cat",
+      "triangles": 5800,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 1.4847168242472232e-8,
+      "height": 0.7400097994552688
+    },
+    {
+      "id": "animal-swan",
+      "triangles": 5800,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 1.4735151315476969e-8,
+      "height": 1.174331142266271
+    },
+    {
+      "id": "animal-owl",
+      "triangles": 5800,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 0.000011370218683750908,
+      "height": 0.6184000764048883
+    },
+    {
+      "id": "animal-duck",
+      "triangles": 5408,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 1.4058073692390433e-8,
+      "height": 0.6148759698651216
+    },
+    {
+      "id": "animal-duckling",
+      "triangles": 5408,
+      "meshes": 2,
+      "skins": 2,
+      "colored": true,
+      "floor": 8.295812536987292e-9,
+      "height": 0.36892562107408644
+    }
+  ],
+  "errors": []
+}

@@ -9,7 +9,7 @@ import { townPlantingClearance } from "./worldLayout";
 import { inRiver } from "./environment";
 import { makeFlame } from "./flame";
 import { makeWater } from "./water";
-import { conformRiverBank, riverGeometry } from "./riverGeometry";
+import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } from "./riverGeometry";
 import { buildRiverbankStones } from "./riverbankStones";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
@@ -30,7 +30,7 @@ export { groundY, riverX } from "./environment";
 
 /** Optional authoring hook; the public village keeps its existing merged render path. */
 export type WorldLayoutCapture = (id: string, name: string, category: string, objects: T.Object3D[], pivot?: [number, number, number]) => void;
-export type VillageBench = { id: string; x: number; z: number; facing: number; seatHeight: number; birdClearing: boolean; hitBox: T.Box3 };
+export type VillageBench = { id: string; x: number; z: number; facing: number; seatHeight: number; seatSpacing?: number; seatCount?: number; birdClearing: boolean; hitBox: T.Box3 };
 
 export type World = {
   group: T.Group;
@@ -250,13 +250,25 @@ export async function buildWorld(
   const terrain = editableTerrain ? new T.PlaneGeometry(640, 640, 320, 320) : new T.PlaneGeometry(650, 650, 210, 210);
   terrain.rotateX(-Math.PI / 2);
   const pos = terrain.attributes.position;
+  const channelHeight = makeRiverChannelHeight(authored, landscapeHeight);
+  const terrainPlacement = !capture && authored.items?.find(item => item.visible && item.asset === "terrain");
+  const terrainTransform = new T.Matrix4();
+  if (terrainPlacement) terrainTransform.compose(new T.Vector3(...terrainPlacement.position),
+    new T.Quaternion().setFromEuler(new T.Euler(...terrainPlacement.rotation.map(T.MathUtils.degToRad) as [number, number, number])), new T.Vector3(...terrainPlacement.scale));
+  const terrainInverse = terrainTransform.clone().invert(), terrainPoint = new T.Vector3();
   const colors = [];
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i),
       z = pos.getZ(i);
     const height = sampleTerrainHeight(authored.terrain, x, z);
     const pondBaseDistance = capture ? Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz) : pondDistance(x, z);
-    pos.setY(i, pondBaseDistance < 1.35 ? Math.min(-.85, height) : height);
+    terrainPoint.set(x, pondBaseDistance < 1.35 ? Math.min(-.85, height) : height, z);
+    if (!capture) {
+      terrainPoint.applyMatrix4(terrainTransform);
+      terrainPoint.y = channelHeight(terrainPoint.x, terrainPoint.z, terrainPoint.y);
+      terrainPoint.applyMatrix4(terrainInverse);
+    }
+    pos.setXYZ(i, terrainPoint.x, terrainPoint.y, terrainPoint.z);
     const patch = .5 + .5 * Math.sin(x * .12) * Math.sin(z * .09);
     const c = new T.Color().setHSL(.235 + patch * .035, .54, .56 + patch * .13);
     colors.push(c.r, c.g, c.b);
@@ -501,8 +513,11 @@ export async function buildWorld(
   for (let i = 0; i < wp.count; i++) {
     const z = wp.getZ(i) * 220;
     wp.setXYZ(i, riverX(z) + wp.getX(i) * 6.4, -0.32, z);
+    wg.attributes.uv.setY(i, z + 110);
   }
   wg.computeVertexNormals();
+  wg.setAttribute("waterJoin", new T.Float32BufferAttribute(new Float32Array(wp.count), 1));
+  wg.setAttribute("waterPondUV", new T.Float32BufferAttribute(new Float32Array(wp.count * 2), 2));
   wg.userData.plantingSurface = "water";
   wg.userData.riverSurface = true;
   const water = add(wg, waterMat, 0, 0, 0);
@@ -511,6 +526,8 @@ export async function buildWorld(
   const pondGeo = new T.CircleGeometry(1, 96);
   pondGeo.rotateX(-Math.PI / 2);
   pondGeo.userData.plantingSurface = "water";
+  pondGeo.setAttribute("waterJoin", new T.Float32BufferAttribute(new Float32Array(pondGeo.attributes.position.count), 1));
+  pondGeo.setAttribute("waterPondUV", new T.Float32BufferAttribute(new Float32Array(pondGeo.attributes.position.count * 2), 2));
   const pond = add(pondGeo, pondSurface.material, POND.x, POND.y, POND.z, POND.rx, 1, POND.rz);
   pond.name = "Willow pond water";
   pond.castShadow = false;
@@ -519,7 +536,8 @@ export async function buildWorld(
   if (!capture) for (const river of authored.rivers ?? []) {
     const item = authored.items!.find(item => item.id === river.id)!;
     const offset = item.position[1] - landscapeHeight(item.position[0], item.position[2]);
-    const stream = add(riverGeometry(river.points, river.width, (x, z) => landscapeHeight(x, z) + offset), waterMat, 0, 0, 0);
+    const geometry = joinRiverToPonds(riverGeometry(river.points, river.width, (x, z) => landscapeHeight(x, z) + offset), new T.Matrix4(), authored);
+    const stream = add(geometry, waterMat, 0, 0, 0);
     stream.name = `Authored river ${river.id}`; stream.castShadow = false;
   }
   let layoutStart = group.children.length;
@@ -737,6 +755,12 @@ export async function buildWorld(
   // Apply the new colliders after seeded planting so unrelated scenery stays in place.
   colliders.pop();
   for (const placed of authored.benches) bench(placed.x, placed.z, placed.yaw, placed.scale[0], placed.id, placed.y, placed.scale[1], placed.scale[2]);
+  for (const item of authored.items ?? []) if (item.visible && item.asset === "picnic-mat") {
+    const yaw = item.rotation[1] * Math.PI / 180, offset = 1.35 * item.scale[2];
+    benches.push({ id: item.id, x: item.position[0] + Math.sin(yaw) * offset, z: item.position[2] + Math.cos(yaw) * offset,
+      facing: yaw, seatHeight: item.position[1] + .24 * item.scale[1], seatSpacing: .9 * item.scale[0], seatCount: 5, birdClearing: false,
+      hitBox: new T.Box3(new T.Vector3(-2.8 * item.scale[0], item.position[1], -.6 * item.scale[2]), new T.Vector3(2.8 * item.scale[0], item.position[1] + .3 * item.scale[1], .6 * item.scale[2])) });
+  }
   for (const placed of authored.swings) {
     const swing = new VillageSwingSet(placed); swings.push(swing); group.add(swing.root);
     colliders.push(...swing.colliders());
@@ -976,15 +1000,16 @@ export async function buildWorld(
     }
   });
   remove.forEach((o) => o.removeFromParent());
-  batches.forEach((surfaces, m) => surfaces.forEach((gs, surface) => {
+  for (const [m, surfaces] of batches) for (const [surface, gs] of surfaces) {
     const g = mergeGeometries(gs);
     gs.forEach((g) => g.dispose());
     if (g) {
+      await optimizeGeometry(g, .0001);
       if (surface) g.userData.plantingSurface = surface;
       const mesh = spatialBatch(g, m, 32); mesh.name = `Village architecture ${surface || m.name || m.type}`;
       mesh.receiveShadow = true; mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial; group.add(mesh); g.dispose();
     }
-  }));
+  }
   }
   const { trees, treeLod, treeRecords } = buildWorldLandscape({
     group, colliders, vegetation, wind, authored, mat, dummy, rnd, add,

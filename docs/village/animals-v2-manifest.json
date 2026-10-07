@@ -2971,32 +2971,32 @@
         "AnimalArt_Matte"
       ],
       "draws": 2,
-      "bytes": 349092,
-      "sha256": "9774daea09727e8284a382436a40c4b1b2f5ed2dadb75301f9bb80adc495da26",
+      "bytes": 453408,
+      "sha256": "e38f420c7af6b346cda81e72f020f7e0f03c0066be06682699f15be12c01e2c6",
       "boundsBlender": [
         [
-          -0.21802887320518494,
-          -0.17217406630516052,
-          0.0
+          -0.21740929782390594,
+          -0.17857027053833008,
+          1.1363435987732373e-05
         ],
         [
-          0.21826006472110748,
-          0.1876278519630432,
-          0.5122116208076477
+          0.21740929782390594,
+          0.21853095293045044,
+          0.6184000968933105
         ]
       ],
-      "decisions": "Continuous rounded head and breast with flush feather-color face disks, shallow eyes and broad folded wings; removes attached face plates.",
-      "optionalVariants": [
-        "barn-owl palette",
-        "sleeping pose",
-        "flight rig"
+      "decisions": [
+        "Eagle-owl reference: paired feather tufts, amber irises, broad soft facial discs and hooked charcoal beak.",
+        "Pale streaked breast, barred broad remiges, short fanned tail and feathered legs.",
+        "Shoulder and wrist skin opens the folded wings outward; two opaque material draws and a 5800 triangle budget."
       ],
+      "optionalVariants": [],
       "textures": 0,
       "uv": "non-overlapping Smart UV charts, reserved for future texture painting",
       "orientation": "metres; glTF Y up, +Z forward; ground origin",
       "animation": "Skinned anatomical rig; stationary root; native looping clips",
       "source": "assets/village/animals-v2/animal-rig-studio.blend#Animal_Owl",
-      "staticSha256": "ccecb3b134143e2052b2aa9576ba946737b26bf9c5a195855fc4c3b9e1497b85",
+      "staticSha256": "1e5ee97911c8106d8663008ecb87551359d3f44dc64f8d1e0b1d0cce713a24b2",
       "rigVersion": 1,
       "bones": [
         "Body",
@@ -3006,9 +3006,11 @@
         "LegFrontLeft",
         "LegFrontLeftLower",
         "WingLeft",
+        "WingTipLeft",
         "LegFrontRight",
         "LegFrontRightLower",
-        "WingRight"
+        "WingRight",
+        "WingTipRight"
       ],
       "bonePivotsBlender": {
         "Body": [
@@ -3042,9 +3044,14 @@
           0.03150000050663948
         ],
         "WingLeft": [
-          -0.1119999960064888,
-          -0.0139999995008111,
-          0.335999995470047
+          -0.12600000202655792,
+          -0.00699999975040555,
+          0.3255000114440918
+        ],
+        "WingTipLeft": [
+          -0.18199999630451202,
+          0.03150000050663948,
+          0.19949999451637268
         ],
         "LegFrontRight": [
           0.07000000029802322,
@@ -3057,9 +3064,14 @@
           0.03150000050663948
         ],
         "WingRight": [
-          0.1119999960064888,
-          -0.0139999995008111,
-          0.335999995470047
+          0.12600000202655792,
+          -0.00699999975040555,
+          0.3255000114440918
+        ],
+        "WingTipRight": [
+          0.18199999630451202,
+          0.03150000050663948,
+          0.19949999451637268
         ]
       },
       "clips": {
@@ -3067,71 +3079,90 @@
         "walk": 1.2,
         "pet": 3.0,
         "fly": 1.0,
-        "swim": 2.0
+        "swim": 2.0,
+        "glide": 3.0,
+        "land": 1.2,
+        "feed": 1.8
       },
       "skinning": {
         "owl_coat": {
-          "weightedVertices": 2350,
-          "blendedVertices": 599,
+          "weightedVertices": 1850,
+          "blendedVertices": 445,
           "jointVertices": {
-            "Body": 511,
-            "Neck": 271,
-            "Head": 750,
-            "Tail": 469,
-            "LegFrontLeft": 43,
-            "LegFrontLeftLower": 181,
-            "WingLeft": 369,
-            "LegFrontRight": 47,
-            "LegFrontRightLower": 180,
-            "WingRight": 375
+            "Body": 405,
+            "Neck": 247,
+            "Head": 622,
+            "Tail": 174,
+            "LegFrontLeft": 14,
+            "LegFrontLeftLower": 120,
+            "WingLeft": 102,
+            "WingTipLeft": 226,
+            "LegFrontRight": 16,
+            "LegFrontRightLower": 120,
+            "WingRight": 102,
+            "WingTipRight": 226
           }
         },
         "owl_eyes": {
-          "weightedVertices": 584,
+          "weightedVertices": 1168,
           "blendedVertices": 0,
           "jointVertices": {
             "Body": 0,
             "Neck": 0,
-            "Head": 584,
+            "Head": 1168,
             "Tail": 0,
             "LegFrontLeft": 0,
             "LegFrontLeftLower": 0,
             "WingLeft": 0,
+            "WingTipLeft": 0,
             "LegFrontRight": 0,
             "LegFrontRightLower": 0,
-            "WingRight": 0
+            "WingRight": 0,
+            "WingTipRight": 0
           }
         }
       },
       "restArtworkHashes": {
-        "owl_coat": "27231b0a6ade0b0d03536ddb5467b4f5199421badf94a38c606cb252a000456d",
-        "owl_eyes": "af32c500ec00007a79a571e897536b5da38c7830524a981deb0f6e8bec68ca93"
+        "owl_coat": "9b8a2a46db31bfabbd0a4d84ce10ab83bd1f012c61c220da93e66199e05ff643",
+        "owl_eyes": "95e7cd11c6703e50eb7ba41fd55d5eb69e8d260c898b8d2b9783158e5ae40a71"
+      },
+      "restAttributeFingerprints": {
+        "owl_coat_mesh.001": "985cccb682bf0a3444ccc6853b7cbfb87efc10acba30aad3574d04556d48f52a",
+        "owl_eyes_mesh.001": "5714e64ae3627cc611b6ed0b6a50168509407abfbf28ca4e5c2262c44c2c00ec"
       },
       "deformation": {
         "idle": {
-          "maxDeformation": 0.005636042879557404,
+          "maxDeformation": 0.020229460531124198,
           "loopSeam": 0.0
         },
         "walk": {
-          "maxDeformation": 0.03310824203883949,
+          "maxDeformation": 0.03275506939124318,
           "loopSeam": 0.0
         },
         "pet": {
-          "maxDeformation": 0.039988446956575566,
+          "maxDeformation": 0.040799107233008024,
           "loopSeam": 0.0
         },
         "fly": {
-          "maxDeformation": 0.21448711879353474,
+          "maxDeformation": 0.16893447995600075,
           "loopSeam": 0.0
         },
         "swim": {
-          "maxDeformation": 0.04704773512790093,
+          "maxDeformation": 0.04643711690123771,
+          "loopSeam": 0.0
+        },
+        "glide": {
+          "maxDeformation": 0.01979244463533996,
+          "loopSeam": 0.0
+        },
+        "land": {
+          "maxDeformation": 0.06822075585702221,
+          "loopSeam": 0.0
+        },
+        "feed": {
+          "maxDeformation": 0.07544039916855767,
           "loopSeam": 0.0
         }
-      },
-      "restAttributeFingerprints": {
-        "owl_coat_mesh": "d05746312f77c8b9d0a9c8030e22eaf338c68ff89e03386a4b0d87c0376177f7",
-        "owl_eyes_mesh": "1150172f25aea546da590b1864b5cf78b4e8ee01ad435d2186de04a46d69a6dc"
       }
     },
     {
@@ -3479,6 +3510,6 @@
       }
     }
   ],
-  "staticArtworkSourceSha256": "68bb9eb0567d2c99dcfdf5cb450fa8af1e0319192240156f0c5425745cb89205",
+  "staticArtworkSourceSha256": "55744328f33889e3843b6d540c2d661f82b2ba70308c5f5d364dc817358af46c",
   "rigProducer": "scripts/village/rig_animal_art.py"
 }

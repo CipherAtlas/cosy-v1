@@ -7,7 +7,7 @@ import type { ForageInventory } from "./townShared";
 
 export type SharedSwingRide = SwingSeat & { angle: number; velocity: number };
 export type SharedPuppyTrick = { id: string; command: PuppyCommand; x: number; z: number; heading: number; startedAt: number };
-export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null };
+export type SharedVisitor = { id: string; name: string; color: string; slot: number; x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: { id: string; index: number } | null; activity?: PlaceId | null };
 export type SharedChatEntry = { id?: string; messageId?: string; name: string; message: string; sentAt?: number };
 export type SharedWorldConnection = {
   sendGarden: (action: GardenAction) => void;
@@ -21,7 +21,7 @@ export type SharedWorldConnection = {
 type WorldMessage =
   | { type: "welcome"; protocol?: number; world?: SharedActors; hasCrumbs?: boolean; forageInventory?: ForageInventory; inventoryToken?: string; selfId: string; visitors: SharedVisitor[]; garden: GardenState; chatHour: number; chat: SharedChatEntry[]; puppyTricks?: SharedPuppyTrick[] }
   | { type: "join"; visitor: SharedVisitor }
-  | { type: "move"; id: string; x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null }
+  | { type: "move"; id: string; x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: { id: string; index: number } | null; activity?: PlaceId | null }
   | { type: "actors"; world: SharedActors }
   | { type: "crumbs"; hasCrumbs: boolean }
   | { type: "forageInventory"; inventory: ForageInventory; token?: string }
@@ -38,7 +38,7 @@ type WorldMessage =
   | { type: "error"; message: string };
 
 export function connectSharedWorld(options: {
-  getPose: () => { x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: SwingSeat | null; activity?: PlaceId | null; active?: boolean; holdingPuppy?: string | null } | null;
+  getPose: () => { x: number; y?: number; z: number; heading: number; lookout?: number | null; horse?: string | null; swing?: SharedSwingRide | null; bench?: { id: string; index: number } | null; activity?: PlaceId | null; active?: boolean; holdingPuppy?: string | null } | null;
   onState: (snapshot: { selfId: string; visitors: SharedVisitor[]; garden: GardenState; gardenChanged: boolean; chatHour: number; chat: SharedChatEntry[] }) => void;
   onChat: (entry: SharedChatEntry) => void;
   onChatModerated?: (removedMessageIds: string[]) => void;

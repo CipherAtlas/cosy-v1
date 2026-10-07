@@ -1,4 +1,5 @@
 "use client";
+import { recipeById, type PicnicContext, type SharedPicnic, type PicnicAction } from "./picnic";
 import { readVillageLanguage, villageNotice } from "./localization";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -6,6 +7,7 @@ import { TouchControls } from "./TouchControls";
 import { VillageMenus, type VillagePanel } from "./VillageMenus";
 import { VillageStartScreen } from "./VillageStartScreen";
 import { TownActivityHUD } from "./TownActivityHUD";
+import { CookingHUD } from "./PicnicControls";
 import type { TownActivityHUDState } from "./townProgress";
 import { readInventory, withGardenInventory, type ForageInventory } from "./townShared";
 import { KeybindingContext, Keycap, ShortcutButton } from "./KeybindingControls";
@@ -128,6 +130,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [ridingHorse, setRidingHorse] = useState<NearbyHorse | null>(null);
   const [townContext, setTownContext] = useState<TownContext | null>(null);
   const [activityHUD, setActivityHUD] = useState<TownActivityHUDState | null>(null);
+  const [picnicContext, setPicnicContext] = useState<PicnicContext | null>(null);
+  const [picnicState, setPicnicState] = useState<SharedPicnic>();
   const [inventory, setInventory] = useState<ForageInventory>(() => readInventory());
   const inventoryRef = useRef(inventory);
   const [garden, setGarden] = useState(freshGarden);
@@ -194,7 +198,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     setNotice("Session complete.");
   });
   const openPlace = useCallback((id: PlaceId) => {
-    const enter = (index?: 0 | 1, position?: [number, number, number]) => {
+    const enter = (index?: number, position?: [number, number, number]) => {
       engine.current?.setActivitySeat(index, position);
       setPlace(id); setActivityCompact(false); setPanel(null);
       engine.current?.travel(id); audio.current?.setPlace(id);
@@ -383,6 +387,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         if (cancelled) return;
         engine.current?.setSharedConnected(true);
         engine.current?.setSharedActors(world, selfId);
+        setPicnicState(world.picnic);
         const next = world.actors.filter(actor => actor.kind === "resident" && actor.following && actor.owner === selfId).map(actor => actor.id);
         if (next.join("|") !== companionsRef.current.join("|")) {
           companionsRef.current = next; setCompanions(next); engine.current?.setCompanions(next);
@@ -475,6 +480,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           gardenSound: (kind, position) => audio.current?.gardenEffect(kind, position),
           nearGarden: setNearGarden,
           gardenInteract: interactGarden,
+          picnicContext: setPicnicContext,
+          picnicOpen: context => { setPicnicContext(context); setPanel(context.kind); },
           nearPuppy: setNearPuppy,
           cottageCat: setCottageCat,
           puppyFollowing: puppies => {
@@ -613,6 +620,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       if (e.defaultPrevented || e.repeat || e.isComposing) return;
       if (e.key === "Escape" && entered && !panel && !sceneryLoading) {
         e.preventDefault();
+        engine.current?.escapeWorld();
         escapeInteraction.current();
         return;
       }
@@ -712,6 +720,18 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const showWorldInteraction = entered && !place;
   const chatCooldownSeconds = Math.min(3, Math.ceil(Math.max(0, chatCooldownUntil - Date.now()) / 1000));
   const chatPeople = chatOpen ? [...sharedPeople].sort((a, b) => a.id === sharedSelfId ? -1 : b.id === sharedSelfId ? 1 : 0) : [];
+  const picnicAct = async (request: PicnicAction) => {
+    const result = await sharedTrialRef.current?.interact(request);
+    if (!result?.ok) setNotice(result?.reason ?? "Wait for the village to reconnect.");
+    else {
+      setNotice(request.action === "eat" ? "Portion eaten." : "");
+      if (request.action === "cook") {
+        setPanel(null);
+        canvas.current?.querySelector("canvas")?.focus();
+      }
+    }
+    return !!result?.ok;
+  };
   const localizedNotice = villageNotice(notice, language);
   const chatTime = (time: number) => new Date(time).toLocaleTimeString(ja ? "ja-JP" : "en-US", { hour: "numeric", minute: "2-digit" });
   const puppyName = nearPuppy ? t(nearPuppy.name, nearPuppy.name === PUPPY_INFO[nearPuppy.breed].name ? PUPPY_INFO[nearPuppy.breed].japanese : nearPuppy.name) : "";
@@ -722,7 +742,9 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const nearbyAction = nearGarden ? nearbyGardenAction(nearGarden, garden) : null;
   const showLookout = showWorldInteraction && (lookout.nearby || lookout.inside || lookout.pending) && !panel && !sceneryLoading;
   const showHorseActions = showWorldInteraction && !showLookout && !!(nearHorse || ridingHorse) && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
-  const showTownActions = showWorldInteraction && !showLookout && !!townContext && !showHorseActions && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
+  const kitchenBusy = picnicContext?.kind === "kitchen" && picnicState?.cooking.some(job => job.kitchen === picnicContext.id && (job.owner === sharedSelfId || job.readyAt > (engine.current?.getSharedNow() ?? Date.now())));
+  const showPicnicActions = showWorldInteraction && !!picnicContext && !showLookout && !showHorseActions && !seatedBench && !kitchenBusy;
+  const showTownActions = !picnicContext && showWorldInteraction && !showLookout && !!townContext && !showHorseActions && !seatedBench && !ridingSwing && !panel && !sceneryLoading;
   const showSwingActions = showWorldInteraction && !showLookout && !showHorseActions && !showTownActions && !!(nearSwing || ridingSwing) && !panel && !sceneryLoading;
   const showPuppyActions = showWorldInteraction && !showLookout && !showHorseActions && !showTownActions && !!nearPuppy && !nearBench && !seatedBench && !showSwingActions && !nearbyAction && !nearBirds && !panel && !sceneryLoading;
   const puppyIsFollowing = followingPuppies.some(puppy => puppy.id === nearPuppy?.id);
@@ -757,8 +779,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     : nearbyAction?.kind === "harvest" ? t("Pick your harvest", "収穫する")
     : nearbyAction?.kind === "basket" ? t("Open harvest basket", "収穫かごを開く")
     : nearbyAction?.kind === "flowers" ? t("Water the irises", "アイリスに水をあげる")
-    : nearbyAction?.kind === "feed" ? garden.crumbPouch ? t("Feed the little duckies", "アヒルたちにパンくずをあげる") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")
-    : t("Enjoy your mint tea", "ミントティーを楽しむ");
+    : nearbyAction?.kind === "feed" ? garden.crumbPouch ? t("Feed the ducks", "アヒルたちにパンくずをあげる") : t("Find Maple or Wren for crumbs", "メープルかレンからパンくずをもらう")
+    : t("Drink mint tea", "ミントティーを飲む");
   const placeName = (id: PlaceId) =>
     ja
       ? japaneseNames[PLACES.findIndex((p) => p.id === id)]
@@ -774,10 +796,10 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       {sceneryLoading && typeof document !== "undefined" && createPortal(<div className="v-scenery-loading" role="status" aria-live="polite" aria-busy="true">
         <div className="v-scenery-loading-content">
           <Leaf size={35} weight="light" aria-hidden="true" />
-          <h2>{t("Preparing the sky", "空を準備しています")}</h2>
-          <p>{sceneryLoading === "night" ? t("Starlit night", "星降る夜")
+          <h2>{t("Changing weather", "天気を変更中")}</h2>
+          <p>{sceneryLoading === "night" ? t("Night", "夜")
             : sceneryLoading === "dusk" ? t("Blue hour", "薄暮")
-            : sceneryLoading === "rain" ? t("Rainy afternoon", "雨の午後")
+            : sceneryLoading === "rain" ? t("Rain", "雨")
             : t("Golden hour", "夕暮れ")}</p>
           <span className="v-scenery-loading-line" aria-hidden="true" />
         </div>
@@ -846,6 +868,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           </footer>
         </>
       )}
+      {showWorldInteraction && !panel && !sceneryLoading && picnicContext?.kind === "picnic" && mouseLook === "locked" && <span className="v-picnic-reticle" aria-hidden="true" />}
       {touchControls && entered && !panel && !sceneryLoading && <TouchControls
         key={`${place ?? "outdoor"}-${!!seatedBench}-${!!ridingSwing}-${!!ridingHorse}-${lookout.inside}`}
         engine={engine} canMove={!place && !seatedBench && !ridingSwing}
@@ -882,7 +905,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         </ShortcutButton>
         <ShortcutButton className="v-interact v-scene-toggle" aria-keyshortcuts="U" aria-controls="v-activity-panel" aria-expanded={!activityCompact} onClick={()=>setActivityCompact(value=>!value)}>
           <Keycap aria-hidden="true">U</Keycap>
-          {activityCompact ? t("Show activity", "操作を表示") : t("Enjoy the view", "景色を楽しむ")}<CaretDown size={16} style={{transform:activityCompact?"rotate(180deg)":undefined}} />
+          {activityCompact ? t("Show activity", "操作を表示") : t("Hide activity controls", "操作を隠す")}<CaretDown size={16} style={{transform:activityCompact?"rotate(180deg)":undefined}} />
         </ShortcutButton>
         </div>
       )}
@@ -961,11 +984,15 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           </div>}
         </section>}
         {showWorldInteraction && seatedBench && <div className="v-bench-actions">
-          <ShortcutButton className="v-interact" aria-keyshortcuts="E Escape" onClick={() => { engine.current?.stand(); canvas.current?.querySelector("canvas")?.focus(); }}><Keycap aria-hidden="true">Esc</Keycap>{t("Stand up", "立ち上がる")}</ShortcutButton>
+          <ShortcutButton className="v-interact" aria-keyshortcuts={picnicContext?.kind === "picnic" ? "Escape" : "E Escape"} onClick={() => { engine.current?.stand(); canvas.current?.querySelector("canvas")?.focus(); }}><Keycap aria-hidden="true">Esc</Keycap>{t("Stand up", "立ち上がる")}</ShortcutButton>
+          {picnicContext?.kind === "picnic" && <>
+            {picnicContext.dish && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => engine.current?.interactPicnic()}><Keycap aria-hidden="true">E</Keycap>{t("Eat a portion", "1人分を食べる")}</ShortcutButton>}
+            <ShortcutButton className="v-interact" aria-keyshortcuts="F" onClick={() => engine.current?.openPicnicBasket()}><Keycap aria-hidden="true">F</Keycap>{t("Share & eat", "料理を分ける・食べる")}</ShortcutButton>
+          </>}
           <button className="v-context-close" aria-label={t("Leave bench", "ベンチを離れる")} onClick={() => { engine.current?.stand(); canvas.current?.querySelector("canvas")?.focus(); }}><X size={18} aria-hidden="true" /></button>
         </div>}
-        {showWorldInteraction && !seatedBench && nearBench && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => { engine.current?.sit(nearBench); canvas.current?.querySelector("canvas")?.focus(); }}><Keycap aria-hidden="true">E</Keycap>{t("Sit on the bench", "ベンチに座る")}</ShortcutButton>}
-        {showWorldInteraction && !showTownActions && !showHorseActions && !seatedBench && !nearBench && nearGarden && nearbyAction && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => interactGarden(nearGarden)}><Keycap aria-hidden="true">E</Keycap>{nearbyLabel}<Leaf size={17} /></ShortcutButton>}
+        {showWorldInteraction && !showPicnicActions && !seatedBench && nearBench && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => { engine.current?.sit(nearBench); canvas.current?.querySelector("canvas")?.focus(); }}><Keycap aria-hidden="true">E</Keycap>{t("Sit on the bench", "ベンチに座る")}</ShortcutButton>}
+        {showWorldInteraction && !showPicnicActions && !showTownActions && !showHorseActions && !seatedBench && !nearBench && nearGarden && nearbyAction && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => interactGarden(nearGarden)}><Keycap aria-hidden="true">E</Keycap>{nearbyLabel}<Leaf size={17} /></ShortcutButton>}
         {showWorldInteraction && !showTownActions && !showHorseActions && nearBirds && !nearbyAction && <ShortcutButton className="v-interact v-bird-feed-button" disabled={birdMealBusy}
           aria-keyshortcuts={seatedBench === "bird-clearing-bench" ? "F" : !nearBench && !seatedBench ? "E" : undefined}
           onClick={() => seatedBench === "bird-clearing-bench" ? scatterBenchCrumbs() : onGardenAction({ kind: "feedBirds" })}
@@ -1034,11 +1061,20 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
           </ShortcutButton>}
           {notice && <div className="v-puppy-response" role="status">{localizedNotice}</div>}
         </section>}
-        {showWorldInteraction && !showTownActions && !showHorseActions && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => openPlace(nearPlace.id)}>
+        {showPicnicActions && <section className="v-picnic-near">
+          {(picnicContext?.kind === "kitchen" || picnicContext?.seatIndex !== undefined || picnicContext?.dish) && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => engine.current?.interactPicnic()}><Keycap>E</Keycap>
+            {picnicContext?.seatIndex !== undefined ? t(`Sit on cushion ${picnicContext.seatIndex + 1}`, `クッション${picnicContext.seatIndex + 1}に座る`) : picnicContext?.dish ? t(`Eat ${recipeById(picnicContext.dish.recipe)?.name}`, `${recipeById(picnicContext.dish.recipe)?.japanese}を食べる`) : t("Cook in the garden kitchen", "キッチンで料理する")}
+          </ShortcutButton>}
+          {picnicContext?.kind === "picnic" && <ShortcutButton className="v-interact" aria-keyshortcuts="F" onClick={() => engine.current?.openPicnicBasket()}><Keycap aria-hidden="true">F</Keycap>{t("Open picnic basket", "ピクニックかごを開く")}</ShortcutButton>}
+        </section>}
+        {showWorldInteraction && !showPicnicActions && !showTownActions && !showHorseActions && nearPlace && nearPlace.id !== "birds" && nearPlace.id !== "garden" && !showSwingActions && !nearBench && !seatedBench && !nearbyAction && !nearPuppy && <ShortcutButton className="v-interact" aria-keyshortcuts="E" onClick={() => openPlace(nearPlace.id)}>
           <Keycap>E</Keycap>{ja ? placeName(nearPlace.id) : nearPlace.prompt}<ArrowUpRight size={16} />
         </ShortcutButton>}
       </div>}
-      {showWorldInteraction && !panel && !sceneryLoading && <TownActivityHUD state={activityHUD} language={language} />}
+      {showWorldInteraction && !panel && !sceneryLoading && <>
+        <TownActivityHUD state={activityHUD} language={language} />
+        <CookingHUD context={picnicContext} state={picnicState} selfId={sharedSelfId} language={language} connected={sharedStatus === "Connected"} act={picnicAct} readClock={() => engine.current?.getSharedNow() ?? Date.now()} />
+      </>}
       {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
       {sharedTrialEnabled && entered && <div className="v-shared-trial">
         <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? t("Hide Hearthwillow chat", "村のチャットを隠す") : chatUnread ? t("Open Hearthwillow chat, new message", "村のチャットを開く。新しいメッセージがあります") : t("Open Hearthwillow chat", "村のチャットを開く")}>
@@ -1094,6 +1130,8 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         </output>
       )}
       <VillageMenus touch={touchControls} panel={panel} setPanel={setPanel} canvas={canvas} engine={engine} settings={settings} inventory={inventory}
+        picnicContext={picnicContext} picnicState={picnicState} selfId={sharedSelfId} connected={sharedStatus === "Connected"}
+        picnicAct={picnicAct}
         place={place} notice={localizedNotice} entered={entered} setEntered={setEntered} enableSound={enableSound} openPlace={openPlace} travelOutdoor={id => {
           engine.current?.travelToMapDestination(id, () => {
             activityRequestRef.current++; pendingActivityRef.current = null;

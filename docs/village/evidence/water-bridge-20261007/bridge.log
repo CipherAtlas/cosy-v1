@@ -1,0 +1,14 @@
+PASS full bridge width has upward-facing paving matching the physical arch
+PASS solid deck has an arched underside with a clear water opening
+PASS bank-to-bank traversal in both directions and both parapet barriers
+PASS bridge recovery reaches nearby clear ground without crossing banks
+PASS pictured bridge-end gap is walkable in both directions and still has recovery
+PASS all four old bridge-end post traps allow escape
+PASS rendered deck, coping and posts are symmetric across both axes
+PASS all four bank-side openings allow entry and exit
+PASS post overlap, post-top recovery and diagonal jumping stay safe at 30/60/120 fps
+PASS central rail overlap resolves locally onto the deck, away from water
+PASS rail contact preserves sliding along the crossing
+(node:29425) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

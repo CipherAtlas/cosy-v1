@@ -98,6 +98,23 @@ export function checkGraphics(engine) {
     check(engine.frames === 0 && engine.frameSum === 0 && engine.slowSamples === 0, 'Visibility change clears stale frame samples');
     const report = engine.getPerformanceReport();
     check(report.browser && report.gpu && report.drawingBuffer.length === 2 && report.preference === 'auto', 'Report identifies browser, renderer and actual resolution');
+    const plants = [...engine.vegetationDetail.entries.filter(entry => entry.mesh.userData.gardenPlant),
+      ...(engine.townScene?.cropRendering.detail?.entries ?? [])];
+    check(plants.length > 0, 'Garden plants have a distant detail level');
+    const position = engine.camera.position.clone(), center = position.clone();
+    for (const entry of plants) {
+      center.copy(entry.mesh.boundingSphere.center).applyMatrix4(entry.mesh.matrixWorld);
+      engine.camera.position.copy(center).addScalar(1000);
+      engine.vegetationDetail.update(engine.camera);
+      engine.townScene?.updateCropDetail(engine.camera);
+      check(entry.mesh.geometry === entry.distant && entry.distant.index.count < entry.detailed.index.count, 'Distant garden plants submit fewer triangles');
+      const count = entry.mesh.count;
+      engine.camera.position.copy(center); engine.vegetationDetail.update(engine.camera);
+      engine.townScene?.updateCropDetail(engine.camera);
+      check(entry.mesh.geometry === entry.detailed && entry.mesh.count === count, 'Approaching restores full plant detail with unchanged density');
+    }
+    engine.camera.position.copy(position); engine.vegetationDetail.update(engine.camera);
+    engine.townScene?.updateCropDetail(engine.camera);
     return { passed: results.length, results };
   } finally {
     host.style.cssText = style;

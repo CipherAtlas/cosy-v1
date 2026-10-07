@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "Regular preview connects to existing Worker2567",
+    "Regular Worker accepts kitchen:farm-kitchen travel; Tea garden absent and Kitchen garden retained",
+    "Regular Worker accepts picnic:picnic-hill-mat travel; Tea garden absent and Kitchen garden retained",
+    "Regular Worker and export agree on24m summit",
+    "Current Worker/export have five cushions and no removed north pond bench",
+    "F opens actual regular-preview picnic basket",
+    "E claims the exact looked-at cushion on the regular Worker",
+    "Accepted seated blob/camera face village and pond",
+    "Regular-preview smoke releases its cushion",
+    "Waterfall curtain advances using the running world water clock",
+    "Reduced motion freezes the waterfall water clock",
+    "At least eight fourth-circuit doves project visibly over picnic hill (client-only visual clock fixture)",
+    "No regular-preview page errors"
+  ],
+  "errors": [],
+  "limits": "Regular static export3051 and preserved local Worker2567. No ingredient grants or inventory changes. Actual map travel/F/E/seat release. Bird screenshot uses a client visual clock fixture only; not evidence of a live authoritative fourth-phase timing."
+}

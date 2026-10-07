@@ -93,6 +93,10 @@ for (const asset of manifest.animals) {
   check(doc.materials.every(m => m.pbrMetallicRoughness.metallicFactor === 0 && ['OPAQUE', undefined].includes(m.alphaMode)), `${asset.id}: simple opaque dielectric PBR`);
   const bird = ['owl', 'swan', 'duck', 'duckling'].includes(asset.id);
   check((bird ? ['WingLeft', 'WingRight'] : ['LegFrontLeft', 'LegFrontRight', 'LegBackLeft', 'LegBackRight']).every(name => usedJoints.has(name)), `${asset.id}: anatomical motion bones genuinely deform vertices`);
+  if (asset.id === 'owl') {
+    check(['WingTipLeft', 'WingTipRight'].every(name => usedJoints.has(name)), 'Owl: both wrists genuinely deform flight feathers');
+    check(['glide', 'land', 'feed'].every(name => doc.animations.some(clip => clip.name === name)), 'Owl: native glide, braking and feeding clips are exported');
+  }
   check(Object.values(asset.skinning).some(stats => stats.blendedVertices > 0), `${asset.id}: continuous surfaces have blended skin transitions`);
   const required = ['idle', 'walk', 'pet', ...(bird ? ['fly', 'swim'] : []), ...(asset.id.startsWith('horse-') ? ['trot', 'canter'] : []), ...(asset.id.startsWith('dog-') ? ['run', 'sit', 'dance', 'spin', 'bow', 'wave', 'roll'] : [])];
   check(required.every(name => doc.animations.some(clip => clip.name === name)), `${asset.id}: all supported gameplay motions have native clips`);

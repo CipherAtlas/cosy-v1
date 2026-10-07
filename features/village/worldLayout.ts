@@ -66,6 +66,7 @@ export function projectWorldLayout(source: unknown): AuthoredWorld {
     if (!item?.visible || !Array.isArray(item.position) || !Array.isArray(item.rotation) || !Array.isArray(item.scale)) continue;
     const [x, y, z] = item.position;
     if (![x, y, z, ...item.rotation, ...item.scale].every(finite)) throw Error(`Invalid transform in ${item.id}.`);
+    if (["garden-kitchen", "picnic-mat"].includes(item.asset) && (Math.abs(item.rotation[0]) > .001 || Math.abs(item.rotation[2]) > .001)) throw Error("Kitchen and picnic mats need upright rotation.");
     if (item.path && ["custom-path", "path-straight", "path-curved", "custom-river"].includes(item.asset)) {
       const angle = item.rotation[1] * Math.PI / 180, c = Math.cos(angle), s = Math.sin(angle);
       const points = item.path.points.map(([px, pz]): WorldPoint => [x + px * item.scale[0] * c + pz * item.scale[2] * s, z - px * item.scale[0] * s + pz * item.scale[2] * c]);

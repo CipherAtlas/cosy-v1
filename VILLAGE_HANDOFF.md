@@ -1,5 +1,52 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-07 — multiplayer horse response fix verified locally
+
+Rapid changed inputs are no longer dropped by the Worker. An accepted rider uses at most 350 ms of provisional display motion with the same horse solver/collisions and snapshot reconciliation; observers, ownership and race/resource outcomes remain authoritative. Countdown, stale delivery and ownership loss stop prediction. Final build/lint/types/contracts/export privacy, focused regressions, 30 real three-client checks and five actual-served smoke checks pass. With 100 ms added to outgoing controls and incoming snapshots, final steering is visible at 35.4 ms versus 411.7 ms for the accepted heading update. Laptop/all six iPad CSS orientations, full seats, disconnection/reconnection and private focus pass; native/physical-device, sustained performance and live network feel remain open.
+
+Preview3051 uses `/tmp/cosy-horse-latency-path.txt`, preserving the completed water/terrain/rendering work and existing Worker2567/persistence. Runtime files/HTML match the checked snapshot. Reload the local village. [Evidence and limits](docs/village/evidence/horse-latency-20261007/README.md) and VILLAGE_BUILD.md. No publication or Git writes.
+
+## 2026-10-07 — waterfall, rocky hill and pond join verified locally
+
+Custom streams clip/blend into transformed ponds; moving a pond in the editor reconstructs the original stream and preserves bank samples. The waterfall has a closed wider cliff and connected headwater/basin. Nineteen local terrain samples shape its recess, with five separately editable sloped rock outcrops. Summit/trail, original placements/routes, protected presets/named designs and bench physics remain. Matching Worker physics has 1,957 colliders/seven benches.
+
+Final build/lint/types/contracts/export privacy, 493 layout/physics, exact parity, 14 asset-editor, 20 riverbank/editor and 56 rendered water/bridge checks pass. All-side Detailed/golden captures and scope evidence are in [the build ledger](VILLAGE_BUILD.md#2026-10-07--waterfall-rock-face-and-pond-join-local). Preview3051 serves the source in `/tmp/cosy-water-join-build-path.txt`; eight actual-served checks confirm shared entry, revised rocks/colliders, approved summit travel and advancing/frozen water. Worker2567 was restarted with its retained persistence after stopping during native review; fresh health/preview checks pass. Native Firefox scene/menu loaded; its close-up review was interrupted when the tab closed. Native/physical-device, sustained-performance and live acceptance remain open. No publication or Git writes.
+
+## 2026-10-07 — rendering optimization verified locally
+
+Shared farms are culled by row and use simplified nearby/distant geometry; static template instancing, conservative architecture simplification and garden-plant detail preserve resolution, density and moving shadows. Mature-farm QA reproduces the problem: matched Chrome/M4 Detailed hilltop 7.65→3.58 M triangles (53.2% fewer), 995→868 calls. Short samples reach56–60 FPS; sustained/native Firefox speed is unproven. Final build lint/types, contracts (2,177 rendering/crop-state), export privacy,299 graphics/detail, 84 shadows, 15 catalog and seven final real three-client smoke checks pass. Preview 3051 serves `/tmp/cosy-render-farms-20261007-vmrx81fi/out` with the existing Worker 2567; all 333 runtime/public files match the snapshot. Reload Firefox. Final native review was blocked by the locked Mac; physical iPad/Safari/M1, long-session and live acceptance remain open. See [rendering evidence](docs/village/evidence/rendering-20261007/README.md) and VILLAGE_BUILD.md. No publication or Git writes.
+
+## 2026-10-07 — downstream water correction verified locally
+
+River detail flows from the first saved path point toward the last, following bends in one direction. Fine ripples/sparse foam replace broad blobs; a narrow lowered waterfall outlet replaces the floating disk, with one continuous falling sheet. Full check/build/types/export privacy, 489 layout/physics, 62 engine/bridge-editor, nine waterfall-editor and six fresh exported-app checks pass. Rendered translation verifies downstream advection; reduced-motion frames stay identical. Preview3051 is refreshed and exact Worker/renderer parity is 1,952 colliders/seven benches, including the concurrent north pond cleanup below. Previous shared bridge crossing evidence remains applicable to unchanged movement code. See the [build ledger](VILLAGE_BUILD.md#2026-10-07--downstream-water-correction-local). Native/physical-device acceptance remains open; no publication.
+
+## 2026-10-07 — north pond clearing cleanup (local)
+
+The north pond circular paving, lamppost and low lantern shown in the screenshot are removed from the active layout; grass fills the former paving. Matching Worker physics removes their two collisions (1,952 colliders/seven benches). Fresh 487 layout/physics checks and local Chrome visual review pass. Preview3051’s runtime layout is refreshed; Firefox/native/live acceptance remains open. Existing saved designs are preserved. See the north pond cleanup entry in VILLAGE_BUILD.md.
+
+## 2026-10-07 — water and bridge refinement (local)
+
+Waterfall water now visibly descends with irregular foam, sheet motion, spray and basin ripples; river/pond currents have clearer highlights. Stone bridges have a higher center with flatter approaches. Walking along rotated rails uses oriented collision and tangent sliding, preserving bank access and jump barriers. Renderer/Worker physics is regenerated. Final build/types/contracts/export privacy, 487 layout/physics, 60 engine/bridge-editor, nine waterfall-editor and seven three-client checks pass. Preview3051 and matching Worker2567 are refreshed; native/physical-device and long-session acceptance remain open. See the [build ledger](VILLAGE_BUILD.md#2026-10-07--animated-water-and-smoother-arched-bridges-local). No publication.
+
+
+## 2026-10-07 — eagle owl revision verified locally
+
+The three owls now use a reference-led eagle-owl model with amber eyes, pointed feather tufts and streaked breast. Native shoulders/wrists, forward flight body, tucked feet, glide/landing/feed clips and staggered shared-clock circuits are implemented. Final build/lint/types/contracts/export privacy, 63 motion/audio, 10,033 binary/skin, 103 native compatibility, 44 editor and 19 real two-client checks pass. The shared flow covers ordinary flight, meal contention/landing, reduced motion and reconnect; CSS scene/aspect checks include all six prescribed iPad orientations. Preview3051 serves the checked local-Worker export. Native/physical iPad, Safari/Firefox and live acceptance remain unverified. Original owl art is archived and other assets/rigs are retained. See the owl entry in VILLAGE_BUILD.md. No deployment or Git writes.
+
+## 2026-10-07 — picnic controls and waterfall revision verified locally
+
+E claims the exact aimed cushion; F opens the picnic basket. Accepted eating poses local/remote blobs, then shows a heart for the retained shared bite clock. The mat/basket moved toward the pond-facing summit edge. Dense low grass covers the hill and one additional shared dove circuit passes overhead. A reusable rock-backed waterfall, authored pond inlet stream and stone footbridge replace the north pond bench/Owl grove north loop; Tea garden is omitted from map destinations. The kitchen remains in its separate eastern clearing.
+
+Final build/lint/types, full contracts, export privacy, 53 Worker, 52 bird-circuit, nine waterfall editor, 451 layout/physics, 80 five-client, 78 UI, 18 captured-pointer/reconnect and 13 regular-preview checks pass. Visual passes corrected waterfall overlap, bridge approaches and portrait basket/player overlap. Preview3051 and Worker2567 use matching source/physics with existing persistence preserved. See VILLAGE_BUILD.md and the waterfall evidence for fixtures and native/physical-device limits. No deployment or Git writes.
+
+## 2026-10-07 — picnic/cooking revision verified locally
+
+The edge-of-hill blanket has five village-facing cushions, direct click/tap food eating and visible B/E controls. The wider trail has a level cross-section; the supported kitchen animates preparation/stirring/plating outside menus. Final build/types/export privacy, full contracts, 49 Worker, 55 five-client flow, 75 final UI, 14 captured-pointer, 38 editor, 433 layout/physics and eight regular-preview checks pass. Portrait menus clear the actual player; reduced-motion stages stay still. Preview3051 and Worker2567 use current source with existing persistence preserved. See VILLAGE_BUILD.md and the October 7 evidence for test fixtures and native/physical-device limits. No deployment or Git writes.
+
+## 2026-10-06 — kitchen and hilltop picnic (local work)
+
+Kitchen recipes, persisted packed dishes and shared picnic portions are implemented, with a separate eastern kitchen and a grassy 24 m hill beyond the western pond. Functional UI copy is enforced in local AGENTS.md and applied to menus/tutorial/statuses. Fresh build/types/lint/contracts/export privacy, 36 real Worker, 26 three-browser, 28 final UI, 38 editor and 430 layout/physics checks pass. Preview3051 is refreshed and Worker2567 uses current source with existing persistence preserved; all five final regular-preview checks pass. No publication. See `VILLAGE_BUILD.md` for evidence and native/physical-device limits.
+
 ## 2026-10-05 — welcome guide and menu back keys (published)
 
 A short English/Japanese guide appears after entry with touch-aware instructions, saved “Don't show tutorial” and a Settings reopening action. Manual-guide Back returns to Settings; Escape/Backspace and visible Back buttons make menus easy to leave without taking over editing/key capture. Build/lint/types/contracts/export privacy and 57 guide/back, 70 onboarding and 18 two-client Japanese checks pass with zero page errors. Preview3051 is refreshed. Application `515dc7e` is pushed/live after successful [Pages run 37343764054](https://github.com/CipherAtlas/cosy-v1/actions/runs/37343764054); all 32 public smoke checks pass with zero page errors. The matching Worker is unchanged. [Behavior and checks](VILLAGE_BUILD.md#2026-10-05--short-welcome-guide-and-keyboard-back-navigation). Native/physical-device and assistive-technology acceptance retains its stated limits. Earlier entries below are development/release checkpoints.
@@ -908,3 +955,8 @@ Release authorized for the pending village work: town/terrain and shared animal 
 ## 2026-10-04 — distant castle removal
 
 The active Willowbank town hides the distant castle, including the local editor’s Playable village view. Original presets and the reusable asset remain available. Regenerated physics retains identical collisions/seats with an updated layout hash. `npm run check`, isolated production build, export privacy and physics parity pass. Release `41a9c6e` is live: [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37213330290) succeeded. Fresh live browser checks confirm byte-identical layout with the castle hidden, shared connection, focus-cottage entry/exit, private editor/admin/API 404s and zero page errors.
+
+
+## 2026-10-07 — riverbank grounding source fix
+
+Automatic river stones sample rendered soil, use rotated lower-vertex contact and embed 5.5–10 cm, with varied lateral offsets/spacing. Game/editor share the helper; clipped-bank sample counts may differ safely. Fresh full check and 18 isolated editor checks pass;91 slope contacts are independently raycast-verified. Close-up QA captures show the current helper with no errors and short 60 FPS Detailed samples. Existing layouts/presets/physics/Worker are preserved. The main chat's 3051 preview is undisturbed and still needs an integrated rebuild including this source change. [Evidence and verification boundaries](docs/village/evidence/riverbank-grounding-20261007/README.md). No publication or Git writes.

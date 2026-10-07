@@ -1,0 +1,25 @@
+{
+  "scope": "Shared animal/pond/owl rendering and petting",
+  "checks": [
+    "Seven farm/garden animals, fifteen farm rows and three Blender owls render from shared state",
+    "All three shared owls use the revised shoulder/wrist skin and flight/glide/landing/feed clips",
+    "Independent real clients agree on the current shared-clock circuit positions",
+    "The real shared clock advances at least one ordinary owl flight",
+    "One accepted owl meal holds the shared roost and refuses competing feeding",
+    "Both real clients see the same tray landing, happy owl hearts and one readable Hoot Hoot response",
+    "Reduced motion keeps owl meal hearts and suppresses flutter, bob and head gestures",
+    "Rendered owl responses stay readable with at most one speech sprite throughout the meal",
+    "The real shared meal gives all three owls distinct speech turns",
+    "Disconnect/reconnect retains the accepted meal clock without restarting the flight or feeding",
+    "Owl scene remains visible with finite poses and correct camera aspect at 1366x768",
+    "Owl scene remains visible with finite poses and correct camera aspect at 1024x640",
+    "Owl scene remains visible with finite poses and correct camera aspect at 810x1080",
+    "Owl scene remains visible with finite poses and correct camera aspect at 1080x810",
+    "Owl scene remains visible with finite poses and correct camera aspect at 820x1180",
+    "Owl scene remains visible with finite poses and correct camera aspect at 1180x820",
+    "Owl scene remains visible with finite poses and correct camera aspect at 744x1133",
+    "Owl scene remains visible with finite poses and correct camera aspect at 1133x744",
+    "No animal browser page errors (0)"
+  ],
+  "errors": []
+}

@@ -1,0 +1,4 @@
+Horse rapid-input, next-frame keyboard/touch response, reconciliation, countdown, collision, stall and ownership checks pass.
+(node:92629) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

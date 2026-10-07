@@ -12,12 +12,62 @@ export function batchStaticProp(root: T.Object3D) {
   });
   for (const [material, meshes] of batches) {
     if (meshes.length < 2) continue;
-    const parts = meshes.map(mesh => mesh.geometry.clone().applyMatrix4(inverse.clone().multiply(mesh.matrixWorld)));
+    const parts = meshes.map(mesh => {
+      const part = mesh.geometry.clone().applyMatrix4(inverse.clone().multiply(mesh.matrixWorld));
+      if (!part.index) part.setIndex(Array.from({ length: part.attributes.position.count }, (_, index) => index));
+      return part;
+    });
     const geometry = mergeGeometries(parts); parts.forEach(part => part.dispose());
     if (!geometry) continue;
     const mesh = new T.Mesh(geometry, material); mesh.castShadow = mesh.receiveShadow = true;
     meshes.forEach(part => part.removeFromParent()); root.add(mesh);
   }
+}
+
+/** Only explicitly static props: retain geometry, materials and transforms in cullable cells. */
+export function instanceStaticProps(roots: T.Object3D[], parent: T.Object3D, cellSize = 32) {
+  parent.updateMatrixWorld(true);
+  const inverse = parent.matrixWorld.clone().invert(), matrix = new T.Matrix4();
+  const batches = new Map<T.BufferGeometry, Map<T.Material | T.Material[], Map<string, {
+    source: T.Mesh; transforms: T.Matrix4[]; colors: T.Color[];
+  }>>>();
+  const remove: T.Mesh[] = [];
+  const retain = new Set<T.Mesh>();
+  for (const root of roots) root.traverseVisible(object => {
+    if (!(object instanceof T.Mesh) || object instanceof T.SkinnedMesh || object instanceof T.BatchedMesh || object.morphTargetInfluences?.length) return;
+    if ((Array.isArray(object.material) ? object.material : [object.material]).some(material => material.transparent)
+      || object.matrixWorld.determinant() < 0) return;
+    let materials = batches.get(object.geometry);
+    if (!materials) { materials = new Map(); batches.set(object.geometry, materials); }
+    let cells = materials.get(object.material);
+    if (!cells) { cells = new Map(); materials.set(object.material, cells); }
+    const local = inverse.clone().multiply(object.matrixWorld);
+    const instanced = object instanceof T.InstancedMesh;
+    for (let i = 0; i < (instanced ? object.count : 1); i++) {
+      if (instanced) { object.getMatrixAt(i, matrix); matrix.premultiply(local); }
+      else matrix.copy(local);
+      const key = `${Math.floor(matrix.elements[12] / cellSize)},${Math.floor(matrix.elements[14] / cellSize)},${object.castShadow},${object.receiveShadow},${object.renderOrder},${object.customDepthMaterial?.uuid ?? ""},${object.layers.mask}`;
+      let cell = cells.get(key);
+      if (!cell) { cell = { source: object, transforms: [], colors: [] }; cells.set(key, cell); }
+      cell.transforms.push(matrix.clone());
+      const color = new T.Color();
+      if (instanced && object.instanceColor) object.getColorAt(i, color);
+      cell.colors.push(color);
+    }
+    remove.push(object);
+  });
+  for (const materials of batches.values()) for (const cells of materials.values()) for (const cell of cells.values()) {
+    const { source, transforms, colors } = cell;
+    if (transforms.length === 1 && !(source instanceof T.InstancedMesh)) { retain.add(source); continue; }
+    const mesh = new T.InstancedMesh(source.geometry, source.material, transforms.length);
+    mesh.name = `Static props ${source.parent?.name || source.name || "cell"}`;
+    mesh.castShadow = source.castShadow; mesh.receiveShadow = source.receiveShadow;
+    mesh.customDepthMaterial = source.customDepthMaterial; mesh.renderOrder = source.renderOrder; mesh.layers.mask = source.layers.mask;
+    mesh.userData = { ...source.userData };
+    transforms.forEach((transform, i) => { mesh.setMatrixAt(i, transform); mesh.setColorAt(i, colors[i]); });
+    mesh.computeBoundingSphere(); parent.add(mesh);
+  }
+  for (const mesh of remove) if (!retain.has(mesh)) { mesh.removeFromParent(); if (mesh instanceof T.InstancedMesh) mesh.dispose(); }
 }
 
 export function spatialMesh(geometry: T.BufferGeometry, material: T.Material, cellSize: number) {

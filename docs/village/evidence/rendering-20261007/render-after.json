@@ -1,0 +1,4340 @@
+{
+  "browser": "chrome",
+  "version": "154.0.8037.98",
+  "env": {
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+    "antialias": true,
+    "timer": true,
+    "multiDraw": true
+  },
+  "loading": {
+    "engineMs": 6012.4000000059605,
+    "resources": [
+      {
+        "url": "/modules/features/village/VillageEngine.js",
+        "bytes": 125445,
+        "ms": 6.0999999940395355
+      },
+      {
+        "url": "/modules/features/village/audio.js",
+        "bytes": 27214,
+        "ms": 11.199999988079071
+      },
+      {
+        "url": "/modules/features/village/environment.js",
+        "bytes": 8012,
+        "ms": 29.400000005960464
+      },
+      {
+        "url": "/modules/features/village/movement.js",
+        "bytes": 12035,
+        "ms": 32.20000000298023
+      },
+      {
+        "url": "/modules/features/village/activityScene.js",
+        "bytes": 15963,
+        "ms": 32.5
+      },
+      {
+        "url": "/modules/features/village/soundtrack.js",
+        "bytes": 8470,
+        "ms": 40.6000000089407
+      },
+      {
+        "url": "/modules/features/village/places.js",
+        "bytes": 2483,
+        "ms": 43.1000000089407
+      },
+      {
+        "url": "/modules/features/village/picnicScene.js",
+        "bytes": 6408,
+        "ms": 24.5
+      },
+      {
+        "url": "/modules/features/village/mealFeedback.js",
+        "bytes": 2716,
+        "ms": 27.599999994039536
+      },
+      {
+        "url": "/modules/features/village/picnic.js",
+        "bytes": 2440,
+        "ms": 29.099999994039536
+      },
+      {
+        "url": "/modules/features/village/keybindings.js",
+        "bytes": 4632,
+        "ms": 29.599999994039536
+      },
+      {
+        "url": "/modules/features/village/placeableAssets.js",
+        "bytes": 12522,
+        "ms": 32.29999999701977
+      },
+      {
+        "url": "/modules/features/village/sceneLayout.js",
+        "bytes": 7797,
+        "ms": 33.69999998807907
+      },
+      {
+        "url": "/modules/features/village/layoutInteractions.js",
+        "bytes": 3779,
+        "ms": 34.099999994039536
+      },
+      {
+        "url": "/modules/features/village/villageVisitors.js",
+        "bytes": 10192,
+        "ms": 33.20000000298023
+      },
+      {
+        "url": "/modules/features/village/birds.js",
+        "bytes": 16695,
+        "ms": 37.70000000298023
+      },
+      {
+        "url": "/modules/features/village/atmosphere.js",
+        "bytes": 4751,
+        "ms": 40.5
+      },
+      {
+        "url": "/modules/features/village/world.js",
+        "bytes": 59987,
+        "ms": 41.099999994039536
+      },
+      {
+        "url": "/modules/features/village/animalDialogue.js",
+        "bytes": 3165,
+        "ms": 38
+      },
+      {
+        "url": "/modules/features/village/puppies.js",
+        "bytes": 31992,
+        "ms": 41.30000001192093
+      },
+      {
+        "url": "/modules/features/village/life.js",
+        "bytes": 32041,
+        "ms": 42.6000000089407
+      },
+      {
+        "url": "/modules/features/village/companionWalk.js",
+        "bytes": 7291,
+        "ms": 43.30000001192093
+      },
+      {
+        "url": "/modules/features/village/dialogue.js",
+        "bytes": 22840,
+        "ms": 44.6000000089407
+      },
+      {
+        "url": "/modules/features/village/plantingClearance.js",
+        "bytes": 5680,
+        "ms": 47.1000000089407
+      },
+      {
+        "url": "/modules/features/village/garden.js",
+        "bytes": 8422,
+        "ms": 48
+      },
+      {
+        "url": "/modules/features/village/gardenScene.js",
+        "bytes": 31203,
+        "ms": 47.900000005960464
+      },
+      {
+        "url": "/modules/features/village/graphics.js",
+        "bytes": 851,
+        "ms": 48.5
+      },
+      {
+        "url": "/modules/features/village/shadows.js",
+        "bytes": 2570,
+        "ms": 49.20000000298023
+      },
+      {
+        "url": "/modules/features/village/towerLookout.js",
+        "bytes": 1019,
+        "ms": 51.1000000089407
+      },
+      {
+        "url": "/modules/features/village/vegetationDetail.js",
+        "bytes": 2273,
+        "ms": 51.80000001192093
+      },
+      {
+        "url": "/modules/features/village/villageAssets.js",
+        "bytes": 1440,
+        "ms": 52.400000005960464
+      },
+      {
+        "url": "/modules/features/village/spatialRendering.js",
+        "bytes": 10006,
+        "ms": 52.5
+      },
+      {
+        "url": "/modules/features/village/geometryOptimization.js",
+        "bytes": 1844,
+        "ms": 54.20000000298023
+      },
+      {
+        "url": "/modules/features/village/focusCottageScene.js",
+        "bytes": 8838,
+        "ms": 54.29999999701977
+      },
+      {
+        "url": "/modules/features/village/cottageCat.js",
+        "bytes": 11328,
+        "ms": 54.70000000298023
+      },
+      {
+        "url": "/modules/features/village/villageCamera.js",
+        "bytes": 9430,
+        "ms": 55.20000000298023
+      },
+      {
+        "url": "/modules/features/village/animalRig.js",
+        "bytes": 5584,
+        "ms": 55.5
+      },
+      {
+        "url": "/modules/features/village/horseRiding.js",
+        "bytes": 1614,
+        "ms": 55.6000000089407
+      },
+      {
+        "url": "/modules/features/village/horses.js",
+        "bytes": 8911,
+        "ms": 55.900000005960464
+      },
+      {
+        "url": "/modules/features/village/townInteractions.js",
+        "bytes": 9822,
+        "ms": 56.400000005960464
+      },
+      {
+        "url": "/modules/features/village/townScene.js",
+        "bytes": 13913,
+        "ms": 57.6000000089407
+      },
+      {
+        "url": "/modules/features/village/townAssets.js",
+        "bytes": 7423,
+        "ms": 58
+      },
+      {
+        "url": "/modules/features/village/townAnimals.js",
+        "bytes": 17538,
+        "ms": 61.400000005960464
+      },
+      {
+        "url": "/modules/features/village/townProgress.js",
+        "bytes": 1232,
+        "ms": 60.19999998807907
+      },
+      {
+        "url": "/modules/features/village/raceGuide.js",
+        "bytes": 2204,
+        "ms": 63
+      },
+      {
+        "url": "/modules/features/village/horseAudio.js",
+        "bytes": 4093,
+        "ms": 61.099999994039536
+      },
+      {
+        "url": "/modules/features/village/townAnimalAudio.js",
+        "bytes": 5673,
+        "ms": 68.29999999701977
+      },
+      {
+        "url": "/modules/features/village/navigation.js",
+        "bytes": 6752,
+        "ms": 60.79999999701977
+      },
+      {
+        "url": "/modules/features/village/layoutTransforms.js",
+        "bytes": 693,
+        "ms": 64.40000000596046
+      },
+      {
+        "url": "/modules/features/village/worldLayout.js",
+        "bytes": 9420,
+        "ms": 64.09999999403954
+      },
+      {
+        "url": "/modules/features/village/terrain.js",
+        "bytes": 6231,
+        "ms": 65.5
+      },
+      {
+        "url": "/modules/features/village/focusCottageProps.js",
+        "bytes": 23881,
+        "ms": 62
+      },
+      {
+        "url": "/modules/features/village/sharedActors.js",
+        "bytes": 3603,
+        "ms": 63.20000000298023
+      },
+      {
+        "url": "/modules/features/village/gardenKitchenScene.js",
+        "bytes": 11690,
+        "ms": 60.29999999701977
+      },
+      {
+        "url": "/modules/features/village/townShared.js",
+        "bytes": 2224,
+        "ms": 56.29999999701977
+      },
+      {
+        "url": "/modules/features/village/animalArt.js",
+        "bytes": 1334,
+        "ms": 53.29999999701977
+      },
+      {
+        "url": "/modules/features/village/waterfallScene.js",
+        "bytes": 7240,
+        "ms": 57.5
+      },
+      {
+        "url": "/modules/features/village/riverbankStones.js",
+        "bytes": 5644,
+        "ms": 59.20000000298023
+      },
+      {
+        "url": "/modules/features/village/swings.js",
+        "bytes": 8672,
+        "ms": 56.20000000298023
+      },
+      {
+        "url": "/modules/features/village/fenceGeometry.js",
+        "bytes": 5368,
+        "ms": 57
+      },
+      {
+        "url": "/modules/features/village/mountainHorizon.js",
+        "bytes": 3319,
+        "ms": 50.20000000298023
+      },
+      {
+        "url": "/modules/features/village/puppyAnimation.js",
+        "bytes": 4304,
+        "ms": 48.79999999701977
+      },
+      {
+        "url": "/modules/features/village/towerScene.js",
+        "bytes": 2816,
+        "ms": 48.70000000298023
+      },
+      {
+        "url": "/modules/features/village/flame.js",
+        "bytes": 4227,
+        "ms": 49.20000000298023
+      },
+      {
+        "url": "/modules/features/village/water.js",
+        "bytes": 3558,
+        "ms": 49.5
+      },
+      {
+        "url": "/modules/features/village/riverGeometry.js",
+        "bytes": 6269,
+        "ms": 50.400000005960464
+      },
+      {
+        "url": "/modules/features/village/bridge.js",
+        "bytes": 4301,
+        "ms": 50.5
+      },
+      {
+        "url": "/modules/features/village/paintedTextures.js",
+        "bytes": 5400,
+        "ms": 51.19999998807907
+      },
+      {
+        "url": "/modules/features/village/architecture.js",
+        "bytes": 8496,
+        "ms": 51.79999999701977
+      },
+      {
+        "url": "/modules/features/village/worldLandscape.js",
+        "bytes": 27744,
+        "ms": 52.5
+      },
+      {
+        "url": "/modules/features/village/wayfinding.js",
+        "bytes": 5135,
+        "ms": 53
+      },
+      {
+        "url": "/modules/features/village/residentMotion.js",
+        "bytes": 3033,
+        "ms": 54.30000001192093
+      },
+      {
+        "url": "/modules/features/village/villagers.js",
+        "bytes": 13435,
+        "ms": 55.5
+      },
+      {
+        "url": "/modules/features/village/pondLife.js",
+        "bytes": 3020,
+        "ms": 49.400000005960464
+      },
+      {
+        "url": "/modules/features/village/gardenGrowthDisplay.js",
+        "bytes": 754,
+        "ms": 51.20000000298023
+      },
+      {
+        "url": "/modules/features/village/horseModel.js",
+        "bytes": 15125,
+        "ms": 44.19999998807907
+      },
+      {
+        "url": "/modules/features/village/localization.js",
+        "bytes": 13793,
+        "ms": 43.8999999910593
+      },
+      {
+        "url": "/modules/features/village/animalEmotes.js",
+        "bytes": 372,
+        "ms": 42.3999999910593
+      },
+      {
+        "url": "/modules/features/village/owlFlight.js",
+        "bytes": 4535,
+        "ms": 43.19999998807907
+      },
+      {
+        "url": "/modules/features/village/fantasyTrees.js",
+        "bytes": 3036,
+        "ms": 43.5
+      },
+      {
+        "url": "/modules/features/village/meadowVegetation.js",
+        "bytes": 3407,
+        "ms": 27.200000002980232
+      },
+      {
+        "url": "/village/world-layout.json",
+        "bytes": 446343,
+        "ms": 3.5999999940395355
+      },
+      {
+        "url": "/village/textures/sunset.hdr",
+        "bytes": 1061624,
+        "ms": 20.400000005960464
+      },
+      {
+        "url": "/village/models/spirit.glb",
+        "bytes": 437768,
+        "ms": 13.700000002980232
+      },
+      {
+        "url": "/village/models/dove.glb",
+        "bytes": 240928,
+        "ms": 22.399999991059303
+      },
+      {
+        "url": "/village/models/garden-pond.glb",
+        "bytes": 3239548,
+        "ms": 5649.199999988079
+      },
+      {
+        "url": "/village/models/animals-v2/swan.glb",
+        "bytes": 351624,
+        "ms": 34.20000000298023
+      },
+      {
+        "url": "/village/models/animals-v2/duck.glb",
+        "bytes": 344932,
+        "ms": 27.200000002980232
+      },
+      {
+        "url": "/village/models/animals-v2/duckling.glb",
+        "bytes": 344816,
+        "ms": 40.400000005960464
+      },
+      {
+        "url": "/village/models/animals-v2/owl.glb",
+        "bytes": 453408,
+        "ms": 39
+      },
+      {
+        "url": "/village/models/animals-v2/horse-grey.glb",
+        "bytes": 615924,
+        "ms": 45.69999998807907
+      },
+      {
+        "url": "/village/models/animals-v2/highland-flower.glb",
+        "bytes": 672684,
+        "ms": 40.79999999701977
+      },
+      {
+        "url": "/village/models/animals-v2/highland-copper.glb",
+        "bytes": 627084,
+        "ms": 44.900000005960464
+      },
+      {
+        "url": "/village/models/animals-v2/sheep.glb",
+        "bytes": 524912,
+        "ms": 53.400000005960464
+      },
+      {
+        "url": "/village/models/animals-v2/horse-bay.glb",
+        "bytes": 751120,
+        "ms": 53.099999994039536
+      },
+      {
+        "url": "/village/models/animals-v2/lamb.glb",
+        "bytes": 366640,
+        "ms": 50.29999999701977
+      },
+      {
+        "url": "/village/models/animals-v2/dog-corgi.glb",
+        "bytes": 495216,
+        "ms": 52.70000000298023
+      },
+      {
+        "url": "/village/models/animals-v2/dog-shiba.glb",
+        "bytes": 489172,
+        "ms": 55.29999999701977
+      },
+      {
+        "url": "/village/models/animals-v2/dog-beagle.glb",
+        "bytes": 462600,
+        "ms": 55.79999999701977
+      },
+      {
+        "url": "/village/models/animals-v2/dog-samoyed.glb",
+        "bytes": 515880,
+        "ms": 56.5
+      },
+      {
+        "url": "/village/models/town-kit.glb",
+        "bytes": 5881396,
+        "ms": 10.799999997019768
+      },
+      {
+        "url": "/village/models/farm-props.glb",
+        "bytes": 763128,
+        "ms": 3.7999999970197678
+      }
+    ]
+  },
+  "checks": {
+    "graphics": {
+      "passed": 28,
+      "results": [
+        "detailed pixel budget at 3840x2160, DPR 1",
+        "battery pixel budget at 3840x2160, DPR 1",
+        "minimal pixel budget at 3840x2160, DPR 1",
+        "detailed pixel budget at 2560x1440, DPR 2",
+        "battery pixel budget at 2560x1440, DPR 2",
+        "minimal pixel budget at 2560x1440, DPR 2",
+        "detailed pixel budget at 1920x1080, DPR 1",
+        "battery pixel budget at 1920x1080, DPR 1",
+        "minimal pixel budget at 1920x1080, DPR 1",
+        "detailed pixel budget at 390x844, DPR 3",
+        "battery pixel budget at 390x844, DPR 3",
+        "minimal pixel budget at 390x844, DPR 3",
+        "Battery mode caps the real 4K drawing buffer",
+        "Startup samples do not downgrade",
+        "First downgrade preserves Automatic",
+        "Automatic can downgrade a second time",
+        "Minimum tier removes the live shadow pass",
+        "Minimum tier caps the real drawing buffer",
+        "Shadow-off frame has no stale shadow-sampler error",
+        "Battery preference can adapt further",
+        "One moderately slow sample does not downgrade",
+        "A healthy sample clears consecutive slow samples",
+        "Sustained sub-45 FPS lowers the tier",
+        "Explicit Detailed restores shadows and stays selected",
+        "Restoring shadows has no WebGL error",
+        "Detailed restores full vegetation counts",
+        "Visibility change clears stale frame samples",
+        "Report identifies browser, renderer and actual resolution"
+      ]
+    },
+    "movingShadows": {
+      "passed": 84,
+      "results": [
+        "Battery sprint shadow matches frame 1 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 2 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 3 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 4 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 5 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 6 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 7 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 8 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 9 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 10 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 11 at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 12 at 30 FPS, reduced motion false",
+        "Battery shadow resolution retained at 30 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 1 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 2 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 3 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 4 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 5 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 6 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 7 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 8 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 9 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 10 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 11 at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 12 at 30 FPS, reduced motion true",
+        "Battery shadow resolution retained at 30 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 1 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 2 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 3 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 4 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 5 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 6 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 7 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 8 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 9 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 10 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 11 at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 12 at 60 FPS, reduced motion false",
+        "Battery shadow resolution retained at 60 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 1 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 2 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 3 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 4 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 5 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 6 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 7 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 8 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 9 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 10 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 11 at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 12 at 60 FPS, reduced motion true",
+        "Battery shadow resolution retained at 60 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 1 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 2 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 3 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 4 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 5 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 6 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 7 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 8 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 9 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 10 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 11 at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 12 at 120 FPS, reduced motion false",
+        "Battery shadow resolution retained at 120 FPS, reduced motion false",
+        "Battery sprint shadow matches frame 1 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 2 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 3 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 4 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 5 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 6 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 7 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 8 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 9 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 10 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 11 at 120 FPS, reduced motion true",
+        "Battery sprint shadow matches frame 12 at 120 FPS, reduced motion true",
+        "Battery shadow resolution retained at 120 FPS, reduced motion true",
+        "Idle battery shadows retain their refresh cap",
+        "Reduced-motion jump shadow matches frame 0",
+        "Reduced-motion jump shadow matches frame 1",
+        "Reduced-motion jump shadow matches frame 2",
+        "Reduced-motion jump shadow matches frame 3",
+        "Moving battery shadows render without WebGL errors"
+      ]
+    },
+    "catalog": [
+      "horse-racetrack",
+      "horse-stable",
+      "farm-row",
+      "owl-feeding-perch",
+      "owl-brown",
+      "hay-bale",
+      "cow-highland",
+      "cow-highland-girl",
+      "sheep",
+      "lamb",
+      "hedgehog",
+      "forage-apple",
+      "forage-mushroom",
+      "apple-tree",
+      "mushroom-patch"
+    ]
+  },
+  "results": [
+    {
+      "view": "picnic",
+      "variant": "high",
+      "frame": {
+        "mean": 16.665927977839328,
+        "p95": 16.700000000000728,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 5.459944751010744,
+        "p95": 6.299999997019768,
+        "min": 3.7999999970197678,
+        "max": 7.200000002980232
+      },
+      "gpu": {
+        "mean": 6.692587093922657,
+        "p95": 7.377124,
+        "min": 6.242374,
+        "max": 8.528791
+      },
+      "draws": {
+        "mean": 848,
+        "p95": 848,
+        "min": 848,
+        "max": 848
+      },
+      "triangles": {
+        "mean": 2916859,
+        "p95": 2916859,
+        "min": 2916859,
+        "max": 2916859
+      },
+      "buffer": [
+        1920,
+        965
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 2759449,
+        "shadow": 157410,
+        "groups": {
+          "Scene": {
+            "draws": 10,
+            "triangles": 44928
+          },
+          "Automatic riverbank stones": {
+            "draws": 35,
+            "triangles": 116720
+          },
+          "Village architecture water": {
+            "draws": 2,
+            "triangles": 1963
+          },
+          "Village architecture Bridge limestone": {
+            "draws": 2,
+            "triangles": 11100
+          },
+          "Mesh": {
+            "draws": 21,
+            "triangles": 125042
+          },
+          "Hill waterfall": {
+            "draws": 45,
+            "triangles": 3592
+          },
+          "White dove flock": {
+            "draws": 8,
+            "triangles": 167520
+          },
+          "Animal_Art_Studio": {
+            "draws": 16,
+            "triangles": 52960
+          },
+          "Village architecture Village oak": {
+            "draws": 2,
+            "triangles": 61140
+          },
+          "Kitchen garden and pond life": {
+            "draws": 112,
+            "triangles": 265308
+          },
+          "Village architecture MeshStandardMaterial": {
+            "draws": 25,
+            "triangles": 373418
+          },
+          "Village architecture Village limestone": {
+            "draws": 1,
+            "triangles": 10338
+          },
+          "Static props cell": {
+            "draws": 4,
+            "triangles": 7360
+          },
+          "Valley ground": {
+            "draws": 33,
+            "triangles": 44678
+          },
+          "Village architecture paving": {
+            "draws": 2,
+            "triangles": 21942
+          },
+          "Willow pond water": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "sunrise-meadow-swings": {
+            "draws": 6,
+            "triangles": 12504
+          },
+          "Painted meadow grass -6,0": {
+            "draws": 1,
+            "triangles": 35406
+          },
+          "Painted meadow grass -6,-3": {
+            "draws": 1,
+            "triangles": 42534
+          },
+          "Painted meadow grass -6,-2": {
+            "draws": 1,
+            "triangles": 38268
+          },
+          "Painted meadow grass -6,-1": {
+            "draws": 1,
+            "triangles": 27738
+          },
+          "Painted meadow grass -5,-3": {
+            "draws": 1,
+            "triangles": 12426
+          },
+          "Painted meadow grass -5,-2": {
+            "draws": 1,
+            "triangles": 32238
+          },
+          "Painted meadow grass -5,-1": {
+            "draws": 1,
+            "triangles": 22320
+          },
+          "Painted meadow grass -5,0": {
+            "draws": 1,
+            "triangles": 7146
+          },
+          "Painted meadow grass -5,1": {
+            "draws": 1,
+            "triangles": 3630
+          },
+          "Painted meadow grass -4,-3": {
+            "draws": 1,
+            "triangles": 7590
+          },
+          "Painted meadow grass -4,0": {
+            "draws": 1,
+            "triangles": 4410
+          },
+          "Painted meadow grass -4,1": {
+            "draws": 1,
+            "triangles": 3714
+          },
+          "Painted meadow grass -4,-2": {
+            "draws": 1,
+            "triangles": 7224
+          },
+          "Painted meadow grass -4,-4": {
+            "draws": 1,
+            "triangles": 7038
+          },
+          "Painted meadow grass -4,-1": {
+            "draws": 1,
+            "triangles": 5196
+          },
+          "Painted meadow grass -3,-5": {
+            "draws": 1,
+            "triangles": 3444
+          },
+          "Painted meadow grass -3,1": {
+            "draws": 1,
+            "triangles": 2748
+          },
+          "Painted meadow grass -3,-1": {
+            "draws": 1,
+            "triangles": 1908
+          },
+          "Painted meadow grass -3,0": {
+            "draws": 1,
+            "triangles": 3072
+          },
+          "Painted meadow grass -3,-4": {
+            "draws": 1,
+            "triangles": 2976
+          },
+          "Painted meadow grass -3,-2": {
+            "draws": 1,
+            "triangles": 2766
+          },
+          "Painted meadow grass -3,2": {
+            "draws": 1,
+            "triangles": 5232
+          },
+          "Painted meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 9324
+          },
+          "Meadow grass -3,0": {
+            "draws": 1,
+            "triangles": 870
+          },
+          "Meadow grass -3,2": {
+            "draws": 1,
+            "triangles": 576
+          },
+          "Meadow grass -3,1": {
+            "draws": 1,
+            "triangles": 1200
+          },
+          "Meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 468
+          },
+          "Painted meadow grass -2,2": {
+            "draws": 1,
+            "triangles": 4458
+          },
+          "Painted meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 6714
+          },
+          "Painted meadow grass -2,3": {
+            "draws": 1,
+            "triangles": 5604
+          },
+          "Meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 8046
+          },
+          "Painted meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 2598
+          },
+          "Painted meadow grass -2,-6": {
+            "draws": 1,
+            "triangles": 2634
+          },
+          "Painted meadow grass -2,-5": {
+            "draws": 1,
+            "triangles": 4104
+          },
+          "Painted meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 288
+          },
+          "Painted meadow grass -2,4": {
+            "draws": 1,
+            "triangles": 3624
+          },
+          "Painted meadow grass -2,-4": {
+            "draws": 1,
+            "triangles": 4320
+          },
+          "Painted meadow grass -2,1": {
+            "draws": 1,
+            "triangles": 2064
+          },
+          "Meadow grass -2,2": {
+            "draws": 1,
+            "triangles": 8592
+          },
+          "Meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 7416
+          },
+          "Meadow grass -2,1": {
+            "draws": 1,
+            "triangles": 8400
+          },
+          "Painted meadow grass -2,-7": {
+            "draws": 1,
+            "triangles": 78
+          },
+          "Meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 1008
+          },
+          "Painted meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 192
+          },
+          "Meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Meadow grass -1,1": {
+            "draws": 1,
+            "triangles": 7116
+          },
+          "Painted meadow grass -1,1": {
+            "draws": 1,
+            "triangles": 1782
+          },
+          "Meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 2832
+          },
+          "Painted meadow grass -1,-6": {
+            "draws": 1,
+            "triangles": 1230
+          },
+          "Meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 4344
+          },
+          "Painted meadow grass -1,2": {
+            "draws": 1,
+            "triangles": 2220
+          },
+          "Painted meadow grass -1,-7": {
+            "draws": 1,
+            "triangles": 228
+          },
+          "Meadow grass -1,2": {
+            "draws": 1,
+            "triangles": 3942
+          },
+          "Painted meadow grass -1,-5": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Meadow grass -1,0": {
+            "draws": 1,
+            "triangles": 4722
+          },
+          "Meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 4116
+          },
+          "Painted meadow grass -1,3": {
+            "draws": 1,
+            "triangles": 2082
+          },
+          "Painted meadow grass -1,0": {
+            "draws": 1,
+            "triangles": 1308
+          },
+          "Painted meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Painted meadow grass -1,4": {
+            "draws": 1,
+            "triangles": 2022
+          },
+          "Painted meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 1848
+          },
+          "Painted meadow grass -1,-4": {
+            "draws": 1,
+            "triangles": 2322
+          },
+          "Painted meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 924
+          },
+          "Painted meadow grass -1,5": {
+            "draws": 1,
+            "triangles": 1230
+          },
+          "Painted meadow grass 0,3": {
+            "draws": 1,
+            "triangles": 3906
+          },
+          "Painted meadow grass 0,-6": {
+            "draws": 1,
+            "triangles": 2010
+          },
+          "Meadow grass 0,-1": {
+            "draws": 1,
+            "triangles": 4980
+          },
+          "Painted meadow grass 0,5": {
+            "draws": 1,
+            "triangles": 2418
+          },
+          "Painted meadow grass 0,-5": {
+            "draws": 1,
+            "triangles": 4074
+          },
+          "Painted meadow grass 0,4": {
+            "draws": 1,
+            "triangles": 3732
+          },
+          "Painted meadow grass 0,-7": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Painted meadow grass 0,2": {
+            "draws": 1,
+            "triangles": 5304
+          },
+          "Meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 7878
+          },
+          "Meadow grass 0,0": {
+            "draws": 1,
+            "triangles": 4932
+          },
+          "Painted meadow grass 0,-1": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Painted meadow grass 0,-4": {
+            "draws": 1,
+            "triangles": 9312
+          },
+          "Painted meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 6690
+          },
+          "Meadow grass 0,2": {
+            "draws": 1,
+            "triangles": 3696
+          },
+          "Meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 3294
+          },
+          "Meadow grass 0,1": {
+            "draws": 1,
+            "triangles": 10854
+          },
+          "Painted meadow grass 0,1": {
+            "draws": 1,
+            "triangles": 9726
+          },
+          "Painted meadow grass 0,0": {
+            "draws": 1,
+            "triangles": 1500
+          },
+          "Painted meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 4038
+          },
+          "Painted meadow grass 1,6": {
+            "draws": 1,
+            "triangles": 90
+          },
+          "Painted meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 6420
+          },
+          "Painted meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 4068
+          },
+          "Meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 630
+          },
+          "Painted meadow grass 1,-4": {
+            "draws": 1,
+            "triangles": 2058
+          },
+          "Painted meadow grass 1,1": {
+            "draws": 1,
+            "triangles": 8754
+          },
+          "Painted meadow grass 1,0": {
+            "draws": 1,
+            "triangles": 1860
+          },
+          "Meadow grass 1,1": {
+            "draws": 1,
+            "triangles": 9714
+          },
+          "Painted meadow grass 1,-1": {
+            "draws": 1,
+            "triangles": 624
+          },
+          "Meadow grass 1,-1": {
+            "draws": 1,
+            "triangles": 2118
+          },
+          "Meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 6822
+          },
+          "Painted meadow grass 1,-5": {
+            "draws": 1,
+            "triangles": 1716
+          },
+          "Meadow grass 1,0": {
+            "draws": 1,
+            "triangles": 4476
+          },
+          "Painted meadow grass 1,4": {
+            "draws": 1,
+            "triangles": 3468
+          },
+          "Painted meadow grass 1,3": {
+            "draws": 1,
+            "triangles": 3864
+          },
+          "Painted meadow grass 1,5": {
+            "draws": 1,
+            "triangles": 2040
+          },
+          "Painted meadow grass 1,2": {
+            "draws": 1,
+            "triangles": 4014
+          },
+          "Meadow grass 1,2": {
+            "draws": 1,
+            "triangles": 2670
+          },
+          "Painted meadow grass 1,-7": {
+            "draws": 1,
+            "triangles": 450
+          },
+          "Painted meadow grass 1,-6": {
+            "draws": 1,
+            "triangles": 1560
+          },
+          "Meadow grass 2,0": {
+            "draws": 1,
+            "triangles": 864
+          },
+          "Meadow grass 2,1": {
+            "draws": 1,
+            "triangles": 306
+          },
+          "Meadow grass 2,-2": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Meadow grass 2,-1": {
+            "draws": 1,
+            "triangles": 324
+          },
+          "Meadow grass 2,-3": {
+            "draws": 1,
+            "triangles": 156
+          },
+          "Meadow grass 2,2": {
+            "draws": 1,
+            "triangles": 228
+          },
+          "Painted meadow grass 2,-6": {
+            "draws": 1,
+            "triangles": 1752
+          },
+          "Painted meadow grass 2,1": {
+            "draws": 1,
+            "triangles": 3468
+          },
+          "Painted meadow grass 2,5": {
+            "draws": 1,
+            "triangles": 1734
+          },
+          "Painted meadow grass 2,-5": {
+            "draws": 1,
+            "triangles": 2376
+          },
+          "Painted meadow grass 2,4": {
+            "draws": 1,
+            "triangles": 3288
+          },
+          "Painted meadow grass 2,0": {
+            "draws": 1,
+            "triangles": 7356
+          },
+          "Painted meadow grass 2,-1": {
+            "draws": 1,
+            "triangles": 5886
+          },
+          "Painted meadow grass 2,3": {
+            "draws": 1,
+            "triangles": 3426
+          },
+          "Painted meadow grass 2,2": {
+            "draws": 1,
+            "triangles": 5604
+          },
+          "Painted meadow grass 2,-2": {
+            "draws": 1,
+            "triangles": 7500
+          },
+          "Painted meadow grass 2,-3": {
+            "draws": 1,
+            "triangles": 2748
+          },
+          "Painted meadow grass 2,-7": {
+            "draws": 1,
+            "triangles": 432
+          },
+          "Painted meadow grass 2,-4": {
+            "draws": 1,
+            "triangles": 8496
+          },
+          "Painted meadow grass 2,6": {
+            "draws": 1,
+            "triangles": 84
+          },
+          "Painted meadow grass 3,6": {
+            "draws": 1,
+            "triangles": 162
+          },
+          "Painted meadow grass 3,-4": {
+            "draws": 1,
+            "triangles": 600
+          },
+          "Painted meadow grass 3,3": {
+            "draws": 1,
+            "triangles": 2550
+          },
+          "Painted meadow grass 3,-2": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass 3,-7": {
+            "draws": 1,
+            "triangles": 258
+          },
+          "Painted meadow grass 3,0": {
+            "draws": 1,
+            "triangles": 3900
+          },
+          "Painted meadow grass 3,-3": {
+            "draws": 1,
+            "triangles": 2502
+          },
+          "Painted meadow grass 3,4": {
+            "draws": 1,
+            "triangles": 3738
+          },
+          "Painted meadow grass 3,5": {
+            "draws": 1,
+            "triangles": 1422
+          },
+          "Painted meadow grass 3,-6": {
+            "draws": 1,
+            "triangles": 3660
+          },
+          "Painted meadow grass 3,1": {
+            "draws": 1,
+            "triangles": 3984
+          },
+          "Painted meadow grass 3,-1": {
+            "draws": 1,
+            "triangles": 4626
+          },
+          "Painted meadow grass 3,-5": {
+            "draws": 1,
+            "triangles": 5814
+          },
+          "Painted meadow grass 3,2": {
+            "draws": 1,
+            "triangles": 3966
+          },
+          "Painted meadow grass 4,-3": {
+            "draws": 1,
+            "triangles": 2700
+          },
+          "Painted meadow grass 4,5": {
+            "draws": 1,
+            "triangles": 1314
+          },
+          "Painted meadow grass 4,-1": {
+            "draws": 1,
+            "triangles": 7926
+          },
+          "Painted meadow grass 4,1": {
+            "draws": 1,
+            "triangles": 2070
+          },
+          "Painted meadow grass 4,0": {
+            "draws": 1,
+            "triangles": 4944
+          },
+          "Painted meadow grass 4,-5": {
+            "draws": 1,
+            "triangles": 7314
+          },
+          "Painted meadow grass 4,-2": {
+            "draws": 1,
+            "triangles": 3636
+          },
+          "Painted meadow grass 4,3": {
+            "draws": 1,
+            "triangles": 4080
+          },
+          "Painted meadow grass 4,4": {
+            "draws": 1,
+            "triangles": 1914
+          },
+          "Painted meadow grass 4,-6": {
+            "draws": 1,
+            "triangles": 3720
+          },
+          "Painted meadow grass 4,-4": {
+            "draws": 1,
+            "triangles": 1506
+          },
+          "Painted meadow grass 4,6": {
+            "draws": 1,
+            "triangles": 150
+          },
+          "Painted meadow grass 4,-7": {
+            "draws": 1,
+            "triangles": 414
+          },
+          "Painted meadow grass 4,2": {
+            "draws": 1,
+            "triangles": 7176
+          },
+          "Painted meadow grass 5,6": {
+            "draws": 1,
+            "triangles": 36
+          },
+          "Painted meadow grass 5,5": {
+            "draws": 1,
+            "triangles": 2064
+          },
+          "Painted meadow grass 5,-7": {
+            "draws": 1,
+            "triangles": 198
+          },
+          "Painted meadow grass 5,1": {
+            "draws": 1,
+            "triangles": 2922
+          },
+          "Painted meadow grass 5,0": {
+            "draws": 1,
+            "triangles": 6966
+          },
+          "Painted meadow grass 5,-2": {
+            "draws": 1,
+            "triangles": 3612
+          },
+          "Painted meadow grass 5,-6": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass 5,-1": {
+            "draws": 1,
+            "triangles": 6816
+          },
+          "Painted meadow grass 5,-4": {
+            "draws": 1,
+            "triangles": 7032
+          },
+          "Painted meadow grass 5,2": {
+            "draws": 1,
+            "triangles": 10488
+          },
+          "Painted meadow grass 5,-3": {
+            "draws": 1,
+            "triangles": 2382
+          },
+          "Painted meadow grass 5,-5": {
+            "draws": 1,
+            "triangles": 5532
+          },
+          "Painted meadow grass 5,3": {
+            "draws": 1,
+            "triangles": 3954
+          },
+          "Painted meadow grass 5,4": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass 6,2": {
+            "draws": 1,
+            "triangles": 4818
+          },
+          "Painted meadow grass 6,3": {
+            "draws": 1,
+            "triangles": 3462
+          },
+          "Painted meadow grass 6,1": {
+            "draws": 1,
+            "triangles": 1710
+          },
+          "Painted meadow grass 6,-5": {
+            "draws": 1,
+            "triangles": 3000
+          },
+          "Painted meadow grass 6,0": {
+            "draws": 1,
+            "triangles": 3630
+          },
+          "Painted meadow grass 6,-4": {
+            "draws": 1,
+            "triangles": 3702
+          },
+          "Painted meadow grass 6,-1": {
+            "draws": 1,
+            "triangles": 2580
+          },
+          "Painted meadow grass 6,-2": {
+            "draws": 1,
+            "triangles": 2430
+          },
+          "Painted meadow grass 6,-6": {
+            "draws": 1,
+            "triangles": 2190
+          },
+          "Painted meadow grass 6,-3": {
+            "draws": 1,
+            "triangles": 2748
+          },
+          "Painted meadow grass 6,4": {
+            "draws": 1,
+            "triangles": 3108
+          },
+          "Painted meadow grass 6,-7": {
+            "draws": 1,
+            "triangles": 336
+          },
+          "Painted meadow grass 6,5": {
+            "draws": 1,
+            "triangles": 1752
+          },
+          "Painted meadow grass 6,6": {
+            "draws": 1,
+            "triangles": 108
+          },
+          "Painted meadow grass 7,6": {
+            "draws": 1,
+            "triangles": 24
+          },
+          "Painted meadow grass 7,-7": {
+            "draws": 1,
+            "triangles": 84
+          },
+          "Painted meadow grass 7,4": {
+            "draws": 1,
+            "triangles": 2250
+          },
+          "Painted meadow grass 7,1": {
+            "draws": 1,
+            "triangles": 1944
+          },
+          "Painted meadow grass 7,5": {
+            "draws": 1,
+            "triangles": 1446
+          },
+          "Painted meadow grass 7,-4": {
+            "draws": 1,
+            "triangles": 2346
+          },
+          "Painted meadow grass 7,-6": {
+            "draws": 1,
+            "triangles": 1224
+          },
+          "Painted meadow grass 7,2": {
+            "draws": 1,
+            "triangles": 2406
+          },
+          "Painted meadow grass 7,3": {
+            "draws": 1,
+            "triangles": 2502
+          },
+          "Painted meadow grass 7,-5": {
+            "draws": 1,
+            "triangles": 2532
+          },
+          "Painted meadow grass 7,-2": {
+            "draws": 1,
+            "triangles": 2202
+          },
+          "Painted meadow grass 7,0": {
+            "draws": 1,
+            "triangles": 2772
+          },
+          "Painted meadow grass 7,-1": {
+            "draws": 1,
+            "triangles": 2388
+          },
+          "Painted meadow grass 7,-3": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Painted meadow grass 8,-5": {
+            "draws": 1,
+            "triangles": 54
+          },
+          "Painted meadow grass 8,4": {
+            "draws": 1,
+            "triangles": 114
+          },
+          "Painted meadow grass 8,-3": {
+            "draws": 1,
+            "triangles": 72
+          },
+          "Painted meadow grass 8,1": {
+            "draws": 1,
+            "triangles": 84
+          },
+          "Painted meadow grass 8,0": {
+            "draws": 1,
+            "triangles": 72
+          },
+          "Painted meadow grass 8,-6": {
+            "draws": 1,
+            "triangles": 18
+          },
+          "Painted meadow grass 8,3": {
+            "draws": 1,
+            "triangles": 90
+          },
+          "Painted meadow grass 8,-2": {
+            "draws": 1,
+            "triangles": 138
+          },
+          "Painted meadow grass 8,-1": {
+            "draws": 1,
+            "triangles": 120
+          },
+          "Painted meadow grass 8,5": {
+            "draws": 1,
+            "triangles": 30
+          },
+          "Painted meadow grass 8,-4": {
+            "draws": 1,
+            "triangles": 162
+          },
+          "Painted meadow grass 8,2": {
+            "draws": 1,
+            "triangles": 12
+          },
+          "Meadow shrubs -3,-1": {
+            "draws": 1,
+            "triangles": 2160
+          },
+          "Meadow shrubs -3,-2": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -3,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -3,0": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,0": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,-1": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,-2": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Meadow shrubs -2,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -1,0": {
+            "draws": 1,
+            "triangles": 10800
+          },
+          "Meadow shrubs -1,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -1,-2": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Meadow shrubs -1,-1": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -1,1": {
+            "draws": 1,
+            "triangles": 15840
+          },
+          "Meadow shrubs 0,2": {
+            "draws": 1,
+            "triangles": 3600
+          },
+          "Meadow shrubs 0,1": {
+            "draws": 1,
+            "triangles": 14400
+          },
+          "Meadow planting -1,-2": {
+            "draws": 2,
+            "triangles": 11776
+          },
+          "Meadow planting -1,-1": {
+            "draws": 2,
+            "triangles": 16896
+          },
+          "Meadow planting -1,2": {
+            "draws": 2,
+            "triangles": 1024
+          },
+          "Meadow planting -1,0": {
+            "draws": 2,
+            "triangles": 12544
+          },
+          "Meadow planting -1,1": {
+            "draws": 2,
+            "triangles": 14336
+          },
+          "Meadow planting 0,-2": {
+            "draws": 2,
+            "triangles": 7936
+          },
+          "Meadow planting 0,-1": {
+            "draws": 2,
+            "triangles": 8448
+          },
+          "Meadow planting 0,1": {
+            "draws": 2,
+            "triangles": 22016
+          },
+          "Meadow planting 0,0": {
+            "draws": 2,
+            "triangles": 9984
+          },
+          "Meadow planting 0,2": {
+            "draws": 2,
+            "triangles": 768
+          },
+          "Meadow wildflowers": {
+            "draws": 108,
+            "triangles": 233632
+          },
+          "Village wayfinding": {
+            "draws": 15,
+            "triangles": 280
+          },
+          "Sunflower": {
+            "draws": 4,
+            "triangles": 34368
+          },
+          "Owl roost & feeding tray": {
+            "draws": 1,
+            "triangles": 2080
+          },
+          "Static props Little mushroom patch": {
+            "draws": 1,
+            "triangles": 6888
+          },
+          "Static props Fruitful apple tree": {
+            "draws": 2,
+            "triangles": 12576
+          },
+          "Horse stable · two feeding bays": {
+            "draws": 9,
+            "triangles": 23356
+          },
+          "Willow circuit · horse racetrack": {
+            "draws": 8,
+            "triangles": 35888
+          },
+          "Static props FarmRow": {
+            "draws": 13,
+            "triangles": 22800
+          },
+          "Static props HayBale": {
+            "draws": 3,
+            "triangles": 2040
+          },
+          "Activity furnishings": {
+            "draws": 13,
+            "triangles": 1504
+          },
+          "GardenKitchen": {
+            "draws": 6,
+            "triangles": 4892
+          },
+          "Fruitful apple tree": {
+            "draws": 1,
+            "triangles": 1878
+          },
+          "Little mushroom patch": {
+            "draws": 1,
+            "triangles": 180
+          },
+          "Pip": {
+            "draws": 9,
+            "triangles": 23588
+          },
+          "Maple": {
+            "draws": 13,
+            "triangles": 24576
+          },
+          "Moss": {
+            "draws": 10,
+            "triangles": 23396
+          },
+          "Luma": {
+            "draws": 8,
+            "triangles": 23208
+          },
+          "Wren": {
+            "draws": 14,
+            "triangles": 25152
+          },
+          "Rusk": {
+            "draws": 11,
+            "triangles": 23584
+          },
+          "Poppy": {
+            "draws": 10,
+            "triangles": 23044
+          },
+          "Cress": {
+            "draws": 11,
+            "triangles": 23584
+          },
+          "Rowan": {
+            "draws": 9,
+            "triangles": 23008
+          },
+          "Living flame": {
+            "draws": 1,
+            "triangles": 1176
+          }
+        },
+        "largest": [
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 105244,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 69870,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture Village oak",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 50750,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 50394,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 50050,
+            "instances": 65
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 48712,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass -6,-3",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 42534,
+            "instances": 2363
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38414,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass -6,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 38268,
+            "instances": 2126
+          },
+          {
+            "name": "Painted meadow grass -6,0",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 35406,
+            "instances": 1967
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Painted meadow grass -5,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 32238,
+            "instances": 1791
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 31680,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass -6,-1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 27738,
+            "instances": 1541
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 23904,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Garden bed 6",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 23720,
+            "instances": 20
+          },
+          {
+            "name": "Painted meadow grass -5,-1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 22320,
+            "instances": 1240
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Kitchen garden and pond life/Garden bed 7",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 21528,
+            "instances": 13
+          },
+          {
+            "name": "Village architecture paving",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 21366,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Pip/Pip spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Maple/Maple spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Moss/Moss spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Luma/Luma spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Wren/Wren spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          }
+        ]
+      }
+    },
+    {
+      "view": "entry",
+      "variant": "high",
+      "frame": {
+        "mean": 16.66611111111111,
+        "p95": 16.700000000000728,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 5.126592797957299,
+        "p95": 6,
+        "min": 3.699999988079071,
+        "max": 10.400000005960464
+      },
+      "gpu": {
+        "mean": 8.932791831024932,
+        "p95": 10.9895,
+        "min": 7.927333,
+        "max": 12.806124
+      },
+      "draws": {
+        "mean": 559.1611111111112,
+        "p95": 573,
+        "min": 554,
+        "max": 579
+      },
+      "triangles": {
+        "mean": 2454947.8,
+        "p95": 2496895,
+        "min": 2439267,
+        "max": 2500911
+      },
+      "buffer": [
+        1920,
+        965
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 1762645,
+        "shadow": 677198,
+        "groups": {
+          "Scene": {
+            "draws": 10,
+            "triangles": 44928
+          },
+          "Automatic riverbank stones": {
+            "draws": 26,
+            "triangles": 90800
+          },
+          "Village architecture water": {
+            "draws": 2,
+            "triangles": 1306
+          },
+          "Village architecture MeshStandardMaterial": {
+            "draws": 27,
+            "triangles": 540154
+          },
+          "Village architecture Village oak": {
+            "draws": 4,
+            "triangles": 79082
+          },
+          "Village architecture Bridge limestone": {
+            "draws": 2,
+            "triangles": 8880
+          },
+          "Village architecture Village limestone": {
+            "draws": 2,
+            "triangles": 14464
+          },
+          "Mesh": {
+            "draws": 11,
+            "triangles": 140420
+          },
+          "Meadow shrubs -1,1": {
+            "draws": 2,
+            "triangles": 31680
+          },
+          "Meadow shrubs -1,-1": {
+            "draws": 2,
+            "triangles": 2880
+          },
+          "Meadow shrubs -1,0": {
+            "draws": 2,
+            "triangles": 21600
+          },
+          "Meadow shrubs 0,1": {
+            "draws": 2,
+            "triangles": 28800
+          },
+          "Meadow shrubs 0,2": {
+            "draws": 1,
+            "triangles": 3600
+          },
+          "Village wayfinding": {
+            "draws": 16,
+            "triangles": 532
+          },
+          "Kitchen garden and pond life": {
+            "draws": 96,
+            "triangles": 267102
+          },
+          "Activity furnishings": {
+            "draws": 17,
+            "triangles": 2176
+          },
+          "Fruitful apple tree": {
+            "draws": 1,
+            "triangles": 1878
+          },
+          "Static props Fruitful apple tree": {
+            "draws": 2,
+            "triangles": 12576
+          },
+          "Static props Little mushroom patch": {
+            "draws": 1,
+            "triangles": 6888
+          },
+          "Static props cell": {
+            "draws": 5,
+            "triangles": 9360
+          },
+          "Pip": {
+            "draws": 9,
+            "triangles": 23588
+          },
+          "Luma": {
+            "draws": 16,
+            "triangles": 46416
+          },
+          "White dove flock": {
+            "draws": 8,
+            "triangles": 167520
+          },
+          "Animal_Art_Studio": {
+            "draws": 16,
+            "triangles": 52960
+          },
+          "Valley ground": {
+            "draws": 28,
+            "triangles": 38965
+          },
+          "Village architecture paving": {
+            "draws": 2,
+            "triangles": 15526
+          },
+          "Willow pond water": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "Painted meadow grass 0,1": {
+            "draws": 1,
+            "triangles": 29178
+          },
+          "Meadow grass 0,1": {
+            "draws": 1,
+            "triangles": 32562
+          },
+          "Meadow grass -1,1": {
+            "draws": 1,
+            "triangles": 21348
+          },
+          "Painted meadow grass -1,1": {
+            "draws": 1,
+            "triangles": 5346
+          },
+          "Painted meadow grass -1,0": {
+            "draws": 1,
+            "triangles": 3924
+          },
+          "Meadow grass 1,0": {
+            "draws": 1,
+            "triangles": 4476
+          },
+          "Meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 8046
+          },
+          "Meadow grass -1,0": {
+            "draws": 1,
+            "triangles": 14166
+          },
+          "Painted meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 2598
+          },
+          "Painted meadow grass 1,0": {
+            "draws": 1,
+            "triangles": 1860
+          },
+          "Meadow grass 0,0": {
+            "draws": 1,
+            "triangles": 14796
+          },
+          "Painted meadow grass 0,0": {
+            "draws": 1,
+            "triangles": 4500
+          },
+          "Painted meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 288
+          },
+          "Meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 1008
+          },
+          "Meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 4116
+          },
+          "Meadow grass 2,-1": {
+            "draws": 1,
+            "triangles": 324
+          },
+          "Meadow grass 0,-1": {
+            "draws": 1,
+            "triangles": 4980
+          },
+          "Painted meadow grass -3,-1": {
+            "draws": 1,
+            "triangles": 1908
+          },
+          "Painted meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 924
+          },
+          "Painted meadow grass 2,-1": {
+            "draws": 1,
+            "triangles": 5886
+          },
+          "Painted meadow grass 0,-1": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Painted meadow grass 1,-1": {
+            "draws": 1,
+            "triangles": 624
+          },
+          "Meadow grass 1,-1": {
+            "draws": 1,
+            "triangles": 2118
+          },
+          "Meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 7878
+          },
+          "Meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 6822
+          },
+          "Painted meadow grass -4,-2": {
+            "draws": 1,
+            "triangles": 7224
+          },
+          "Painted meadow grass 2,-2": {
+            "draws": 1,
+            "triangles": 7500
+          },
+          "Painted meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 6690
+          },
+          "Meadow grass 2,-2": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Painted meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 4068
+          },
+          "Painted meadow grass -3,-2": {
+            "draws": 1,
+            "triangles": 2766
+          },
+          "Painted meadow grass 3,-2": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 4344
+          },
+          "Meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Painted meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 192
+          },
+          "Meadow grass 2,-3": {
+            "draws": 1,
+            "triangles": 156
+          },
+          "Meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 3294
+          },
+          "Meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 2832
+          },
+          "Meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 468
+          },
+          "Meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 7416
+          },
+          "Painted meadow grass -5,-3": {
+            "draws": 1,
+            "triangles": 12426
+          },
+          "Meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 630
+          },
+          "Painted meadow grass 3,-3": {
+            "draws": 1,
+            "triangles": 2502
+          },
+          "Painted meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 1848
+          },
+          "Painted meadow grass 4,-3": {
+            "draws": 1,
+            "triangles": 2700
+          },
+          "Painted meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 4038
+          },
+          "Painted meadow grass 2,-3": {
+            "draws": 1,
+            "triangles": 2748
+          },
+          "Painted meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 9324
+          },
+          "Painted meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 6714
+          },
+          "Painted meadow grass -4,-3": {
+            "draws": 1,
+            "triangles": 7590
+          },
+          "Painted meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 6420
+          },
+          "Painted meadow grass 2,-4": {
+            "draws": 1,
+            "triangles": 8496
+          },
+          "Painted meadow grass -6,-4": {
+            "draws": 1,
+            "triangles": 8322
+          },
+          "Painted meadow grass 0,-4": {
+            "draws": 1,
+            "triangles": 9312
+          },
+          "Painted meadow grass -5,-4": {
+            "draws": 1,
+            "triangles": 6858
+          },
+          "Painted meadow grass -3,-4": {
+            "draws": 1,
+            "triangles": 2976
+          },
+          "Painted meadow grass -2,-4": {
+            "draws": 1,
+            "triangles": 4320
+          },
+          "Painted meadow grass 1,-4": {
+            "draws": 1,
+            "triangles": 2058
+          },
+          "Painted meadow grass 5,-4": {
+            "draws": 1,
+            "triangles": 7032
+          },
+          "Painted meadow grass -4,-4": {
+            "draws": 1,
+            "triangles": 7038
+          },
+          "Painted meadow grass -1,-4": {
+            "draws": 1,
+            "triangles": 2322
+          },
+          "Painted meadow grass 4,-4": {
+            "draws": 1,
+            "triangles": 1506
+          },
+          "Painted meadow grass 3,-4": {
+            "draws": 1,
+            "triangles": 600
+          },
+          "Painted meadow grass 0,-5": {
+            "draws": 1,
+            "triangles": 4074
+          },
+          "Painted meadow grass -7,-5": {
+            "draws": 1,
+            "triangles": 3582
+          },
+          "Painted meadow grass 5,-5": {
+            "draws": 1,
+            "triangles": 5532
+          },
+          "Painted meadow grass -6,-5": {
+            "draws": 1,
+            "triangles": 5454
+          },
+          "Painted meadow grass -5,-5": {
+            "draws": 1,
+            "triangles": 3264
+          },
+          "Painted meadow grass 6,-5": {
+            "draws": 1,
+            "triangles": 3000
+          },
+          "Painted meadow grass -3,-5": {
+            "draws": 1,
+            "triangles": 3444
+          },
+          "Painted meadow grass 2,-5": {
+            "draws": 1,
+            "triangles": 2376
+          },
+          "Painted meadow grass 3,-5": {
+            "draws": 1,
+            "triangles": 5814
+          },
+          "Painted meadow grass 1,-5": {
+            "draws": 1,
+            "triangles": 1716
+          },
+          "Painted meadow grass 4,-5": {
+            "draws": 1,
+            "triangles": 7314
+          },
+          "Painted meadow grass -4,-5": {
+            "draws": 1,
+            "triangles": 4254
+          },
+          "Painted meadow grass -2,-5": {
+            "draws": 1,
+            "triangles": 4104
+          },
+          "Painted meadow grass -1,-5": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Painted meadow grass 4,-6": {
+            "draws": 1,
+            "triangles": 3720
+          },
+          "Painted meadow grass 3,-6": {
+            "draws": 1,
+            "triangles": 3660
+          },
+          "Painted meadow grass 6,-6": {
+            "draws": 1,
+            "triangles": 2190
+          },
+          "Painted meadow grass -6,-6": {
+            "draws": 1,
+            "triangles": 936
+          },
+          "Painted meadow grass -4,-6": {
+            "draws": 1,
+            "triangles": 2610
+          },
+          "Painted meadow grass 0,-6": {
+            "draws": 1,
+            "triangles": 2010
+          },
+          "Painted meadow grass 1,-6": {
+            "draws": 1,
+            "triangles": 1560
+          },
+          "Painted meadow grass 5,-6": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass -2,-6": {
+            "draws": 1,
+            "triangles": 2634
+          },
+          "Painted meadow grass 7,-6": {
+            "draws": 1,
+            "triangles": 1224
+          },
+          "Painted meadow grass -3,-6": {
+            "draws": 1,
+            "triangles": 1908
+          },
+          "Painted meadow grass -5,-6": {
+            "draws": 1,
+            "triangles": 1956
+          },
+          "Painted meadow grass -1,-6": {
+            "draws": 1,
+            "triangles": 1230
+          },
+          "Painted meadow grass 2,-6": {
+            "draws": 1,
+            "triangles": 1752
+          },
+          "Painted meadow grass -6,-7": {
+            "draws": 1,
+            "triangles": 12
+          },
+          "Painted meadow grass -2,-7": {
+            "draws": 1,
+            "triangles": 78
+          },
+          "Painted meadow grass -3,-7": {
+            "draws": 1,
+            "triangles": 360
+          },
+          "Painted meadow grass -4,-7": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "Painted meadow grass 4,-7": {
+            "draws": 1,
+            "triangles": 414
+          },
+          "Painted meadow grass 5,-7": {
+            "draws": 1,
+            "triangles": 198
+          },
+          "Painted meadow grass 3,-7": {
+            "draws": 1,
+            "triangles": 258
+          },
+          "Painted meadow grass 0,-7": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Painted meadow grass -5,-7": {
+            "draws": 1,
+            "triangles": 240
+          },
+          "Painted meadow grass 1,-7": {
+            "draws": 1,
+            "triangles": 450
+          },
+          "Painted meadow grass 2,-7": {
+            "draws": 1,
+            "triangles": 432
+          },
+          "Painted meadow grass -1,-7": {
+            "draws": 1,
+            "triangles": 228
+          },
+          "Painted meadow grass 7,-7": {
+            "draws": 1,
+            "triangles": 84
+          },
+          "Painted meadow grass 6,-7": {
+            "draws": 1,
+            "triangles": 336
+          },
+          "Meadow shrubs -2,0": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,-1": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -3,-2": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -1,-2": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Meadow shrubs -2,-2": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Meadow shrubs -3,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -1,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow planting -1,1": {
+            "draws": 2,
+            "triangles": 14336
+          },
+          "Meadow planting 0,1": {
+            "draws": 2,
+            "triangles": 22016
+          },
+          "Meadow planting -1,0": {
+            "draws": 2,
+            "triangles": 12544
+          },
+          "Meadow planting 0,0": {
+            "draws": 2,
+            "triangles": 9984
+          },
+          "Meadow planting -1,-1": {
+            "draws": 2,
+            "triangles": 16896
+          },
+          "Meadow planting 0,-1": {
+            "draws": 2,
+            "triangles": 8448
+          },
+          "Meadow planting 0,-2": {
+            "draws": 2,
+            "triangles": 7936
+          },
+          "Meadow planting -1,-2": {
+            "draws": 2,
+            "triangles": 11776
+          },
+          "Meadow wildflowers": {
+            "draws": 54,
+            "triangles": 109760
+          },
+          "Owl roost & feeding tray": {
+            "draws": 1,
+            "triangles": 2080
+          },
+          "Static props FarmRow": {
+            "draws": 12,
+            "triangles": 22260
+          },
+          "Maple": {
+            "draws": 13,
+            "triangles": 24576
+          },
+          "Moss": {
+            "draws": 10,
+            "triangles": 23396
+          },
+          "Rusk": {
+            "draws": 11,
+            "triangles": 23584
+          },
+          "Poppy": {
+            "draws": 10,
+            "triangles": 23044
+          },
+          "Living flame": {
+            "draws": 1,
+            "triangles": 1176
+          }
+        },
+        "largest": [
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 79845,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 76270,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 51466,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 50312,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 40306,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 37321,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 37232,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 36154,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture Village oak",
+            "material": "Village oak",
+            "pass": "color",
+            "triangles": 33132,
+            "instances": 1
+          },
+          {
+            "name": "Meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 32562,
+            "instances": 1809
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 31600,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture Village oak",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 30888,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 29402,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass 0,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 29178,
+            "instances": 1621
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 24640,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 23904,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 23904,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Garden bed 6",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 23720,
+            "instances": 20
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 23144,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 22536,
+            "instances": 12
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 22536,
+            "instances": 12
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Kitchen garden and pond life/Garden bed 7",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 21528,
+            "instances": 13
+          },
+          {
+            "name": "Meadow grass -1,1",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 21348,
+            "instances": 1186
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 20020,
+            "instances": 26
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          }
+        ]
+      }
+    },
+    {
+      "view": "pond",
+      "variant": "high",
+      "frame": {
+        "mean": 16.6661111111111,
+        "p95": 16.700000000004366,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 4.608587257460874,
+        "p95": 5.799999997019768,
+        "min": 3.3999999910593033,
+        "max": 8.400000005960464
+      },
+      "gpu": {
+        "mean": 7.702289288088644,
+        "p95": 9.750666,
+        "min": 7.018208,
+        "max": 11.411999
+      },
+      "draws": {
+        "mean": 493.3388888888889,
+        "p95": 494,
+        "min": 492,
+        "max": 494
+      },
+      "triangles": {
+        "mean": 1648349.6666666667,
+        "p95": 1660967,
+        "min": 1643303,
+        "max": 1661687
+      },
+      "buffer": [
+        1920,
+        965
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 921132,
+        "shadow": 727579,
+        "groups": {
+          "Scene": {
+            "draws": 10,
+            "triangles": 44928
+          },
+          "sunrise-meadow-swings": {
+            "draws": 6,
+            "triangles": 12504
+          },
+          "pasture-meadow-swings-2": {
+            "draws": 6,
+            "triangles": 12504
+          },
+          "Automatic riverbank stones": {
+            "draws": 16,
+            "triangles": 57040
+          },
+          "Village architecture water": {
+            "draws": 2,
+            "triangles": 501
+          },
+          "Village architecture MeshStandardMaterial": {
+            "draws": 39,
+            "triangles": 280634
+          },
+          "Village architecture Village oak": {
+            "draws": 3,
+            "triangles": 23214
+          },
+          "Village architecture Bridge limestone": {
+            "draws": 2,
+            "triangles": 4440
+          },
+          "Village architecture Village limestone": {
+            "draws": 2,
+            "triangles": 8542
+          },
+          "Mesh": {
+            "draws": 10,
+            "triangles": 100116
+          },
+          "Meadow shrubs -1,1": {
+            "draws": 1,
+            "triangles": 15840
+          },
+          "Meadow shrubs -1,-1": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -1,0": {
+            "draws": 1,
+            "triangles": 10800
+          },
+          "Meadow shrubs -2,0": {
+            "draws": 2,
+            "triangles": 1440
+          },
+          "Meadow shrubs -1,-2": {
+            "draws": 2,
+            "triangles": 5760
+          },
+          "Meadow shrubs -2,-3": {
+            "draws": 2,
+            "triangles": 1440
+          },
+          "Meadow shrubs -2,-1": {
+            "draws": 2,
+            "triangles": 1440
+          },
+          "Meadow shrubs -3,0": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -2,-2": {
+            "draws": 2,
+            "triangles": 5760
+          },
+          "Meadow shrubs -1,-3": {
+            "draws": 2,
+            "triangles": 1440
+          },
+          "Meadow shrubs -3,-1": {
+            "draws": 2,
+            "triangles": 4320
+          },
+          "Village wayfinding": {
+            "draws": 6,
+            "triangles": 512
+          },
+          "Kitchen garden and pond life": {
+            "draws": 117,
+            "triangles": 284454
+          },
+          "Activity furnishings": {
+            "draws": 6,
+            "triangles": 412
+          },
+          "Static props cell": {
+            "draws": 7,
+            "triangles": 13920
+          },
+          "Maple": {
+            "draws": 13,
+            "triangles": 24576
+          },
+          "Moss": {
+            "draws": 10,
+            "triangles": 23396
+          },
+          "Luma": {
+            "draws": 8,
+            "triangles": 23208
+          },
+          "Wren": {
+            "draws": 14,
+            "triangles": 25152
+          },
+          "White dove flock": {
+            "draws": 8,
+            "triangles": 167520
+          },
+          "Animal_Art_Studio": {
+            "draws": 16,
+            "triangles": 52960
+          },
+          "Valley ground": {
+            "draws": 22,
+            "triangles": 31419
+          },
+          "Village architecture paving": {
+            "draws": 2,
+            "triangles": 6577
+          },
+          "Willow pond water": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "Meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 24138
+          },
+          "Painted meadow grass -2,0": {
+            "draws": 1,
+            "triangles": 7794
+          },
+          "Meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 12348
+          },
+          "Painted meadow grass -1,-1": {
+            "draws": 1,
+            "triangles": 2772
+          },
+          "Meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 3024
+          },
+          "Painted meadow grass -2,-1": {
+            "draws": 1,
+            "triangles": 864
+          },
+          "Painted meadow grass -3,-1": {
+            "draws": 1,
+            "triangles": 5724
+          },
+          "Painted meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 4344
+          },
+          "Painted meadow grass -4,-1": {
+            "draws": 1,
+            "triangles": 5196
+          },
+          "Painted meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 4038
+          },
+          "Meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 1074
+          },
+          "Painted meadow grass -5,-1": {
+            "draws": 1,
+            "triangles": 7440
+          },
+          "Meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 2832
+          },
+          "Painted meadow grass -2,-2": {
+            "draws": 1,
+            "triangles": 192
+          },
+          "Painted meadow grass -3,-2": {
+            "draws": 1,
+            "triangles": 2766
+          },
+          "Painted meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 1848
+          },
+          "Meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 7416
+          },
+          "Painted meadow grass -4,-2": {
+            "draws": 1,
+            "triangles": 7224
+          },
+          "Meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 468
+          },
+          "Painted meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 6714
+          },
+          "Painted meadow grass 0,-4": {
+            "draws": 1,
+            "triangles": 9312
+          },
+          "Painted meadow grass -6,-2": {
+            "draws": 1,
+            "triangles": 12756
+          },
+          "Painted meadow grass -3,-3": {
+            "draws": 1,
+            "triangles": 9324
+          },
+          "Painted meadow grass -5,-2": {
+            "draws": 1,
+            "triangles": 10746
+          },
+          "Painted meadow grass -1,-4": {
+            "draws": 1,
+            "triangles": 2322
+          },
+          "Painted meadow grass 1,-5": {
+            "draws": 1,
+            "triangles": 1716
+          },
+          "Painted meadow grass -4,-3": {
+            "draws": 1,
+            "triangles": 7590
+          },
+          "Painted meadow grass 0,-5": {
+            "draws": 1,
+            "triangles": 4074
+          },
+          "Painted meadow grass -2,-4": {
+            "draws": 1,
+            "triangles": 4320
+          },
+          "Painted meadow grass -5,-3": {
+            "draws": 1,
+            "triangles": 12426
+          },
+          "Painted meadow grass -6,-3": {
+            "draws": 1,
+            "triangles": 14178
+          },
+          "Painted meadow grass -3,-4": {
+            "draws": 1,
+            "triangles": 2976
+          },
+          "Painted meadow grass -1,-5": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Painted meadow grass 1,-6": {
+            "draws": 1,
+            "triangles": 1560
+          },
+          "Painted meadow grass -7,-3": {
+            "draws": 1,
+            "triangles": 11502
+          },
+          "Painted meadow grass -4,-4": {
+            "draws": 1,
+            "triangles": 7038
+          },
+          "Painted meadow grass -2,-5": {
+            "draws": 1,
+            "triangles": 4104
+          },
+          "Painted meadow grass 0,-6": {
+            "draws": 1,
+            "triangles": 2010
+          },
+          "Painted meadow grass -5,-4": {
+            "draws": 1,
+            "triangles": 6858
+          },
+          "Painted meadow grass 1,-7": {
+            "draws": 1,
+            "triangles": 450
+          },
+          "Painted meadow grass -3,-5": {
+            "draws": 1,
+            "triangles": 3444
+          },
+          "Painted meadow grass -8,-3": {
+            "draws": 1,
+            "triangles": 6672
+          },
+          "Painted meadow grass -6,-4": {
+            "draws": 1,
+            "triangles": 8322
+          },
+          "Painted meadow grass -1,-6": {
+            "draws": 1,
+            "triangles": 1230
+          },
+          "Painted meadow grass 0,-7": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Painted meadow grass -4,-5": {
+            "draws": 1,
+            "triangles": 4254
+          },
+          "Painted meadow grass -9,-3": {
+            "draws": 1,
+            "triangles": 5412
+          },
+          "Painted meadow grass -2,-6": {
+            "draws": 1,
+            "triangles": 2634
+          },
+          "Painted meadow grass -7,-4": {
+            "draws": 1,
+            "triangles": 7914
+          },
+          "Painted meadow grass -5,-5": {
+            "draws": 1,
+            "triangles": 3264
+          },
+          "Painted meadow grass -1,-7": {
+            "draws": 1,
+            "triangles": 228
+          },
+          "Painted meadow grass -8,-4": {
+            "draws": 1,
+            "triangles": 4380
+          },
+          "Painted meadow grass -3,-6": {
+            "draws": 1,
+            "triangles": 1908
+          },
+          "Painted meadow grass -9,-4": {
+            "draws": 1,
+            "triangles": 132
+          },
+          "Painted meadow grass -2,-7": {
+            "draws": 1,
+            "triangles": 78
+          },
+          "Painted meadow grass -6,-5": {
+            "draws": 1,
+            "triangles": 5454
+          },
+          "Painted meadow grass -4,-6": {
+            "draws": 1,
+            "triangles": 2610
+          },
+          "Painted meadow grass -7,-5": {
+            "draws": 1,
+            "triangles": 3582
+          },
+          "Painted meadow grass -3,-7": {
+            "draws": 1,
+            "triangles": 360
+          },
+          "Painted meadow grass -8,-5": {
+            "draws": 1,
+            "triangles": 582
+          },
+          "Painted meadow grass -5,-6": {
+            "draws": 1,
+            "triangles": 1956
+          },
+          "Painted meadow grass -4,-7": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "Painted meadow grass -6,-6": {
+            "draws": 1,
+            "triangles": 936
+          },
+          "Painted meadow grass -5,-7": {
+            "draws": 1,
+            "triangles": 240
+          },
+          "Painted meadow grass -6,-7": {
+            "draws": 1,
+            "triangles": 12
+          },
+          "Meadow shrubs -3,-2": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -3,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow planting -1,-2": {
+            "draws": 2,
+            "triangles": 11776
+          },
+          "Meadow wildflowers": {
+            "draws": 36,
+            "triangles": 77952
+          },
+          "Owl roost & feeding tray": {
+            "draws": 1,
+            "triangles": 2080
+          },
+          "Hill waterfall": {
+            "draws": 40,
+            "triangles": 3162
+          }
+        },
+        "largest": [
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 65630,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 41490,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life",
+            "material": "Painted garden colors",
+            "pass": "color",
+            "triangles": 32760,
+            "instances": 14
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 29996,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 29974,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 24286,
+            "instances": 1
+          },
+          {
+            "name": "Meadow grass -2,0",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 24138,
+            "instances": 1341
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 20922,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Maple/Maple spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Moss/Moss spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Luma/Luma spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Wren/Wren spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveWingLeftMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingRightMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingLeftMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveWingRightMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 16032,
+            "instances": 12
+          },
+          {
+            "name": "Meadow shrubs -1,1",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 15840,
+            "instances": 22
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 15024,
+            "instances": 8
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 15024,
+            "instances": 8
+          },
+          {
+            "name": "Village architecture Village oak",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 15012,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 14646,
+            "instances": 1
+          },
+          {
+            "name": "Painted meadow grass -6,-3",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 14178,
+            "instances": 2363
+          }
+        ]
+      }
+    },
+    {
+      "view": "orchard",
+      "variant": "high",
+      "frame": {
+        "mean": 16.665833333333325,
+        "p95": 16.799999999995634,
+        "min": 16.5,
+        "max": 16.80000000000291
+      },
+      "cpu": {
+        "mean": 3.790581716972705,
+        "p95": 4.699999988079071,
+        "min": 2.7000000029802322,
+        "max": 8.5
+      },
+      "gpu": {
+        "mean": 7.957622110803321,
+        "p95": 11.077375,
+        "min": 6.414333,
+        "max": 15.950999
+      },
+      "draws": {
+        "mean": 321.4111111111111,
+        "p95": 322,
+        "min": 320,
+        "max": 322
+      },
+      "triangles": {
+        "mean": 1553164.5777777778,
+        "p95": 1554373,
+        "min": 1548573,
+        "max": 1566237
+      },
+      "buffer": [
+        1920,
+        965
+      ],
+      "quality": "high",
+      "shadows": true,
+      "submissions": {
+        "color": 771510,
+        "shadow": 782863,
+        "groups": {
+          "Scene": {
+            "draws": 10,
+            "triangles": 44928
+          },
+          "Automatic riverbank stones": {
+            "draws": 21,
+            "triangles": 72240
+          },
+          "Village architecture water": {
+            "draws": 2,
+            "triangles": 985
+          },
+          "Village architecture MeshStandardMaterial": {
+            "draws": 32,
+            "triangles": 478925
+          },
+          "Village architecture Village oak": {
+            "draws": 4,
+            "triangles": 68098
+          },
+          "Village architecture Bridge limestone": {
+            "draws": 1,
+            "triangles": 4440
+          },
+          "Village architecture Village limestone": {
+            "draws": 2,
+            "triangles": 13326
+          },
+          "Mesh": {
+            "draws": 7,
+            "triangles": 75078
+          },
+          "Meadow shrubs -1,1": {
+            "draws": 1,
+            "triangles": 15840
+          },
+          "Meadow shrubs -1,-1": {
+            "draws": 1,
+            "triangles": 1440
+          },
+          "Meadow shrubs -1,0": {
+            "draws": 1,
+            "triangles": 10800
+          },
+          "Meadow shrubs -2,0": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -1,-2": {
+            "draws": 1,
+            "triangles": 2880
+          },
+          "Meadow shrubs -2,-1": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs -1,-3": {
+            "draws": 1,
+            "triangles": 720
+          },
+          "Meadow shrubs 0,1": {
+            "draws": 1,
+            "triangles": 14400
+          },
+          "Village wayfinding": {
+            "draws": 1,
+            "triangles": 252
+          },
+          "Kitchen garden and pond life": {
+            "draws": 8,
+            "triangles": 33652
+          },
+          "Activity furnishings": {
+            "draws": 10,
+            "triangles": 1084
+          },
+          "Static props FarmRow": {
+            "draws": 20,
+            "triangles": 34420
+          },
+          "Static props cell": {
+            "draws": 2,
+            "triangles": 5760
+          },
+          "Maple": {
+            "draws": 13,
+            "triangles": 24576
+          },
+          "Moss": {
+            "draws": 10,
+            "triangles": 23396
+          },
+          "Luma": {
+            "draws": 8,
+            "triangles": 23208
+          },
+          "Poppy": {
+            "draws": 10,
+            "triangles": 23044
+          },
+          "White dove flock": {
+            "draws": 8,
+            "triangles": 167520
+          },
+          "Animal_Art_Studio": {
+            "draws": 16,
+            "triangles": 52960
+          },
+          "Valley ground": {
+            "draws": 20,
+            "triangles": 25463
+          },
+          "Village architecture paving": {
+            "draws": 1,
+            "triangles": 6902
+          },
+          "Painted meadow grass 0,-1": {
+            "draws": 1,
+            "triangles": 5688
+          },
+          "Meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 23634
+          },
+          "Meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 20466
+          },
+          "Painted meadow grass 0,-2": {
+            "draws": 1,
+            "triangles": 20070
+          },
+          "Painted meadow grass 1,-2": {
+            "draws": 1,
+            "triangles": 12204
+          },
+          "Painted meadow grass -1,-2": {
+            "draws": 1,
+            "triangles": 3222
+          },
+          "Meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 9882
+          },
+          "Meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 2832
+          },
+          "Meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 630
+          },
+          "Painted meadow grass -1,-3": {
+            "draws": 1,
+            "triangles": 1848
+          },
+          "Painted meadow grass 0,-3": {
+            "draws": 1,
+            "triangles": 12114
+          },
+          "Painted meadow grass 2,-3": {
+            "draws": 1,
+            "triangles": 2748
+          },
+          "Painted meadow grass -2,-3": {
+            "draws": 1,
+            "triangles": 6714
+          },
+          "Painted meadow grass 1,-3": {
+            "draws": 1,
+            "triangles": 6420
+          },
+          "Painted meadow grass 2,-4": {
+            "draws": 1,
+            "triangles": 8496
+          },
+          "Painted meadow grass 0,-4": {
+            "draws": 1,
+            "triangles": 9312
+          },
+          "Painted meadow grass -3,-4": {
+            "draws": 1,
+            "triangles": 2976
+          },
+          "Painted meadow grass -2,-4": {
+            "draws": 1,
+            "triangles": 4320
+          },
+          "Painted meadow grass 1,-4": {
+            "draws": 1,
+            "triangles": 2058
+          },
+          "Painted meadow grass -1,-4": {
+            "draws": 1,
+            "triangles": 2322
+          },
+          "Painted meadow grass 3,-4": {
+            "draws": 1,
+            "triangles": 600
+          },
+          "Painted meadow grass 0,-5": {
+            "draws": 1,
+            "triangles": 4074
+          },
+          "Painted meadow grass -3,-5": {
+            "draws": 1,
+            "triangles": 3444
+          },
+          "Painted meadow grass 2,-5": {
+            "draws": 1,
+            "triangles": 2376
+          },
+          "Painted meadow grass 3,-5": {
+            "draws": 1,
+            "triangles": 5814
+          },
+          "Painted meadow grass 1,-5": {
+            "draws": 1,
+            "triangles": 1716
+          },
+          "Painted meadow grass 4,-5": {
+            "draws": 1,
+            "triangles": 7314
+          },
+          "Painted meadow grass -4,-5": {
+            "draws": 1,
+            "triangles": 4254
+          },
+          "Painted meadow grass -2,-5": {
+            "draws": 1,
+            "triangles": 4104
+          },
+          "Painted meadow grass -1,-5": {
+            "draws": 1,
+            "triangles": 1896
+          },
+          "Painted meadow grass 4,-6": {
+            "draws": 1,
+            "triangles": 3720
+          },
+          "Painted meadow grass 3,-6": {
+            "draws": 1,
+            "triangles": 3660
+          },
+          "Painted meadow grass -4,-6": {
+            "draws": 1,
+            "triangles": 2610
+          },
+          "Painted meadow grass 0,-6": {
+            "draws": 1,
+            "triangles": 2010
+          },
+          "Painted meadow grass 1,-6": {
+            "draws": 1,
+            "triangles": 1560
+          },
+          "Painted meadow grass 5,-6": {
+            "draws": 1,
+            "triangles": 2694
+          },
+          "Painted meadow grass -2,-6": {
+            "draws": 1,
+            "triangles": 2634
+          },
+          "Painted meadow grass -3,-6": {
+            "draws": 1,
+            "triangles": 1908
+          },
+          "Painted meadow grass -5,-6": {
+            "draws": 1,
+            "triangles": 1956
+          },
+          "Painted meadow grass -1,-6": {
+            "draws": 1,
+            "triangles": 1230
+          },
+          "Painted meadow grass 2,-6": {
+            "draws": 1,
+            "triangles": 1752
+          },
+          "Painted meadow grass -2,-7": {
+            "draws": 1,
+            "triangles": 78
+          },
+          "Painted meadow grass -3,-7": {
+            "draws": 1,
+            "triangles": 360
+          },
+          "Painted meadow grass -4,-7": {
+            "draws": 1,
+            "triangles": 96
+          },
+          "Painted meadow grass 4,-7": {
+            "draws": 1,
+            "triangles": 414
+          },
+          "Painted meadow grass 5,-7": {
+            "draws": 1,
+            "triangles": 198
+          },
+          "Painted meadow grass 3,-7": {
+            "draws": 1,
+            "triangles": 258
+          },
+          "Painted meadow grass 0,-7": {
+            "draws": 1,
+            "triangles": 408
+          },
+          "Painted meadow grass -5,-7": {
+            "draws": 1,
+            "triangles": 240
+          },
+          "Painted meadow grass 1,-7": {
+            "draws": 1,
+            "triangles": 450
+          },
+          "Painted meadow grass 2,-7": {
+            "draws": 1,
+            "triangles": 432
+          },
+          "Painted meadow grass -1,-7": {
+            "draws": 1,
+            "triangles": 228
+          },
+          "Painted meadow grass 6,-7": {
+            "draws": 1,
+            "triangles": 336
+          },
+          "Meadow planting 0,-2": {
+            "draws": 2,
+            "triangles": 7936
+          },
+          "Meadow wildflowers": {
+            "draws": 40,
+            "triangles": 72296
+          },
+          "Rusk": {
+            "draws": 11,
+            "triangles": 23584
+          }
+        },
+        "largest": [
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 86935,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 55392,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 51674,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 41810,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 39912,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture Village oak",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 38436,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 33548,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32786,
+            "instances": 1
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveBodyMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 32352,
+            "instances": 12
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 25856,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 24012,
+            "instances": 1
+          },
+          {
+            "name": "Kitchen garden and pond life/Harvest basket/BasketMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 23904,
+            "instances": 1
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 23738,
+            "instances": 1
+          },
+          {
+            "name": "Meadow grass 0,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 23634,
+            "instances": 1313
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 21952,
+            "instances": 2
+          },
+          {
+            "name": "Meadow grass 1,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 20466,
+            "instances": 1137
+          },
+          {
+            "name": "Painted meadow grass 0,-2",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 20070,
+            "instances": 1115
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "White dove flock/DoveHeadMesh",
+            "material": "Porcelain white dove colors",
+            "pass": "color",
+            "triangles": 19344,
+            "instances": 12
+          },
+          {
+            "name": "Village architecture MeshStandardMaterial",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 19146,
+            "instances": 1
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 18780,
+            "instances": 10
+          },
+          {
+            "name": "Mesh",
+            "material": "MeshStandardMaterial",
+            "pass": "color",
+            "triangles": 18780,
+            "instances": 10
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Maple/Maple spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Moss/Moss spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Luma/Luma spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Poppy/Poppy spirit/SpiritBody",
+            "material": "MeshDepthMaterial",
+            "pass": "shadow",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Scene/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          },
+          {
+            "name": "Rusk/Rusk spirit/SpiritBody",
+            "material": "Pearl white spirit",
+            "pass": "color",
+            "triangles": 17664,
+            "instances": 1
+          }
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 105244,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 69870,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 61542,
+      "instances": 13,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Village architecture Village oak",
+      "type": "Mesh",
+      "triangles": 56160,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 50394,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 48712,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 38414,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "DoveBodyMesh",
+      "type": "Mesh",
+      "triangles": 32352,
+      "instances": 12,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Village architecture MeshStandardMaterial",
+      "type": "Mesh",
+      "triangles": 31680,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "MintMesh",
+      "type": "Mesh",
+      "triangles": 28836,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "MintMesh",
+      "type": "Mesh",
+      "triangles": 28836,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "MintMesh",
+      "type": "Mesh",
+      "triangles": 28836,
+      "instances": 1,
+      "cast": false,
+      "receive": false
+    },
+    {
+      "name": "BasketMesh",
+      "type": "Mesh",
+      "triangles": 23904,
+      "instances": 1,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 23720,
+      "instances": 20,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Meadow grass 0,-2",
+      "type": "Mesh",
+      "triangles": 23634,
+      "instances": 1313,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Village architecture paving",
+      "type": "Mesh",
+      "triangles": 22246,
+      "instances": 1,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "",
+      "type": "Mesh",
+      "triangles": 21952,
+      "instances": 2,
+      "cast": true,
+      "receive": true
+    },
+    {
+      "name": "Meadow grass 1,-2",
+      "type": "Mesh",
+      "triangles": 20466,
+      "instances": 1137,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "Painted meadow grass 0,-2",
+      "type": "Mesh",
+      "triangles": 20070,
+      "instances": 1115,
+      "cast": false,
+      "receive": true
+    },
+    {
+      "name": "DoveHeadMesh",
+      "type": "Mesh",
+      "triangles": 19344,
+      "instances": 12,
+      "cast": true,
+      "receive": true
+    }
+  ],
+  "errors": []
+}

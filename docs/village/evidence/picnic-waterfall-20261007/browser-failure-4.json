@@ -1,0 +1,26 @@
+{
+  "self": "65c059cf-bd85-421e-a920-b652f6f3c2ec",
+  "connected": true,
+  "blocked": false,
+  "context": {
+    "id": "picnic-hill-mat",
+    "kind": "picnic",
+    "dish": {
+      "id": "07d8b1ff-f40c-497e-be04-106facd4aefe",
+      "mat": "picnic-hill-mat",
+      "slot": 0,
+      "recipe": "gardenSoup",
+      "portions": 3,
+      "placedBy": "0f794170-b160-4fe1-b90e-d90db9fe94f5",
+      "placedAt": 1791366891704
+    }
+  },
+  "bench": "picnic-hill-mat",
+  "seat": 4,
+  "pose": [
+    -97.50174317936964,
+    23.619999999999997,
+    -18.3245097961442
+  ],
+  "text": "Fluffy Otter\nMellow Swan\nHearthwillow\nN\n↑\nM\nMap\nI\n,\nW\nA\nS\nD\nMove\nShift\nHold to run\nE\nInteract\nR\nRecover\nTab\nFocus next button\nClick to look · Esc to release\nEsc\nStand up\nE\nEat a portion\nF\nShare & eat\n5 blobs here\nHearthwillow chat\nSee everyone here (5)\n\nEveryone is in Hearthwillow. Messages clear each hour, next at 3:30 PM your time.\n\nNo messages yet."
+}

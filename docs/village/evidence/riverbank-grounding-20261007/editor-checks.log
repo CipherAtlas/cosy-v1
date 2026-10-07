@@ -1,0 +1,19 @@
+Small riverbank stone has a rendered Nature shelf preview
+2 m river has continuous rocks on both banks through its full length
+2 m river keeps small, grounded, deterministic stones after transforms
+6 m river has continuous rocks on both banks through its full length
+6 m river keeps small, grounded, deterministic stones after transforms
+18 m river has continuous rocks on both banks through its full length
+18 m river keeps small, grounded, deterministic stones after transforms
+All path and bridge paving crossings stay clear
+Joined waterways have no stone rows across open water
+Hidden rivers produce no stones
+Editor width, bend and position changes regenerate bank rocks
+River dressing and independently placed stone transforms survive JSON save/reload
+Limestone stones provide a white vertex tint for the shared architecture material
+Every rotated rock embeds 5.5–10 cm into the rendered transformed slope despite an incorrect original height callback
+Clipped water joins support unequal bank samples without losing outward directions
+Named layout file persists the river and independent stone
+Browser reload restores the saved river and stone transforms
+Editor has no page errors
+18 riverbank checks passed.

@@ -1,0 +1,268 @@
+{
+  "changedSamples": [
+    {
+      "grid": [
+        -47,
+        -19
+      ],
+      "before": 19.40639,
+      "after": 19.2688
+    },
+    {
+      "grid": [
+        -47,
+        -18
+      ],
+      "before": 20.31026,
+      "after": 19.99676
+    },
+    {
+      "grid": [
+        -47,
+        -17
+      ],
+      "before": 20.5133,
+      "after": 20.46
+    },
+    {
+      "grid": [
+        -45,
+        -21
+      ],
+      "before": 15.1186,
+      "after": 14.8938
+    },
+    {
+      "grid": [
+        -45,
+        -20
+      ],
+      "before": 19.6,
+      "after": 14.62336
+    },
+    {
+      "grid": [
+        -45,
+        -19
+      ],
+      "before": 19.6,
+      "after": 13.6
+    },
+    {
+      "grid": [
+        -45,
+        -18
+      ],
+      "before": 19.6,
+      "after": 14.62336
+    },
+    {
+      "grid": [
+        -44,
+        -23
+      ],
+      "before": 11.8025,
+      "after": 11.51706
+    },
+    {
+      "grid": [
+        -44,
+        -22
+      ],
+      "before": 11.60324,
+      "after": 10.53695
+    },
+    {
+      "grid": [
+        -44,
+        -21
+      ],
+      "before": 11.20691,
+      "after": 9.22635
+    },
+    {
+      "grid": [
+        -44,
+        -17
+      ],
+      "before": 9.6346,
+      "after": 8.76347
+    },
+    {
+      "grid": [
+        -44,
+        -16
+      ],
+      "before": 9.24691,
+      "after": 9.14578
+    },
+    {
+      "grid": [
+        -43,
+        -23
+      ],
+      "before": 8.12238,
+      "after": 7.58812
+    },
+    {
+      "grid": [
+        -43,
+        -22
+      ],
+      "before": 7.74902,
+      "after": 5.96766
+    },
+    {
+      "grid": [
+        -43,
+        -21
+      ],
+      "before": 7.30381,
+      "after": 4.12592
+    },
+    {
+      "grid": [
+        -43,
+        -19
+      ],
+      "before": 1.8,
+      "after": 1.6
+    },
+    {
+      "grid": [
+        -43,
+        -17
+      ],
+      "before": 5.90291,
+      "after": 3.7135
+    },
+    {
+      "grid": [
+        -43,
+        -16
+      ],
+      "before": 5.62042,
+      "after": 4.71094
+    },
+    {
+      "grid": [
+        -43,
+        -15
+      ],
+      "before": 5.28786,
+      "after": 5.12095
+    }
+  ],
+  "outcrops": [
+    {
+      "id": "waterfall-hill-outcrop-1",
+      "asset": "hill-rock-outcrop",
+      "name": "Waterfall hill outcrop 1",
+      "position": [
+        -92,
+        14.28691,
+        -43.5
+      ],
+      "rotation": [
+        -39.44529,
+        -16.91293,
+        -23.78832
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "waterfall-hill-outcrop-2",
+      "asset": "hill-rock-outcrop",
+      "name": "Waterfall hill outcrop 2",
+      "position": [
+        -90,
+        12.16736,
+        -32.5
+      ],
+      "rotation": [
+        22.14937,
+        4.44806,
+        -63.14572
+      ],
+      "scale": [
+        1.2,
+        1,
+        1.1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "waterfall-hill-outcrop-3",
+      "asset": "hill-rock-outcrop",
+      "name": "Waterfall hill outcrop 3",
+      "position": [
+        -85.5,
+        4.00304,
+        -43.5
+      ],
+      "rotation": [
+        33.16446,
+        -3.12738,
+        -47.82184
+      ],
+      "scale": [
+        0.85,
+        0.8,
+        0.9
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "waterfall-hill-outcrop-4",
+      "asset": "hill-rock-outcrop",
+      "name": "Waterfall hill outcrop 4",
+      "position": [
+        -87,
+        5.75747,
+        -31.5
+      ],
+      "rotation": [
+        -17.01617,
+        -4.98184,
+        -61.30645
+      ],
+      "scale": [
+        0.9,
+        0.8,
+        1
+      ],
+      "visible": true,
+      "locked": false
+    },
+    {
+      "id": "waterfall-hill-outcrop-5",
+      "asset": "hill-rock-outcrop",
+      "name": "Waterfall hill outcrop 5",
+      "position": [
+        -94,
+        18.1688,
+        -38
+      ],
+      "rotation": [
+        79.57532,
+        62.85508,
+        -100.42468
+      ],
+      "scale": [
+        0.85,
+        0.8,
+        0.75
+      ],
+      "visible": true,
+      "locked": false
+    }
+  ]
+}

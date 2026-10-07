@@ -15,10 +15,10 @@ import { PUPPY_INFO } from "../../features/village/puppies";
 import { VillageSwingSet } from "../../features/village/swings";
 import { VillageActivities } from "../../features/village/activityScene";
 import { sampleTerrainHeight, validateTerrain, type TerrainElevation } from "../../features/village/terrain";
-import { pondDistance, setAuthoredWorld } from "../../features/village/environment";
+import { landscapeHeight, pondDistance, setAuthoredWorld } from "../../features/village/environment";
 import { projectWorldLayout } from "../../features/village/worldLayout";
 import { makeHorseModel } from "../../features/village/horseModel";
-import { conformRiverBank, riverGeometry } from "../../features/village/riverGeometry";
+import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } from "../../features/village/riverGeometry";
 import { buildRiverbankStones, disposeRiverbankStones } from "../../features/village/riverbankStones";
 import type { Collider } from "../../features/village/environment";
 import { loadTownAssetKit } from "../../features/village/townAssets";
@@ -74,7 +74,7 @@ export function validateLayout(value: unknown, assets?: Map<string, Asset>): Lay
     if (item.asset === "fence-line" && item.path && item.path.points.slice(1).reduce((length, point, index) => length + Math.hypot(point[0] - item.path!.points[index][0], point[1] - item.path!.points[index][1]), 0) > 300) throw Error("A fence line can be up to 300 metres long.");
     if (PATH_ASSETS.includes(item.asset) && !item.path) throw Error("A custom path needs its control points.");
     if (["horse-bay", "horse-grey"].includes(item.asset) && (item.scale.some(n => n < .5 || n > 2 || Math.abs(n - item.scale[0]) > .001) || Math.abs(item.rotation[0]) > .001 || Math.abs(item.rotation[2]) > .001)) throw Error("Horses need upright rotation and uniform scale between 0.5 and 2.");
-    if (["horse-racetrack", "horse-stable", "farm-row", "owl-feeding-perch", "owl-brown", "cow-highland", "cow-highland-girl", "sheep", "lamb", "hedgehog", "apple-tree", "mushroom-patch"].includes(item.asset) && (Math.abs(item.rotation[0]) > .001 || Math.abs(item.rotation[2]) > .001)) throw Error("Keep town activity objects upright. Turn them with Y rotation.");
+    if (["garden-kitchen", "picnic-mat", "horse-racetrack", "horse-stable", "farm-row", "owl-feeding-perch", "owl-brown", "cow-highland", "cow-highland-girl", "sheep", "lamb", "hedgehog", "apple-tree", "mushroom-patch"].includes(item.asset) && (Math.abs(item.rotation[0]) > .001 || Math.abs(item.rotation[2]) > .001)) throw Error("Keep town activity objects upright. Turn them with Y rotation.");
   }
   if (doc.routes !== undefined) {
     if (!doc.routes || typeof doc.routes !== "object" || Array.isArray(doc.routes) || Object.keys(doc.routes).some(id => !RESIDENT_IDS.includes(id as ResidentId))) throw Error("Invalid resident routes.");
@@ -114,6 +114,7 @@ function batchProp(root: T.Object3D) {
 }
 
 export class LayoutScene {
+  private currentWorld?: World["authored"];
   readonly assets = new Map<string, Asset>();
   readonly roots = new Map<string, T.Object3D>();
   readonly group = new T.Group();
@@ -224,7 +225,7 @@ export class LayoutScene {
     }
     residents.dispose();
     const townKit = await loadTownAssetKit();
-    for (const [id, asset] of supplementalAssets(this.world.gardenSurfaces, makeAnimalRig("cat"), townKit)) this.assets.set(id, asset);
+    for (const [id, asset] of supplementalAssets(this.world.gardenSurfaces, makeAnimalRig("cat"), townKit, this.world.water.userData.time)) this.assets.set(id, asset);
     for (const [id, asset] of await loadAnimalArt()) this.assets.set(id, asset);
     this.pathMaterial = this.world.gardenSurfaces.paving;
     const riverPath = { points: [[0, 0], [0, -5], [2, -10], [0, -16]] as [number, number][], width: 6 };
@@ -305,6 +306,7 @@ export class LayoutScene {
 
   apply(layout: Layout) {
     const authored = projectWorldLayout(layout);
+    this.currentWorld = authored;
     setAuthoredWorld(authored);
     const active = new Set(layout.objects.map(o => o.id));
     for (const [id, root] of this.roots) if (!active.has(id)) { root.removeFromParent(); this.releasePath(root); this.roots.delete(id); }
@@ -331,19 +333,28 @@ export class LayoutScene {
     this.refreshTerrain(layout.terrain);
   }
   refreshTerrain(terrain?: TerrainElevation) {
-    const key = JSON.stringify(terrain ?? null);
+    const world = this.currentWorld && { ...this.currentWorld, terrain };
+    const key = JSON.stringify({ terrain, rivers: world?.rivers, streams: world?.items?.filter(item => item.asset === "custom-river") });
+    const channelHeight = world && makeRiverChannelHeight(world, landscapeHeight);
+    const point = new T.Vector3();
     for (const root of this.roots.values()) {
       if (root.userData.asset !== "terrain") continue;
       root.traverse(object => {
         if (!(object instanceof T.Mesh)) return;
-        if (object.userData.elevationKey === key) return;
+        const elevationKey = key + JSON.stringify(object.matrixWorld.elements);
+        if (object.userData.elevationKey === elevationKey) return;
         if (!object.userData.editableTerrain) { object.geometry = object.geometry.clone(); this.generated.add(object.geometry); object.userData.editableTerrain = true; }
-        object.userData.elevationKey = key;
+        object.userData.elevationKey = elevationKey;
         const positions = object.geometry.attributes.position;
+        const base: number[] = object.userData.terrainBasePositions ?? Array.from(positions.array);
+        object.userData.terrainBasePositions = base;
+        const inverse = object.matrixWorld.clone().invert();
         for (let i = 0; i < positions.count; i++) {
-          const x = positions.getX(i), z = positions.getZ(i);
+          const x = base[i * 3], z = base[i * 3 + 2];
           const height = sampleTerrainHeight(terrain, x, z);
-          positions.setY(i, pondDistance(x, z) < 1.35 ? Math.min(-.85, height) : height);
+          point.set(x, pondDistance(x, z) < 1.35 ? Math.min(-.85, height) : height, z).applyMatrix4(object.matrixWorld);
+          if (channelHeight) point.y = channelHeight(point.x, point.z, point.y);
+          point.applyMatrix4(inverse); positions.setXYZ(i, point.x, point.y, point.z);
         }
         positions.needsUpdate = true; object.geometry.computeVertexNormals(); object.geometry.computeBoundingSphere(); object.geometry.computeBoundingBox();
       });
@@ -388,13 +399,25 @@ export class LayoutScene {
       const anchor = height(root.position.x, root.position.z);
       root.traverse(object => {
         if (!(object instanceof T.Mesh) || !object.geometry.userData.flatPositions) return;
+        if (root.userData.asset === "custom-river") {
+          const path = root.userData.path;
+          this.generated.delete(object.geometry); object.geometry.dispose();
+          object.geometry = riverGeometry(path.points, path.width);
+        }
         const base = object.geometry.userData.flatPositions as number[], attribute = object.geometry.attributes.position;
         for (let i = 0; i < attribute.count; i++) {
-          const point = new T.Vector3(base[i * 3], 0, base[i * 3 + 2]).applyMatrix4(object.matrixWorld);
+          const sample = root.userData.asset === "custom-river" ? i - i % 2 : i;
+          const localX = root.userData.asset === "custom-river" ? (base[sample * 3] + base[(sample + 1) * 3]) / 2 : base[i * 3];
+          const localZ = root.userData.asset === "custom-river" ? (base[sample * 3 + 2] + base[(sample + 1) * 3 + 2]) / 2 : base[i * 3 + 2];
+          const point = new T.Vector3(localX, 0, localZ).applyMatrix4(object.matrixWorld);
           const lift = height(point.x, point.z) - anchor + base[i * 3 + 1];
           attribute.setY(i, Math.abs(object.matrixWorld.elements[5]) > .1 ? lift / object.matrixWorld.elements[5] : .09);
         }
         attribute.needsUpdate = true; object.geometry.computeVertexNormals(); object.geometry.computeBoundingBox(); object.geometry.computeBoundingSphere();
+        if (root.userData.asset === "custom-river" && this.currentWorld) {
+          object.geometry = joinRiverToPonds(object.geometry, object.matrixWorld, this.currentWorld);
+          this.generated.add(object.geometry);
+        }
       });
     }
     this.riverStones = buildRiverbankStones(this.group, this.world.gardenSurfaces.stone, height);

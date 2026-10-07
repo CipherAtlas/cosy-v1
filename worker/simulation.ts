@@ -8,6 +8,7 @@ import { VillageNavigation } from "../features/village/navigation";
 import { CompanionWalk } from "../features/village/companionWalk";
 import { Vector3 } from "three";
 import { HorseRiding } from "./horseRiding";
+import { PicnicSimulation } from "./picnic";
 import { TownSimulation } from "./town";
 import { mapArrival, outdoorMapDestinations } from "../features/village/mapDestinations";
 import { trackPoint, TOWN_TRACK_START_ANGLE, TOWN_RIVAL_LANE, TOWN_RIVAL_LAP_MS, type TownAction, type ForageInventory } from "../features/village/townShared";
@@ -19,7 +20,7 @@ import { ACTIVITY_STAGES, COMPANION_STAGES, PUPPY_PATROLS, PUPPY_TRICK_SECONDS, 
   type SharedActor, type SharedActors, type SharedBirds, type SharedHorseInput, type SharedInteraction, type InteractionResult } from "../features/village/sharedActors";
 
 type Visitor = { id: string; x: number; y?: number; z: number; heading: number; active?: boolean; lastSeen?: number;
-  lookout?: number | null; horse?: string | null; activity?: PlaceId | null; activityPosition?: [number, number, number] | null; bench?: { id: string; index: 0 | 1 } | null; swing?: { id: string; index: 0 | 1 } | null; holdingPuppy?: string | null; forageInventory?: ForageInventory };
+  lookout?: number | null; horse?: string | null; activity?: PlaceId | null; activityPosition?: [number, number, number] | null; bench?: { id: string; index: number } | null; swing?: { id: string; index: 0 | 1 } | null; holdingPuppy?: string | null; forageInventory?: ForageInventory };
 type Actor = { state: SharedActor; movement: VillageMovement; route: [number, number][]; waypoint: number;
   pause: number; path: [number, number][]; goal: [number, number] | null; nextPath: number;
   followOwner: string | null; hold: boolean; cooldown: number; chat: number; petOrigin: [number, number] | null; height: number; activity: PlaceId | null };
@@ -59,11 +60,13 @@ export class VillageSimulation {
   private companionWalks = new Map<string, CompanionWalk>();
   private riding = new HorseRiding();
   readonly town: TownSimulation;
+  readonly picnic: PicnicSimulation;
   birds: SharedBirds = { phase: "flight", since: 0, mealAt: null, queued: false, served: false, throwAt: null, origin: [0, 0, 0], flightCount: 0 };
 
   constructor(saved?: ReturnType<VillageSimulation["save"]>) {
     setAuthoredWorld(this.authored);
     configureLayoutInteractions(this.authored);
+    this.picnic = new PicnicSimulation(this.authored, saved?.picnic);
     this.navigation = new VillageNavigation(physics.colliders, this.authored);
     this.town = new TownSimulation(this.authored, saved?.town && saved.layoutHash !== physics.layoutHash
       ? { ...saved.town, animals: [] } : saved?.town, physics.colliders);
@@ -109,11 +112,12 @@ export class VillageSimulation {
   }
 
   save() {
-    return { layoutHash: physics.layoutHash, time: this.lastTime, epoch: this.epoch, pondFeedAt: this.pondFeedAt, gift: this.gift, birds: this.birds, town: this.town.snapshot(),
+    return { layoutHash: physics.layoutHash, time: this.lastTime, epoch: this.epoch, pondFeedAt: this.pondFeedAt, gift: this.gift, birds: this.birds, town: this.town.snapshot(), picnic: this.picnic.save(),
       trails: [...this.trails.entries()].filter(([id]) => this.actors.some(actor => actor.followOwner === id)),
       actors: this.actors.map(({ movement, route: _route, ...record }) => ({ ...record, outdoorPosition: { ...movement.position } })) };
   }
-  snapshot(now: number): SharedActors { return { time: now, epoch: this.epoch, pondFeedAt: this.pondFeedAt, gift: this.gift, town: this.town.snapshot(), actors: this.actors.filter(actor => actor.state.kind !== "resident" || residentInLayout(this.authored, actor.state.id as ResidentId)).map(actor => ({ ...actor.state, activity: actor.activity })), birds: { ...this.birds } }; }
+  snapshot(now: number): SharedActors { return { time: now, epoch: this.epoch, pondFeedAt: this.pondFeedAt, gift: this.gift, town: this.town.snapshot(), picnic: this.picnic.snapshot(), actors: this.actors.filter(actor => actor.state.kind !== "resident" || residentInLayout(this.authored, actor.state.id as ResidentId)).map(actor => ({ ...actor.state, activity: actor.activity,
+      ...(actor.state.kind === "horse" && actor.state.mode === "ride" ? { ride: this.riding.snapshot(actor, now, this.town.countdownHorse(actor.state.id, now)) } : {}) })), birds: { ...this.birds } }; }
   activityEnabled(id: PlaceId) { return activityInLayout(this.authored, id); }
   actor(id: string, kind: SharedActor["kind"]) { return this.actors.find(actor => actor.state.id === id && actor.state.kind === kind); }
   mountedHorse(id: string) { return this.actors.find(actor => actor.state.kind === "horse" && actor.state.owner === id && actor.state.mode === "ride"); }
@@ -216,7 +220,7 @@ export class VillageSimulation {
   private visitorPoint(visitor: Visitor): [number, number] {
     if (visitor.bench) {
       const bench = this.benches.find(bench => bench.id === visitor.bench!.id);
-      if (bench) { const offset = visitor.bench.index === 0 ? -.68 : .68;
+      if (bench) { const offset = ("seatCount" in bench ? visitor.bench.index - (Number(bench.seatCount) - 1) / 2 : visitor.bench.index * 2 - 1) * ("seatSpacing" in bench ? Number(bench.seatSpacing) : .68);
         return [bench.x + Math.cos(bench.facing) * offset, bench.z - Math.sin(bench.facing) * offset]; }
     }
     const stage = visitor.activity && (visitor.activityPosition ?? ACTIVITY_STAGES[visitor.activity].actor);

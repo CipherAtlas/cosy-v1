@@ -1,0 +1,16 @@
+{
+  "self": "a74c5b35-ef7c-4016-aed0-a366f651517d",
+  "connected": true,
+  "blocked": true,
+  "context": {
+    "id": "farm-kitchen",
+    "kind": "kitchen"
+  },
+  "seat": null,
+  "pose": [
+    113,
+    0.05,
+    -75
+  ],
+  "text": "Hearthwillow\nR\nN\n↑\nM\nMap\nI\n,\nE\nCook in the garden kitchen\n1 blob here\nCook\n\nCook harvested ingredients, pack finished dishes and share food at a picnic mat.\n\nChoose a recipe. Each dish serves 3.\n\n🥣\nGarden soup\nCarrot\n10/1\nMushroom\n10/1\nCook\n🥗\nMint & radish salad\nRadish\n10/1\nMint\n10/1\nCook\n🍎\nBaked apples\nApple\n10/1\nCook\n🥕\nRoasted vegetables\nCarrot\n10/1\nRadish\n10/1\nCook\nEsc\nBack\n⌫"
+}

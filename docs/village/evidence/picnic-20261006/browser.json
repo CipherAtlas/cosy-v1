@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "Kitchen exposes four recipes from the accepted basket",
+    "Accepted cooking animates the actual shared stove",
+    "Kitchen fits and scrolls at 1366×768",
+    "Kitchen fits and scrolls at 1024×640",
+    "Kitchen fits and scrolls at 810×1080",
+    "Kitchen fits and scrolls at 1080×810",
+    "Kitchen fits and scrolls at 820×1180",
+    "Kitchen fits and scrolls at 1180×820",
+    "Kitchen fits and scrolls at 744×1133",
+    "Kitchen fits and scrolls at 1133×744",
+    "Packing saves a dish and frees the recipe controls",
+    "Sharing renders a real dish and spends one saved dish",
+    "The menu button takes an accepted picnic seat",
+    "Another real browser sees the existing shared dish",
+    "E eats a nearby dish and both browsers see two portions",
+    "Late browser join renders the current food and portion count",
+    "Picnic fits and scrolls at 810×1080",
+    "Picnic fits and scrolls at 1080×810",
+    "Picnic fits and scrolls at 820×1180",
+    "Picnic fits and scrolls at 1180×820",
+    "Picnic fits and scrolls at 744×1133",
+    "Picnic fits and scrolls at 1133×744",
+    "A third browser cannot overlap occupied picnic cushions",
+    "Seated eating removes the final dish in all three browsers",
+    "Reload retains the accepted ingredient spend",
+    "No page errors in the three-client kitchen/picnic flow"
+  ],
+  "errors": [],
+  "limits": "Local static export and real SQLite Worker with test-only ingredient grants, accelerated clocks and positioning. CSS/touch-capability viewports, not physical iPad acceptance."
+}

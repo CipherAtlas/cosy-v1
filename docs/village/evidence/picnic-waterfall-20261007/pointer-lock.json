@@ -1,0 +1,24 @@
+{
+  "checks": [
+    "Kitchen exposes four recipes from the accepted basket",
+    "Accepted cooking closes the recipe dialog and leaves the scene playable",
+    "Cooking progress is in a compact contextual HUD",
+    "Accepted cooking visibly animates preparation at the actual shared kitchen",
+    "The actual kitchen progresses to an animated stirring stage",
+    "Ready food exposes the real E pack shortcut",
+    "E packs one persisted dish and dismisses the cooking HUD without reopening a menu",
+    "Sharing renders a real dish and spends one saved dish",
+    "Pointer capture begins on empty scene space without consuming food",
+    "Actual pointer capture displays the picnic aiming reticle",
+    "The captured-pointer center ray targets real food with the menu closed",
+    "A captured-pointer click eats a shared portion without opening a menu or releasing capture",
+    "The accepted captured-pointer bite broadcasts to a second real browser",
+    "Real reconnect and a late WebSocket join retain the same accepted meal clock instead of restarting it",
+    "The reconnected eater shows its own heart after the shared eating phase",
+    "Another reconnected client shows the same post-meal heart",
+    "Reduced motion presents a still visible heart without bobbing or scaling",
+    "No page errors in the focused captured-pointer food interaction"
+  ],
+  "errors": [],
+  "limits": "Local Chrome captured-pointer input against the static export and a real SQLite Worker; deterministic starting position and camera aim, injected ingredients and clock. This is not a native Firefox or iPad check."
+}

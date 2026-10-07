@@ -50,8 +50,49 @@ const assert = require('node:assert/strict');
     }
     console.log('All clients ready');
     const [a, b, c] = pages;
-    await a.waitForFunction(() => testEngine.remoteVisitors.size === 2);
-    check(await b.evaluate(() => testEngine.remoteVisitors.size === 2), 'Three real browser clients join one Worker');
+    const clientIds = await Promise.all(pages.map(page => page.evaluate(() => testEngine.sharedSelfId)));
+    await a.waitForFunction(ids => ids.every(id => id === testEngine.sharedSelfId || testEngine.remoteVisitors.has(id)), clientIds);
+    check(await b.evaluate(ids => ids.every(id => id === testEngine.sharedSelfId || testEngine.remoteVisitors.has(id)), clientIds), 'Three real browser clients join one Worker');
+    if (process.env.BRIDGE_ONLY === '1') {
+      for (const page of pages) {
+        if (await page.locator('[data-tutorial-done]').isVisible()) await page.locator('[data-tutorial-done]').click();
+        await page.waitForFunction(()=>!testEngine.blocked,null,{timeout:30000});
+      }
+      const bridge = await a.evaluate(() => testEngine.world.authored.items.find(item => item.id === 'hill-stream-bridge'));
+      const yaw = bridge.rotation[1] * Math.PI / 180, cosine = Math.cos(yaw), sine = Math.sin(yaw);
+      for (const [index, page] of [a, b].entries()) {
+        const direction = index ? -1 : 1, lane = index ? -.8 : .8;
+        await page.setViewportSize(index ? {width:810,height:1080} : {width:1366,height:768});
+        await page.evaluate(({bridge,yaw,direction,lane}) => {
+          const e=testEngine, c=Math.cos(yaw),s=Math.sin(yaw),along=-direction*6.3*bridge.scale[0],across=lane*bridge.scale[2];
+          e.clearKeys();e.movement.settle(bridge.position[0]+along*c+across*s,bridge.position[2]-along*s+across*c);
+          e.yaw=yaw-Math.PI/2;e.renderer.domElement.focus();
+        },{bridge,yaw,direction,lane});
+        await page.keyboard.down(direction===1?'w':'s');
+      }
+      for (const [index,page] of [a,b].entries()) {
+        const direction=index?-1:1;
+        await page.waitForFunction(({bridge,cosine,sine,direction}) => {
+          const p=testEngine.movement.position;
+          return direction*((p.x-bridge.position[0])*cosine-(p.z-bridge.position[2])*sine)>6.4*bridge.scale[0];
+        },{bridge,cosine,sine,direction},{timeout:30000});
+        await page.keyboard.up(direction===1?'w':'s');
+        check(await page.evaluate(()=>testEngine.movement.grounded),'Real keyboard crossing stays grounded on client '+(index+1));
+      }
+      const poses=await Promise.all([a,b].map(page=>page.evaluate(()=>({id:testEngine.sharedSelfId,position:testEngine.getPlayerPose()}))));
+      await c.waitForFunction(poses=>poses.every(({id,position})=>{
+        const remote=testEngine.remoteVisitors.get(id);return remote&&Math.hypot(remote.group.position.x-position.x,remote.group.position.z-position.z)<.35;
+      }),poses,{timeout:30000});
+      check(true,'A third real client observes both accepted bank-to-bank crossings');
+      await c.evaluate(()=>testSockets.at(-1).close());
+      await c.waitForFunction(()=>testSockets.length>1&&testEngine.sharedConnected,null,{timeout:30000});
+      check(true,'The bridge observer reconnects to the same shared world');
+      await a.emulateMedia({reducedMotion:'reduce'});await a.waitForTimeout(200);
+      check(await a.evaluate(()=>testEngine.world.water.userData.time.value===0),'Reduced motion freezes the actual exported-app water clock');
+      check(errors.length===0,'No page errors during shared bridge movement');
+      fs.writeFileSync(path.join(output,'shared-bridge.json'),JSON.stringify({checks,errors,limits:'Local exported app and real Worker; native keyboard at laptop/iPad CSS dimensions. Placement at each bank is a QA fixture; no inventory or claims are changed. No native or physical-device acceptance.'},null,2));
+      console.log(checks.length+' shared bridge checks passed.');return;
+    }
     if (process.env.SWING_ONLY) {
       const swingIds = await a.evaluate(() => testEngine.world.swings.map(value => value.placement.id));
       check(swingIds.length === 2, 'Both authored pasture swing copies load in the actual game');

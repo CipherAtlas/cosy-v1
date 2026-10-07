@@ -36,6 +36,7 @@ export type Collider = {
   d: number;
   bottom?: number;
   top?: number;
+  bridgeRail?: boolean;
 };
 
 export const riverX = (z: number) => -11 + Math.sin(z * 0.052) * 3;
@@ -53,20 +54,18 @@ export const POND_DOCK = { x: -21.65, z: -5.5, w: 5.5, d: 2.2 };
 export const BIRD_CLEARING = { x: -37, z: 4, radius: 3.8, benchZ: 6.5, feedingPerimeter: 7 };
 let authoredWorld: AuthoredWorld = { paths: [], fences: [], structures: {}, grass: [], clearings: [], walkable: [], trees: [], benches: [], swings: [], crumbPouches: [], puppies: [], routes: {} };
 let sceneItems = new Map<string, NonNullable<AuthoredWorld["items"]>>();
-let sceneBridgeBarriers = BRIDGE_BARRIERS;
+let sceneBridgeBarriers = BRIDGE_BARRIERS.map(barrier => ({ ...barrier, yaw: 0 }));
 export function setAuthoredWorld(world: AuthoredWorld) {
   authoredWorld = world; sceneItems = new Map();
   if (world.sceneVersion === 1) for (const item of world.items ?? []) {
     if (!item.visible) continue;
     const entries = sceneItems.get(item.asset) ?? []; entries.push(item); sceneItems.set(item.asset, entries);
   }
-  sceneBridgeBarriers = world.sceneVersion !== 1 ? BRIDGE_BARRIERS : (sceneItems.get("bridge") ?? []).flatMap(item => BRIDGE_BARRIERS.map(barrier => {
-    const corners = [-1, 1].flatMap(sx => [-1, 1].map(sz => layoutWorldPoint(item,
-      [barrier.x + sx * barrier.w / 2, 0, barrier.z + sz * barrier.d / 2], [BRIDGE.x, 0, BRIDGE.z])));
-    const xs = corners.map(point => point[0]), zs = corners.map(point => point[2]);
-    return { x: (Math.min(...xs) + Math.max(...xs)) / 2, z: (Math.min(...zs) + Math.max(...zs)) / 2,
-      w: Math.max(...xs) - Math.min(...xs), d: Math.max(...zs) - Math.min(...zs) };
-  }));
+  sceneBridgeBarriers = world.sceneVersion !== 1 ? BRIDGE_BARRIERS.map(barrier => ({ ...barrier, yaw: 0 }))
+    : (sceneItems.get("bridge") ?? []).flatMap(item => BRIDGE_BARRIERS.map(barrier => {
+      const [x, , z] = layoutWorldPoint(item, [barrier.x, 0, barrier.z], [BRIDGE.x, 0, BRIDGE.z]);
+      return { ...barrier, x, z, w: barrier.w * item.scale[0], d: barrier.d * item.scale[2], yaw: item.rotation[1] * Math.PI / 180 };
+    }));
 }
 export function bridgeBarriers() { return sceneBridgeBarriers; }
 function placements(asset: string, pivot: readonly number[]) {
@@ -107,7 +106,7 @@ export function dockHeight(x: number) {
 }
 export function bridgeHeight(x: number) {
   const t = Math.max(0, Math.min(1, (x - BRIDGE.x) / BRIDGE.length + 0.5));
-  return 0.08 + Math.sin(t * Math.PI) ** 2 * 1.1;
+  return 0.08 + Math.sin(t * Math.PI) ** 3 * 1.6;
 }
 export function groundY(x: number, z: number) {
   return baseGroundHeight(x, z);

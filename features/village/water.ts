@@ -1,9 +1,9 @@
 import * as T from "three";
 
-/** A shared world-space current, with separate shoreline masks for river and pond. */
+/** Stream-distance advection follows authored bends; ponds use a slower surface drift. */
 export function makeWater(time: { value: number }, gust: { value: number }, pond = false) {
   const material = new T.MeshPhysicalMaterial({
-    color: "#3b9d9e", roughness: .34, metalness: 0,
+    color: "#3b9d9e", roughness: .2, metalness: 0,
     clearcoat: .35, clearcoatRoughness: .3, envMapIntensity: .45,
   });
   const weather = { value: new T.Vector2() };
@@ -11,48 +11,68 @@ export function makeWater(time: { value: number }, gust: { value: number }, pond
     Object.assign(shader.uniforms, {
       uWaterTime: time, uWaterGust: gust, uWaterWeather: weather,
       uPond: { value: pond ? 1 : 0 },
-      uDeep: { value: new T.Color("#267981") }, uShallow: { value: new T.Color("#7cc8b3") },
+      uDeep: { value: new T.Color("#287f86") }, uShallow: { value: new T.Color("#87c9bd") },
     });
     const field = `
       uniform float uWaterTime, uWaterGust, uPond;
       varying vec3 vWaterWorld;
       varying vec2 vWaterUV;
+      varying vec2 vWaterPondUV;
+      varying float vWaterJoin;
       float waterHash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
       float waterNoise(vec2 p) {
         vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
         return mix(mix(waterHash(i),waterHash(i+vec2(1,0)),f.x),mix(waterHash(i+vec2(0,1)),waterHash(i+vec2(1,1)),f.x),f.y);
       }
+      vec2 waterCurrent(float pond) {
+        vec2 p=mix(vec2(vWaterUV.x*6.4,vWaterUV.y),vWaterWorld.xz,pond);
+        // Every moving detail samples this same field, travelling toward increasing stream distance.
+        p.y-=uWaterTime*mix(.9,.12,pond);
+        return p;
+      }
       float waterHeight(vec2 p) {
-        float speed=mix(.45,.085,uPond), t=uWaterTime*speed;
-        vec2 flow=vec2(p.x+sin(p.y*.052)*.32,p.y-t);
-        return waterNoise(flow*.95)*.13 + waterNoise(flow*2.1+vec2(t*.17,2.8))*.05
-          + sin(p.x*1.3+p.y*.58+t*.7)*.022 + sin(p.y*.92-p.x*.64-t*.48)*.019;
+        return sin(p.y*9.0+waterNoise(vec2(p.x*1.8,p.y*.6))*2.0)*.012
+          + (waterNoise(p*vec2(4.0,3.0))-.5)*.022;
+      }
+      float waterFoam(vec2 p) {
+        float thread=waterNoise(p*vec2(9.0,.85));
+        float fleck=waterNoise(p*vec2(3.0,2.8)+vec2(11.,7.));
+        return smoothstep(.79,.93,thread)*smoothstep(.55,.8,fleck);
       }
     `;
-    shader.vertexShader = field + shader.vertexShader;
+    shader.vertexShader = `attribute float waterJoin; attribute vec2 waterPondUV;\n` + field + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", `#include <begin_vertex>
       vWaterUV=uv;
+      vWaterJoin=waterJoin;vWaterPondUV=waterPondUV;
       vWaterWorld=(modelMatrix*vec4(position,1.0)).xyz;
-      transformed.y+=(waterHeight(vWaterWorld.xz)-.09)*.28;
     `);
     shader.fragmentShader = field + `uniform vec3 uDeep,uShallow; uniform vec2 uWaterWeather;\n` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", `#include <color_fragment>
       float bank=mix(abs(vWaterUV.x-.5)*2.0,length(vWaterUV-.5)*2.0,uPond);
+      bank=mix(bank,length(vWaterPondUV-.5)*2.0,vWaterJoin);
       float shallow=smoothstep(.42,1.0,bank);
-      float eddy=waterNoise(vWaterWorld.xz*.72+vec2(0.0,-uWaterTime*.19));
-      vec3 waterColor=mix(uDeep,uShallow,shallow*.73+eddy*.12);
+      vec2 current=waterCurrent(uPond);
+      vec3 waterColor=mix(uDeep,uShallow,shallow*.72);
       waterColor=mix(waterColor,waterColor*vec3(.6,.7,.94),uWaterWeather.y*.55);
       waterColor=mix(waterColor,waterColor*vec3(.8,.92,.95),uWaterWeather.x*.4);
-      float foam=smoothstep(.9,.98,bank)*smoothstep(.45,.73,eddy)*.24;
-      diffuseColor.rgb=mix(waterColor,vec3(.77,.88,.79),foam);
+      float foam=waterFoam(current);
+      if(vWaterJoin>0.0)foam=mix(foam,waterFoam(waterCurrent(1.0)),vWaterJoin);
+      float edge=smoothstep(.86,.98,bank);
+      diffuseColor.rgb=mix(waterColor,vec3(.84,.95,.91),foam*(.13+edge*.15));
     `);
     shader.fragmentShader = shader.fragmentShader.replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
-      float h=waterHeight(vWaterWorld.xz), e=.09;
-      vec2 slope=vec2(waterHeight(vWaterWorld.xz+vec2(e,0.0))-h,waterHeight(vWaterWorld.xz+vec2(0.0,e))-h)/e;
-      vec3 rippleNormal=normalize(vec3(-slope.x*(.8+uWaterGust*.3),1.0,-slope.y));
+      float h=waterHeight(waterCurrent(uPond));
+      if(vWaterJoin>0.0)h=mix(h,waterHeight(waterCurrent(1.0)),vWaterJoin);
+      vec3 dx=dFdx(vWaterWorld),dy=dFdy(vWaterWorld);
+      vec3 up=normalize(cross(dx,dy));
+      if(up.y<0.0)up=-up;
+      vec3 rx=cross(dy,up),ry=cross(up,dx);
+      float area=dot(dx,rx);
+      vec3 gradient=(rx*dFdx(h)+ry*dFdy(h))/max(abs(area),.000001)*sign(area);
+      vec3 rippleNormal=normalize(up-gradient*(.8+uWaterGust*.2));
       normal=normalize((viewMatrix*vec4(rippleNormal,0.0)).xyz);
     `);
   };
-  material.customProgramCacheKey = () => `village-water-current-${pond}`;
+  material.customProgramCacheKey = () => `village-water-joined-${pond}`;
   return { material, setWeather: (rain: number, dusk: number) => { weather.value.set(rain,dusk); } };
 }

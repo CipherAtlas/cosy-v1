@@ -1,0 +1,92 @@
+{
+  "checks": [
+    "Shared flock starts with the first circuit",
+    "Takeoff advances shared circuit 1",
+    "Mid-flight steps retain circuit 1",
+    "Takeoff advances shared circuit 2",
+    "Mid-flight steps retain circuit 2",
+    "Takeoff advances shared circuit 3",
+    "Mid-flight steps retain circuit 3",
+    "Takeoff advances shared circuit 4",
+    "Mid-flight steps retain circuit 4",
+    "Saved and broadcast snapshots retain the circuit choice",
+    "One existing twelve-dove flock has four circuits including the saved picnic hill",
+    "Two renderers agree on shared circuit 0",
+    "Two renderers agree on shared circuit 1",
+    "Two renderers agree on shared circuit 2",
+    "Two renderers agree on shared circuit 3",
+    "Two renderers agree on shared circuit 4",
+    "The fifth shared flight wraps to the first route",
+    "Shared flights use four distinct routes",
+    "Hill circuit takes off from saved dove landing 0",
+    "Hill circuit returns to saved dove landing 0",
+    "Hill circuit takes off from saved dove landing 1",
+    "Hill circuit returns to saved dove landing 1",
+    "Hill circuit takes off from saved dove landing 2",
+    "Hill circuit returns to saved dove landing 2",
+    "Hill circuit takes off from saved dove landing 3",
+    "Hill circuit returns to saved dove landing 3",
+    "Hill circuit takes off from saved dove landing 4",
+    "Hill circuit returns to saved dove landing 4",
+    "Hill circuit takes off from saved dove landing 5",
+    "Hill circuit returns to saved dove landing 5",
+    "Hill circuit takes off from saved dove landing 6",
+    "Hill circuit returns to saved dove landing 6",
+    "Hill circuit takes off from saved dove landing 7",
+    "Hill circuit returns to saved dove landing 7",
+    "Hill circuit takes off from saved dove landing 8",
+    "Hill circuit returns to saved dove landing 8",
+    "Hill circuit takes off from saved dove landing 9",
+    "Hill circuit returns to saved dove landing 9",
+    "Hill circuit takes off from saved dove landing 10",
+    "Hill circuit returns to saved dove landing 10",
+    "Hill circuit takes off from saved dove landing 11",
+    "Hill circuit returns to saved dove landing 11",
+    "The longer hill circuit remains continuous at 60 FPS",
+    "The existing flock circles close to the picnic for more than six seconds",
+    "Hill flight remains bounded above the real hill and tree crowns",
+    "Late-joining renderer follows the same hill circuit at 1 seconds",
+    "Late-joining renderer follows the same hill circuit at 10 seconds",
+    "Late-joining renderer follows the same hill circuit at 15 seconds",
+    "Late-joining renderer follows the same hill circuit at 20 seconds",
+    "Late-joining renderer follows the same hill circuit at 29 seconds",
+    "A shared meal shows the fuller serving and separate thrown crumbs",
+    "The full serving fills the bowl and spills around its rim"
+  ],
+  "sharedMidpoints": [
+    [
+      -28.760017452898264,
+      28.61622281479387,
+      -25.93751851198931
+    ],
+    [
+      -18.828040959710982,
+      39.228725826942245,
+      -19.769320704986022
+    ],
+    [
+      -44.6928744125386,
+      31.358152505896786,
+      -15.700341772005675
+    ],
+    [
+      -108.0637103838055,
+      40.36365736934716,
+      -24.46339955530645
+    ],
+    [
+      -28.760017452898264,
+      28.61622281479387,
+      -25.93751851198931
+    ]
+  ],
+  "hillFlight": {
+    "closest": 0.8483400623240098,
+    "secondsNearPicnic": 8.584722222222222,
+    "maxStep": 0.1697319840500831,
+    "minimumClearance": 2.5692362334311962,
+    "peak": 42.28110324308939
+  },
+  "inside": 63,
+  "outside": 33
+}

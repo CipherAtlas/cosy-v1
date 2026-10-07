@@ -1,0 +1,43 @@
+{
+  "profile": {
+    "allocated": 153934,
+    "nonzero": 153934,
+    "hill": 35738,
+    "samples": [
+      {
+        "fps": 37,
+        "draws": 376,
+        "triangles": 1122248
+      },
+      {
+        "fps": 60,
+        "draws": 483,
+        "triangles": 1563650
+      },
+      {
+        "fps": 60,
+        "draws": 1089,
+        "triangles": 3424582
+      },
+      {
+        "fps": 60,
+        "draws": 590,
+        "triangles": 2272617
+      },
+      {
+        "fps": 60,
+        "draws": 304,
+        "triangles": 983186
+      },
+      {
+        "fps": 60,
+        "draws": 304,
+        "triangles": 983186
+      }
+    ],
+    "waterfallClock": true,
+    "waterfallTime": 13.335499999999964
+  },
+  "errors": [],
+  "limits": "Local Chrome QA production engine at1366x768, deterministic camera captures. FPS includes renderer warmup/camera changes; not native device or sustained performance proof."
+}

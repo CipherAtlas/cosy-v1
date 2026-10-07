@@ -11,7 +11,7 @@ import { createAnimalDialogueCue, type AnimalDialogueCue } from "./animalDialogu
 
 export type NearbyHorse = { id: string; name: string; owner: string | null; mode?: SharedActor["mode"] };
 
-/** Horses render accepted server poses only; losing delivery stops them in place. */
+/** Observers render the accepted path; the accepted rider can supply a provisional display pose. */
 export class VillageHorses {
   readonly group = new T.Group();
   private readonly motion = new ResidentMotion();
@@ -60,11 +60,13 @@ export class VillageHorses {
     }
   }
 
-  update(dt: number, elapsed: number, reducedMotion: boolean, listener: T.Vector3, enabled: boolean) {
+  update(dt: number, elapsed: number, reducedMotion: boolean, listener: T.Vector3, enabled: boolean, riderPose?: SharedActor | null) {
     this.enabled = enabled;
     for (const horse of this.horses) {
       const state = this.states.get(horse.id); horse.dialogue.visible = false; if (!state) continue;
-      const pose = this.motion.sample(state), travel = Math.hypot(pose.x - horse.actor.position.x, pose.z - horse.actor.position.z);
+      const pose = riderPose?.id === state.id && state.owner === this.selfId && state.mode === "ride"
+        ? riderPose : this.motion.sample(state);
+      const travel = Math.hypot(pose.x - horse.actor.position.x, pose.z - horse.actor.position.z);
       const speed = dt > 0 && dt < .25 && travel < 2 ? travel / dt : 0;
       const step = travel < 2 ? travel / Math.max(.2, horse.actor.scale.z) : 0;
       horse.distance += step;

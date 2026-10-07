@@ -4,7 +4,7 @@
 
 ## Native rig delivery and active integration
 
-[Native rig evidence](rigs/README.md) supersedes the initial static export below. All seventeen GLBs now contain weighted skins and 110 native clips; approved rest geometry/colors/UVs are unchanged. Active horses, dogs, pasture animals, owls, pond birds and the private cat use the new artwork. The [separate rig studio](../../../../assets/village/animals-v2/animal-rig-studio.blend) preserves the original art studio. The catalog and manifest describe the current delivery; earlier portraits remain valid artwork references.
+[Native rig evidence](rigs/README.md) supersedes the initial static export below. At the October 4 checkpoint, seventeen GLBs contained 110 native clips with unchanged approved resting artwork. The [October 7 owl revision](../owl-20261007/README.md) replaces only the owl artwork and adds three clips; the current set has 113. Active horses, dogs, pasture animals, owls, pond birds and the private cat use the new artwork. The [separate rig studio](../../../../assets/village/animals-v2/animal-rig-studio.blend) preserves the original art studio. The catalog and manifest describe the current delivery; earlier portraits remain valid artwork references.
 
 ## Final portraits
 

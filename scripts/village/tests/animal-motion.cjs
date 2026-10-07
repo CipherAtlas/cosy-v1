@@ -6,7 +6,7 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
 }).outputText.replace('require("@/lib/basePath")', 'require("../../lib/basePath.ts")'), filename);
 const { PondLifeSpace, POND_BIRDS } = require('../../../features/village/pondLife.ts');
-const { owlPosition, owlFlightPosition } = require('../../../features/village/owlFlight.ts');
+const { owlPosition, owlFlightPosition, owlFlightPose } = require('../../../features/village/owlFlight.ts');
 const { TownAnimalAudio } = require('../../../features/village/townAnimalAudio.ts');
 const T = require('three');
 const checks = [];
@@ -38,6 +38,26 @@ for (let index = 0; index < 3; index++) {
   for (const boundary of [feedAt, feedAt + 2.2, feedAt + 9.2, feedAt + 12]) assert(length(owlPosition(home, perch, index, boundary - .00001, feedAt), owlPosition(home, perch, index, boundary + .00001, feedAt)) < .001);
   check(true, `Owl ${index}: feeding intercepts an airborne loop and rejoins it without a teleport`);
   check(JSON.stringify(owlPosition(home, perch, index, feedAt + 5, feedAt)) === JSON.stringify(owlPosition(home, perch, index, feedAt + 5, feedAt)), `Owl ${index}: observers and late arrivals use the same accepted meal clock`);
+  const modes = new Set();
+  for (let cycle = .1; cycle < 46; cycle += .1) {
+    const time = cycle - index * 13, pose = owlFlightPose(home, perch, index, time, null);
+    modes.add(pose.action);
+    assert.deepEqual(pose.position, owlFlightPosition(home, index, time));
+    assert([pose.heading, pose.pitch, pose.bank].every(Number.isFinite));
+    assert(Math.abs(pose.bank) <= .32 && Math.abs(pose.pitch) <= .30);
+    if (cycle > 3 && cycle < 23) {
+      const before = owlFlightPosition(home, index, time - .01), after = owlFlightPosition(home, index, time + .01);
+      const dx = after[0] - before[0], dz = after[2] - before[2];
+      assert((Math.sin(pose.heading) * dx + Math.cos(pose.heading) * dz) / Math.hypot(dx, dz) > .999);
+      assert(pose.bank * (index % 2 ? 1 : -1) > 0, 'Bank follows the actual turn direction');
+    }
+  }
+  check(['idle', 'fly', 'glide', 'land'].every(mode => modes.has(mode)), `Owl ${index}: flight includes powered takeoff, long glides, banking, braking and roost rest`);
+  const landing = owlFlightPose(home, perch, index, 26 - index * 13, null);
+  check(length(landing.position, home.position) < .000001 && Math.abs(landing.heading - home.rotation[1] * Math.PI / 180) < .000001,
+    `Owl ${index}: landing settles at the exact saved roost facing without a heading snap`);
+  check(owlFlightPose(home, perch, index, feedAt + 1.9, feedAt).action === 'land'
+    && owlFlightPose(home, perch, index, feedAt + 5, feedAt).action === 'feed', `Owl ${index}: accepted meal approach brakes before the dedicated feeding pose`);
 }
 
 class Node {

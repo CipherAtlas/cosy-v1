@@ -34,12 +34,12 @@ export function VillageSettings({ settings, sound, soundLoading, toggleSound, en
             <option value="auto">{t("Follow local time", "現地時間に合わせる")}</option>
             <option value="golden">{t("Golden hour", "夕暮れ")}</option>
             <option value="dusk">{t("Blue hour", "薄暮")}</option>
-            <option value="night">{t("Starlit night", "星降る夜")}</option>
-            <option value="rain">{t("Rainy afternoon", "雨の午後")}</option>
+            <option value="night">{t("Night", "夜")}</option>
+            <option value="rain">{t("Rain", "雨")}</option>
           </select>
         </label>
         <label><span>{t("Graphics", "画質")}</span><select aria-label={t("Graphics", "画質")} value={quality} onChange={event => setQuality(event.target.value as Quality)}>
-          <option value="low">{t("Gentle on battery", "省電力")}</option><option value="high">{t("Detailed", "高画質")}</option><option value="auto">{t("Automatic", "自動")}</option>
+          <option value="low">{t("Low power", "省電力")}</option><option value="high">{t("Detailed", "高画質")}</option><option value="auto">{t("Automatic", "自動")}</option>
         </select></label>
         <label><span>{t("Language", "言語")}</span><select aria-label={t("Language", "言語")} value={language} onChange={event => setLanguage(event.target.value as "en" | "ja")}><option value="en">English</option><option value="ja">日本語</option></select></label>
         <div className="v-tutorial-preference">

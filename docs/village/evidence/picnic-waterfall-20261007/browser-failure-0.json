@@ -1,0 +1,25 @@
+{
+  "self": "f3107937-8f19-4c7d-8f7a-157503e59a86",
+  "connected": true,
+  "blocked": false,
+  "context": {
+    "id": "picnic-hill-mat",
+    "kind": "picnic",
+    "dish": {
+      "id": "383b8daf-3517-4f23-a9bc-1dec8db2929d",
+      "mat": "picnic-hill-mat",
+      "slot": 0,
+      "recipe": "gardenSoup",
+      "portions": 2,
+      "placedBy": "1aa2a9a4-301d-479a-995a-4182ee2aed10",
+      "placedAt": 1791367517256
+    }
+  },
+  "seat": null,
+  "pose": [
+    -96,
+    24,
+    -20
+  ],
+  "text": "Hearthwillow\nN\n↑\nM\nMap\nI\n,\nW\nA\nS\nD\nMove\nShift\nHold to run\nE\nInteract\nR\nRecover\nTab\nFocus next button\nMouse to look · Esc to leave / release\nPortion eaten.\nE\nEat Garden soup\nF\nOpen picnic basket\n2 blobs here\nHearthwillow chat\nGentle Lamb (you)\nSleepy Duckling\n\nEveryone is in Hearthwillow. Messages clear each hour, next at 4:30 PM your time.\n\nNo messages yet."
+}

@@ -1,6 +1,6 @@
 # Native animal rigs — 2026-10-04 local
 
-Seventeen approved Blender models now contain weighted skins and 110 native clips and are active in the game/editor. [Catalog](../../../ANIMAL_ART.md), [manifest](../../../animals-v2-manifest.json), [ledger](../../../../../VILLAGE_BUILD.md#2026-10-04--native-animal-rigs-and-active-integration-local).
+At this October 4 checkpoint, seventeen approved Blender models contained weighted skins and 110 native clips. The [October 7 eagle-owl revision](../../owl-20261007/README.md) supersedes this owl artwork/flight evidence and brings the current set to 113 clips. The original delivery archive remains a historical checkpoint. [Catalog](../../../ANIMAL_ART.md), [manifest](../../../animals-v2-manifest.json), [ledger](../../../../../VILLAGE_BUILD.md#2026-10-04--native-animal-rigs-and-active-integration-local).
 
 - [Asset summary](asset-summary.json): 9,746 binary/actual CPU skin assertions, preserved resting artwork and separate Blender rig source. Its ZIP digest records the producer checkpoint; the final archive is refreshed with these docs/evidence.
 - [Native horse/dog compatibility](horse-dog-compatibility/rig-checks.json): 84 actual skin, clone, accepted clip-duration, saddle, cache and reduced-motion checks; rendered rest/walk/wave captures alongside the report.

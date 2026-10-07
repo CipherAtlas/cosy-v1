@@ -1,0 +1,12 @@
+{
+  "checks": 433,
+  "passed": true,
+  "physicsLayoutHashMatches": true,
+  "colliders": 1901,
+  "benchEntities": 8,
+  "picnicSeatCount": 5,
+  "trailWidthMetres": 3.6,
+  "maximumCrossFallMetres": 0.05572446566544542,
+  "maximumClimbGrade": 0.1638205962673396,
+  "limits": "Local actual saved renderer colliders and water/terrain movement checks. Full trail walked with production movement. No native device or deployed evidence."
+}

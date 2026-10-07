@@ -9,7 +9,7 @@ export const ANIMAL_ART = [
   ["dog-collie", "Border collie · standing"], ["dog-shepherd", "German shepherd · standing"],
   ["sheep", "Woolly meadow sheep"], ["lamb", "Woolly meadow lamb"],
   ["cat", "Cream & caramel cat · standing"], ["swan", "Ivory swan"],
-  ["owl", "Tawny woodland owl · perched"], ["duck", "Cream duck"], ["duckling", "Golden duckling"],
+  ["owl", "Eagle owl · perched"], ["duck", "Cream duck"], ["duckling", "Golden duckling"],
 ] as const;
 
 /** Placeable previews share the approved models and skeletons with the active animals. */

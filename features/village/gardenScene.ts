@@ -246,6 +246,7 @@ export class GardenScene {
       geometry = mergeGeometries(parts)!; parts.forEach(g => g.dispose()); this.geometry.set(name, geometry);
     }
     const mesh = new T.InstancedMesh(geometry, windy ? this.foliage : this.material, positions.length);
+    mesh.userData.gardenPlant = true;
     positions.forEach(([x, y, z, scale], i) => {
       this.dummy.position.set(x, y, z); this.dummy.rotation.set(0, name === "Sunflower" ? Math.atan2(this.sunDirection.x, this.sunDirection.z) : Math.sin(i * 7.3) * .3, 0); this.dummy.scale.setScalar(scale); this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
     });

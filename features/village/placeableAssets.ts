@@ -8,15 +8,20 @@ import { townAssets, TOWN_ASSET_IDS, TOWN_ANIMAL_ASSETS, transformTownColliders,
 import type { Collider } from "./environment";
 import { loadAnimalArt } from "./animalArt";
 import { ANIMAL_RIG_ASSETS, makeAnimalRig } from "./animalRig";
-import { batchStaticProp } from "./spatialRendering";
+import { batchStaticProp, instanceStaticProps } from "./spatialRendering";
+import { makePicnicAssets, makePicnicDish } from "./picnicScene";
+import { RECIPES } from "./picnic";
+import { makeHillRockOutcrop, makeHillWaterfall } from "./waterfallScene";
 import { makeRiverbankStone } from "./riverbankStones";
 
 export type PlaceableAsset = { id: string; name: string; category: string; template: T.Object3D; shelf: boolean; surface?: boolean; solid?: boolean; localColliders?: Collider[] };
 
 /** One catalog for supplemental studio props and their playable counterparts. */
-export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource: T.Object3D = new T.Group(), townSource?: T.Object3D) {
+export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource: T.Object3D = new T.Group(), townSource?: T.Object3D, waterTime: { value: number } = { value: 0 }) {
   const assets = new Map<string, PlaceableAsset>();
   const sourceGround = surfaces.ground;
+  const waterfall = makeHillWaterfall(waterTime); assets.set(waterfall.id, waterfall);
+  const outcrop = makeHillRockOutcrop(); assets.set(outcrop.id, outcrop);
   assets.set("riverbank-stone", { id: "riverbank-stone", name: "Small riverbank stone", category: "Nature", template: makeRiverbankStone(surfaces.stone), shelf: true });
     const raisedBed = new T.Group();
     const bedWood = surfaces.wood, soil = new T.MeshStandardMaterial({ color: "#80634b", roughness: 1 });
@@ -80,6 +85,8 @@ export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource:
     boulder.scale.set(1.6, .75, 1); boulder.position.y = .6; boulder.castShadow = boulder.receiveShadow = true;
     const rock = new T.Group(); rock.add(boulder); assets.set("boulder", { id: "boulder", name: "Mossy boulder", category: "Nature", template: rock, shelf: true });
   for (const asset of assets.values()) asset.solid = asset.category === "Buildings" || ["raised-bed", "boulder"].includes(asset.id);
+  for (const asset of makePicnicAssets()) assets.set(asset.id, asset);
+  for (const recipe of RECIPES) assets.set(`picnic-food-${recipe.id}`, { id: `picnic-food-${recipe.id}`, name: recipe.name, category: "Furnishings", template: makePicnicDish(recipe.id), shelf: true });
   if (townSource) for (const [id, asset] of townAssets(townSource)) assets.set(id, asset);
   return assets;
 }
@@ -87,9 +94,15 @@ export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource:
 export async function addSupplementalLayout(world: World, models: T.Object3D, cat?: T.Object3D, townSource?: T.Object3D) {
   if (world.authored.sceneVersion !== 1) return;
   const requested = new Set((world.authored.items ?? []).filter(item => item.visible).map(item => item.asset));
-  if (![...requested].some(id => TOWN_ASSET_IDS.includes(id) || /^(animal-|land-|cottage-(cat|couch|reading|fern|botanical|writing|books|pottery|book))/.test(id) || /^garden-(sunflower|daisy|iris|mint|reeds|lily|carrot|radish|basket|wateringcan|swan|duck|duckling|fish)$/.test(id) || ["riverbank-stone", "meadow-island", "boulder", "raised-bed", "coffee-cup", "writing-journal", "kind-note", "desk-inkwell", "desk-quill", "focus-hourglass", "village-window-vista"].includes(id))) return;
+  if (![...requested].some(id => TOWN_ASSET_IDS.includes(id) || /^(animal-|land-|cottage-(cat|couch|reading|fern|botanical|writing|books|pottery|book))/.test(id) || /^garden-(sunflower|daisy|iris|mint|reeds|lily|carrot|radish|basket|wateringcan|swan|duck|duckling|fish)$/.test(id) || ["hill-waterfall", "hill-rock-outcrop", "garden-kitchen", "picnic-mat", "picnic-basket", ...RECIPES.map(recipe => `picnic-food-${recipe.id}`), "riverbank-stone", "meadow-island", "boulder", "raised-bed", "coffee-cup", "writing-journal", "kind-note", "desk-inkwell", "desk-quill", "focus-hourglass", "village-window-vista"].includes(id))) return;
   if (!townSource && [...requested].some(id => TOWN_ASSET_IDS.includes(id))) townSource = await loadTownAssetKit();
-  const assets = supplementalAssets(world.gardenSurfaces, cat, townSource);
+  const assets = supplementalAssets(world.gardenSurfaces, cat, townSource, world.water.userData.time);
+  const staticAssets = new Set(["garden-kitchen", "picnic-mat", "picnic-basket", "farm-row", "horse-stable", "horse-racetrack", "hay-bale", "owl-feeding-perch", "apple-tree", "mushroom-patch", "forage-apple", "forage-mushroom", "riverbank-stone"]);
+  for (const id of staticAssets) {
+    const template = assets.get(id)?.template;
+    if (template) batchStaticProp(template);
+  }
+  const staticRoots: T.Object3D[] = [];
   const animalIds = new Set((world.authored.items ?? []).filter(item => item.visible && item.asset.startsWith("animal-")).map(item => item.asset));
   if (animalIds.size) for (const [id, asset] of await loadAnimalArt(animalIds)) assets.set(id, asset);
   const retainedGeometry = new Set<T.BufferGeometry>();
@@ -107,7 +120,7 @@ export async function addSupplementalLayout(world: World, models: T.Object3D, ca
       ? makeAnimalRig(ANIMAL_RIG_ASSETS[item.asset]) : models.getObjectByName(names[item.asset.slice(7)])?.clone(true);
     if (!template) continue;
     const root = cloneSkeleton(template);
-    root.traverse(object => { if (object instanceof T.Mesh) {
+    root.traverse(object => { if (object instanceof T.Mesh || object instanceof T.Points) {
       retainedGeometry.add(object.geometry);
       (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => retainedMaterials.add(material));
     } });
@@ -118,10 +131,11 @@ export async function addSupplementalLayout(world: World, models: T.Object3D, ca
       const box = new T.Box3().setFromObject(root), center = box.getCenter(new T.Vector3()), size = box.getSize(new T.Vector3());
       world.colliders.push({ x: center.x, z: center.z, w: size.x, d: size.z, bottom: box.min.y, top: box.max.y });
     }
-    if (["farm-row", "horse-stable", "horse-racetrack", "hay-bale", "owl-feeding-perch"].includes(item.asset)) batchStaticProp(root);
+    if (staticAssets.has(item.asset)) staticRoots.push(root);
   }
+  instanceStaticProps(staticRoots, world.group);
   for (const asset of assets.values()) asset.template.traverse(object => {
-    if (!(object instanceof T.Mesh)) return;
+    if (!(object instanceof T.Mesh || object instanceof T.Points)) return;
     if (!retainedGeometry.has(object.geometry)) object.geometry.dispose();
     for (const material of Array.isArray(object.material) ? object.material : [object.material]) if (!retainedMaterials.has(material)) material.dispose();
   });

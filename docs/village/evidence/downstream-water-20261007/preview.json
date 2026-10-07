@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "Regular preview connects to existing Worker2567",
+    "3051 serves the downstream shader build",
+    "Export contains metric river coordinates and revised continuous waterfall sheet",
+    "Actual exported water clock advances",
+    "Actual reduced-motion preference freezes water",
+    "No actual exported-app page errors"
+  ],
+  "geometry": {
+    "distance": 220,
+    "curtains": 1,
+    "clock": true
+  },
+  "errors": [],
+  "limits": "Fresh Chrome client on3051 with existing local Worker2567; no inventory grants, claims or server-state fixtures."
+}

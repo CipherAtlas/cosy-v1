@@ -1,0 +1,5 @@
+{
+  key: 'village-water-downstream-false|village-tent-shadow-9',
+  compile: 'function(t,i){e.call(this,t,i),t.fragmentShader=t.fragmentShader.replace("#include <shadowmap_pars_fragment>",eu)}'
+}
+6 preview checks passed

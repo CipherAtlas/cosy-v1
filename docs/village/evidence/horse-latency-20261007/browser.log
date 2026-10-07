@@ -1,0 +1,8 @@
+Loading horse test client 1
+Joined horse test client 1
+Loading horse test client 2
+Joined horse test client 2
+Horse response under added 200ms RTT: { visualMs: 35.3999999910593, authoritativeMs: 411.69999998807907 }
+Loading horse test client 3
+Joined horse test client 3
+30 rendered horse checks passed; /tmp/cosy-horse-latency-browser

@@ -1,0 +1,5 @@
+
+> a-peaceful-room@0.1.0 check:export
+> node scripts/village/check-export.cjs
+
+Static export contains no editor, save API or admin route.

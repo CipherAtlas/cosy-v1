@@ -84,7 +84,7 @@ export class StudioCollision {
     let height = this.defaultTerrain && Math.abs(x) <= 325 && Math.abs(z) <= 325 ? Math.max(0, landscapeHeight(x, z)) : 0;
     this.ray.set(new T.Vector3(x, 10000, z), new T.Vector3(0, -1, 0));
     for (const surface of this.surfaces) {
-      if (surface.id === exclude || x < surface.bounds.min.x || x > surface.bounds.max.x || z < surface.bounds.min.z || z > surface.bounds.max.z) continue;
+      if (surface.id === exclude || surface.bounds.max.y <= height || x < surface.bounds.min.x || x > surface.bounds.max.x || z < surface.bounds.min.z || z > surface.bounds.max.z) continue;
       const hit = this.ray.intersectObjects(surface.meshes, false)[0];
       if (hit) height = Math.max(height, hit.point.y);
     }

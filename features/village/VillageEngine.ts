@@ -1,3 +1,6 @@
+import { PicnicScene } from "./picnicScene";
+import { MealFeedback } from "./mealFeedback";
+import { nearPicnic, type PicnicContext, type PicnicAction } from "./picnic";
 import { DEFAULT_KEYBINDINGS, gameKey, type Keybindings } from "./keybindings";
 import { activityInLayout, configureLayoutInteractions } from "./layoutInteractions";
 import { addSupplementalLayout } from "./placeableAssets";
@@ -29,7 +32,7 @@ import { withBasePath } from "@/lib/basePath";
 import { towerLookout } from "./towerLookout";
 import type { SharedChatEntry, SharedVisitor, SharedPuppyTrick } from "./sharedWorld";
 import { loadVillageLayout, loadPlacedPuppies } from "./villageAssets";
-import { VegetationDetail } from "./vegetationDetail";
+import { registerPlantDetail, VegetationDetail } from "./vegetationDetail";
 import { instanceCells } from "./spatialRendering";
 import { optimizeGardenGeometry } from "./geometryOptimization";
 import { VillageCamera } from "./villageCamera";
@@ -85,6 +88,11 @@ export class VillageEngine {
   private dialogue?: VillagerDialogue;
   private activities?: VillageActivities;
   private garden?: GardenScene;
+  private picnicScene?: PicnicScene;
+  private mealFeedback = new MealFeedback();
+  private scenePointer: { x: number; y: number } | null = null;
+  private picnicContext: PicnicContext | null = null;
+  private lastPicnicContext = "";
   private gardenState = freshGarden();
   private companions: string[] = [];
   private nearGarden: string | null = null;
@@ -136,7 +144,8 @@ export class VillageEngine {
     y: number;
     startX: number;
     startY: number;
-    seat?: { id: string; index: 0 | 1 };
+    seat?: { id: string; index: number };
+    dish?: { id: string; mat: string };
   };
   private benchRaycaster = new T.Raycaster();
   private benchPointer = new T.Vector2();
@@ -156,7 +165,7 @@ export class VillageEngine {
   private near: PlaceId | null = null;
   private nearBench: VillageBench | null = null;
   private seatedBench: VillageBench | null = null;
-  private seatedIndex: 0 | 1 | null = null;
+  private seatedIndex: number | null = null;
   private nearLookout = false;
   private lookoutIndex: number | null = null;
   private lookoutPosition: [number, number, number] | null = null;
@@ -211,12 +220,10 @@ export class VillageEngine {
   private onKeyDown = (e: KeyboardEvent) => {
     const key = gameKey(this.keybindings, e.key);
     if (e.key === "Escape") {
-      if ((this.lookoutPosition || this.lookoutPending) && !this.blocked) this.leaveLookout();
-      if ((this.horseRiding.actor || this.horseMountPending) && !this.blocked) this.leaveHorse();
-      if (this.ridingSwing && !this.blocked) this.leaveSwing();
-      if (this.seatedBench && !this.blocked) this.stand();
-      this.releaseMouseLook();
-      this.clearKeys();
+      if (e.defaultPrevented || e.repeat || e.isComposing) return;
+      this.escapeWorld();
+      this.callbacks.escape?.();
+      e.preventDefault();
       return;
     }
     if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing || !key) return;
@@ -238,6 +245,12 @@ export class VillageEngine {
       if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift", "home", "end", "pageup", "pagedown"].includes(key)) { e.preventDefault(); this.keys.add(key); }
       if ((key === "e" || key === "r") && !e.repeat) { e.preventDefault(); this.leaveLookout(); }
       return;
+    }
+    if (this.picnicContext?.kind === "picnic" && key === "f" && !e.repeat) {
+      e.preventDefault(); this.openPicnicBasket(); return;
+    }
+    if (this.picnicContext && key === "e" && !e.repeat) {
+      e.preventDefault(); this.interactPicnic(); return;
     }
     if (key === "f" && !e.repeat && !this.seatedBench && !this.ridingSwing && !this.horseRiding.actor && this.dialogue?.talk()) {
       e.preventDefault(); return;
@@ -332,10 +345,13 @@ export class VillageEngine {
     const canvas = this.renderer.domElement;
     const locked = document.pointerLockElement === canvas;
     const rect = canvas.getBoundingClientRect();
-    const seat = this.pickBenchSeat(locked ? rect.left + rect.width / 2 : e.clientX,
-      locked ? rect.top + rect.height / 2 : e.clientY);
+    const x = locked ? rect.left + rect.width / 2 : e.clientX;
+    const y = locked ? rect.top + rect.height / 2 : e.clientY;
+    const dish = this.pickPicnicDish(x, y);
+    const seat = dish ? null : this.pickBenchSeat(x, y);
     if (locked) {
-      if (seat) this.sit(seat.id, seat.index);
+      if (dish) this.picnicAction({ kind: "picnic", action: "eat", id: dish.mat, dishId: dish.id });
+      else if (seat) this.sit(seat.id, seat.index);
       return;
     }
     this.pointer = {
@@ -345,15 +361,23 @@ export class VillageEngine {
       startX: e.clientX,
       startY: e.clientY,
       seat: seat ?? undefined,
+      dish: dish ?? undefined,
     };
-    if (seat || e.pointerType !== "mouse") canvas.setPointerCapture(e.pointerId);
+    if (dish || seat || e.pointerType !== "mouse") canvas.setPointerCapture(e.pointerId);
     else this.captureMouse();
   };
   private onMove = (e: PointerEvent) => {
-    if (!this.pointer || e.pointerId !== this.pointer.id || this.blocked) return;
-    if (this.pointer.seat) {
+    if (e.pointerType === "mouse") this.scenePointer = { x: e.clientX, y: e.clientY };
+    if (!this.pointer) {
+      if (e.pointerType === "mouse" && document.pointerLockElement !== this.renderer.domElement)
+        this.renderer.domElement.style.cursor = this.pickPicnicDish(e.clientX, e.clientY) ? "pointer" : "";
+      return;
+    }
+    if (e.pointerId !== this.pointer.id || this.blocked) return;
+    if (this.pointer.seat || this.pointer.dish) {
       if (Math.hypot(e.clientX - this.pointer.startX, e.clientY - this.pointer.startY) < 8) return;
       this.pointer.seat = undefined;
+      this.pointer.dish = undefined;
       if (e.pointerType === "mouse") this.setMouseLook("drag");
     }
     if (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag") return;
@@ -373,10 +397,12 @@ export class VillageEngine {
   };
   private onUp = (e: PointerEvent) => {
     if (this.pointer?.id !== e.pointerId) return;
-    const { seat, startX, startY } = this.pointer;
+    const { seat, dish, startX, startY } = this.pointer;
     this.pointer = undefined;
     if (this.renderer.domElement.hasPointerCapture(e.pointerId)) this.renderer.domElement.releasePointerCapture(e.pointerId);
-    if (seat && Math.hypot(e.clientX - startX, e.clientY - startY) < 8) this.sit(seat.id, seat.index);
+    if (e.type !== "pointerup" || this.blocked || Math.hypot(e.clientX - startX, e.clientY - startY) >= 8) return;
+    if (dish) this.picnicAction({ kind: "picnic", action: "eat", id: dish.mat, dishId: dish.id });
+    else if (seat) this.sit(seat.id, seat.index);
   };
   private onMouseMove = (e: MouseEvent) => {
     if (document.pointerLockElement !== this.renderer.domElement || this.blocked) return;
@@ -481,6 +507,8 @@ export class VillageEngine {
       horseSound?: (event: HorseSoundEvent) => void;
       townAnimalSound?: (event: TownAnimalSoundEvent) => void;
       animalNearby?: (sources: AnimalSoundSource[], walking: boolean) => void;
+      picnicContext?: (context: PicnicContext | null) => void;
+      picnicOpen?: (context: PicnicContext) => void;
       townContext?: (context: TownContext | null) => void;
       activityHUD?: (state: TownActivityHUDState | null) => void;
       scatterBirds?: (fromBench?: boolean) => void;
@@ -557,7 +585,7 @@ export class VillageEngine {
     );
     this.player.position.set(0.3, 0, 20);
     this.player.rotation.y = Math.PI;
-    this.scene.add(this.player);
+    this.scene.add(this.player, this.mealFeedback.group);
     this.camera.position.set(0.3, 2.0, 23.8);
     this.currentLook.set(0.3, 1.35, 20);
     this.camera.lookAt(this.currentLook);
@@ -666,14 +694,22 @@ export class VillageEngine {
     this.garden.group.traverse(object => { if (object instanceof T.InstancedMesh && object.userData.bankPlant) bankPlants.push(object); });
     clearSurfacePlanting(world.group, bankPlants);
     for (const mesh of bankPlants) instanceCells(mesh, 8, "Pond planting", .1);
-    this.vegetationDetail = new VegetationDetail(world.vegetation);
+    const gardenPlants: T.InstancedMesh[] = [];
+    this.garden.group.traverse(object => { if (object instanceof T.InstancedMesh && object.userData.gardenPlant) {
+      object.computeBoundingSphere(); gardenPlants.push(object);
+    } });
+    await registerPlantDetail(gardenPlants);
+    this.vegetationDetail = new VegetationDetail([...world.vegetation, ...gardenPlants]);
     configureLayoutInteractions(world.authored);
     await addSupplementalLayout(world, gardenKit.scene, placedCat, townKit);
+    this.picnicScene = new PicnicScene(world.authored); world.group.add(this.picnicScene.group);
+    this.picnicScene.sync(this.sharedActors?.picnic);
     this.life = new VillageLife(root, world.colliders, gardenKit.scene, world.authored);
     if (townKit) {
       this.townAnimals = new TownAnimals(world.authored, townKit, root, event => this.callbacks.townAnimalSound?.(event), this.life.residents.find(resident => resident.root.name === "Rowan")?.spirit);
       this.townScene = new TownScene(world.authored, gardenKit.scene, townKit, event => this.callbacks.townAnimalSound?.(event));
       this.scene.add(this.townAnimals.group, this.townScene.group);
+      await this.townScene.prepareCrops();
     }
     this.life.setCompanions(this.companions);
     this.scene.add(this.life.group);
@@ -692,6 +728,7 @@ export class VillageEngine {
     for (const trick of this.pendingPuppyTricks.values()) this.puppies.sharedTrick(trick);
     this.pendingPuppyTricks.clear();
     this.scene.add(this.puppies.group);
+    this.horseRiding.setColliders(world.colliders);
     this.horses = new VillageHorses(world.authored.horses ?? [], event => this.callbacks.horseSound?.(event), event => this.callbacks.townAnimalSound?.(event));
     this.scene.add(this.horses.group);
     this.dialogue = new VillagerDialogue(this.host, this.life, world.colliders, this.clearKeys, {
@@ -876,7 +913,7 @@ export class VillageEngine {
     const gl = this.renderer.getContext();
     const debug = gl.getExtension("WEBGL_debug_renderer_info");
     return {
-      graphicsVersion: "spatial-batches-v2",
+      graphicsVersion: "static-detail-v3",
       browser: navigator.userAgent,
       gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
       viewport: [this.host.clientWidth, this.host.clientHeight],
@@ -1008,6 +1045,39 @@ export class VillageEngine {
       this.heldPuppy = null; this.puppies?.cancelPet(); this.puppyTrickId = null; this.leaveSwing(); this.stand();
     }
   }
+  getSharedNow() { return Date.now() + this.sharedTimeOffset; }
+  escapeWorld() {
+    if ((this.lookoutPosition || this.lookoutPending) && !this.blocked) this.leaveLookout();
+    if ((this.horseRiding.actor || this.horseMountPending) && !this.blocked) this.leaveHorse();
+    if (this.ridingSwing && !this.blocked) this.leaveSwing();
+    if (this.seatedBench && !this.blocked) this.stand();
+    this.releaseMouseLook();
+    this.clearKeys();
+  }
+  openPicnicBasket() {
+    if (!this.blocked && this.picnicContext?.kind === "picnic") this.callbacks.picnicOpen?.(this.picnicContext);
+  }
+  interactPicnic() {
+    const context = this.picnicContext;
+    if (!context || this.blocked) return;
+    const cooking = context.kind === "kitchen" && (this.sharedActors?.picnic?.cooking.find(job => job.kitchen === context.id && job.owner === this.sharedSelfId)
+      ?? this.sharedActors?.picnic?.cooking.find(job => job.kitchen === context.id && job.readyAt > this.getSharedNow()));
+    if (cooking) {
+      if (cooking.owner === this.sharedSelfId && cooking.readyAt <= this.getSharedNow()) this.picnicAction({ kind: "picnic", action: "pack", id: context.id });
+      return;
+    }
+    if (context.kind === "picnic") {
+      const target = this.picnicAim();
+      if (target.seat && !this.seatedBench) this.sit(target.seat.id, target.seat.index);
+      else if (target.dish) this.picnicAction({ kind: "picnic", action: "eat", id: target.dish.mat, dishId: target.dish.id });
+      else if (this.seatedBench && context.dish) this.picnicAction({ kind: "picnic", action: "eat", id: context.id, dishId: context.dish.id });
+      return;
+    }
+    this.callbacks.picnicOpen?.(context);
+  }
+  picnicAction(request: PicnicAction) {
+    this.requestShared(request, () => { if (request.action === "eat") this.callbacks.sharedNotice?.("Portion eaten."); });
+  }
   setForageInventory(inventory: ForageInventory) {
     this.forageInventory = { ...inventory };
   }
@@ -1028,6 +1098,7 @@ export class VillageEngine {
   }
   setSharedActors(world: SharedActors, selfId: string) {
     this.sharedActors = world; this.sharedSelfId = selfId;
+    this.picnicScene?.sync(world.picnic);
     this.sharedTimeOffset = world.time - Date.now();
     this.puppies?.applyShared(world.actors, selfId, world.time);
     this.life?.applyShared(world.actors, selfId, world.time);
@@ -1036,7 +1107,7 @@ export class VillageEngine {
     this.townScene?.applyShared(world.town, world.time);
     this.raceGuide?.applyShared(world.town, selfId);
     const previousHorse = this.horseRiding.actor;
-    if (this.horseRiding.sync(world.actors, selfId)) {
+    if (this.horseRiding.sync(world.actors, selfId, world.time)) {
       if (this.horseRiding.actor) {
         this.clearKeys(); this.dialogue?.setEnabled(false);
         this.puppyTrickId = null; this.heldPuppy = null;
@@ -1058,8 +1129,8 @@ export class VillageEngine {
     const following = world.actors.filter(actor => actor.kind === "puppy" && actor.following && actor.owner === selfId).map(actor => actor.id).sort().join("|");
     if (following !== this.lastSharedFollowers) { this.lastSharedFollowers = following; this.callbacks.puppyFollowing?.(followers); }
   }
-  setActivitySeat(index: 0 | 1 | undefined, position?: [number, number, number]) {
-    this.activitySeat = index ?? null; this.activityPosition = position ?? null;
+  setActivitySeat(index: number | undefined, position?: [number, number, number]) {
+    this.activitySeat = index === 0 || index === 1 ? index : null; this.activityPosition = position ?? null;
   }
   showPuppyTrick(trick: SharedPuppyTrick) {
     if (this.puppies) this.puppies.sharedTrick(trick);
@@ -1078,28 +1149,57 @@ export class VillageEngine {
   }
   showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) { this.visitors.showChatBubble(entry, selfId, selfName); }
   removeChatBubbles(messageIds: string[]) { this.visitors.removeChatBubbles(messageIds); }
-  private seatPoint(bench: VillageBench, index: 0 | 1) {
-    const offset = index === 0 ? -.68 : .68;
+  private benchIndices(bench: VillageBench) { return Array.from({ length: bench.seatCount ?? 2 }, (_, index) => index); }
+  private seatPoint(bench: VillageBench, index: number) {
+    const offset = bench.seatCount ? (index - (bench.seatCount - 1) / 2) * (bench.seatSpacing ?? .68)
+      : (index * 2 - 1) * (bench.seatSpacing ?? .68);
     return { x: bench.x + Math.cos(bench.facing) * offset, z: bench.z - Math.sin(bench.facing) * offset };
   }
+  picnicAim() {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const pointer = document.pointerLockElement !== this.renderer.domElement && this.scenePointer;
+    const x = pointer ? pointer.x : rect.left + rect.width / 2, y = pointer ? pointer.y : rect.top + rect.height / 2;
+    const seat = this.pickBenchSeat(x, y);
+    return { seat, dish: seat ? null : this.pickPicnicDish(x, y) };
+  }
+  private pickPicnicDish(clientX: number, clientY: number) {
+    if (this.blocked || this.place || this.picnicContext?.kind !== "picnic" || !this.picnicScene) return null;
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    this.benchPointer.set((clientX - rect.left) / rect.width * 2 - 1, 1 - (clientY - rect.top) / rect.height * 2);
+    this.benchRaycaster.setFromCamera(this.benchPointer, this.camera);
+    const dish = this.picnicScene.pickDish(this.benchRaycaster);
+    return dish?.mat === this.picnicContext.id ? dish : null;
+  }
   private pickBenchSeat(clientX: number, clientY: number) {
-    const bench = this.nearBench;
+    const bench = this.world?.benches.find(bench => bench.id === this.picnicContext?.id) ?? this.nearBench;
     if (!bench || this.blocked || this.place || this.seatedBench) return null;
     const rect = this.renderer.domElement.getBoundingClientRect();
     if (!rect.width || !rect.height) return null;
     this.benchPointer.set((clientX - rect.left) / rect.width * 2 - 1, 1 - (clientY - rect.top) / rect.height * 2);
     this.benchRaycaster.setFromCamera(this.benchPointer, this.camera);
     this.benchMatrix.makeRotationY(bench.facing).setPosition(bench.x, 0, bench.z).invert();
-    const hit = this.benchRaycaster.ray.clone().applyMatrix4(this.benchMatrix).intersectBox(bench.hitBox, this.benchHit);
-    if (!hit) return null;
-    return { id: bench.id, index: (hit.x < 0 ? 0 : 1) as 0 | 1 };
+    const ray = this.benchRaycaster.ray.clone().applyMatrix4(this.benchMatrix);
+    if (bench.seatCount) {
+      let nearest: { id: string; index: number; distance: number } | null = null;
+      const halfWidth = (bench.seatSpacing ?? .68) * .4, halfDepth = bench.hitBox.max.z * .6;
+      for (const index of this.benchIndices(bench)) {
+        const center = (index - (bench.seatCount - 1) / 2) * (bench.seatSpacing ?? .68);
+        const box = new T.Box3(new T.Vector3(center - halfWidth, bench.hitBox.min.y, -halfDepth), new T.Vector3(center + halfWidth, bench.hitBox.max.y, halfDepth));
+        const hit = ray.intersectBox(box, this.benchHit);
+        if (hit) { const distance = hit.distanceTo(ray.origin); if (!nearest || distance < nearest.distance) nearest = { id: bench.id, index, distance }; }
+      }
+      return nearest && { id: nearest.id, index: nearest.index };
+    }
+    const hit = ray.intersectBox(bench.hitBox, this.benchHit);
+    return hit ? { id: bench.id, index: hit.x < 0 ? 0 : 1 } : null;
   }
   private visitorSeat(x: number, z: number, heading: number) {
     for (const bench of this.world?.benches ?? []) {
       const turn = Math.atan2(Math.sin(heading - bench.facing), Math.cos(heading - bench.facing));
       if (Math.abs(turn) > .45) continue;
       if (Math.hypot(x - bench.x, z - bench.z) < .35) return { bench, index: null };
-      for (const index of [0, 1] as const) {
+      for (const index of this.benchIndices(bench)) {
         const point = this.seatPoint(bench, index);
         if (Math.hypot(x - point.x, z - point.z) < .4) return { bench, index };
       }
@@ -1107,7 +1207,7 @@ export class VillageEngine {
     return null;
   }
   private seatOccupants(bench: VillageBench) {
-    const occupants = new Map<0 | 1, number[]>();
+    const occupants = new Map<number, number[]>();
     for (const remote of this.remoteVisitors.values()) {
       if (this.sharedMode) {
         if (remote.bench?.id === bench.id) occupants.set(remote.bench.index, [remote.slot]);
@@ -1115,7 +1215,7 @@ export class VillageEngine {
       }
       const seat = this.visitorSeat(remote.target.x, remote.target.z, remote.heading);
       if (seat?.bench.id !== bench.id) continue;
-      for (const index of seat.index === null ? [0, 1] as const : [seat.index]) {
+      for (const index of seat.index === null ? this.benchIndices(bench) : [seat.index]) {
         const slots = occupants.get(index) ?? [];
         slots.push(remote.slot);
         occupants.set(index, slots);
@@ -1129,8 +1229,8 @@ export class VillageEngine {
     if (!bench || index === null) return;
     const occupied = this.seatOccupants(bench);
     if (!(occupied.get(index) ?? []).some(slot => slot < (this.sharedSlot ?? Infinity))) return;
-    const other = index === 0 ? 1 : 0;
-    if (!occupied.has(other)) this.seatedIndex = other;
+    const other = this.benchIndices(bench).find(value => !occupied.has(value));
+    if (other !== undefined) this.seatedIndex = other;
   }
   setSharedIdentity(slot: number, color: string) {
     if (this.sharedSlot === slot && this.sharedColor === color) return;
@@ -1274,6 +1374,13 @@ export class VillageEngine {
     if (this.blocked || this.place || this.seatedBench || this.ridingSwing) return false;
     return this.requestShared(action, () => {});
   }
+  private horseDisplayOccupied(id: string, x: number, z: number) {
+    return [...this.remoteVisitors.values()].some(visitor => visitor.activity !== "focus"
+      && Math.hypot(visitor.target.x - x, visitor.target.z - z) < 1)
+      || this.sharedActors?.actors.some(actor => actor.id !== id && actor.activity !== "focus"
+        && Math.hypot(actor.x - x, actor.z - z) < (actor.kind === "horse" ? 1.4 : .8)) === true;
+  }
+
   mountHorse(id: string) {
     if (this.blocked || this.place || this.seatedBench || this.ridingSwing || this.horseRiding.actor || this.horseMountPending || !this.movement?.grounded) return false;
     if (!this.sharedConnected || !this.sharedInteraction) { this.callbacks.sharedNotice?.("Wait for the village to reconnect."); return false; }
@@ -1488,14 +1595,15 @@ export class VillageEngine {
     this.callbacks.recovered?.(nearby ? "nearby" : "entrance");
     return true;
   }
-  sit(id: string, selectedSide?: 0 | 1, accepted = false) {
+  sit(id: string, selectedSide?: number, accepted = false) {
     const bench = this.world?.benches.find(value => value.id === id);
-    if (!bench || this.blocked || this.place || this.seatedBench || this.ridingSwing || this.nearBench?.id !== id) return;
+    if (!bench || this.blocked || this.place || this.seatedBench || this.ridingSwing || this.nearBench?.id !== id && !(this.picnicContext?.id === id && Math.hypot(this.player.position.x - bench.x, this.player.position.z - bench.z) <= 4)) return;
     if (!accepted && this.requestShared({ kind: "bench", id, ...(selectedSide === undefined ? {} : { index: selectedSide }) },
       result => this.sit(id, result.index, true))) return;
     const occupied = this.seatOccupants(bench);
-    const preferred = selectedSide !== undefined ? [selectedSide, selectedSide === 0 ? 1 : 0] as const
-      : this.sharedSlot !== null && this.sharedSlot % 2 === 1 ? [1, 0] as const : [0, 1] as const;
+    const indices = this.benchIndices(bench);
+    const first = selectedSide ?? (this.sharedSlot !== null ? this.sharedSlot % indices.length : 0);
+    const preferred = [first, ...indices.filter(index => index !== first)];
     const index = accepted ? selectedSide : preferred.find(value => !occupied.has(value));
     if (index === undefined) { this.callbacks.sharedNotice?.("That bench is occupied. Try another bench."); return; }
     this.clearKeys();
@@ -1626,9 +1734,12 @@ export class VillageEngine {
     if (!this.blocked) this.cottageCat?.update(dt, this.elapsed, this.reducedMotion);
     const movement = this.movement!;
     const horse = this.horseRiding.actor;
-    this.horseRiding.update(this.keys, !this.blocked && !this.place && this.sharedConnected, this.elapsed,
+    this.horseRiding.update(this.keys, !this.blocked && !this.place && this.sharedConnected, now / 1000,
       { forward: -this.touchMove.y, turn: -this.touchMove.x, sprint: this.touchSprint, brake: this.elapsed < this.touchBrakeUntil });
-    this.horses?.update(dt, this.elapsed, this.reducedMotion, this.player.position, this.place !== "focus" && !this.blocked);
+    const riderPose = horse ? this.horseRiding.sample(dt,
+      this.world.authored.horses?.find(placement => placement.id === horse.id)?.scale[0] ?? 1, movement,
+      (x, z) => this.horseDisplayOccupied(horse.id, x, z), now) : null;
+    this.horses?.update(dt, this.elapsed, this.reducedMotion, this.player.position, this.place !== "focus" && !this.blocked, riderPose);
     this.townAnimals?.update(dt, this.reducedMotion, this.camera.quaternion);
     this.townScene?.update(this.reducedMotion, this.camera.quaternion);
     this.direction.set(0, 0, 0);
@@ -1666,13 +1777,24 @@ export class VillageEngine {
     if (this.seatedBench) {
       const seat = this.seatPoint(this.seatedBench, this.seatedIndex ?? 0);
       this.player.position.set(seat.x, this.seatedBench.seatHeight - .62, seat.z);
-      this.player.rotation.y = this.seatedBench.facing;
+      this.player.rotation.y = this.seatedBench.facing + (this.seatedBench.seatCount === 5 ? Math.PI : 0);
     }
     if (this.lookoutPosition) {
       this.player.position.fromArray(this.lookoutPosition);
       this.player.rotation.y = this.yaw + Math.PI;
     }
     this.player.visible = !this.lookoutPosition;
+    this.picnicScene?.update(Date.now() + this.sharedTimeOffset, this.reducedMotion);
+    if (!this.blocked) {
+      this.picnicContext = !this.place && !horse && !this.ridingSwing && !this.lookoutPosition
+        ? nearPicnic(this.world.authored, this.player.position.x, this.player.position.z, this.sharedActors?.picnic) : null;
+      if (this.picnicContext?.kind === "picnic" && !this.seatedBench) {
+        const aim = this.picnicAim();
+        this.picnicContext = { ...this.picnicContext, seatIndex: aim.seat?.index, dish: aim.dish ? this.sharedActors?.picnic?.dishes.find(dish => dish.id === aim.dish?.id) : undefined };
+      }
+      const signature = JSON.stringify(this.picnicContext);
+      if (signature !== this.lastPicnicContext) { this.lastPicnicContext = signature; this.callbacks.picnicContext?.(this.picnicContext); }
+    }
     const moving = movement.speed > 0.12;
     if (moving) {
       const angle = Math.atan2(movement.velocity.x, movement.velocity.z);
@@ -1753,6 +1875,10 @@ export class VillageEngine {
     if (this.character) this.townAnimals?.posePetting(this.sharedSelfId, this.player, this.character, this.spiritFins, dt, this.reducedMotion,
       !this.blocked && !this.place && !this.seatedBench && !this.ridingSwing && !horse && !moving);
     this.activities?.update(this.elapsed,this.place,this.reducedMotion,this.player,this.character,this.spiritScale);
+    const mealNow = this.getSharedNow(), bites = this.sharedActors?.picnic?.bites;
+    this.mealFeedback.beginFrame(bites, mealNow);
+    if (this.character) this.mealFeedback.pose({ id: this.sharedSelfId, root: this.player, character: this.character, fins: this.spiritFins, baseTilt: this.seatedBench ? -.08 : movement.speed * .022 },
+      bites?.find(bite => bite.visitor === this.sharedSelfId), mealNow, this.camera.quaternion, this.reducedMotion, this.sharedConnected && !this.place);
     if (this.sharedMode && this.place && this.activityPosition) this.player.position.fromArray(this.activityPosition);
     if (this.sharedMode && this.place && this.activitySeat !== null) {
       const benchId = { music: "bench-1", mood: "bench-4", birds: "bird-clearing-bench" }[this.place as "music" | "mood" | "birds"];
@@ -1955,6 +2081,8 @@ export class VillageEngine {
     for (const [id, remote] of this.remoteVisitors) {
       this.townAnimals?.posePetting(id, remote.group, remote.spirit, remote.fins, dt, this.reducedMotion,
         remote.group.visible && !remote.activity && !remote.bench && !remote.swing && remote.group.position.distanceTo(remote.target) < .1);
+      this.mealFeedback.pose({ id, root: remote.group, character: remote.spirit, fins: remote.fins, baseTilt: remote.bench ? -.08 : 0 },
+        bites?.find(bite => bite.visitor === id), mealNow, this.camera.quaternion, this.reducedMotion, remote.group.visible && !remote.activity);
     }
     for (const rider of this.horses?.riders ?? []) {
       const remote = this.remoteVisitors.get(rider.owner);
@@ -1975,6 +2103,7 @@ export class VillageEngine {
     this.renderBridgeWindow(now, t);
     if (this.place === "focus") this.sun.intensity = 0;
     this.vegetationDetail?.update(this.camera);
+    this.townScene?.updateCropDetail(this.camera);
     this.renderer.render(this.scene, this.camera);
     if (now - this.qualityChangedAt > 4000)
       this.longestRenderSubmitMs = Math.max(this.longestRenderSubmitMs, performance.now() - renderStart);
@@ -2045,6 +2174,8 @@ export class VillageEngine {
     this.puppies?.dispose();
     this.horseRiding.clear(); this.horses?.dispose();
     this.townAnimals?.dispose(); this.townScene?.dispose(); this.raceGuide?.dispose();
+    this.picnicScene?.dispose();
+    this.mealFeedback.dispose();
     this.garden?.dispose();
     this.cottageCat?.dispose();
     this.world?.group.removeFromParent();

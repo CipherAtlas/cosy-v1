@@ -1,0 +1,26 @@
+{
+  "self": "57c474e3-a357-4f30-9911-caa2c832d9db",
+  "connected": true,
+  "blocked": true,
+  "context": {
+    "id": "picnic-hill-mat",
+    "kind": "picnic",
+    "dish": {
+      "id": "07d8b1ff-f40c-497e-be04-106facd4aefe",
+      "mat": "picnic-hill-mat",
+      "slot": 0,
+      "recipe": "gardenSoup",
+      "portions": 3,
+      "placedBy": "0f794170-b160-4fe1-b90e-d90db9fe94f5",
+      "placedAt": 1791366891704
+    }
+  },
+  "bench": "picnic-hill-mat",
+  "seat": 2,
+  "pose": [
+    -97.34486284242385,
+    23.619999999999997,
+    -20.11766025270934
+  ],
+  "text": "Gentle Panda\nFluffy Otter\nHearthwillow\nN\n↑\nM\nMap\nI\n,\nEsc\nStand up\nE\nEat a portion\nF\nShare & eat\n5 blobs here\nPicnic basket\n\nCook harvested ingredients, pack finished dishes and share food at a picnic mat.\n\nPlace a dish to share. Click food on the mat to eat. Five cushions are available.\n\n🥣\nGarden soup\n0 in basket\nPlace on mat\n🥗\nMint & radish salad\n0 in basket\nPlace on mat\n🍎\nBaked apples\n0 in basket\nPlace on mat\n🥕\nRoasted vegetables\n0 in basket\nPlace on mat\n🥣 Eat Garden soup · 3 left\nSit on a picnic cushion\nEsc\nBack\n⌫"
+}

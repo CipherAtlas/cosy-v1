@@ -11,6 +11,7 @@ import hashlib
 import shutil
 import sys
 import struct
+import tempfile
 from pathlib import Path
 from mathutils import Vector, Quaternion
 
@@ -26,7 +27,7 @@ baseline_dir = Path('/tmp/cosy-animal-static-baseline')
 baseline_dir.mkdir(exist_ok=True)
 for entry in manifest['animals']:
     target = baseline_dir / (entry['id'] + '.glb')
-    if not target.exists():
+    if not target.exists() or not entry.get('rigVersion'):
         shutil.copy2(OUT / target.name, target)
 
 
@@ -81,7 +82,7 @@ def profile(slug):
     if slug=='cat':
         return dict(kind='cat', scale=.84, body=(0,.08,.36), neck=(0,-.22,.45), head=(0,-.33,.58), tail=(0,.405,.40), front=-.22, back=.29, side=.115, hip=.35, knee=.16, ear=(.105,-.34,.675), legtop=.27, headcut=-.32, tailcut=.45)
     if slug=='owl':
-        return dict(kind='owl', scale=.70, body=(0,.015,.28), neck=(0,-.005,.40), head=(0,-.005,.50), tail=(0,.13,.19), wing=(.16,-.02,.48), front=.015, side=.10, hip=.14, knee=.045, legtop=.08, headcut=.44)
+        return dict(kind='owl', scale=.70, body=(0,.015,.28), neck=(0,-.005,.40), head=(0,-.005,.50), tail=(0,.13,.19), wing=(.18,-.01,.465), front=.015, side=.10, hip=.14, knee=.045, legtop=.08, headcut=.44)
     if slug=='swan':
         return dict(kind='swan', scale=1., body=(0,.12,.28), neck=(0,-.32,.34), head=(0,-.78,1.12), tail=(0,.70,.40), wing=(.20,.02,.40), front=.04, side=.15, hip=.16, knee=.055, legtop=.12, headcut=1.02)
     return dict(kind='duck', scale=.60 if slug=='duckling' else 1., body=(0,.08,.24), neck=(0,-.16,.28), head=(0,-.27,.47), tail=(0,.35,.31), wing=(.15,-.02,.33), front=.015, side=.095, hip=.16, knee=.055, legtop=.09, headcut=.41)
@@ -120,6 +121,7 @@ def make_rig(root, slug, p):
         if bird:
             w=p['wing'];a=(side*w[0],w[1],w[2]);b=(side*(w[0]+.15),w[1]+.10,w[2]-.10)
             bone('Wing'+label,a,b,'Body')
+            if p['kind']=='owl':bone('WingTip'+label,(side*.26,.045,.285),(side*.29,.12,.08),'Wing'+label)
         else:
             ear=p['ear'];a=(side*ear[0],ear[1],ear[2])
             bone('Ear'+label,a,(a[0]+side*.05,a[1],a[2]+.09),'Head')
@@ -182,6 +184,7 @@ def bird_weights(v, p):
     lower=1-smooth(p['knee']*.8,p['knee']*1.4,z)
     weights['LegFront'+side]=leg*(1-lower);weights['LegFront'+side+'Lower']=leg*lower
     tail=smooth(p['tail'][1]-.06,p['tail'][1]+.12,y)
+    if kind=='owl':tail*=1-smooth(.22,.31,z)
     if tail>.001:
         weights={k:w*(1-tail) for k,w in weights.items()};weights['Tail']=tail
     return weights
@@ -203,7 +206,7 @@ def skin(mesh, rig, p):
         if mesh.name.endswith('_eyes'):rigid='Head'
         elif bird and small:
             wing=abs(centre.x)>.07 and centre.y>-.09 and centre.z>p['legtop']+.035
-            if wing and kind=='owl' and maxs[2]<.49:rigid='Wing'+('Left' if centre.x<0 else 'Right')
+            if wing and kind=='owl' and maxs[2]<.51:rigid='Wing'+('Left' if centre.x<0 else 'Right')
             elif wing and kind in ('duck','swan') and mins[2]>(.14 if kind=='swan' else .18) and centre.y>0:rigid='Wing'+('Left' if centre.x<0 else 'Right')
             elif centre.y>p['tail'][1] and abs(centre.x)<.08:rigid='Tail'
             elif kind=='owl' and maxs[2]<.16:rigid='LegFront'+('Left' if centre.x<0 else 'Right')+'Lower'
@@ -216,7 +219,11 @@ def skin(mesh, rig, p):
             elif centre.y<p['headcut']-.05:rigid='Head'
         for index in comp:
             v=mesh.data.vertices[index].co
-            weights={rigid:1.} if rigid else (bird_weights(v,p) if bird else quadruped_weights(v,p))
+            if kind=='owl' and rigid and rigid.startswith('Wing'):
+                tip=1-smooth(.22,.34,v.z/p['scale'])
+                weights={rigid:1-tip,'WingTip'+rigid[4:]:tip}
+            else:
+                weights={rigid:1.} if rigid else (bird_weights(v,p) if bird else quadruped_weights(v,p))
             if not rigid and not bird:
                 x,y,z=v/p['scale']
                 t=smooth(p['tailcut']-.015,p['tailcut']+.10,y)
@@ -264,9 +271,27 @@ def animation(rig, meshes, p, name, duration):
             rotations['Neck']=(.025*sn,0,0);rotations['Head']=(-.020*sn,0,0)
             rotations['Tail']=(0,.07*sn,.055*sn)
             height=.014*(1-math.cos(a*2)) if name=='walk' else .035*(1-math.cos(a*2))
+        elif kind=='owl' and name in ('fly','glide','land'):
+            # The perched wing points down: opposite Y rotations open it outward.
+            opening=1.45+.48*sn if name=='fly' else 1.48+.025*sn if name=='glide' else 1.22+.20*sn
+            rotations['Body']=(1.03 if name!='land' else .19,0,0)
+            rotations['Head']=(-.95 if name!='land' else -.16,0,.015*sn)
+            rotations['Tail']=(-.12 if name!='land' else -.32+.03*sn,0,0)
+            for side,label in ((-1,'Left'),(1,'Right')):
+                rotations['Wing'+label]=(.05*sn,-side*opening,side*.05)
+                rotations['WingTip'+label]=(0,-side*(.12+.13*math.sin(a-.7) if name=='fly' else .03*sn),0)
+                rotations['LegFront'+label]=(.90 if name!='land' else .25,0,0)
+                rotations['LegFront'+label+'Lower']=(-.55 if name!='land' else -.12,0,0)
+        elif kind=='owl' and name=='feed':
+            rotations['Neck']=(.17+.10*sn,0,0)
+            rotations['Head']=(.30+.14*sn,0,.025*cs)
+            rotations['Tail']=(-.025*sn,0,0)
+        elif kind=='owl' and name=='idle':
+            rotations['Neck']=(.009*sn,0,0)
+            rotations['Head']=(-.009*sn,0,.20*math.sin(a)*(.5+.5*cs))
         elif name=='fly':
             for side,label in ((-1,'Left'),(1,'Right')):
-                rotations['Wing'+label]=(.08*sn,side*(.85+.70*sn),side*(.06 if kind=='owl' else -.95))
+                rotations['Wing'+label]=(.08*sn,side*(.85+.70*sn),side*-.95)
                 rotations['LegFront'+label]=(-.65,0,0)
                 rotations['LegFront'+label+'Lower']=(-.65,0,0)
             rotations['Head']=(.035*sn,0,0);rotations['Tail']=(.09*sn,0,0)
@@ -325,10 +350,15 @@ def animation(rig, meshes, p, name, duration):
                 for side,label in ((-1,'Left'),(1,'Right')):rotations['Ear'+label]=(.025*math.sin(a*2),0,0)
         for bone,angles in rotations.items():rotation(bone,angles)
         lift(height)
+        if kind=='owl' and name in ('fly','glide'):
+            for label in ('Left','Right'):
+                bone=rig.pose.bones['LegFront'+label+'Lower']
+                bone.location=rest[bone.name].conjugated() @ Vector((0,.015,.045*p['scale']))
+                bone.keyframe_insert('location',frame=f+1,group=bone.name)
         for bone in rig.pose.bones:
             if bone.name in rotations:bone.keyframe_insert('rotation_quaternion',frame=f+1,group=bone.name)
-            if bone.name=='Body' and name not in ('fly','swim'):bone.keyframe_insert('location',frame=f+1,group=bone.name)
-        if name not in ('fly','swim'):
+            if bone.name=='Body' and name not in ('fly','glide','land','swim'):bone.keyframe_insert('location',frame=f+1,group=bone.name)
+        if name not in ('fly','glide','land','swim'):
             bpy.context.view_layer.update()
             deps=bpy.context.evaluated_depsgraph_get()
             lowest=min(v.co.z for ob in meshes for v in ob.evaluated_get(deps).data.vertices)
@@ -377,6 +407,7 @@ for entry in manifest['animals']:
     if p['kind']=='horse':clips.update(trot=.8,canter=.9)
     if p['kind']=='dog':clips.update(run=.7,sit=7.,dance=5.2,spin=3.2,bow=3.8,wave=4.2,roll=4.6)
     if p['kind'] in ('owl','duck','swan'):clips.update(fly=1. if p['kind']=='owl' else 1.5,swim=2.)
+    if p['kind']=='owl':clips.update(glide=3.,land=1.2,feed=1.8)
     if p['kind']=='cat':clips.update(nap=5.,stretch=3.,ask=3.,up=2.,down=2.)
     probes={}
     for name,duration in clips.items():
@@ -402,6 +433,21 @@ for entry in manifest['animals']:
     reports.append({'id':slug,'clips':clips,'deformation':probes})
     MANIFEST.write_text(json.dumps(manifest,indent=2)+'\n')
     print('RIG_COMPLETE '+json.dumps(reports[-1]),flush=True)
+if requested and RIG_SOURCE.exists():
+    unchanged=[entry for entry in manifest['animals'] if entry['id'] not in requested]
+    names=[name for entry in unchanged for name in (entry['root'],entry['id']+'_rig',entry['id']+'_coat',entry['id']+'_eyes')]
+    for entry in unchanged:
+        old=bpy.data.objects.get(entry['root'])
+        if old:
+            for ob in list(old.children_recursive)+[old]:bpy.data.objects.remove(ob,do_unlink=True)
+    # Blender refuses to overwrite a file used as an append library.
+    with tempfile.TemporaryDirectory(prefix='cosy-rig-library-') as directory:
+        prior_source=Path(directory)/RIG_SOURCE.name
+        shutil.copy2(RIG_SOURCE,prior_source)
+        with bpy.data.libraries.load(str(prior_source),link=False) as (prior,current):
+            current.objects=[name for name in names if name in prior.objects]
+    for ob in current.objects:
+        if ob:bpy.context.scene.collection.objects.link(ob)
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(RIG_SOURCE))
 assert hashlib.sha256(SOURCE.read_bytes()).hexdigest()==original_source_hash,'Static artwork source was modified'

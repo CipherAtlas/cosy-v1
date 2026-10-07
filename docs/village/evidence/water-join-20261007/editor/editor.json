@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "hill-waterfall has a named Landscape registration",
+    "hill-waterfall shows a rendered geometry preview",
+    "Waterfall shelf preview renders colored water as well as rocks",
+    "hill-waterfall accepts placement, yaw and scale controls",
+    "hill-waterfall can be selected from the Scene list",
+    "hill-rock-outcrop has a named Landscape registration",
+    "hill-rock-outcrop shows a rendered geometry preview",
+    "hill-rock-outcrop accepts placement, yaw and scale controls",
+    "hill-rock-outcrop can be selected from the Scene list",
+    "hill-waterfall placement, yaw and scale survive file save",
+    "hill-rock-outcrop placement, yaw and scale survive file save",
+    "Complete layout and terrain survive browser reload",
+    "Apply saves all new props and terrain into the isolated playable file",
+    "Protected layouts remain byte-identical with no page errors"
+  ],
+  "errors": [],
+  "limits": "Local Chrome editor, pointer/control placement and temporary save/Apply. Asset-control fixture contains terrain and tested props; omits unrelated town objects and routes. Source layout and presets unchanged."
+}

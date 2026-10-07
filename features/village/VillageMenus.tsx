@@ -1,3 +1,5 @@
+import { PicnicControls } from "./PicnicControls";
+import type { PicnicContext, SharedPicnic, PicnicAction } from "./picnic";
 import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { SpeakerHigh, SpeakerSlash, X } from "@phosphor-icons/react";
@@ -15,13 +17,14 @@ import { Keycap } from "./KeybindingControls";
 import { VillageTutorial } from "./VillageTutorial";
 import { useVillageMenuNavigation } from "./useVillageMenuNavigation";
 
-export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | "tutorial" | null;
+export type VillagePanel = "places" | "sound" | "settings" | "controls" | "basket" | "language" | "tutorial" | "kitchen" | "picnic" | null;
 
-export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings, inventory, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
+export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings, inventory, picnicContext, picnicState, selfId, connected, picnicAct, place, notice, entered, setEntered, enableSound, openPlace, travelOutdoor,
   sound, soundLoading, toggleSound, radioPrefs, radioLoading, radioError, selectStation, nextRadioTrack, playVillageMusic, showStats, setShowStats, stats }: {
   touch: boolean; panel: VillagePanel; setPanel: Dispatch<SetStateAction<VillagePanel>>;
   canvas: RefObject<HTMLDivElement | null>; engine: RefObject<VillageEngine | null>;
   settings: ReturnType<typeof useVillagePreferences>; inventory: ForageInventory;
+  picnicContext: PicnicContext | null; picnicState?: SharedPicnic; selfId: string; connected: boolean; picnicAct: (request: PicnicAction) => Promise<boolean>;
   place: PlaceId | null; notice: string; entered: boolean; setEntered: (value: boolean) => void;
   enableSound: () => Promise<void>; openPlace: (id: PlaceId) => void; travelOutdoor: (id: string) => void;
   sound: boolean; soundLoading: boolean; toggleSound: () => void; openRadio: () => void;
@@ -44,7 +47,9 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
   const [lastPanel, setLastPanel] = useState(panel);
   useEffect(() => { if (panel !== null) setLastPanel(panel); }, [panel]);
   const displayedPanel = panel ?? lastPanel;
+  const picnicWorkspace = displayedPanel === "kitchen" || displayedPanel === "picnic";
   const settingsWorkspace = displayedPanel === "settings" || displayedPanel === "sound" && !PERSONAL_RADIO_ENABLED;
+  const readPicnicTime = useCallback(() => engine.current?.getSharedNow() ?? Date.now(), [engine]);
   const readMapPose = useCallback(() => engine.current?.getPlayerPose() ?? null, [engine]);
   const readMapActors = useCallback(() => engine.current?.getMapActors() ?? [], [engine]);
   return (
@@ -55,9 +60,10 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
         }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-overlay" : ""}${!entered ? " v-start-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
+          <Dialog.Overlay className={`v-dialog-overlay${settingsWorkspace || displayedPanel === "kitchen" || displayedPanel === "picnic" || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-overlay" : ""}${picnicWorkspace ? " v-picnic-overlay" : ""}${!entered ? " v-start-overlay" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-overlay" : ""}`} />
           <Dialog.Content
-            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-dialog" : ""}${!entered ? " v-start-dialog" : ""}${displayedPanel === "tutorial" ? " v-tutorial-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
+            className={`v-dialog${displayedPanel === "places" ? " v-map-dialog" : ""}${settingsWorkspace || displayedPanel === "kitchen" || displayedPanel === "picnic" || displayedPanel === "language" || displayedPanel === "tutorial" ? " v-settings-dialog" : ""}${picnicWorkspace ? " v-picnic-dialog" : ""}${!entered ? " v-start-dialog" : ""}${displayedPanel === "tutorial" ? " v-tutorial-dialog" : ""}${PERSONAL_RADIO_ENABLED && displayedPanel === "sound" ? " v-radio-dialog" : ""}`}
+            onEscapeKeyDown={event => { event.preventDefault(); closePanel(); }}
             onOpenAutoFocus={event => {
               if (panel === "tutorial") {
                 event.preventDefault();
@@ -74,12 +80,12 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
             }}
           >
             <Dialog.Title tabIndex={displayedPanel === "tutorial" ? -1 : undefined}>
-              {displayedPanel === "places"
+              {displayedPanel === "kitchen" ? t("Cook", "料理を作る") : displayedPanel === "picnic" ? t("Picnic basket", "ピクニックかご") : displayedPanel === "places"
                 ? t("Hearthwillow", "ハースウィロー")
                 : displayedPanel === "sound" && PERSONAL_RADIO_ENABLED
                   ? t("Sound", "音")
                   : displayedPanel === "tutorial"
-                    ? t("Welcome to Hearthwillow", "ハースウィローへようこそ")
+                    ? t("Village guide", "村のガイド")
                   : displayedPanel === "language"
                     ? t("Language", "言語")
                   : displayedPanel === "basket"
@@ -89,7 +95,7 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
                     : t("Settings", "設定")}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              {displayedPanel === "places"
+              {displayedPanel === "kitchen" || displayedPanel === "picnic" ? t("Cook harvested ingredients, pack finished dishes and share food at a picnic mat.", "収穫した食材で料理を作り、かごに入れてピクニックマットで分け合います。") : displayedPanel === "places"
                 ? t("Full-screen village map. The gold diamond marks you; blue circles mark other players. Names appear above markers. Click a destination to travel, or use arrow keys and Enter. Press the map key again or Escape to close.", "全画面の村の地図。金色のひし形はあなた、青い丸は他のプレイヤーです。名前はマーカーの上に表示されます。クリック、または矢印キーとEnterで移動し、地図キーかEscapeで閉じます。")
                 : displayedPanel === "sound"
                   ? PERSONAL_RADIO_ENABLED ? t("Choose a radio station and adjust all sound volumes.", "ラジオ局を選び、音量を調整します。") : t("Music and ambience controls.", "音楽と環境音の設定。")
@@ -98,7 +104,7 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
                   : displayedPanel === "language"
                     ? t("Choose the language for menus, controls and village conversations.", "メニュー・操作・村での会話の言語を選びます。")
                   : displayedPanel === "basket"
-                    ? t("Your saved harvests and woodland treats.", "庭で収穫して保存したもの。")
+                    ? t("Your saved ingredients and cooked dishes.", "庭で収穫して保存したもの。")
                   : displayedPanel === "controls"
                     ? t("Gliding, camera and interaction controls.", "移動・カメラ・ふれあいの操作。")
                     : t("Village appearance, sound and personal keyboard settings.", "村の環境・音・個人のキー設定。")}
@@ -121,6 +127,8 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
               </button>)}
               <footer className="v-settings-footer"><span>{t("Changes save on this device.", "変更はこの端末に保存されます。")}</span></footer>
             </div>}
+            {(displayedPanel === "kitchen" || displayedPanel === "picnic") && <PicnicControls context={picnicContext} state={picnicState} selfId={selfId} inventory={inventory} language={language} connected={connected} act={picnicAct} notice={notice} readClock={readPicnicTime}
+              sit={id => { setPanel(null); engine.current?.setBlocked(false); engine.current?.sit(id); }} />}
             {displayedPanel === "basket" && <VillageInventory inventory={inventory} language={language} />}
             {displayedPanel === "controls" && (
               <div className="v-control-guide">
@@ -130,14 +138,14 @@ export function VillageMenus({ touch, panel, setPanel, canvas, engine, settings,
                     [t("Click, then move mouse", "クリックしてマウスを動かす"), t("Look around without holding a button", "ボタンを押さずに見回す")],
                     ["Esc", t("Leave an activity, stand up, get off, or close tricks / a menu", "アクティビティ終了・立ち上がる・降りる・芸やメニューを閉じる")],
                     ["Tab / Shift Tab", t("Choose any control; Enter / Space activates it", "操作を選ぶ（Enter / Spaceで実行）")],
-                    ["U", t("Show activity controls / enjoy the view", "操作を表示 / 景色を楽しむ")],
+                    ["U", t("Show / hide activity controls", "操作を表示 / 隠す")],
                     ["Space / R", t("In focus or breathing: begin / pause and reset", "集中や呼吸では開始 / 一時停止・リセット")],
                     [t("Touch drag", "タッチでドラッグ"), t("Look around", "見回す")],
                     [t("Click or tap a bench side", "ベンチの左右をクリック・タップ"), t("Sit on that side", "選んだ側に座る")],
                     ["F", t("Scatter crumbs from the birdwatching bench", "野鳥観察のベンチでパンくずを撒く")],
-                    [t("Mouse / drag while settled", "ひと休み中にマウス / ドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
+                    [t("Mouse / drag during activities", "ひと休み中にマウス / ドラッグ"), t("Move the camera around your activity", "その場でカメラを動かす")],
                     [t("Scroll", "スクロール"), t("Move the camera closer or farther", "カメラの距離")],
-                    ["G", t("Toggle gentle / quick glide", "ゆっくり / 速く")],
+                    ["G", t("Toggle walk / run", "ゆっくり / 速く")],
                     ["R", t("Move to nearby safe ground if stuck", "動けなくなったら近くの安全な場所へ")],
                     ["Shift", t("Hold to dash", "長押しでダッシュ")],
                     ["Space", t("Jump", "ジャンプ")],

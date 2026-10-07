@@ -41,7 +41,7 @@ export function townAssets(source: T.Object3D): Map<string, TownAsset> {
     ["farm-row", "Farm planting row · 16 m", "Town", "FarmRow"],
     ["owl-feeding-perch", "Owl roost & feeding tray", "Town", "OwlFeedingPerch"],
     ["hay-bale", "Golden hay bale", "Furnishings", "HayBale"],
-    ["owl-brown", "Tawny woodland owl", "Animals", "OwlBrown"],
+    ["owl-brown", "Eagle owl", "Animals", "OwlBrown"],
     ["cow-highland", "Soft Highland cow", "Animals", "CowHighland"],
     ["cow-highland-girl", "Flower Highland cow", "Animals", "CowHighlandGirl"],
     ["sheep", "Cloud-soft sheep", "Animals", "Sheep"],
