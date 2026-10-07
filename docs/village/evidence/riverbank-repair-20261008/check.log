@@ -1,0 +1,352 @@
+
+> a-peaceful-room@0.1.0 check
+> npm run lint && npm run typecheck && npm test
+
+
+> a-peaceful-room@0.1.0 lint
+> next lint
+
+`next lint` is deprecated and will be removed in Next.js 16.
+For new projects, use create-next-app to choose your preferred linter.
+For existing projects, migrate to the ESLint CLI:
+npx @next/codemod@canary next-lint-to-eslint-cli .
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/sabar/Documents/package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/sabar/Documents/cosy-v1/package-lock.json
+
+
+./components/room/RoomScene.tsx
+58:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+
+> a-peaceful-room@0.1.0 typecheck
+> tsc --noEmit
+
+
+> a-peaceful-room@0.1.0 test
+> node scripts/village/check.cjs
+
+corgi: 1,185,776 bytes, original geometry and all ten animations
+shiba: 1,198,884 bytes, original geometry and all ten animations
+beagle: 1,111,496 bytes, original geometry and all ten animations
+samoyed: 1,251,476 bytes, original geometry and all ten animations
+collie: 1,213,676 bytes, original geometry and all ten animations
+shepherd: 1,212,148 bytes, original geometry and all ten animations
+Farm props: 763,128 bytes; 3,420,784 source bytes; all retained buffers identical
+Horse rapid-input, next-frame keyboard/touch response, reconciliation, countdown, collision, stall and ownership checks pass.
+(node:67577) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Four gallery floor rays have a single timber surface at the authoritative height.
+(node:67578) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+43 device-gate checks passed
+10033 actual animal GLB checks passed.
+(node:67605) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:67608) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+122 shared-world Worker checks passed.
+Shared client pose/heartbeat, seat requests, rejection/timeout, crumb grants, reconnect and close contracts pass.
+123 shared town checks passed.
+A fresh farm begins with two mature rows, a sprout and two empty rows
+A nearby stable horse accepts one hay meal
+Contested hay cannot restart the shared meal
+Hay holds the real horse rather than granting a ride
+A departing feeder releases ownership while the accepted meal clock stays busy
+Disconnect cannot be used to duplicate the unfinished hay meal
+The stable horse becomes available after its meal
+Owls refuse visitors without food
+The perch grants treats only to a nearby visitor
+An accepted owl meal consumes its server-owned pouch
+Rejected competing owl feeds keep the visitor food and original clock
+The carrot farm refuses mint without changing the row or granting inventory
+Farming accepts the end of a full 16 metre row
+Remote visitors cannot plant a town row
+Two visitors cannot plant the same occupied row
+Water records a shared three-minute growth deadline
+Competing water does not restart growth
+A mature row grants one accepted private crop
+Concurrent harvest cannot duplicate a crop
+Scaled and rotated row ends use their actual authored rectangle
+A remote farm action cannot cross the map
+The shared cow accepts nearby petting
+The cow holds still and refuses competing petting
+Leaving releases the cow
+The shared sheep accepts nearby petting
+The sheep holds still and refuses competing petting
+Leaving releases the sheep
+The shared lamb accepts nearby petting
+The lamb holds still and refuses competing petting
+Leaving releases the lamb
+The shared hedgehog accepts nearby petting
+The hedgehog holds still and refuses competing petting
+Leaving releases the hedgehog
+Mounted visitors at the ribbon start one shared countdown
+Another visitor cannot replace the current race
+The accepted countdown blocks the racing horse input
+The Worker starts and moves the NPC rival on the same clock
+Skipping or reversing checkpoints cannot complete a lap
+Eight ordered checkpoints publish one visitor finish and result
+A completed race yields to nearby farm progress while its result remains available at the track
+Hibernation keeps completed race clocks and communal crops
+Leaving cancels the race without transferring it to a spectator
+A cancelled race cannot obscure another activity or leave a result floating around the village
+carrot farm offers only its crop with the E shortcut
+carrot farm uses its crop and stable row number in the heading
+carrot farm rejects a forged mint planting request
+carrot growth has a disabled E Harvest button and no bottom countdown
+carrot farm grants exactly its own mature crop
+radish farm offers only its crop with the E shortcut
+radish farm uses its crop and stable row number in the heading
+radish farm rejects a forged mint planting request
+radish growth has a disabled E Harvest button and no bottom countdown
+radish farm grants exactly its own mature crop
+mint farm offers only its crop with the E shortcut
+mint farm uses its crop and stable row number in the heading
+mint farm rejects a forged radish planting request
+mint growth has a disabled E Harvest button and no bottom countdown
+mint farm grants exactly its own mature crop
+Reordering editor objects does not change a named farm crop
+An unmounted visitor beside a stable horse can feed hay where the south ribbon context overlaps the stable
+The visitor’s active race still keeps its leave control available across the stable context
+The editable world exposes both swings, three farms, field, circuit, owl grove and watch tower as map destinations
+The watch tower map destination follows the edited tower position and doorway rotation
+A hidden tower has no map destination
+Unknown map destinations cannot release an activity or move the visitor
+Opening a map pauses movement without preventing an accepted teleport
+Worker approves a clear arrival near Meadow swings 1
+Simultaneous map arrivals do not overlap at Meadow swings 1
+Worker approves a clear arrival near Meadow swings 2
+Simultaneous map arrivals do not overlap at Meadow swings 2
+Worker approves a clear arrival near Watch tower
+Simultaneous map arrivals do not overlap at Watch tower
+Worker approves a clear arrival near Willow circuit
+Simultaneous map arrivals do not overlap at Willow circuit
+Worker approves a clear arrival near Owl grove
+Simultaneous map arrivals do not overlap at Owl grove
+Worker approves a clear arrival near Garden kitchen
+Simultaneous map arrivals do not overlap at Garden kitchen
+Worker approves a clear arrival near Picnic hill
+Simultaneous map arrivals do not overlap at Picnic hill
+Worker approves a clear arrival near Carrot farm
+Simultaneous map arrivals do not overlap at Carrot farm
+Worker approves a clear arrival near Radish farm
+Simultaneous map arrivals do not overlap at Radish farm
+Worker approves a clear arrival near Mint farm
+Simultaneous map arrivals do not overlap at Mint farm
+Worker approves a clear arrival near Grazing field
+Simultaneous map arrivals do not overlap at Grazing field
+An entirely blocked destination refuses travel
+The actual stable-to-track approach contains the reproduced 5 cm limestone edge
+Worker horse inputs cross the actual paving edge from rest
+The small paving allowance does not permit a steep sculpted slope
+Horse terrain probes still refuse the steep cliff footprint
+Foraging starts toward a real orchard and cannot grant a gift while walking
+The shared pickup clock starts only at the authored apple collection point
+Restoring an active pickup preserves its original deadline without granting food early
+The hedgehog gains one carried apple after the accepted pickup clock
+Restoring the shared world preserves a returning hedgehog and its one carried item
+The hedgehog brings its gift back to its actual home
+Late snapshots see the same offered apple
+Remote visitors cannot collect a shared hedgehog gift
+Private focus cannot collect an outdoor gift
+A full server basket cannot consume the offered gift
+Petting an offered-gift hedgehog holds it exclusively without duplicating its carry
+Leaving gift petting preserves the shared carried apple
+One accepted gift atomically consumes shared carry and grants server visitor inventory
+A competing gift request cannot duplicate or locally grant inventory
+The flower Highland girl is a real shared cow alongside the boy
+Accepted apple feeding consumes exactly one inventory apple and starts the distinct cow meal
+The accepted cow apple meal faces and holds toward its actual feeder
+Contested cow feeding cannot consume rejected food or restart the meal clock
+Leaving releases cow ownership but keeps its accepted meal busy until completion
+The next foraging trip visits the real mushroom patch and grants its separate gift
+An empty apple basket cannot grant an apple meal
+Accepted mushroom feeding consumes one private mushroom
+Contested mushroom feeding cannot grant a second meal
+Visitors can pick one available apple themselves
+Competing apple picking does not duplicate the shared apple
+Apple regrowth survives Worker restoration
+An apple tree becomes available after its public regrowth clock
+Foraging uses the editor-rotated and scaled orchard collection contact
+A physically blocked collection contact cannot teleport a hedgehog or create food
+An unreachable preferred orchard still lets the hedgehog visit a reachable mushroom patch
+(node:67810) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+461 focused town layout checks passed (Water/terrain movement; rendered colliders require --physics).
+(node:67812) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+63 focused animal motion/audio checks passed.
+Swan 0: swimming and feeding headings follow travel even below 1 cm/frame
+Swan 1: swimming and feeding headings follow travel even below 1 cm/frame
+Swan 2: swimming and feeding headings follow travel even below 1 cm/frame
+Duck 3: swimming and feeding headings follow travel even below 1 cm/frame
+Duck 4: swimming and feeding headings follow travel even below 1 cm/frame
+Duck 5: swimming and feeding headings follow travel even below 1 cm/frame
+Duck 6: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 7: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 8: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 9: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 10: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 11: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 12: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 13: swimming and feeding headings follow travel even below 1 cm/frame
+Duckling 14: swimming and feeding headings follow travel even below 1 cm/frame
+Authored pond height, rotation and scale reach the swimming path and heading
+Owl 0: continuous authored woodland loop takes off, glides and returns to the roost
+Owl 0: feeding intercepts an airborne loop and rejoins it without a teleport
+Owl 0: observers and late arrivals use the same accepted meal clock
+Owl 0: flight includes powered takeoff, long glides, banking, braking and roost rest
+Owl 0: landing settles at the exact saved roost facing without a heading snap
+Owl 0: accepted meal approach brakes before the dedicated feeding pose
+Owl 1: continuous authored woodland loop takes off, glides and returns to the roost
+Owl 1: feeding intercepts an airborne loop and rejoins it without a teleport
+Owl 1: observers and late arrivals use the same accepted meal clock
+Owl 1: flight includes powered takeoff, long glides, banking, braking and roost rest
+Owl 1: landing settles at the exact saved roost facing without a heading snap
+Owl 1: accepted meal approach brakes before the dedicated feeding pose
+Owl 2: continuous authored woodland loop takes off, glides and returns to the roost
+Owl 2: feeding intercepts an airborne loop and rejoins it without a teleport
+Owl 2: observers and late arrivals use the same accepted meal clock
+Owl 2: flight includes powered takeoff, long glides, banking, braking and roost rest
+Owl 2: landing settles at the exact saved roost facing without a heading snap
+Owl 2: accepted meal approach brakes before the dedicated feeding pose
+Animal calls remain silent before explicit village audio activation
+cow: recorded call is spatial at the actual animal position
+sheep: recorded call is spatial at the actual animal position
+lamb: recorded call is spatial at the actual animal position
+hedgehog: recorded call is spatial at the actual animal position
+owl: recorded call is spatial at the actual animal position
+A busy animal channel drops a chorus of new calls
+Stopping audio disconnects every animal call
+Standing near animals does not start walk-by greetings
+A herd gives one greeting on approach
+Petting interrupts a lower-priority greeting
+Remaining in the herd does not cycle through every animal
+Leaving and returning after the cooldown allows a fresh greeting
+Accepted 120 ms animal snapshots swim through 120 fps without bursty position easing
+Every species keeps a distance-driven gait at the accepted movement speed
+One accepted pet clock triggers one species call for each animal
+Rendering a held pet cannot repeat its voice, and all species display hearts and dialogue
+Reduced motion preserves the shared position and still heart/dialogue treatment while suppressing body, head and leg gestures
+Shared disconnect hides animal poses and all associated emotes
+Farm growth countdown floats above the center of its authored row
+Farm floating timer uses accepted growAt and the server clock even with an eight-second client-clock difference
+Accepted owl supper displays every heart pool and one readable Hoot Hoot response at a time
+Reduced-motion owl supper keeps still readable feedback
+Accepted Worker snapshots preserve the current reduced-motion owl pose
+Owl 1: the accepted clock gives each owl its own non-overlapping speech turn
+Owl 2: the accepted clock gives each owl its own non-overlapping speech turn
+An accepted group owl meal gives one short audible response while all three birds keep their speech turns
+An unwatered farm row and absent accepted owl meal cannot gain a timer or happy hearts
+Shared reset hides the farm timers and owl effects
+(node:67859) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+121 patrol navigation checks passed.
+(node:67860) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+52 focused shared bird circuit checks passed
+(node:67888) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+245 Japanese content/control checks passed.
+(node:67940) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Hourly reset and persisted, broadcast chat timestamps pass through the shared client.
+Chat refuses Enter-time sends during cooldown and accepts the retained second sentence afterward.
+Admin authentication, stored message identity, message removal, stale-hour guard, clear, and client sync pass.
+IP kick: authentication, shared-IP removal, ownership release, restart/reload enforcement, five-minute expiry, IP privacy, IPv6 and terminal client handling pass.
+Notes persistence checks passed
+(node:67973) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{
+  "passed": 41,
+  "checks": [
+    "34,560 same/next-hour admin polls schedule exactly 24 hourly alarms",
+    "Polling only persists the 23 elapsed chat-hour changes",
+    "Admin polling does not touch world/garden writes",
+    "Reconstruction reads the persisted matching alarm without rewriting",
+    "Missing, overdue and wrong future alarms are repaired",
+    "Consumed alarm resets the hour with no connected visitors and schedules its successor",
+    "Duplicate alarm delivery with a correct successor does not rewrite it",
+    "A retry repairs an absent alarm without clearing the same hour twice",
+    "No-visitor alarm emits no stale socket messages",
+    "Scheduling failure is awaited/propagated and a retry can restore the alarm",
+    "A failed alarm read is surfaced and later requests recover",
+    "Hour boundary during getAlarm does not leave a stale chat hour or past alarm",
+    "Repeated empty chat clears skip all identical KV writes",
+    "Empty clear still broadcasts both legacy reset and current chat sync events",
+    "A new chat message still persists and receives a stable ID",
+    "A stale clear version neither writes nor removes a message",
+    "In-place message removal persists despite the immutable prior-value baseline",
+    "Missing message removal and already-empty clear add no writes",
+    "Legacy message-ID migration writes once and survives reconstruction",
+    "An absent chat record is initialized rather than treated as already persisted",
+    "Ten unchanged flower actions skip ten garden writes",
+    "No-op garden actions retain every action event and authoritative world snapshot write",
+    "No-op persistent garden value still grants crumbs to the socket attachment",
+    "Feeding retains the durable shared meal clock while skipping unchanged garden storage",
+    "Reconstructed shared meal refuses a competing early restart",
+    "Harvest persists public bed changes and the accepted private crop together",
+    "Duplicate harvest cannot create another crop or redundant garden write",
+    "Plant/water transitions and watering timestamp persist",
+    "Constructor-applied growth is compared against raw persisted state and saved by an otherwise no-op action",
+    "Normalization repairs are not incorrectly suppressed",
+    "A missing garden is persisted on the first accepted action",
+    "A synchronous garden-write failure emits no garden acceptance and preserves durable inventory",
+    "Reconstruction after a failed garden write permits one durable harvest",
+    "Private inventory failure rolls back the public bed and emits neither acceptance",
+    "The same Worker can retry a rolled-back garden grant once without a stale write baseline",
+    "Town sharedActors failure preserves the shared crop and cannot grant a private item",
+    "Town sharedActors rollback permits one accepted retry without reconstructing the Worker",
+    "Town visitorInventories failure preserves the shared crop and cannot grant a private item",
+    "Town visitorInventories rollback permits one accepted retry without reconstructing the Worker",
+    "Failed put does not advance the baseline; later nested mutation is compared to immutable serialized bytes",
+    "World publish cadence and persistence remain one snapshot write per publish"
+  ],
+  "writeCounts": {
+    "adminPolls": 34560,
+    "alarmWrites": 24,
+    "unchangedFlowerActions": 10,
+    "gardenWritesForFlowers": 0,
+    "sharedActorsWritesForFlowers": 10
+  }
+}
+PASS 30/60/120 fps travel, jump height and contact counts agree
+PASS blocking wall stops displacement and footsteps while dashing
+PASS dash stays at full speed for a minute at 30/60/120 fps and releases to normal gliding
+PASS dialogs, focus loss and travel clear buffered jump and motion
+PASS bridge deck matches physics on both approaches; parapet contains jumping
+PASS low props block walking but support landing after a jump
+PASS water and pond remain impassable in the air
+PASS bounded catch-up prevents a background resume launch
+PASS a low ceiling stops ascending motion
+PASS sculpted cliffs refuse slow and fast climbing while gentle terrain and jumps remain usable
+  piano: 340 bars, 2204 events, max 8/bar
+  lofi: 340 bars, 7234 events, max 23/bar
+  jazz: 340 bars, 5290 events, max 17/bar
+PASS score is seed-reproducible, evolves over long sessions and keeps distinct orchestration
+11 contract checks passed.
+(node:68006) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+2177 rendering topology, placement, bounds and detail checks passed.
+(node:68007) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Current village contract checks passed.

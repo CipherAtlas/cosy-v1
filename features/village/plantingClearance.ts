@@ -5,7 +5,7 @@ export class PlantingSurfaceMask {
   private readonly cells = new Map<string, number[][]>();
   private readonly cellSize = 2;
 
-  constructor(group: T.Object3D, surface?: "paving" | "water") {
+  constructor(group: T.Object3D, surface?: "paving" | "water", coreOnly = false) {
     group.updateMatrixWorld(true);
     const a = new T.Vector3(), b = new T.Vector3(), c = new T.Vector3();
     group.traverseVisible(object => {
@@ -13,6 +13,8 @@ export class PlantingSurfaceMask {
       const positions = object.geometry.getAttribute("position"), indices = object.geometry.index;
       const count = indices?.count ?? positions.count;
       for (let i = 0; i < count; i += 3) {
+        const colors = object.geometry.attributes.color;
+        if (coreOnly && colors && [0, 1, 2].some(offset => colors.getX(indices ? indices.getX(i + offset) : i + offset) < .6)) continue;
         a.fromBufferAttribute(positions, indices ? indices.getX(i) : i).applyMatrix4(object.matrixWorld);
         b.fromBufferAttribute(positions, indices ? indices.getX(i + 1) : i + 1).applyMatrix4(object.matrixWorld);
         c.fromBufferAttribute(positions, indices ? indices.getX(i + 2) : i + 2).applyMatrix4(object.matrixWorld);
@@ -48,6 +50,28 @@ export class PlantingSurfaceMask {
     }
     return false;
   }
+}
+
+/** Keep grass-coloured shoulders from covering the paving at overlapping path junctions. */
+export function blendPavingJunctions(group: T.Object3D) {
+  group.traverse(object => {
+    if (!(object instanceof T.Mesh) || object.geometry.userData.plantingSurface !== "paving" || !object.geometry.attributes.color) return;
+    const colors = object.geometry.attributes.color;
+    const base = object.geometry.userData.pavingBaseColors ?? Array.from(colors.array);
+    object.geometry.userData.pavingBaseColors = base;
+    colors.array.set(base);
+  });
+  const paving = new PlantingSurfaceMask(group, "paving", true), point = new T.Vector3();
+  group.traverse(object => {
+    if (!(object instanceof T.Mesh) || object.geometry.userData.plantingSurface !== "paving" || !object.geometry.attributes.color) return;
+    const colors = object.geometry.attributes.color, positions = object.geometry.attributes.position;
+    for (let i = 0; i < colors.count; i++) {
+      if (colors.getX(i) >= 1) continue;
+      point.fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld);
+      if (paving.covers(point.x, point.z)) colors.setX(i, 1);
+    }
+    colors.needsUpdate = true;
+  });
 }
 
 /** Includes the whole blade/leaf silhouette and wind, rather than checking its root alone. */

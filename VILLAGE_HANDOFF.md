@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-08 — radish-bank repair (local)
+
+Solid riverside/pond stones are restored with matching 3,323-collider Worker physics. Locally refined stream terrain removes ground intruding into the river; narrow-bank rocks and overlapping paving shoulders are corrected beside the radish farm. Bridge side access remains clear and the local editor shares the changes. Build/lint/types/contracts/export privacy, 498 layout/physics, 56 rendered bridge/water, 23 isolated editor and 27 fresh real three-client checks pass. Port3051 serves the final local-Worker export; its corrected radish-bank capture and all 1,366 rendered automatic-rock bounds match the saved physics. See the newest build ledger entry and [evidence](docs/village/evidence/riverbank-repair-20261008/README.md). This is a local repair after the published October 7 release; native/physical-device and live acceptance remain open. No publication or Git writes.
+
 ## 2026-10-07 — integrated release published
 
 Release `f801a1f` is published: [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37631095808) succeeded, and matching Worker version `d4fb57ee-79f0-436d-b511-17dd41dd45e6` is deployed with healthy `/health`. Fresh live Chrome checks confirm scene entry, production shared connection, picnic snapshots/two horses, private cottage/cat, activity exit and Worker-accepted villager speech, with no captured page errors. Live layout and owl bytes match source; editor/admin/layout-API and AGENTS paths return 404. One music request returned 503 during browser verification; focused full/range retries returned 200/206, and the full MP3 is byte-identical to source. This records recovery, not a claim of an entirely failure-free resource session. Physical devices, native Firefox/Safari, sustained performance and live riding feel remain unverified.

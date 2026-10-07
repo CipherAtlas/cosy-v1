@@ -13,9 +13,10 @@ const { projectWorldLayout, RESIDENT_IDS, insidePlantingClearance, distanceToPat
 const { RESIDENT_ROUTES } = require('../../../features/village/sharedActors.ts');
 const { layoutWorldPoint } = require('../../../features/village/layoutTransforms.ts');
 const { trackPoint, townPoint } = require('../../../features/village/townShared.ts');
-const { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } = require('../../../features/village/riverGeometry.ts');
-const { riverBanks } = require('../../../features/village/riverbankStones.ts');
+const { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, refineRiverTerrain, riverGeometry } = require('../../../features/village/riverGeometry.ts');
+const { riverBanks, buildRiverbankStones } = require('../../../features/village/riverbankStones.ts');
 const T = require('three');
+const { blendPavingJunctions } = require('../../../features/village/plantingClearance.ts');
 const { MEADOW_FLOWER_COUNT, townPlantingClearance } = require('../../../features/village/meadowVegetation.ts');
 const { VillageMovement, MOVEMENT } = require('../../../features/village/movement.ts');
 const { VillageNavigation } = require('../../../features/village/navigation.ts');
@@ -107,6 +108,51 @@ check(Math.abs(streamBank.attributes.position.getY(0) - 4.37) < 1e-5 && streamBa
 conformRiverBank(streamBank, new T.Matrix4(), { ...streamFixture, rivers: [] }, slopedHeight);
 check(streamBank.attributes.position.getY(0) === 5, 'Removing an edited stream restores the original bank geometry');
 streamBank.dispose();
+
+// Reproduce the reported radish-bank intrusion using the actual winding brook and coarse terrain grid.
+const terrainSource = new T.PlaneGeometry(16, 20, 8, 10); terrainSource.rotateX(-Math.PI / 2); terrainSource.translate(60, 0, -55);
+const bankTerrain = refineRiverTerrain(terrainSource, authored, new T.Matrix4());
+const terrainPositions = bankTerrain.attributes.position, actualChannel = makeRiverChannelHeight(authored, () => 0);
+for (let i = 0; i < terrainPositions.count; i++) terrainPositions.setY(i, actualChannel(terrainPositions.getX(i), terrainPositions.getZ(i), 0));
+bankTerrain.computeVertexNormals();
+const bankGround = new T.Mesh(bankTerrain, new T.MeshBasicMaterial()); bankGround.name = 'Valley ground';
+const brook = authored.rivers.find(river => river.id === 'town-brook');
+const brookMesh = new T.Mesh(riverGeometry(brook.points, brook.width), new T.MeshBasicMaterial());
+const bankScene = new T.Group(); bankScene.add(bankGround, brookMesh); bankScene.updateMatrixWorld(true);
+const ray = new T.Raycaster(), streamPositions = brookMesh.geometry.attributes.position;
+let wetSamples = 0;
+for (let i = 0; i < streamPositions.count; i += 2) {
+  if (streamPositions.getZ(i) < -62 || streamPositions.getZ(i) > -47) continue;
+  for (const across of [.03, .15, .5, .85, .97]) {
+    const point = new T.Vector3().fromBufferAttribute(streamPositions, i).lerp(new T.Vector3().fromBufferAttribute(streamPositions, i + 1), across);
+    ray.set(new T.Vector3(point.x, 3, point.z), new T.Vector3(0, -1, 0));
+    const ground = ray.intersectObject(bankGround)[0];
+    assert(ground && ground.point.y < point.y - .02, 'Radish-bank soil stays below the water across the full curved ribbon'); wetSamples++;
+  }
+}
+check(wetSamples > 100, 'Refined radish-bank ground cannot form green triangles through the river');
+const rockColliders = [], stones = buildRiverbankStones(bankScene, new T.MeshBasicMaterial(), () => 0, rockColliders);
+const bankMovement = new VillageMovement(rockColliders, () => {});
+check(rockColliders.length > 30, 'Generated riverbank stones register solid movement footprints');
+for (const collider of rockColliders.filter(c => c.x > 54 && c.x < 66 && c.z > -62 && c.z < -47))
+  assert(!bankMovement.clear(collider.x, collider.z, collider.bottom + .01), 'A walking spirit cannot pass through a visible bank stone');
+check(rockColliders.every(c => c.top > .07 && c.top > c.bottom), 'Rock collision uses the actual visible stone height');
+stones.traverse(mesh => { if (mesh instanceof T.InstancedMesh) mesh.dispose(); });
+terrainSource.dispose(); bankTerrain.dispose(); brookMesh.geometry.dispose();
+
+const junction = new T.Group();
+const coreGeometry = new T.PlaneGeometry(4, 4); coreGeometry.rotateX(-Math.PI / 2); coreGeometry.userData.plantingSurface = 'paving';
+const shoulderGeometry = new T.BufferGeometry();
+shoulderGeometry.setAttribute('position', new T.Float32BufferAttribute([0,.06,0, 1,.06,0, 0,.06,1], 3));
+shoulderGeometry.setAttribute('color', new T.Float32BufferAttribute([0,1,1, 0,1,1, 0,1,1], 3)); shoulderGeometry.userData.plantingSurface = 'paving';
+const coreMesh = new T.Mesh(coreGeometry), shoulderMesh = new T.Mesh(shoulderGeometry); junction.add(coreMesh, shoulderMesh);
+blendPavingJunctions(junction);
+check([0,1,2].every(i => shoulderGeometry.attributes.color.getX(i) === 1), 'Overlapping path shoulders cannot paint a grass wedge over another paved lane');
+coreMesh.position.x = 20; blendPavingJunctions(junction);
+check([0,1,2].every(i => shoulderGeometry.attributes.color.getX(i) === 0), 'Moving the other lane restores the original outer shoulder in the editor');
+coreGeometry.dispose(); shoulderGeometry.dispose();
+
+
 
 const hillZones = authored.grass.filter(zone => zone.id.startsWith('picnic-hill-grass'));
 check(hillZones.length === 24 && hillZones.every(zone => zone.heightScale <= .8), 'The hill has 24 editable zones of low grass');

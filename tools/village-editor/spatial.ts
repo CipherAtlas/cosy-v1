@@ -53,6 +53,11 @@ export class StudioCollision {
         });
       } else if (solid && item.asset !== "bridge") this.playerSolids.push(solid);
     }
+    for (const collider of this.model.riverbankColliders) {
+      const box = new T.Box3(new T.Vector3(collider.x - collider.w / 2, collider.bottom!, collider.z - collider.d / 2),
+        new T.Vector3(collider.x + collider.w / 2, collider.top!, collider.z + collider.d / 2));
+      const obb = new OBB().fromBox3(box); this.playerSolids.push(obb); this.solids.push(obb);
+    }
   }
   private bounds(asset: string) {
     let box = this.localBounds.get(asset);

@@ -18,12 +18,12 @@ import { sampleTerrainHeight, validateTerrain, type TerrainElevation } from "../
 import { landscapeHeight, pondDistance, setAuthoredWorld } from "../../features/village/environment";
 import { projectWorldLayout } from "../../features/village/worldLayout";
 import { makeHorseModel } from "../../features/village/horseModel";
-import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } from "../../features/village/riverGeometry";
+import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, refineRiverTerrain, riverGeometry } from "../../features/village/riverGeometry";
 import { buildRiverbankStones, disposeRiverbankStones } from "../../features/village/riverbankStones";
 import type { Collider } from "../../features/village/environment";
 import { loadTownAssetKit } from "../../features/village/townAssets";
 import { meadowFlowers, MEADOW_WIDTH, MEADOW_GRASS_COUNT } from "../../features/village/meadowVegetation";
-import { plantingRadius } from "../../features/village/plantingClearance";
+import { plantingRadius, blendPavingJunctions } from "../../features/village/plantingClearance";
 import { PondLifeSpace } from "../../features/village/pondLife";
 import { loadAnimalArt } from "../../features/village/animalArt";
 import { ANIMAL_RIG_SLUGS, loadAnimalRigs, makeAnimalRig, type AnimalRigSlug } from "../../features/village/animalRig";
@@ -124,6 +124,7 @@ export class LayoutScene {
   readonly defaultRoutes: Partial<Record<ResidentId, ResidentRoute>> = {};
   private generated = new Set<T.BufferGeometry>();
   private riverStones = new T.Group();
+  riverbankColliders: Collider[] = [];
 
   async load(renderer: T.WebGLRenderer, progress: (n: number) => void) {
     await loadAnimalRigs(ANIMAL_RIG_SLUGS);
@@ -274,7 +275,7 @@ export class LayoutScene {
     this.assets.set("walkable-region", { id: "walkable-region", name: "Walkable meadow area", category: "Landscape", template: region, shelf: true });
     for (const asset of this.assets.values()) {
       asset.surface ||= ["terrain", "shore", "meadow-island", "bridge", "dock"].includes(asset.id) || asset.id.startsWith("island-");
-      if (!asset.localColliders) asset.solid = asset.category === "Buildings" || asset.category === "Bridges" || /^(bench-|fence-|lamp-|edge-lantern-|tree-|willow-)/.test(asset.id) || ["oak-bench", "postbox", "raised-bed", "boulder", "bird-clearing-bench", "bird-feeding-dish"].includes(asset.id);
+      if (!asset.localColliders) asset.solid = asset.solid || asset.category === "Buildings" || asset.category === "Bridges" || /^(bench-|fence-|lamp-|edge-lantern-|tree-|willow-)/.test(asset.id) || ["oak-bench", "postbox", "raised-bed", "boulder", "bird-clearing-bench", "bird-feeding-dish"].includes(asset.id);
     }
     this.original = { version: 1, base: "cosy-village-2026-09-27", name: "Current village", objects: originals };
     this.apply(this.original); progress(100);
@@ -343,11 +344,15 @@ export class LayoutScene {
         if (!(object instanceof T.Mesh)) return;
         const elevationKey = key + JSON.stringify(object.matrixWorld.elements);
         if (object.userData.elevationKey === elevationKey) return;
-        if (!object.userData.editableTerrain) { object.geometry = object.geometry.clone(); this.generated.add(object.geometry); object.userData.editableTerrain = true; }
+        if (!object.userData.terrainSourceGeometry) {
+          object.userData.terrainSourceGeometry = object.geometry.clone(); this.generated.add(object.userData.terrainSourceGeometry);
+        }
+        if (this.generated.delete(object.geometry)) object.geometry.dispose();
+        object.geometry = world ? refineRiverTerrain(object.userData.terrainSourceGeometry, world, object.matrixWorld) : object.userData.terrainSourceGeometry.clone();
+        this.generated.add(object.geometry);
         object.userData.elevationKey = elevationKey;
         const positions = object.geometry.attributes.position;
-        const base: number[] = object.userData.terrainBasePositions ?? Array.from(positions.array);
-        object.userData.terrainBasePositions = base;
+        const base = Array.from(positions.array) as number[];
         const inverse = object.matrixWorld.clone().invert();
         for (let i = 0; i < positions.count; i++) {
           const x = base[i * 3], z = base[i * 3 + 2];
@@ -420,7 +425,9 @@ export class LayoutScene {
         }
       });
     }
-    this.riverStones = buildRiverbankStones(this.group, this.world.gardenSurfaces.stone, height);
+    blendPavingJunctions(this.group);
+    this.riverbankColliders = [];
+    this.riverStones = buildRiverbankStones(this.group, this.world.gardenSurfaces.stone, height, this.riverbankColliders);
     this.group.add(this.riverStones);
   }
   conformGrass(height: (x: number, z: number) => number, blocked: (point: T.Vector3) => boolean, cleared: (x: number, z: number, radius: number) => boolean) {

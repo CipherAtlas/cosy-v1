@@ -3,6 +3,44 @@ import { distanceToPath, type AuthoredWorld } from "./worldLayout";
 import { landscapeHeight, POND } from "./environment";
 import { layoutLocalPoint, layoutWorldPoint } from "./layoutTransforms";
 
+/** Refine only stream corridors so coarse ground triangles cannot protrude through curved water. */
+export function refineRiverTerrain(geometry: T.BufferGeometry, world: AuthoredWorld, matrix: T.Matrix4) {
+  if (!world.rivers?.length) return geometry.clone();
+  const attributes = Object.entries(geometry.attributes).filter(([name]) => name !== "normal");
+  const output = attributes.map(() => [] as number[]), indices = geometry.index;
+  const vertexIds = new Map<string, number>(), refinedIndices: number[] = [];
+  const emit = (v: number[][]) => {
+    const key = v.map(values => values.map(value => value.toFixed(6)).join(",")).join("|");
+    let id = vertexIds.get(key);
+    if (id === undefined) { id = vertexIds.size; vertexIds.set(key, id); v.forEach((values, i) => output[i].push(...values)); }
+    refinedIndices.push(id);
+  };
+  const vertex = (i: number) => attributes.map(([, attribute]) => Array.from({ length: attribute.itemSize }, (_, c) => attribute.array[i * attribute.itemSize + c]));
+  const midpoint = (a: number[][], b: number[][]) => a.map((values, i) => values.map((value, c) => (value + b[i][c]) / 2));
+  const positionIndex = attributes.findIndex(([name]) => name === "position");
+  const triangle = (a: number[][], b: number[][], c: number[][], depth: number) => {
+    if (depth === 2) { [a, b, c].forEach(emit); return; }
+    const points = [a, b, c].map(v => new T.Vector3(...v[positionIndex] as [number, number, number]).applyMatrix4(matrix));
+    const center = points[0].clone().add(points[1]).add(points[2]).multiplyScalar(1 / 3);
+    const radius = Math.max(...points.map(p => Math.hypot(p.x - center.x, p.z - center.z)));
+    const near = depth < 2 && world.rivers!.some(river => center.x >= river.bounds[0] - radius - 1 && center.x <= river.bounds[2] + radius + 1
+      && center.z >= river.bounds[1] - radius - 1 && center.z <= river.bounds[3] + radius + 1
+      && distanceToPath(center.x, center.z, river) < river.width / 2 + 1 + radius);
+    if (near) {
+      const ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a);
+      triangle(a, ab, ca, depth + 1); triangle(ab, b, bc, depth + 1);
+      triangle(ca, bc, c, depth + 1); triangle(ab, bc, ca, depth + 1);
+    } else [a, b, c].forEach(emit);
+  };
+  for (let i = 0; i < (indices?.count ?? geometry.attributes.position.count); i += 3)
+    triangle(vertex(indices ? indices.getX(i) : i), vertex(indices ? indices.getX(i + 1) : i + 1), vertex(indices ? indices.getX(i + 2) : i + 2), 0);
+  const refined = new T.BufferGeometry();
+  attributes.forEach(([name, attribute], i) => refined.setAttribute(name, new T.Float32BufferAttribute(output[i], attribute.itemSize)));
+  refined.setIndex(refinedIndices);
+  refined.userData = { ...geometry.userData };
+  return refined;
+}
+
 /** Cut only authored stream and waterfall outlet footprints; the source terrain remains the water-height reference. */
 export function makeRiverChannelHeight(world: AuthoredWorld, waterBaseHeight: (x: number, z: number) => number) {
   const channels = (world.rivers ?? []).flatMap(river => {

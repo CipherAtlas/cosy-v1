@@ -22,7 +22,7 @@ export function supplementalAssets(surfaces: World["gardenSurfaces"], catSource:
   const sourceGround = surfaces.ground;
   const waterfall = makeHillWaterfall(waterTime); assets.set(waterfall.id, waterfall);
   const outcrop = makeHillRockOutcrop(); assets.set(outcrop.id, outcrop);
-  assets.set("riverbank-stone", { id: "riverbank-stone", name: "Small riverbank stone", category: "Nature", template: makeRiverbankStone(surfaces.stone), shelf: true });
+  assets.set("riverbank-stone", { id: "riverbank-stone", name: "Small riverbank stone", category: "Nature", template: makeRiverbankStone(surfaces.stone), shelf: true, solid: true });
     const raisedBed = new T.Group();
     const bedWood = surfaces.wood, soil = new T.MeshStandardMaterial({ color: "#80634b", roughness: 1 });
     const bedPart = (material: T.Material, position: [number, number, number], size: [number, number, number]) => {

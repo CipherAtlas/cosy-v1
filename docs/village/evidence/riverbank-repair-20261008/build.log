@@ -1,0 +1,66 @@
+
+> a-peaceful-room@0.1.0 build
+> next build
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/sabar/Documents/package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/sabar/Documents/cosy-v1/package-lock.json
+
+   ▲ Next.js 15.5.12
+   - Experiments (use with caution):
+     ⨯ devtoolSegmentExplorer
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully in 14.1s
+   Linting and checking validity of types ...
+
+./components/room/RoomScene.tsx
+58:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/22) ...
+   Generating static pages (5/22) 
+   Generating static pages (10/22) 
+   Generating static pages (16/22) 
+ ✓ Generating static pages (22/22)
+   Finalizing page optimization ...
+   Collecting build traces ...
+   Exporting (0/2) ...
+ ✓ Exporting (2/2)
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                     223 kB         325 kB
+├ ○ /_not-found                            995 B         103 kB
+├ ○ /books                               1.14 kB         111 kB
+├ ○ /books/book                          2.34 kB         116 kB
+├ ○ /books/history                         952 B         111 kB
+├ ○ /books/read                          5.15 kB         119 kB
+├ ○ /books/search                        2.84 kB         116 kB
+├ ○ /breathe                             1.65 kB         143 kB
+├ ○ /compliment                          4.43 kB         110 kB
+├ ○ /focus                               1.69 kB         107 kB
+├ ○ /gratitude                           2.17 kB         108 kB
+├ ○ /mood                                1.48 kB         107 kB
+├ ○ /music                               73.3 kB         179 kB
+├ ○ /reader                              1.19 kB         111 kB
+├ ○ /reader/history                        923 B         111 kB
+├ ○ /reader/library                      1.04 kB         111 kB
+├ ○ /reader/pdf                          4.17 kB         114 kB
+├ ○ /reader/read                         5.09 kB         118 kB
+├ ○ /reader/search                       3.03 kB         116 kB
+└ ○ /reader/series                        1.9 kB         115 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/255-102f2e5b2e3dc2ef.js       46.1 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          2.06 kB
+
+
+○  (Static)  prerendered as static content
+

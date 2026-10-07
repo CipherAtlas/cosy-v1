@@ -1,6 +1,7 @@
 import * as T from "three";
 import { PlantingSurfaceMask } from "./plantingClearance";
 import { instanceCells } from "./spatialRendering";
+import type { Collider } from "./environment";
 
 function stoneGeometry() {
   const geometry = new T.IcosahedronGeometry(1, 1);
@@ -75,12 +76,17 @@ function bankHeight(group: T.Object3D, fallback: (x: number, z: number) => numbe
   };
 }
 
-/** Small, non-blocking stones spaced by bank length, with clear paths and open confluences. */
-export function buildRiverbankStones(group: T.Object3D, material: T.Material, height: (x: number, z: number) => number) {
+/** Solid stones spaced by bank length, with clear paths and open confluences. */
+export function buildRiverbankStones(group: T.Object3D, material: T.Material, height: (x: number, z: number) => number, colliders: Collider[] = []) {
   const root = new T.Group(); root.name = "Automatic riverbank stones";
   group.updateMatrixWorld(true);
   const paving = new PlantingSurfaceMask(group, "paving"), water = new PlantingSurfaceMask(group, "water");
+  const bridgeDecks: T.Box3[] = [];
+  group.traverseVisible(object => {
+    if (object instanceof T.Mesh && object.name === "Continuous paved crossing") bridgeDecks.push(new T.Box3().setFromObject(object));
+  });
   const geometry = stoneGeometry(), dummy = new T.Object3D();
+  geometry.computeBoundingBox();
   const ground = bankHeight(group, height), vertex = new T.Vector3();
   const support = new Map<string, T.Vector3>();
   for (let i = 0; i < geometry.attributes.position.count; i++) {
@@ -101,15 +107,18 @@ export function buildRiverbankStones(group: T.Object3D, material: T.Material, he
           const outward = a.outward.clone().lerp(b.outward, next / length).normalize();
           const size = .82 + random() * .32, radius = .43 * size;
           const waterHeight = point.y;
-          point.addScaledVector(outward, radius + .12 + random() * .22);
-          // Keep a lowered stream bank from swallowing the whole stone at the waterline.
-          for (let step = 0; step < 4 && ground(point.x, point.z) < waterHeight - .12; step++) point.addScaledVector(outward, .15);
+          const bankOffset = radius + .12 + random() * .22;
+          point.addScaledVector(outward, bankOffset);
+          // A narrow paved verge still needs edging: let the stone straddle the waterline.
+          for (let step = 0; step < 4 && paving.covers(point.x, point.z, radius); step++) point.addScaledVector(outward, -.1);
           const key = `${Math.floor(point.x)},${Math.floor(point.z)}`;
           let overlaps = false;
           for (let x = Math.floor(point.x) - 1; x <= Math.floor(point.x) + 1; x++) for (let z = Math.floor(point.z) - 1; z <= Math.floor(point.z) + 1; z++) {
             if (occupied.get(`${x},${z}`)?.some(p => Math.hypot(point.x - p.x, point.z - p.z) < .6)) overlaps = true;
           }
-          if (!overlaps && !paving.covers(point.x, point.z, radius + .12) && !water.covers(point.x, point.z)) {
+          const bridgeAccess = bridgeDecks.some(bounds => point.x >= bounds.min.x - radius - .4 && point.x <= bounds.max.x + radius + .4
+            && point.z >= bounds.min.z - radius - 1.8 && point.z <= bounds.max.z + radius + 1.8);
+          if (!overlaps && !bridgeAccess && !paving.covers(point.x, point.z, radius) && !water.covers(point.x, point.z)) {
             dummy.position.set(point.x, 0, point.z);
             dummy.rotation.set((random() - .5) * .3, random() * Math.PI * 2, (random() - .5) * .3);
             dummy.scale.set(radius, (.23 + random() * .1) * size, (.32 + random() * .09) * size);
@@ -121,6 +130,10 @@ export function buildRiverbankStones(group: T.Object3D, material: T.Material, he
             }
             dummy.position.y = seat - (.055 + random() * .045);
             dummy.updateMatrix(); matrices.push(dummy.matrix.clone());
+            const bounds = geometry.boundingBox!.clone().applyMatrix4(dummy.matrix);
+            const center = bounds.getCenter(new T.Vector3()), boundsSize = bounds.getSize(new T.Vector3());
+            // Never grant collision to a stone completely below the visible water surface.
+            if (bounds.max.y > waterHeight) colliders.push({ x: center.x, z: center.z, w: boundsSize.x, d: boundsSize.z, bottom: bounds.min.y, top: bounds.max.y });
             colors.push(new T.Color().setScalar(.92 + random() * .12));
             const cell = occupied.get(key) ?? []; cell.push(point); occupied.set(key, cell);
           }

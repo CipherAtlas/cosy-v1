@@ -9,7 +9,7 @@ import { townPlantingClearance } from "./worldLayout";
 import { inRiver } from "./environment";
 import { makeFlame } from "./flame";
 import { makeWater } from "./water";
-import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, riverGeometry } from "./riverGeometry";
+import { conformRiverBank, joinRiverToPonds, makeRiverChannelHeight, refineRiverTerrain, riverGeometry } from "./riverGeometry";
 import { buildRiverbankStones } from "./riverbankStones";
 import { buildBridge } from "./bridge";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
@@ -17,7 +17,7 @@ import { paintedTextures } from "./paintedTextures";
 import { buildCottage } from "./architecture";
 import { loadVillageLayout } from "./villageAssets";
 import { buildWorldLandscape } from "./worldLandscape";
-import { clearPavingBorders } from "./plantingClearance";
+import { clearPavingBorders, blendPavingJunctions } from "./plantingClearance";
 import { buildWayfinding } from "./wayfinding";
 import { BIRD_CLEARING, BRIDGE, HEARTH, POND, POND_DOCK, dockHeight, pondDistance, landscapeHeight, riverX, roadX, type Collider } from "./environment";
 import { GARDEN_COURT, HARVEST_BASKET } from "./garden";
@@ -247,14 +247,15 @@ export async function buildWorld(
     parent: T.Object3D = group,
   ) => add(boxGeo, m, x, y, z, sx, sy, sz, parent);
   const editableTerrain = Boolean(capture || authored.terrain?.samples.length);
-  const terrain = editableTerrain ? new T.PlaneGeometry(640, 640, 320, 320) : new T.PlaneGeometry(650, 650, 210, 210);
+  let terrain: T.BufferGeometry = editableTerrain ? new T.PlaneGeometry(640, 640, 320, 320) : new T.PlaneGeometry(650, 650, 210, 210);
   terrain.rotateX(-Math.PI / 2);
-  const pos = terrain.attributes.position;
   const channelHeight = makeRiverChannelHeight(authored, landscapeHeight);
   const terrainPlacement = !capture && authored.items?.find(item => item.visible && item.asset === "terrain");
   const terrainTransform = new T.Matrix4();
   if (terrainPlacement) terrainTransform.compose(new T.Vector3(...terrainPlacement.position),
     new T.Quaternion().setFromEuler(new T.Euler(...terrainPlacement.rotation.map(T.MathUtils.degToRad) as [number, number, number])), new T.Vector3(...terrainPlacement.scale));
+  if (!capture) { const source = terrain; terrain = refineRiverTerrain(source, authored, terrainTransform); source.dispose(); }
+  const pos = terrain.attributes.position;
   const terrainInverse = terrainTransform.clone().invert(), terrainPoint = new T.Vector3();
   const colors = [];
   for (let i = 0; i < pos.count; i++) {
@@ -941,6 +942,7 @@ export async function buildWorld(
   }
   onProgress(45);
   if (!capture) sceneLayout.apply();
+  const riverbankColliders: Collider[] = [];
   // Static architectural geometry is merged per material into a handful of draw calls.
   if (!capture) {
   group.updateMatrixWorld(true);
@@ -955,7 +957,8 @@ export async function buildWorld(
     }
   });
   clearPavingBorders(group);
-  const riverStones = buildRiverbankStones(group, mat.stone, landscapeHeight); group.add(riverStones);
+  blendPavingJunctions(group);
+  const riverStones = buildRiverbankStones(group, mat.stone, landscapeHeight, riverbankColliders); group.add(riverStones);
   const batches = new Map<T.Material, Map<string, T.BufferGeometry[]>>();
   const keep = new Set<T.Object3D>([...flames, water, pond, terrainMesh, shoreMesh]);
   groundBatch.traverse(object => keep.add(object));
@@ -1021,6 +1024,7 @@ export async function buildWorld(
   group.add(wayfinding.group);
   record("wayfinding", "Village fingerposts", "Furnishings", [wayfinding.group]);
   if (!capture) sceneLayout.apply();
+  colliders.push(...riverbankColliders);
   onProgress(80);
   group.updateMatrixWorld(true);
   if (authored.sceneVersion === 1) {
