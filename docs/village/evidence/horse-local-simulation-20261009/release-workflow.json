@@ -1,0 +1,1 @@
+{"conclusion":"success","headSha":"106a112d838037740796b97d7defb3600ce41e00","jobs":[{"conclusion":"success","name":"build","status":"completed"},{"conclusion":"success","name":"deploy","status":"completed"}],"status":"completed","url":"https://github.com/CipherAtlas/cosy-v1/actions/runs/37942024010"}

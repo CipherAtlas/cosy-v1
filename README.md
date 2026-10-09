@@ -1,6 +1,6 @@
 # Hearthwillow
 
-October 9 release `1e469f1` is live. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37918668381) succeeded; fresh live Chat, scene/shared connection, private cottage/exit, resident conversation, layout identity and route-boundary checks pass with no captured errors. [Release proof and remaining device/performance limits](docs/village/evidence/quiet-release-20261009/README.md).
+Horse riding release `106a112` is live. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37942024010) succeeded; 23 fresh live checks pass, including accepted mounting, 8.4 ms local steering response, server acceptance, dismount, shared scene, private cottage/exit and resident conversation, with no captured errors or failed resources. [Release proof and remaining device/performance limits](docs/village/evidence/horse-local-simulation-20261009/README.md).
 
 The published October 9 quiet-space fixes add an idle rendering budget, clearer camera and speech placement, an explicit Chat entry with saved visibility and a steady unread dot, compact translucent activity controls and bounded loading with retry. Existing activities and shared ownership rules remain. [Latest chat refinement](VILLAGE_BUILD.md#2026-10-09--explicit-chat-entry-local) and [audit checks/limits](VILLAGE_BUILD.md#2026-10-09--quiet-space-audit-fixes-local). Published in release `1e469f1` with the matching Worker.
 
@@ -8,7 +8,7 @@ The published October 9 horse repair fixes snapshot movement hitches and expensi
 
 The October 7 picnic, owl, water/terrain, rendering and horse-response release `f801a1f` is live with the matching Worker. [Pages deployment](https://github.com/CipherAtlas/cosy-v1/actions/runs/37631095808) succeeded. Live scene/shared connection, private cottage entry/exit, villager speech, layout/owl byte identity and private-route boundaries pass. A transient music 503 recovered on focused retries with byte-identical audio. Physical-device, sustained-performance and live riding-feel acceptance remain open. Earlier local-only notes below describe development checkpoints; see the integrated release entry in `VILLAGE_BUILD.md`.
 
-Multiplayer horse controls accept rapid steering changes. A local follow-up runs the accepted rider's movement continuously on their device, with server replies supplying secondary corrections and other visitors rendering the accepted shared path. Ownership and race outcomes stay with the Worker. [Local verification and publication status](VILLAGE_BUILD.md#2026-10-09--horse-acknowledgement-delay-local).
+Multiplayer horse controls accept rapid steering changes. The accepted rider's movement runs continuously on their device, with server replies supplying secondary corrections and other visitors rendering the accepted shared path. Ownership and race outcomes stay with the Worker. [Published verification and limits](VILLAGE_BUILD.md#2026-10-09--responsive-horse-release-published).
 
 The active north pond bank now has grass in place of the old circular paving, lamppost and low lantern. [Local checks](VILLAGE_BUILD.md#2026-10-07--north-pond-clearing-cleanup-local).
 

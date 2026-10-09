@@ -1,0 +1,37 @@
+[
+  {
+    "path": "Worker /health",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/village/world-layout.json",
+    "status": 200,
+    "sourceMatches": true,
+    "sha256": "58c751fe6d008943434994d57c1b4fe71bbc791c4f6c3e25e7377056824bdf98"
+  },
+  {
+    "path": "/editor/",
+    "status": 404
+  },
+  {
+    "path": "/village-editor/",
+    "status": 404
+  },
+  {
+    "path": "/admin/",
+    "status": 404
+  },
+  {
+    "path": "/api/layout",
+    "status": 404
+  },
+  {
+    "path": "/tools/village-editor/",
+    "status": 404
+  },
+  {
+    "path": "/AGENTS.md",
+    "status": 404
+  }
+]

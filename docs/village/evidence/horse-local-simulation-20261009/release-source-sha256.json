@@ -1,0 +1,10 @@
+{
+  "features/village/horseRiding.ts": "d696f6198820bb77fa0ba5abb3e694dd78cb5158ca50d6d201d917015766ba5e",
+  "features/village/horseMotion.ts": "244cce708aee6ccf9fd823522035f44af263c6189463a9579989045a5f6b92f0",
+  "features/village/sharedActors.ts": "9be7dc5cb27c36d524b2b633c87d02751fdb1debc5fa03b9d234db0a748fe076",
+  "worker/index.js": "5279af41fc0f9219c371673353be9aadfc1b724e35292cc266d7d8832369f62e",
+  "worker/horseRiding.ts": "5a4fddec222736c37ee381f7f6c43f9d91f592b2c8d4870807bc1dcee64b5856",
+  "worker/simulation.ts": "fff8015360d66f19b5411ffc47eeea87333a2f868afa9ec6bc4b5f4532f096af",
+  "public/village/world-layout.json": "58c751fe6d008943434994d57c1b4fe71bbc791c4f6c3e25e7377056824bdf98",
+  "worker/world-physics.json": "de1bb015968232e8b627d84daad188b485ee5011a8518d9d25e77cf86135f3d5"
+}
