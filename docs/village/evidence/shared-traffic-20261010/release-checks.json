@@ -1,0 +1,16 @@
+{
+  "sourceCheck": "npm run check passed on final source",
+  "productionBuild": "Passed in isolated source copy with production WebSocket endpoint",
+  "exportBoundary": "Passed: no editor, layout-save API or admin routes",
+  "workerVersion": "3ace9f87-18cb-4873-a3d6-fe557c33be01",
+  "workerHealth": {
+    "status": 200,
+    "ok": true
+  },
+  "reusedLocalBrowserEvidence": [
+    "horses.json",
+    "petting.json",
+    "traffic.json"
+  ],
+  "liveSite": "Pending Pages publication"
+}

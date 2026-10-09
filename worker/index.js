@@ -4,6 +4,7 @@ import { GARDEN_TARGETS } from "../features/village/garden.ts";
 import { VillageSimulation } from "./simulation.ts";
 import { towerLookout, LOOKOUT_CAPACITY } from "../features/village/towerLookout.ts";
 import { ACTIVITY_STAGES } from "../features/village/sharedActors.ts";
+import { SharedWorldClock } from "./worldClock.js";
 
 const MAX_VISITORS = 64;
 const PRIVATE_CROP_KEYS = ["carrots", "radishes", "mint", "daisies", "sunflowers", "mintTea"];
@@ -91,6 +92,12 @@ export class VillageWorld extends DurableObject {
       Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000).map(trick => [trick.id, trick]));
     this.simulation = new VillageSimulation(ctx.storage.kv.get("sharedActors"));
     this.lastWorldTick = 0;
+    this.lastWorldSave = 0;
+    this.persistedRace = "";
+    this.clock = new SharedWorldClock(
+      () => this.visitors().some(visitor => visitor.watching !== false && visitor.activity !== "focus"),
+      () => this.publishWorld(Date.now(), undefined, false),
+    );
     /** @type {Map<string, { inventory: import("../features/village/townShared").ForageInventory; usedAt: number }>} */
     this.inventories = new Map((ctx.storage.kv.get("visitorInventories") || []).filter(([token, record]) =>
       /^[0-9a-f-]{36}$/.test(token) && Date.now() - record.usedAt < 90 * 24 * 60 * 60_000).map(([token, record]) =>
@@ -195,23 +202,33 @@ export class VillageWorld extends DurableObject {
     for (const socket of this.sockets()) if (socket !== except) send(socket, message);
   }
 
-  /** @param {number} [now] @param {import("./runtime").WorkerVisitor} [inventoryVisitor] */
-  publishWorld(now = Date.now(), inventoryVisitor) {
+  /** @param {number} [now] @param {import("./runtime").WorkerVisitor} [inventoryVisitor] @param {boolean} [persist] */
+  publishWorld(now = Date.now(), inventoryVisitor, persist = true) {
+    let expired = false;
     for (const socket of this.sockets()) {
       const visitor = socket.deserializeAttachment();
       if (visitor && now - (visitor.lastSeen ?? now) > 15000) {
         visitor.left = true; socket.serializeAttachment(visitor);
+        expired = true;
         this.simulation.releaseVisitor(visitor.id, now);
         this.broadcast({ type: "leave", id: visitor.id }, socket);
         socket.close(1001, "Connection timed out");
       }
     }
-    this.advanceWorld(now, true);
-    const persist = () => this.ctx.storage.kv.put("sharedActors", this.simulation.save());
-    if (inventoryVisitor) this.persistResources(inventoryVisitor, persist);
-    else persist();
+    const dismounted = this.advanceWorld(now, true);
+    const race = JSON.stringify(this.simulation.town.state.race);
+    const raceChanged = race !== this.persistedRace;
+    // Actions/resources save immediately; ordinary motion needs only periodic recovery checkpoints.
+    if (persist || inventoryVisitor || expired || dismounted || raceChanged || now - this.lastWorldSave >= 5000) {
+      const save = () => this.ctx.storage.kv.put("sharedActors", this.simulation.save());
+      if (inventoryVisitor) this.persistResources(inventoryVisitor, save);
+      else save();
+      this.lastWorldSave = now;
+      this.persistedRace = race;
+    }
     this.broadcast({ type: "actors", world: this.simulation.snapshot(now) });
     this.lastWorldTick = now;
+    this.clock.refresh();
   }
 
   /** @param {number} now @param {boolean} [broadcastRiders] */
@@ -428,6 +445,7 @@ export class VillageWorld extends DurableObject {
       puppyTricks: [...this.puppyTricks.values()].filter(trick => Date.now() - trick.startedAt < PUPPY_TRICK_SECONDS[trick.command] * 1000),
     });
     this.broadcast({ type: "join", visitor: { id: visitor.id, name, color: visitor.color, slot, x: 0, z: 0, heading: 0 } }, server);
+    this.clock.refresh();
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -453,6 +471,7 @@ export class VillageWorld extends DurableObject {
     }
     if (message.type === "heartbeat") {
       visitor.active = message.active === true;
+      visitor.watching = message.watching !== false;
       if (visitor.horse && message.horse !== visitor.horse && now >= (visitor.reservationUntil ?? 0)) {
         this.simulation.dismount(visitor, now, this.visitors(), true);
         this.broadcast({ type: "move", id: visitor.id, x: visitor.x, y: visitor.y, z: visitor.z, heading: visitor.heading, lookout: visitor.lookout ?? null,
@@ -474,7 +493,8 @@ export class VillageWorld extends DurableObject {
           swing: null, bench: null, activity: null });
       }
       socket.serializeAttachment(visitor);
-      if (now - this.lastWorldTick >= 100) this.publishWorld(now);
+      if (now - this.lastWorldTick >= 100) this.publishWorld(now, undefined, false);
+      this.clock.refresh();
       return;
     }
     if (message.type === "interaction" && typeof message.requestId === "string" && message.requestId.length <= 100) {
@@ -532,7 +552,7 @@ export class VillageWorld extends DurableObject {
         if (horse) this.simulation.syncRider(visitor, horse);
         visitor.reservationUntil = 0;
         socket.serializeAttachment(visitor);
-        if (now - this.lastWorldTick >= 100) this.publishWorld(now);
+        if (now - this.lastWorldTick >= 100) this.publishWorld(now, undefined, false);
       } else if (released) this.publishWorld(now);
       return;
     }
@@ -675,8 +695,11 @@ export class VillageWorld extends DurableObject {
       this.simulation.releaseVisitor(visitor.id, Date.now());
       this.broadcast({ type: "leave", id: visitor.id }, socket);
       this.ctx.storage.kv.put("sharedActors", this.simulation.save());
+      this.lastWorldSave = Date.now();
+      this.persistedRace = JSON.stringify(this.simulation.town.state.race);
       this.broadcast({ type: "actors", world: this.simulation.snapshot(Date.now()) }, socket);
     }
+    this.clock.refresh();
   }
 
   /** @param {import("./runtime").WorkerSocket} socket */

@@ -6,7 +6,9 @@ let now = 10000, current, interval, timerId = 0;
 const timers = new Map(), sent = [], worlds = [], tricks = [];
 let disconnected = 0, rejected = 0, crumbs = false, inventory;
 const privateStorage = new Map();
-const visibility = { hidden: false };
+const visibilityListeners = new Map();
+const visibility = { hidden: false, addEventListener: (event, callback) => visibilityListeners.set(event, callback),
+  removeEventListener: event => visibilityListeners.delete(event) };
 const basketToken = "00000000-0000-0000-0000-000000000001";
 let pose = { x: 1, z: 2, heading: 0, active: true };
 class ClientSocket {
@@ -45,7 +47,7 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal(inventory.apples, 0); assert.equal(JSON.parse(privateStorage.get('cosy.village.inventory.v1')).inventory.mushrooms, 1);
   interval(); interval();
   assert.equal(sent.filter(message => message.type === 'move').length, 1);
-  assert.equal(sent.filter(message => message.type === 'heartbeat').length, 2);
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, 1, 'Unchanged visible presence is not sent every poll');
   pose = { ...pose, y: 1 }; interval();
   assert.equal(sent.filter(message => message.type === 'move').at(-1).y, 1);
   pose = { ...pose, bench: { id: 'bench-1', index: 0 } }; interval();
@@ -54,18 +56,28 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal(sent.at(-1).holdingPuppy, 'mochi'); assert.equal(sent.at(-1).active, false);
   const modalCount = sent.filter(message => message.type === 'heartbeat').length;
   interval(); interval();
-  assert.equal(sent.filter(message => message.type === 'heartbeat').length, modalCount + 2, 'Visible modal clients preserve the shared simulation cadence');
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, modalCount, 'Visible menus do not generate refresh-rate renewal traffic');
   visibility.hidden = true;
+  visibilityListeners.get('visibilitychange')();
+  assert.equal(sent.at(-1).watching, false, 'Backgrounding immediately tells the Worker to suspend an unobserved world');
   const inactiveCount = sent.filter(message => message.type === 'heartbeat').length;
   now += 120; interval(); now += 120; interval();
   assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount, 'Inactive unchanged presence avoids refresh-rate heartbeats');
-  now += 760; interval();
-  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 1, 'Inactive claims still renew every second');
+  now += 4760; interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 1, 'Inactive claims renew every five seconds');
   pose = { ...pose, bench: null, holdingPuppy: null }; interval();
   assert.equal(sent.at(-1).bench, null, 'Inactive ownership changes are sent immediately');
   pose = { ...pose, active: true }; interval(); interval();
-  visibility.hidden = false; interval();
-  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 4, 'Visible sessions immediately restore the shared simulation cadence');
+  visibility.hidden = false; visibilityListeners.get('visibilitychange')();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 4, 'Returning immediately resumes the Worker clock');
+  const idleStart = sent.filter(message => message.type === 'heartbeat').length;
+  for (let poll = 0; poll < 500; poll++) { now += 120; interval(); }
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length - idleStart, 11,
+    'A minute of unchanged visible presence sends eleven renewals rather than five hundred');
+  pose = { ...pose, activity: 'focus' }; interval();
+  assert.equal(sent.at(-1).watching, false, 'Private focus does not keep the outdoor clock running');
+  pose = { ...pose, activity: null }; interval();
+  assert.equal(sent.at(-1).watching, true, 'Leaving private focus immediately resumes outdoor observation');
   const claim = connection.interact({ kind: 'bench', id: 'bench-1', index: 0 });
   const request = sent.at(-1);
   assert.equal(request.type, 'interaction');
@@ -93,6 +105,7 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal(crumbs, false, 'Stale socket callbacks cannot change the rejoined visit');
   const closing = connection.interact({ kind: 'puppy', id: 'mochi', action: 'hold' });
   connection.close(); assert.equal((await closing).ok, false);
+  assert.equal(visibilityListeners.size, 0, 'Closing a connection removes its visibility listener');
   const before = sent.length; assert.equal((await connection.interact({ kind: 'activity', id: 'music' })).ok, false);
   assert.equal(sent.length, before);
   console.log('Shared client pose/heartbeat, seat requests, rejection/timeout, crumb grants, reconnect and close contracts pass.');

@@ -26,12 +26,14 @@ class WorkerResponse {
 const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n/gm, '')
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');
 const workerModule = { exports: {} };
-vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };`, {
+vm.runInNewContext(`${fs.readFileSync('worker/worldClock.js', 'utf8').replace('export class SharedWorldClock', 'class SharedWorldClock')}\n${source}\nmodule.exports = { VillageWorld, workerDefault };`, {
+  setTimeout: () => 1, clearTimeout: () => {},
   module: workerModule, crypto: webcrypto, TextEncoder, Uint8Array, URL, Request, Response: WorkerResponse, Date: Clock,
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
   freshGarden: () => ({ beds: [] }), readGarden: raw => JSON.parse(raw),
   VillageSimulation: class {
     picnic = { resume() {} };
+    town = { state: { race: null } };
     mountedHorse() { return undefined; }
     step() {} snapshot() { return {}; } save() { return {}; }
     releaseVisitor(id) { releases.push(id); }

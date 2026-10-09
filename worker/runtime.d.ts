@@ -17,7 +17,7 @@ export type StoredRecords = {
 export type WorkerVisitor = SharedVisitor & {
   ipHash: string | null; lastMove: number; lastChat: number; lastSeen: number;
   reservationUntil?: number; lastInteraction?: number; lastTrick?: number;
-  active?: boolean; crumbPouch: boolean; left?: boolean; kickedUntil?: number;
+  active?: boolean; watching?: boolean; crumbPouch: boolean; left?: boolean; kickedUntil?: number;
   forageInventory?: ForageInventory;
   inventoryToken?: string;
   holdingPuppy?: string | null; activityPosition?: [number, number, number] | null; requestingActivity?: boolean;

@@ -10,7 +10,8 @@ const source = fs.readFileSync('worker/index.js', 'utf8')
   .replace('export default {', 'const workerDefault = {');
 const moduleRef = { exports: {} };
 const nowHour = Math.floor(Date.now() / 3_600_000);
-vm.runInNewContext(`${source}\nmodule.exports = { VillageWorld, workerDefault };`, {
+vm.runInNewContext(`${fs.readFileSync('worker/worldClock.js', 'utf8').replace('export class SharedWorldClock', 'class SharedWorldClock')}\n${source}\nmodule.exports = { VillageWorld, workerDefault };`, {
+  setTimeout: () => 1, clearTimeout: () => {},
   module: moduleRef, crypto: webcrypto, TextEncoder, Uint8Array, URL, Request, Response, Date,
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
   freshGarden: () => ({ beds: [] }), readGarden: value => JSON.parse(value),

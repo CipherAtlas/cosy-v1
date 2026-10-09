@@ -81,6 +81,8 @@ export function connectSharedWorld(options: {
     let lastPose: ReturnType<typeof options.getPose> = null;
     let lastHeartbeat = "";
     let lastHeartbeatAt = -Infinity;
+    let syncPresence: (() => void) | undefined;
+    const visibilityChanged = () => syncPresence?.();
     let nextChatAt = 0;
     let nextTrickAt = 0;
     let trickTimer = 0;
@@ -124,6 +126,8 @@ export function connectSharedWorld(options: {
       }),
       close: () => {
         closed = true;
+        syncPresence = undefined;
+        if (typeof document !== "undefined") document.removeEventListener("visibilitychange", visibilityChanged);
         window.clearInterval(interval);
         window.clearTimeout(retry);
         window.clearTimeout(trickTimer);
@@ -182,7 +186,7 @@ export function connectSharedWorld(options: {
           if (message.world) options.onWorld?.(message.world, selfId);
           for (const trick of message.puppyTricks ?? []) options.onPuppyTrick?.(trick);
           window.clearInterval(interval);
-          interval = window.setInterval(() => {
+          syncPresence = () => {
             const pose = options.getPose();
             if (pose && !pose.horse && active.readyState === WebSocket.OPEN && (!lastPose
               || Math.hypot(pose.x - lastPose.x, pose.z - lastPose.z) > 0.01
@@ -196,16 +200,18 @@ export function connectSharedWorld(options: {
             }
             if (pose && active.readyState === WebSocket.OPEN) {
               const heartbeat = JSON.stringify({ type: "heartbeat", active: pose.active !== false,
+                watching: (typeof document === "undefined" || !document.hidden) && pose.activity !== "focus",
                 lookout: pose.lookout ?? null, holdingPuppy: pose.holdingPuppy ?? null, activity: pose.activity ?? null, bench: pose.bench ?? null, horse: pose.horse ?? null,
                 swing: pose.swing ? { id: pose.swing.id, index: pose.swing.index } : null });
-              // Visible clients drive the shared actor clock, including beneath menus.
-              // Ownership/visibility changes bypass the slower renewal so claims cannot linger.
+              // The Worker owns the animation clock. Renew unchanged presence only every five seconds.
+              // Ownership/visibility changes still bypass that renewal delay.
               const now = Date.now();
-              if (typeof document === "undefined" || !document.hidden || heartbeat !== lastHeartbeat || now - lastHeartbeatAt >= 1000) {
+              if (heartbeat !== lastHeartbeat || now - lastHeartbeatAt >= 5000) {
                 active.send(heartbeat); lastHeartbeat = heartbeat; lastHeartbeatAt = now;
               }
             }
-          }, 120);
+          };
+          interval = window.setInterval(() => syncPresence?.(), 120);
           if (!connectedOnce) { connectedOnce = true; resolve(connection); }
         } else if (message.type === "join") {
           visitors.set(message.visitor.id, message.visitor);
@@ -260,6 +266,7 @@ export function connectSharedWorld(options: {
         if (socket !== active) return;
         if (event.code === 4003) { kicked(); return; }
         window.clearInterval(interval);
+        syncPresence = undefined;
         window.clearTimeout(trickTimer);
         window.clearTimeout(joinTimer);
         failPending();
@@ -272,6 +279,7 @@ export function connectSharedWorld(options: {
       };
     };
     options.signal?.addEventListener("abort", connection.close, { once: true });
+    if (typeof document !== "undefined") document.addEventListener("visibilitychange", visibilityChanged);
     if (options.signal?.aborted) { connection.close(); return; }
     open();
   });

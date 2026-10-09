@@ -16,6 +16,8 @@ const { ACTIVITY_STAGES } = require('../../../features/village/sharedActors.ts')
 const physics = require('../../../worker/world-physics.json');
 assert.equal(physics.layoutHash, createHash('sha256').update(fs.readFileSync('public/village/world-layout.json')).digest('hex'), 'Worker physics must match the current saved layout');
 let now = 100000, requestNumber = 0;
+let clockTimerId = 0;
+const clockTimers = new Map();
 const sockets = [], records = new Map(), checks = [];
 const check = (condition, label) => { assert(condition, label); checks.push(label); };
 const makeSocket = id => {
@@ -31,7 +33,9 @@ const ctx = { getWebSockets: () => sockets, acceptWebSocket: socket => sockets.p
 const mod = { exports: {} };
 const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n/gm, '')
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');
-vm.runInNewContext(`${source}\nmodule.exports = VillageWorld;`, { module: mod, crypto: webcrypto,
+vm.runInNewContext(`${fs.readFileSync('worker/worldClock.js', 'utf8').replace('export class SharedWorldClock', 'class SharedWorldClock')}\n${source}\nmodule.exports = VillageWorld;`, { module: mod, crypto: webcrypto,
+  setTimeout: (callback, delay) => { assert.equal(delay, 100); const id = ++clockTimerId; clockTimers.set(id, callback); return id; },
+  clearTimeout: id => clockTimers.delete(id),
   Date: class extends Date { static now() { return now; } }, DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
   VillageSimulation, towerLookout, LOOKOUT_CAPACITY, ACTIVITY_STAGES, GARDEN_TARGETS: garden.GARDEN_TARGETS, ...garden,
   WebSocketPair: class { constructor() { this.client = {}; this.server = makeSocket('joining'); sockets.pop(); } },
@@ -372,6 +376,56 @@ const puppy = () => world.simulation.actors.find(actor => actor.state.kind === '
   const transformed = towerLookout({ ...world.simulation.authored, structures: { tower: { x: 30, y: 2, z: 40, yaw: Math.PI / 2 } } });
   check(Math.abs(transformed.entrance[0] - 33.5) < .001 && transformed.position(0)[1] === 13.4, 'Gallery and doorway follow editor position, height and rotation');
   check(JSON.stringify(transformed.constrain(30, 40)) === JSON.stringify([30, 13.4, 40]), 'Free gallery walking follows the editor tower center and height');
-console.log(`${checks.length} shared-world Worker checks passed.`);
+  const clockVisitor = makeSocket('clock-visitor');
+  const clockRecords = new Map(); let checkpoints = 0;
+  const clockWorld = new World({ ...ctx, getWebSockets: () => [clockVisitor], storage: { ...ctx.storage,
+    kv: { get: key => clockRecords.get(key), put: (key, value) => {
+      clockRecords.set(key, JSON.parse(JSON.stringify(value))); if (key === 'sharedActors') checkpoints++;
+    } } } });
+  clockWorld.publishWorld(now);
+  const beforeActors = clockVisitor.messages.filter(message => message.type === 'actors').length;
+  const firstTimer = clockWorld.clock.timer;
+  clockWorld.clock.refresh(); clockWorld.clock.refresh();
+  check(clockWorld.clock.timer === firstTimer, 'Multiple visitors/events share one scheduled simulation tick');
+  for (let step = 1; step <= 100; step++) {
+    now += 100;
+    const timer = clockWorld.clock.timer, callback = clockTimers.get(timer);
+    clockTimers.delete(timer); callback();
+    if (step % 50 === 0) await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'heartbeat', active: true, watching: true }));
+  }
+  check(clockVisitor.messages.filter(message => message.type === 'actors').length - beforeActors === 100,
+    'The Worker broadcasts smooth shared motion between five-second visitor renewals');
+  check(checkpoints === 3, 'Ten seconds of motion use two recovery checkpoints instead of one hundred writes');
+  const clockTrack = clockWorld.simulation.authored.items.find(item => item.asset === 'horse-racetrack');
+  clockWorld.simulation.town.state.race = { trackId: clockTrack.id, owner: clockVisitor.visitor.id,
+    horseId: clockWorld.simulation.actors.find(actor => actor.state.kind === 'horse').state.id,
+    phase: 'finished', startedAt: now - 4000, goAt: now - 1000, nextCheckpoint: 9,
+    playerFinishAt: now, npcFinishAt: null, result: 'visitor', until: now + 30000 };
+  clockWorld.advanceWorld(now);
+  clockWorld.publishWorld(now, undefined, false);
+  check(checkpoints === 4 && clockRecords.get('sharedActors').town.race.result === 'visitor',
+    'A race transition advanced before publication still saves immediately rather than waiting for a checkpoint');
+  clockWorld.simulation.town.state.race = null;
+  clockWorld.publishWorld(now, undefined, false);
+  const beforeActionSave = checkpoints;
+  const clockBench = clockWorld.simulation.benches[0];
+  Object.assign(clockVisitor.visitor, { x: clockBench.x, z: clockBench.z + 1.5 });
+  await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'interaction', requestId: 'clock-seat', request: { kind: 'bench', id: clockBench.id, index: 0 } }));
+  check(checkpoints === beforeActionSave + 1 && clockVisitor.visitor.bench?.index === 0, 'Accepted actions save immediately between movement checkpoints');
+  await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'heartbeat', active: false, watching: false, bench: clockVisitor.visitor.bench }));
+  check(clockWorld.clock.timer === null, 'An entirely hidden world stops its timer and can hibernate');
+  await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'heartbeat', active: false, watching: true, bench: clockVisitor.visitor.bench }));
+  check(clockWorld.clock.timer !== null, 'Visible menus keep shared actors moving even while player input is inactive');
+  now += 100;
+  await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'interaction', requestId: 'clock-focus', request: { kind: 'activity', id: 'focus' } }));
+  check(clockWorld.clock.timer === null && clockVisitor.visitor.activity === 'focus', 'Private focus does not run the public movement clock');
+  now += 100;
+  await clockWorld.webSocketMessage(clockVisitor, JSON.stringify({ type: 'interaction', requestId: 'clock-leave', request: { kind: 'leave' } }));
+  check(clockWorld.clock.timer !== null, 'Leaving private focus resumes the public clock');
+  now += 15001;
+  const staleTimer = clockWorld.clock.timer;
+  clockTimers.get(staleTimer)();
+  check(clockVisitor.visitor.left && clockWorld.clock.timer === null, 'Missing renewals expire visitors and stop the last active timer');
+  console.log(`${checks.length} shared-world Worker checks passed.`);
   if (process.env.OUTPUT_FILE) fs.writeFileSync(process.env.OUTPUT_FILE, JSON.stringify({ checks }, null, 2) + '\n');
 })().catch(error => { console.error(error); process.exitCode = 1; });

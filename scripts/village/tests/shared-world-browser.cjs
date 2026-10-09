@@ -24,9 +24,14 @@ const assert = require('node:assert/strict');
         localStorage.setItem('cosy-village-preferences', JSON.stringify({ weather: 'golden', weatherMode: 'manual' }));
         window.testSockets = [];
         window.testMessages = [];
+        window.testSentMessages = [];
+        window.testActorTimes = [];
         const Native = window.WebSocket;
         window.WebSocket = class extends Native { constructor(...args) { super(localWorker || args[0], ...args.slice(1)); window.testSockets.push(this);
-          this.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'interaction_result' || message.type === 'action_rejected') window.testMessages.push(message); }); } };
+          this.addEventListener('message', event => { const message = JSON.parse(event.data);
+            if (message.type === 'actors') window.testActorTimes.push(performance.now());
+            if (message.type === 'interaction_result' || message.type === 'action_rejected') window.testMessages.push(message); }); }
+          send(raw) { window.testSentMessages.push({ type: JSON.parse(raw).type }); super.send(raw); } };
       }, process.env.LOCAL_WORKER_URL || null);
       console.log('Loading client', index + 1);
       await page.goto('http://127.0.0.1:3051');
@@ -46,6 +51,8 @@ const assert = require('node:assert/strict');
         }
         return !!window.testEngine && !!window.testConnection;
       }, null, { timeout: 120000 });
+      if (await page.locator('[data-tutorial-done]').isVisible()) await page.locator('[data-tutorial-done]').click();
+      await page.waitForFunction(() => !testEngine.blocked, null, { timeout: 30000 });
       await page.evaluate(() => testEngine.setQuality('low'));
     }
     console.log('All clients ready');
@@ -53,6 +60,20 @@ const assert = require('node:assert/strict');
     const clientIds = await Promise.all(pages.map(page => page.evaluate(() => testEngine.sharedSelfId)));
     await a.waitForFunction(ids => ids.every(id => id === testEngine.sharedSelfId || testEngine.remoteVisitors.has(id)), clientIds);
     check(await b.evaluate(ids => ids.every(id => id === testEngine.sharedSelfId || testEngine.remoteVisitors.has(id)), clientIds), 'Three real browser clients join one Worker');
+    if (process.env.TRAFFIC_CHECK === '1') {
+      const starting = await a.evaluate(() => ({ sent: testSentMessages.length, actors: testActorTimes.length }));
+      await a.waitForTimeout(6200);
+      const traffic = await a.evaluate(start => {
+        const received = testActorTimes.slice(start.actors);
+        const gaps = received.slice(1).map((at, index) => at - received[index]).sort((left, right) => left - right);
+        return { heartbeats: testSentMessages.slice(start.sent).filter(message => message.type === 'heartbeat').length,
+          actorSnapshots: received.length, medianGapMs: gaps[Math.floor(gaps.length / 2)], visible: !document.hidden };
+      }, starting);
+      check(traffic.visible && traffic.heartbeats <= 3, 'A real visible idle client sends at most three heartbeats in 6.2 seconds');
+      check(traffic.actorSnapshots >= 20 && traffic.medianGapMs < 250, 'Shared actors keep moving smoothly without frequent client heartbeats');
+      fs.writeFileSync(path.join(output, 'traffic.json'), JSON.stringify(traffic, null, 2));
+      console.log('Idle traffic and shared clock:', traffic);
+    }
     if (process.env.BRIDGE_ONLY === '1') {
       for (const page of pages) {
         if (await page.locator('[data-tutorial-done]').isVisible()) await page.locator('[data-tutorial-done]').click();
@@ -150,18 +171,35 @@ const assert = require('node:assert/strict');
     const dogId = await a.evaluate(() => testEngine.sharedActors.actors.find(actor => actor.kind === 'puppy').id);
     const nearDog = async page => {
       await page.bringToFront();
-      await page.evaluate(id => {
+      await page.evaluate(async id => {
         const e = testEngine, dog = e.puppies.puppies.find(dog => dog.info.id === id);
-        const point = Array.from({ length: 16 }, (_, index) => ({
+        const candidates = Array.from({ length: 16 }, (_, index) => ({
           x: dog.actor.position.x + Math.sin(index * Math.PI / 8) * 1.6,
           z: dog.actor.position.z + Math.cos(index * Math.PI / 8) * 1.6,
-        })).find(point => e.movement.clear(point.x, point.z) && dog.movement.canWalkTo(point.x, point.z));
-        if (!point) throw Error('The authored dog approach needs clear ground.');
-        e.movement.settle(point.x, point.z); e.player.position.set(e.movement.position.x, e.movement.position.y, e.movement.position.z);
-        e.yaw = .65; e.pitch = .18;
+        }));
+        for (const point of candidates) {
+          if (!e.movement.clear(point.x, point.z) || !dog.movement.canWalkTo(point.x, point.z)) continue;
+          e.movement.settle(point.x, point.z); e.player.position.copy(e.movement.position);
+          e.yaw = .65; e.pitch = .18;
+          await new Promise(resolve => setTimeout(resolve, 250));
+          if (e.movement.grounded && e.movement.speed < .18 && e.nearPuppy?.id === id
+            && Math.hypot(e.player.position.x - point.x, e.player.position.z - point.z) < .15) return;
+        }
+        throw Error('The authored dog approach needs stable clear ground.');
       }, dogId);
       await page.waitForFunction(id => testEngine.nearPuppy?.id === id, dogId);
     };
+    if (process.env.PET_ONLY === '1') {
+      await nearDog(a);
+      await a.getByRole('button', { name: /Pet / }).click();
+      await a.waitForFunction(id => testEngine.sharedActors.actors.find(actor => actor.id === id)?.mode === 'pet', dogId, { timeout: 8000 });
+      await b.waitForFunction(id => testEngine.puppies.puppies.find(dog => dog.info.id === id)?.petting, dogId);
+      check(await b.evaluate(() => !testEngine.puppies.pettingPuppy), 'The observer receives pet animation without the owner camera');
+      await a.waitForFunction(id => !testEngine.sharedActors.actors.find(actor => actor.id === id)?.owner, dogId, { timeout: 8000 });
+      check(true, 'The Worker completes and releases petting between five-second presence renewals');
+      fs.writeFileSync(path.join(output, 'checks.json'), JSON.stringify({ checks, errors }, null, 2) + '\n');
+      console.log(`${checks.length} focused petting/shared-clock checks passed.`); return;
+    }
     await nearDog(a); await a.locator('canvas').focus(); await a.keyboard.press('t');
     await a.waitForFunction(id => testEngine.sharedActors.actors.find(actor => actor.id === id)?.owner === testEngine.sharedSelfId, dogId);
     await nearDog(b);

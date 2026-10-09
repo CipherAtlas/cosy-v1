@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Three real browser clients join one Worker",
+    "A real visible idle client sends at most three heartbeats in 6.2 seconds",
+    "Shared actors keep moving smoothly without frequent client heartbeats",
+    "The observer receives pet animation without the owner camera",
+    "The Worker completes and releases petting between five-second presence renewals"
+  ],
+  "errors": []
+}

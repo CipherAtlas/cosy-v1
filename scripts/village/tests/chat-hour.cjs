@@ -11,7 +11,8 @@ const source = fs.readFileSync('worker/index.js', 'utf8')
 const hourMs = 3_600_000;
 let now = 100 * hourMs + 1000;
 const workerModule = { exports: {} };
-vm.runInNewContext(`${source}\nmodule.exports = VillageWorld;`, {
+vm.runInNewContext(`${fs.readFileSync('worker/worldClock.js', 'utf8').replace('export class SharedWorldClock', 'class SharedWorldClock')}\n${source}\nmodule.exports = VillageWorld;`, {
+  setTimeout: () => 1, clearTimeout: () => {},
   module: workerModule,
   Date: class extends Date { static now() { return now; } },
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } },

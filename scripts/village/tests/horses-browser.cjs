@@ -380,12 +380,16 @@ fs.mkdirSync(output, { recursive: true });
     await rider.screenshot({ path: `${output}/riding-1024.png` });
     await rider.setViewportSize({ width: 1366, height: 768 });
     await rider.bringToFront(); await rider.locator('canvas').focus();
-    await rider.mouse.click(500, 100);
-    await rider.waitForFunction(() => document.pointerLockElement === e.renderer.domElement);
+    if (process.env.TRAFFIC_CHECK !== '1') {
+      await rider.mouse.click(500, 100);
+      await rider.waitForFunction(() => document.pointerLockElement === e.renderer.domElement);
+    }
     await rider.keyboard.press('Escape');
     await rider.waitForFunction(() => !e.horseRiding.actor);
     await observer.waitForFunction(() => !e.sharedActors.actors.find(a => a.id === 'horse-juniper').owner);
-    check(await rider.evaluate(() => !document.pointerLockElement && e.movement.clear(e.player.position.x, e.player.position.z)), 'First Escape releases pointer lock and dismounts onto clear ground');
+    check(await rider.evaluate(() => !document.pointerLockElement && e.movement.clear(e.player.position.x, e.player.position.z)),
+      process.env.TRAFFIC_CHECK === '1' ? 'Escape dismounts onto accepted clear ground without capturing the pointer'
+        : 'First Escape releases pointer lock and dismounts onto clear ground');
     await approach(rider); await rider.getByRole('button', { name: 'Ride', exact: true }).click();
     await rider.waitForFunction(() => !!e.horseRiding.actor);
     await rider.evaluate(() => testSockets.at(-1).close(1000));

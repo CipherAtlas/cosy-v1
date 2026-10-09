@@ -15,7 +15,8 @@ const clone = value => value === undefined ? undefined : JSON.parse(JSON.stringi
 const source = fs.readFileSync('worker/index.js', 'utf8').replace(/^import .*;\n/gm, '')
   .replace('export class VillageWorld', 'class VillageWorld').replace('export default {', 'const workerDefault = {');
 const mod = { exports: {} };
-vm.runInNewContext(`${source}\nmodule.exports = VillageWorld;`, {
+vm.runInNewContext(`${fs.readFileSync('worker/worldClock.js', 'utf8').replace('export class SharedWorldClock', 'class SharedWorldClock')}\n${source}\nmodule.exports = VillageWorld;`, {
+  setTimeout: () => 1, clearTimeout: () => {},
   module: mod, crypto: webcrypto, URL, Request, Response, TextEncoder, Uint8Array,
   Date: class extends Date { static now() { return now; } },
   DurableObject: class { constructor(ctx) { this.ctx = ctx; } }, VillageSimulation, ACTIVITY_STAGES,
@@ -210,6 +211,6 @@ function fixture({ savedGarden = garden.freshGarden(), savedChat = { hour: Math.
   check(failure.records.get('chat').entries[0].message === 'Synthetic nested edit', 'Failed put does not advance the baseline; later nested mutation is compared to immutable serialized bytes');
   const worldWrites = failure.count('sharedActors');
   for (let i = 0; i < 10; i++) { now += 120; failure.world.publishWorld(now); }
-  check(failure.count('sharedActors') === worldWrites + 10, 'World publish cadence and persistence remain one snapshot write per publish');
+  check(failure.count('sharedActors') === worldWrites + 10, 'Explicit action publications retain one immediate snapshot write each');
   console.log(JSON.stringify({ passed: checks.length, checks, writeCounts: { adminPolls: 34560, alarmWrites: 24, unchangedFlowerActions: 10, gardenWritesForFlowers: 0, sharedActorsWritesForFlowers: 10 } }, null, 2));
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -1,5 +1,15 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-10 — Durable Object heartbeat traffic (local)
+
+Unchanged visitor presence now renews every five seconds instead of every 120 ms. Ownership/visibility changes still bypass the renewal delay. `worker/worldClock.js` owns one roughly 100 ms simulation timer per public world; it continues beneath visible menus and stops when every visitor is hidden, in private focus or gone. This keeps accepted actor/rider snapshots smooth without per-visitor clock-driving requests. Movement and riding inputs retain their existing responsiveness.
+
+Ordinary actor motion checkpoints every five seconds; accepted actions/resource transactions, race transitions, dismounts and departures save immediately. A runtime restart can restore roughly five seconds of earlier ordinary movement. The active timer consumes duration while the world is observed; inactive/private worlds retain hibernation. No dependency, layout, deployment configuration or public UI changes.
+
+Local check/build/export privacy pass. The final race-baseline guard passes Worker types, 132 Worker contracts and focused chat/admin/kick checks. Real three-client verification has 27 passing horse/contention/disconnect/reconnect/full-seat/private-focus and laptop/all-six-iPad-CSS checks, plus five focused pet/clock checks, with zero page errors. The final visible idle sample sends one heartbeat and receives 60 actor snapshots in 6.2 seconds (104.5 ms median gap). A simulated ten seconds uses two periodic writes beyond the initial save; accepted actions/race transitions still save immediately. Initial animal setup lacked tutorial dismissal/stable approach; focused petting passes after repairing those fixtures. The full animal chain and native pointer capture remain open; the final horse run verifies uncaptured Escape. [Evidence and limits](docs/village/evidence/shared-traffic-20261010/README.md). Preview3051 uses Worker2567 with separate synthetic persistence. No deployment or Git writes; production retains its current behavior.
+
+Release authorized on 2026-10-10. Fresh final `npm run check`, isolated production-endpoint build and export privacy pass. Worker version `3ace9f87-18cb-4873-a3d6-fe557c33be01` is deployed and `/health` returns 200/`ok: true`. Pages publication and focused live client verification are pending.
+
 ## 2026-10-09 — responsive horse release published
 
 Application commit `106a112` is pushed and published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37942024010). The accepted rider runs continuous local physics, with server replies supplying secondary reconciliation and other visitors retaining the accepted shared path. Worker code/physics are unchanged, and the existing production Worker is healthy; no Worker deployment was needed.
