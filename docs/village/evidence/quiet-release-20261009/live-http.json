@@ -1,0 +1,36 @@
+{
+  "routes": [
+    {
+      "route": "/village/world-layout.json",
+      "status": 200,
+      "matchesSource": true
+    },
+    {
+      "route": "/editor/",
+      "status": 404
+    },
+    {
+      "route": "/village-editor/",
+      "status": 404
+    },
+    {
+      "route": "/admin/",
+      "status": 404
+    },
+    {
+      "route": "/tools/",
+      "status": 404
+    },
+    {
+      "route": "/api/layout",
+      "status": 404
+    },
+    {
+      "route": "/AGENTS.md",
+      "status": 404
+    }
+  ],
+  "workerHealth": {
+    "ok": true
+  }
+}

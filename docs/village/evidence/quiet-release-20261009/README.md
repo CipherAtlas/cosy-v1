@@ -1,0 +1,11 @@
+# October 9 integrated release evidence
+
+Application commit `1e469f113afa5e2a9cdcd39911eea9af220bc750` is published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37918668381). Matching Worker version `0e3cbb07-302f-44e1-a998-6540cfa8f98f` is healthy. The release includes the quiet-space audit, explicit Chat entry and completed horse/collision repair; existing activities and ownership remain.
+
+`production-build.log` records the isolated root-path export with the public Worker URL; export privacy passed. `worker-deploy.log` records publication. `source-sha256.json` records released runtime/layout/physics files; the isolated build snapshot differs only by removal of a trailing blank line in assetLoading.ts. Earlier check/build and local browser evidence remains applicable to unchanged behavior.
+
+`live-checks.json` records 18 fresh live Chrome checks with no page errors or failed resources. Chat discovery, Enter/Space toggles and laptop/small-window/iPad mini CSS targets pass. Shared scene/catalog, every automatic stone collision box, farm travel, private cottage/cat, exit and accepted farmer conversation pass. `live-http.json` records byte-identical layout, Worker health and six private routes returning 404. Screenshots show the live control and scene. No public chat messages were sent.
+
+Early smoke fixtures measured before React/press feedback completed and before tutorial dismissal; correcting waits resolves the checks. Another fixture approached the farmer without immediately updating the player display position and waited only for accepted callbacks; synchronizing the approach and checking the direct Worker result gives an accepted conversation. These were fixture changes; no product source changes followed publication. Python's initial Worker health request returned 403; the existing curl path and browser connection confirm healthy service.
+
+All six iPad CSS orientations, two-client chat delivery and three-client ownership/private-focus coverage remain local evidence. Native Safari/Firefox, physical iPads, real hidden-tab cadence, sustained thermals and long-session listening remain open. Sound review stays with the user. Local preview3051 and Worker2567 are preserved.

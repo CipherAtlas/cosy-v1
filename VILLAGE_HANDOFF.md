@@ -1,8 +1,11 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-09 — authorized integrated release
+## 2026-10-09 — quiet-space, chat and horse repair published
 
-Audit essentials, visual/performance/loading fixes, explicit Chat entry and the completed horse repair are being released together with the matching Worker. Current local evidence is retained; publication/live results will be recorded after deployment completes. See the newest VILLAGE_BUILD.md entry.
+Release `1e469f1` is pushed and published. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37918668381) both succeeded. Matching Worker version `0e3cbb07-302f-44e1-a998-6540cfa8f98f` is deployed with healthy `/health`. The separate production-endpoint build/export privacy checks pass; the local preview retains its local Worker endpoint.
+
+Fresh live Chrome checks pass for the explicit Chat label, collapsed default, Enter/Space toggling, 44 px target/layout at 1366×768, 900×640 and both iPad mini CSS orientations, loaded shared scene, all 1,366 stone bounds against the 3,323-collider catalog, accepted farm travel, private cottage/cat, activity exit and Worker-accepted resident conversation. No page errors or failed resource responses were captured in the final run. Live layout bytes match source; editor/admin/save-API/tools/AGENTS routes return 404. No public chat messages were sent. Local two-/three-client and all six tablet-orientation evidence is reused for unchanged behavior, not relabelled as live contention testing. [Release evidence](docs/village/evidence/quiet-release-20261009/README.md). Native/physical devices, hidden-tab traffic, sustained thermals and long-session listening remain unverified; listening stays with the user.
+
 
 ## 2026-10-09 — explicit chat entry (local)
 

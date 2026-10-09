@@ -1,0 +1,30 @@
+{
+  "checks": [
+    "Live scene enters and connects to the public Worker",
+    "Live collapsed control explicitly identifies Chat",
+    "Live fresh visitor starts with collapsed chat",
+    "Live Enter activation opens the chat panel",
+    "Live Space activation collapses chat",
+    "Live Chat target fits 1366×768",
+    "Live Chat target fits 900×640",
+    "Live Chat target fits 744×1133",
+    "Live Chat target fits 1133×744",
+    "Live renderer has the released 3323-collider/seven-bench catalog",
+    "Every live automatic stone matches a released collision box within 0.1 mm",
+    "Public Worker accepts travel to the radish farm",
+    "Live private cottage enters with the cat and outdoor scene hidden",
+    "Live activity exit returns to the village",
+    "Worker accepts return travel after leaving the cottage",
+    "Live Worker accepts radish-farmer conversation",
+    "Live smoke has no page errors",
+    "Live smoke has no failed resource responses"
+  ],
+  "errors": [],
+  "requests": [],
+  "rocks": {
+    "colliders": 3323,
+    "benches": 7,
+    "rocks": 1366,
+    "matched": 1366
+  }
+}
