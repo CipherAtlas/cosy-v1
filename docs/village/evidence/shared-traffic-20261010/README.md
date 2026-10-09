@@ -1,4 +1,4 @@
-# Shared presence traffic — 2026-10-10 local
+# Shared presence traffic — 2026-10-10
 
 Unchanged presence renews every five seconds (previously 120 ms), approximately 98% fewer idle heartbeats. Ownership/activity/visibility changes bypass the delay. The local 120 ms pose poll still detects walking and state changes; it does not send unchanged presence on every poll. One Worker-owned 100 ms timeout chain advances shared motion while any visitor sees the outdoor world, including menus. Hidden/private/empty worlds cancel it and retain WebSocket hibernation. Movement and horse control rates are unchanged.
 
@@ -16,8 +16,16 @@ Ordinary actor movement checkpoints every five seconds. Accepted actions/resourc
 
 ## Preview and release limits
 
-Port 3051 serves root `out`, built with `ws://127.0.0.1:2567`. Worker2567 uses separate synthetic persistence at `/tmp/cosy-shared-traffic-20261010-worker`. No Git writes or deployment. Production retains the previous heartbeat behavior. An authorized release must deploy the Worker and matching client; existing village tabs must reload. Native/physical devices, long background sessions, thermals and live billing/duration reduction are not established by these local checks.
+Port 3051 serves root `out`, built with `ws://127.0.0.1:2567`. Worker2567 uses separate synthetic persistence at `/tmp/cosy-shared-traffic-20261010-worker`. The Worker and matching client are now published; existing village tabs must reload. Native/physical devices, long background sessions, thermals and live billing/duration reduction are not established by these local checks.
 
-## Authorized release progress
+## Published release
 
-Fresh final `npm run check`, isolated production-endpoint build and export boundary checks pass. Worker `3ace9f87-18cb-4873-a3d6-fe557c33be01` is deployed and its health response is 200/`ok: true`. Pages publication and live-client acceptance are pending; the local evidence above remains local.
+Application `f3acc61` is pushed and published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37982796596). Worker version `3ace9f87-18cb-4873-a3d6-fe557c33be01` is deployed and its health response is 200/`ok: true`. Fresh final source checks, isolated production-endpoint build and export privacy pass. The emitted bundle contains the production Worker endpoint and no local Worker endpoint.
+
+- [Thirteen live Chrome checks](live-checks.json) pass with no page errors or failed resource responses: shared entry, farm travel, private cottage/cat, observation suspension/resumption, activity exit and accepted farmer conversation.
+- [Live idle traffic](live-traffic.json): two heartbeats and 62 actor snapshots in 6.2 seconds, 98 ms median gap, using the production WebSocket endpoint.
+- [Live route boundaries](live-http.json): all six editor/admin/layout-save/tools/AGENTS paths return 404.
+- [Separate accepted live ride](live-riding.json): accepted mounting, 600 ms held steering and dismount; 22 ms local visual response and 605 ms accepted response. The first 120 ms timing sample missed server movement. A later horse position blocked both visual/server timing observations; [that trace](live-riding-blocked.json) remains recorded. These probes are not deterministic short-input latency acceptance.
+- The first NPC test selected clear ground across a blocked walking path. Requiring the matching movement solver's clear path fixed the test; the final Worker conversation request succeeded without application changes.
+
+Local multi-client/contention/tablet evidence above is reused for unchanged source. The live smoke uses one real browser visitor. Native/physical devices, long-session thermals, continuous riding feel and live daily billing savings remain unverified.

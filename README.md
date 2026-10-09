@@ -1,6 +1,6 @@
 # Hearthwillow
 
-The local October 10 traffic fix renews unchanged shared presence every five seconds, with immediate ownership/visibility changes and a single Worker clock for smooth outdoor movement. Ordinary motion saves every five seconds; accepted actions/resources and race transitions save immediately. It is not deployed. [Verification and limits](VILLAGE_BUILD.md#2026-10-10--durable-object-heartbeat-traffic-local).
+The published October 10 traffic fix renews unchanged shared presence every five seconds, with immediate ownership/visibility changes and a single Worker clock for smooth outdoor movement. Ordinary motion saves every five seconds; accepted actions/resources and race transitions save immediately. Release `f3acc61` and the matching Worker are live; reload existing tabs. [Verification and limits](VILLAGE_BUILD.md#2026-10-10--durable-object-traffic-release-published).
 
 Horse riding release `106a112` is live. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37942024010) succeeded; 23 fresh live checks pass, including accepted mounting, 8.4 ms local steering response, server acceptance, dismount, shared scene, private cottage/exit and resident conversation, with no captured errors or failed resources. [Release proof and remaining device/performance limits](docs/village/evidence/horse-local-simulation-20261009/README.md).
 

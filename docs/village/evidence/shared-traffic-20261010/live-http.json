@@ -1,0 +1,29 @@
+{
+  "checkedUTC": "2026-10-09T19:52:07.382073+00:00",
+  "privateRoutes": [
+    {
+      "path": "/editor",
+      "status": 404
+    },
+    {
+      "path": "/admin",
+      "status": 404
+    },
+    {
+      "path": "/api/layout",
+      "status": 404
+    },
+    {
+      "path": "/tools/village-editor",
+      "status": 404
+    },
+    {
+      "path": "/AGENTS.md",
+      "status": 404
+    },
+    {
+      "path": "/api/admin",
+      "status": 404
+    }
+  ]
+}

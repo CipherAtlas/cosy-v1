@@ -1,0 +1,9 @@
+{
+  "heartbeats": 2,
+  "actorSnapshots": 62,
+  "medianGapMs": 98,
+  "visible": true,
+  "socketUrls": [
+    "wss://cosy-village-world.sabargulati777.workers.dev/"
+  ]
+}

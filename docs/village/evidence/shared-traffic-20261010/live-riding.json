@@ -1,0 +1,10 @@
+{
+  "visualMs": 21.900000005960464,
+  "acceptedMs": 605.1999999880791,
+  "heldTurnMs": 600,
+  "inputMessagesDuringProbe": 6,
+  "actorSnapshotsDuringProbe": 6,
+  "mountAccepted": true,
+  "dismountAccepted": true,
+  "evidenceNote": "Recorded in the earlier live run, which subsequently stopped at an invalid NPC approach. A later horse position blocked the timing probe; it is retained separately."
+}

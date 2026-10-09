@@ -12,5 +12,8 @@
     "petting.json",
     "traffic.json"
   ],
-  "liveSite": "Pending Pages publication"
+  "liveSite": "Published with successful Pages build/deploy",
+  "liveBrowserChecks": 13,
+  "livePrivateRoutes": 6,
+  "releaseCommit": "f3acc61644bd7aa33a1a6f3add951a6aa90b19e9"
 }

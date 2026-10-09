@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "Live scene enters and connects to the public Worker",
+    "Live idle client sends at most three heartbeats in 6.2 seconds",
+    "Live Worker continues shared motion between sparse renewals",
+    "Live client uses the production Worker",
+    "Public Worker accepts travel to the radish farm",
+    "Live private cottage enters with the cat and outdoor scene hidden",
+    "Live private focus immediately disables outdoor observation",
+    "Live activity exit returns to the village",
+    "Live activity exit immediately resumes outdoor observation",
+    "Worker accepts return travel after leaving the cottage",
+    "Live Worker accepts radish-farmer conversation",
+    "Live smoke has no page errors",
+    "Live smoke has no failed resource responses"
+  ],
+  "errors": [],
+  "requests": [],
+  "traffic": {
+    "heartbeats": 2,
+    "actorSnapshots": 62,
+    "medianGapMs": 98,
+    "visible": true,
+    "socketUrls": [
+      "wss://cosy-village-world.sabargulati777.workers.dev/"
+    ]
+  }
+}

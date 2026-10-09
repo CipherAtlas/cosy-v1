@@ -1,0 +1,9 @@
+{
+  "commit": "f3acc61644bd7aa33a1a6f3add951a6aa90b19e9",
+  "sha256": {
+    "features/village/sharedWorld.ts": "41b58a95bc26d4f2904fd746a29e7da3b64de2b5caa748d2e157337ab75bfb0d",
+    "worker/index.js": "992121f46d5bcba127042154e60da65892a112bfab42946ac3d9a41b4c6c39ac",
+    "worker/worldClock.js": "cd7d5d30fa7f106c2a3dcd01fb396e2e8151596f113ee2497f47db94244652ae",
+    "worker/runtime.d.ts": "d8c682e1ed67fa91953ad3a006eb5e0ca56edd6275163aca6d36b3736e6671dc"
+  }
+}

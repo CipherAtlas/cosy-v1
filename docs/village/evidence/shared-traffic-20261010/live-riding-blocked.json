@@ -1,0 +1,551 @@
+{
+  "visualMs": null,
+  "acceptedMs": null,
+  "trace": {
+    "inputs": [
+      {
+        "at": 20641.59999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 3
+      },
+      {
+        "at": 20741.30000001192,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 4
+      },
+      {
+        "at": 20840.40000000596,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 5
+      },
+      {
+        "at": 20957.90000000596,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 6
+      },
+      {
+        "at": 21074.59999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 7
+      },
+      {
+        "at": 21190.69999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 1,
+        "sprint": false,
+        "brake": false,
+        "sequence": 8
+      },
+      {
+        "at": 21241.30000001192,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 9
+      },
+      {
+        "at": 21341.30000001192,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 10
+      },
+      {
+        "at": 21441.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 11
+      },
+      {
+        "at": 21558.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 12
+      },
+      {
+        "at": 21658.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 13
+      },
+      {
+        "at": 21758.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 14
+      },
+      {
+        "at": 21874.59999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 15
+      },
+      {
+        "at": 21991.09999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 16
+      },
+      {
+        "at": 22090.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 17
+      },
+      {
+        "at": 22191.30000001192,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 18
+      },
+      {
+        "at": 22307.90000000596,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 19
+      },
+      {
+        "at": 22424,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 20
+      },
+      {
+        "at": 22523.59999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 21
+      },
+      {
+        "at": 22624.09999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 22
+      },
+      {
+        "at": 22741.19999998808,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 23
+      },
+      {
+        "at": 22841.09999999404,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 24
+      },
+      {
+        "at": 22957.80000001192,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 25
+      },
+      {
+        "at": 23074.5,
+        "type": "horseInput",
+        "forward": 0,
+        "turn": 0,
+        "sprint": false,
+        "brake": false,
+        "sequence": 26
+      }
+    ],
+    "snapshots": [
+      {
+        "at": 20648.09999999404,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 20745.5,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 20839.80000001192,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21014.09999999404,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21047.19999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21179.09999999404,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21261.69999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21353,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21506,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21550.69999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21653.09999999404,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21754.59999999404,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 21857.30000001192,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22045,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22066.80000001192,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22162.90000000596,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22330.30000001192,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22411.19999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22480.19999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22591.19999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22674.5,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22777.90000000596,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22887.69999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 22979.30000001192,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      },
+      {
+        "at": 23082.69999998808,
+        "horses": [
+          {
+            "id": "horse-juniper",
+            "heading": 1.4981122750451197
+          },
+          {
+            "id": "horse-willow",
+            "heading": -0.029670160880851577
+          }
+        ]
+      }
+    ]
+  }
+}
