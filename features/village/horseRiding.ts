@@ -84,6 +84,12 @@ export class HorseRiding {
         Math.hypot(collider.x - actor.x, collider.z - actor.z) <= radius + Math.hypot(collider.w, collider.d) / 2), () => {});
     }
     const probe = this.probe ?? movement;
+    const expected = this.reconcile && this.predicted && this.simulation ? { ...this.predicted } : null;
+    if (expected && this.simulation) {
+      // Compare poses at the same frame time, otherwise each snapshot erases one frame of travel.
+      stepHorse(expected, this.simulation.velocity, this.simulation.input, scale,
+        Math.max(0, Math.min(.35, (now - this.simulation.at) / 1000)), probe, occupied);
+    }
     const previous = !this.reconcile && this.simulation;
     const pose = { ...(previous ? previous.pose : actor) };
     let cursor = previous ? previous.at : Math.max(this.baseAt, now - 350);
@@ -98,8 +104,8 @@ export class HorseRiding {
     if (until > cursor) velocity = stepHorse(pose, velocity, input, scale, (until - cursor) / 1000, probe, occupied);
     this.simulation = { pose: { ...pose }, at: until, velocity, input };
     if (this.reconcile) {
-      this.correction = this.predicted && Math.hypot(this.predicted.x - pose.x, this.predicted.z - pose.z) < 2
-        ? { x: this.predicted.x - pose.x, y: this.predicted.y - pose.y, z: this.predicted.z - pose.z }
+      this.correction = expected && Math.hypot(expected.x - pose.x, expected.z - pose.z) < 2
+        ? { x: expected.x - pose.x, y: expected.y - pose.y, z: expected.z - pose.z }
         : { x: 0, y: 0, z: 0 };
       this.reconcile = false;
     }

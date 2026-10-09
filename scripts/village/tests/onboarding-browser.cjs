@@ -113,11 +113,13 @@ fs.mkdirSync(output, { recursive: true });
       await a.locator('[data-start-panel="settings"]').click();
       for (const name of ['Experience', 'Sound', 'Controls']) {
         await tab(a, name).click();
+        check(await a.locator('.v-settings-content').evaluate(element => element.scrollTop === 0), `${width}: ${name} starts at the top after switching sections`);
         check(await a.locator('.v-start-dialog').evaluate(element => {
           const r = element.getBoundingClientRect(), body = element.querySelector('.v-settings-content');
           return r.top >= 0 && r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight
             && body.scrollWidth <= body.clientWidth + 1 && element.scrollHeight <= element.clientHeight + 2;
         }), `${width}×${height}: ${name} menu stays contained with a scrolling body`);
+        await a.locator('.v-settings-content').evaluate(element => { element.scrollTop = element.scrollHeight; });
       }
       if (width === 1366) await a.screenshot({ path: path.join(output, 'settings-controls.png') });
       await a.keyboard.press('Escape');

@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Fresh visitor starts with collapsed chat and a visible entry",
+    "Fresh visitor starts with collapsed chat and a visible entry",
+    "Real remote chat produces a persistent visible New badge without opening the panel",
+    "Unread indicator stays still",
+    "Opening chat shows the new message and clears unread",
+    "Explicit open chat preference survives reload",
+    "Explicit collapsed preference survives reload",
+    "Synthetic moderation retains the badge while another unread message remains",
+    "Synthetic moderation clears the final unread message even with retained history",
+    "Synthetic hourly reset clears unread without opening chat",
+    "1280×800: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "810×1080: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "1080×810: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "820×1180: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "1180×820: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "744×1133: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "1133×744: actual remapped dog Shift/Space labels have padding and contained 44 px targets",
+    "No captured page errors ()"
+  ],
+  "errors": []
+}

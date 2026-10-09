@@ -2,6 +2,7 @@ import { ArrowRight, GearSix, Translate } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Keycap } from "./KeybindingControls";
 import { useVillageMenuNavigation } from "./useVillageMenuNavigation";
+import { villageNotice } from "./localization";
 
 export function VillageStartScreen({ language, ready, progress, error, touch, enter, retry, openLanguage, openSettings }: {
   language: "en" | "ja"; ready: boolean; progress: number; error: string; touch: boolean;
@@ -43,7 +44,7 @@ export function VillageStartScreen({ language, ready, progress, error, touch, en
             <GearSix size={21} aria-hidden="true" /><span>{t("Settings", "設定")}</span>
           </button>
         </nav>
-        {error && <p className="v-start-error" role="alert">{t("The village couldn't load. You can adjust Settings, then retry.", "村を読み込めませんでした。設定を調整して、もう一度お試しください。")}</p>}
+        {error && <p className="v-start-error" role="alert">{villageNotice(error, language)}</p>}
       </div>
       <div className="v-start-hint">{touch ? t("Move with the thumbstick · Drag to look around", "スティックで移動 · ドラッグで見回す") : <>
         <span><Keycap>W A S D</Keycap> {t("Move", "移動")}</span><span>{t("Mouse to look", "マウスで見回す")}</span><span><Keycap>E</Keycap> {t("Interact", "調べる")}</span>

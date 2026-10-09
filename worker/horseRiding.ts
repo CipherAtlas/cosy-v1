@@ -42,8 +42,10 @@ export class HorseRiding {
     if (delta <= 0) return;
     const input = this.inputs.get(horse.state.id);
     const fresh = input && now - input.at <= 400;
+    // Include the full swept body; distant scenery cannot affect this step.
+    const probe = horse.movement.nearby(horse.state.x, horse.state.z, 9 * delta + 2 * scale + 1);
     const velocity = stepHorse(horse.state, fresh ? this.velocities.get(horse.state.id) ?? 0 : 0,
-      fresh ? input : { forward: 0, turn: 0, sprint: false, brake: true }, scale, delta, horse.movement, occupied);
+      fresh ? input : { forward: 0, turn: 0, sprint: false, brake: true }, scale, delta, probe, occupied);
     horse.movement.position = { x: horse.state.x, y: horse.state.y, z: horse.state.z };
     this.velocities.set(horse.state.id, velocity);
   }

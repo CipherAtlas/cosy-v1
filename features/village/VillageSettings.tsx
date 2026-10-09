@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { GearSix, Keyboard, SpeakerHigh, SpeakerSlash } from "@phosphor-icons/react";
 import { MixSliders, SoundtrackChoices } from "./Activities";
 import { KeybindingControls } from "./KeybindingControls";
@@ -14,6 +14,8 @@ export function VillageSettings({ settings, sound, soundLoading, toggleSound, en
   stats: { fps: number; draws: number; triangles: number }; showTutorial: () => void; initial?: "experience" | "sound";
 }) {
   const [section, setSection] = useState<"experience" | "sound" | "controls">(initial);
+  const content = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => { if (content.current) content.current.scrollTop = 0; }, [section]);
   const [report, setReport] = useState("");
   const { mix, setMix, quality, setQuality, weather, setWeather, weatherMode, setWeatherMode,
     language, setLanguage, dontShowTutorial, setDontShowTutorial, mouseSensitivity, setMouseSensitivity, keybindings, setKeybindings } = settings;
@@ -24,7 +26,7 @@ export function VillageSettings({ settings, sound, soundLoading, toggleSound, en
         ["experience", GearSix, t("Experience", "環境")], ["sound", SpeakerHigh, t("Sound", "音")], ["controls", Keyboard, t("Controls", "操作")],
       ] as const).map(([id, Icon, label]) => <button key={id} aria-pressed={section === id} aria-controls="v-settings-content" onClick={() => setSection(id)}><Icon size={18} aria-hidden="true" />{label}</button>)}
     </nav>
-    <div id="v-settings-content" className="v-settings-content">
+    <div id="v-settings-content" className="v-settings-content" ref={content}>
       {section === "experience" && <div className="v-settings-fields">
         <label><span>{t("Time & weather", "時間と天気")}</span>
           <select aria-label={t("Time & weather", "時間と天気")} value={weatherMode === "auto" ? "auto" : weather} onChange={event => {

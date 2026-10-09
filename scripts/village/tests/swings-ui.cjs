@@ -36,6 +36,11 @@ const fs = require('node:fs');
       const button = page.getByRole('button', { name, exact: true }), rect = await button.boundingBox();
       check(rect.height >= 44 && rect.x >= 0 && rect.y >= 0 && rect.x + rect.width <= 1280 && rect.y + rect.height <= 800, `${name} desktop target fits`);
       check(await button.locator('kbd').isVisible(), `${name} keycap is visible`);
+      check(await button.locator('kbd').evaluate(key => {
+        const text = document.createRange(); text.selectNodeContents(key);
+        const label = text.getBoundingClientRect(), border = key.getBoundingClientRect();
+        return label.left >= border.left + 3 && label.right <= border.right - 3;
+      }), `${name} keycap keeps its full label inside padded borders`);
     }
     const forward = page.getByRole('button', { name: 'Forward', exact: true });
     await forward.focus(); await page.keyboard.down('w'); await page.waitForTimeout(650);

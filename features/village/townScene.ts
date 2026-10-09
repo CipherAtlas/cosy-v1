@@ -151,7 +151,7 @@ export class TownScene {
     }
   }
 
-  prepareCrops() { return this.cropRendering.prepare(); }
+  prepareCrops(signal?: AbortSignal) { return this.cropRendering.prepare(signal); }
   updateCropDetail(camera: T.Camera) { this.cropRendering.updateDetail(camera); }
 
   dispose() {

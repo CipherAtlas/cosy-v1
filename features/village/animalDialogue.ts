@@ -1,4 +1,7 @@
 import * as T from "three";
+import type { Collider } from "./environment";
+import { bubbleLayout } from "./bubbleLayout";
+import { SceneSight } from "./sceneSight";
 
 export type AnimalDialogueCue = {
   id: string;
@@ -16,6 +19,8 @@ export function createAnimalDialogueCue(id: string, en: string, ja: string): Ani
 export class AnimalDialogue {
   readonly bubble = document.createElement("div");
   private projected = new T.Vector3();
+  private layout;
+  private sight = new SceneSight();
   private width = 1;
   private height = 1;
   private language: "en" | "ja" = "en";
@@ -24,6 +29,7 @@ export class AnimalDialogue {
   private bubbleHeight = 65;
 
   constructor(host: HTMLElement) {
+    this.layout = bubbleLayout(host);
     this.bubble.className = "v-bird-bubble v-animal-bubble";
     this.bubble.hidden = true;
     this.bubble.setAttribute("role", "status");
@@ -31,10 +37,12 @@ export class AnimalDialogue {
     host.append(this.bubble);
   }
 
-  resize(width: number, height: number) { this.width = width; this.height = height; this.bubble.style.maxWidth = `${Math.min(270, Math.max(1, width - 24))}px`; }
+  resize(width: number, height: number) { this.bubbleWidth = 0; this.width = width; this.height = height; this.bubble.style.maxWidth = `${Math.min(270, Math.max(1, width - 24))}px`; }
   setLanguage(language: "en" | "ja") { this.language = language; this.bubble.lang = language; }
 
-  update(cues: readonly AnimalDialogueCue[], camera: T.Camera, listener: T.Vector3, dt: number, reduced: boolean, enabled: boolean) {
+  update(cues: readonly AnimalDialogueCue[], camera: T.Camera, listener: T.Vector3, dt: number, reduced: boolean, enabled: boolean, colliders?: Collider[]) {
+    this.layout.begin(this);
+    if (colliders) this.sight.setColliders(colliders);
     let selected: AnimalDialogueCue | undefined, distance = Infinity;
     camera.updateWorldMatrix(true, false);
     if (enabled) for (const cue of cues) {
@@ -43,25 +51,28 @@ export class AnimalDialogue {
       if (next > 10 ** 2) continue;
       this.projected.copy(cue.position).project(camera);
       if (this.projected.z < -1 || this.projected.z > 1 || Math.abs(this.projected.x) > .94 || Math.abs(this.projected.y) > .94) continue;
+      if (!this.sight.visible(camera.position, cue.position)) continue;
       if (!selected || cue.priority > selected.priority || cue.priority === selected.priority && next < distance) {
         selected = cue; distance = next;
       }
     }
     this.opacity = reduced ? Number(Boolean(selected)) : T.MathUtils.damp(this.opacity, Number(Boolean(selected)), 16, dt);
-    if (!enabled || !selected && this.opacity < .03) { this.bubble.hidden = true; this.opacity = 0; return; }
+    if (!enabled || !selected) { this.bubble.hidden = true; this.opacity = 0; return; }
     if (selected) {
       const text = selected.text[this.language];
       const changed = this.bubble.textContent !== text || this.bubble.hidden;
       this.bubble.hidden = false;
       this.bubble.dataset.animal = selected.id;
-      if (changed) {
+      if (changed || !this.bubbleWidth) {
         this.bubble.textContent = text;
         this.bubbleWidth = this.bubble.offsetWidth; this.bubbleHeight = this.bubble.offsetHeight;
       }
       this.projected.copy(selected.position).project(camera);
-      const margin = this.bubbleWidth / 2 + 12;
-      this.bubble.style.left = `${T.MathUtils.clamp((this.projected.x * .5 + .5) * this.width, margin, Math.max(margin, this.width - margin))}px`;
-      this.bubble.style.top = `${T.MathUtils.clamp((-this.projected.y * .5 + .5) * this.height - 14, this.bubbleHeight + 12, this.height - 24)}px`;
+      const x = (this.projected.x * .5 + .5) * this.width, y = (-this.projected.y * .5 + .5) * this.height;
+      const rect = this.layout.place(x, y, this.bubbleWidth, this.bubbleHeight, this.width, this.height);
+      if (!rect) { this.bubble.hidden = true; this.opacity = 0; return; }
+      this.bubble.style.left = `${rect.left + this.bubbleWidth / 2}px`;
+      this.bubble.style.top = `${rect.top + this.bubbleHeight}px`;
     }
     this.bubble.style.opacity = String(this.opacity);
   }

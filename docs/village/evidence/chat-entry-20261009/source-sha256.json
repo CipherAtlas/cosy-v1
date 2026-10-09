@@ -1,0 +1,6 @@
+{
+  "features/village/Village.tsx": "b5f1bb56f4978f084e11b7b2d5fd10f3c400fe4537a801c81866cffd1f215236",
+  "features/village/village.css": "4ba715d0093ac542bb939a3aac5fd75e4b31c5a9d780c36b77e804d2a7421540",
+  "scripts/village/tests/quiet-ui-browser.cjs": "578a4d655366ba14420afb9bd0e7ee1fab2c45831f9072dcdc66110f40795f03",
+  "scripts/village/tests/japanese-browser.cjs": "b7779a21968151077f1a0867c5f48e83728d509e9c5c983eb06a1293639808af"
+}

@@ -8,6 +8,7 @@ const { HorseRiding: WorkerRiding } = require('../../../worker/horseRiding.ts');
 const { HorseRiding: ClientRiding } = require('../../../features/village/horseRiding.ts');
 const { VillageMovement } = require('../../../features/village/movement.ts');
 const { setAuthoredWorld } = require('../../../features/village/environment.ts');
+const { stepHorse } = require('../../../features/village/horseMotion.ts');
 setAuthoredWorld({ terrain: { base: 'flat', samples: [] }, openWorld: true, paths: [], items: [], bridges: [], walkable: [] });
 const horse = { state: { id: 'test-horse', kind: 'horse', owner: 'rider', mode: 'ride', x: 12, y: 0, z: 20, heading: 0, speed: 0 }, movement: new VillageMovement([], () => {}) };
 const worker = new WorkerRiding();
@@ -74,4 +75,61 @@ assert.equal(legacy.sample(.016, 1, horse.movement, () => false, 16), null, 'Old
 assert.equal(worker.snapshot(horse, 2000, false).input, null, 'Expired accepted input is not replayed from snapshots');
 worker.stop(horse);
 assert.equal(worker.snapshot(horse, 2000, false).sequence, 0, 'Releasing a ride clears its acknowledgement and velocity');
+
+// A fresh snapshot must not ease away the distance travelled since the last rendered frame.
+const steady = new ClientRiding(); steady.connect(() => {});
+const cruise = { ...accepted, ride: { ...accepted.ride, velocity: 9, input: { ...forward, sprint: true } } };
+steady.sync([cruise], 'rider', 1000, 0);
+steady.sample(.016, 1, horse.movement, () => false, 16);
+steady.sync([{ ...cruise, z: cruise.z + 9 * .032 }], 'rider', 1032, 32);
+assert(Math.abs(steady.sample(.016, 1, horse.movement, () => false, 32).z - (cruise.z + 9 * .032)) < .01,
+  'A steady accepted trajectory must not hitch when a snapshot arrives');
+steady.sync([{ ...cruise, z: cruise.z + 9 * .132 }], 'rider', 1132, 132);
+assert(Math.abs(steady.sample(.06, 1, horse.movement, () => false, 132).z - (cruise.z + 9 * .132)) < .01,
+  'Reconciliation preserves real elapsed travel after a slow render frame');
+
+const fence = new VillageMovement([{ x: 13, z: 20, w: .1, d: 30 }], () => {});
+const sliding = { x: 11.9, y: 0, z: 20, heading: Math.PI / 4, speed: 0 };
+let slideVelocity = 4.5;
+for (let i = 0; i < 60; i++) slideVelocity = stepHorse(sliding, slideVelocity, forward, 1, 1 / 60, fence, () => false);
+assert(sliding.z > 22, 'Holding forward against a fence retains useful sliding speed');
+
+const turning = { ...accepted, heading: 0 };
+stepHorse(turning, 9, { ...forward, sprint: true, turn: 1 }, 1, .5, horse.movement, () => false);
+assert(turning.heading >= .7, 'Cantering must allow a useful turn without a ten-metre turning radius');
+
+const dense = new VillageMovement([{ x: 13, z: 20, w: .1, d: 30 },
+  ...Array.from({ length: 3300 }, (_, i) => ({ x: 100 + i, z: 100, w: 1, d: 1 }))], () => {});
+const localProbe = dense.nearby(12, 20, 4);
+assert.equal(localProbe.colliders.length, 1, 'Horse steps exclude distant scenery while retaining nearby long barriers');
+for (const x of [11, 12, 12.5, 13, 13.5, 14]) assert.equal(localProbe.clear(x, 20), dense.clear(x, 20));
+const blockedHorse = { state: { ...accepted, ride: undefined }, movement: dense };
+const blockedWorker = new WorkerRiding(); blockedWorker.input(blockedHorse, { ...forward, turn: 1 }, 1000);
+const fullScan = dense.clear.bind(dense);
+let fullScans = 0;
+dense.clear = (...args) => { fullScans++; return fullScan(...args); };
+blockedWorker.step(blockedHorse, 1, .1, 1100, () => false);
+assert.equal(fullScans, 0, 'The authoritative ride uses the bounded probe rather than repeatedly scanning the whole village');
+let distantReads = 0;
+const distant = { x: 200, z: 200, w: 1, d: 1, get top() { distantReads++; return 8; } };
+const walkingProbe = new VillageMovement([distant], () => {});
+walkingProbe.clear(12, 20);
+assert.equal(distantReads, 0, 'Advancing the other shared actors must not scan distant solids on each collision probe');
+const lookup = require('../../../features/village/collisionLookup.ts');
+const query = lookup.nearbyColliders;
+const solids = [...require('../../../worker/world-physics.json').colliders,
+  { x: 12, z: 20, w: 8, d: .2, yaw: Math.PI / 4, bottom: 0, top: 3 },
+  { x: -8, z: -8, w: .2, d: 20, yaw: Math.PI / 2, bottom: 2, top: 4 }];
+const indexed = new VillageMovement(solids, () => {});
+let compared = 0;
+for (const collider of solids) for (const offset of [-1, 0, 1]) {
+  const x = collider.x + offset * (collider.w / 2 + .31), z = collider.z + offset * (collider.d / 2 + .31);
+  const result = indexed.clear(x, z, collider.bottom ?? 0);
+  lookup.nearbyColliders = () => solids;
+  const brute = indexed.clear(x, z, collider.bottom ?? 0);
+  lookup.nearbyColliders = query;
+  assert.equal(result, brute, 'Indexed collision keeps the exact full-scan result at layout and rotated-solid boundaries');
+  compared++;
+}
+console.log(`${compared} indexed/full-scan collision comparisons pass.`);
 console.log('Horse rapid-input, next-frame keyboard/touch response, reconciliation, countdown, collision, stall and ownership checks pass.');

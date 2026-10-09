@@ -35,6 +35,7 @@ for (const url of [villageUrl, adminUrl, workerUrl]) {
       page.on('websocket', socket => socket.on('framereceived', frame => frames.push(JSON.parse(frame.payload))));
       await page.goto(villageUrl);
       await page.getByRole('button', { name: 'Enter Hearthwillow' }).click({ timeout: 120_000 });
+      await page.getByRole('button', { name: /^Open Hearthwillow chat/ }).click();
       await page.getByRole('textbox', { name: 'Message', exact: true }).waitFor();
       await page.waitForFunction(() => document.querySelector('.v-shared-chat input')?.disabled === false, null, { timeout: 15_000 });
       const welcome = frames.find(frame => frame.type === 'welcome');

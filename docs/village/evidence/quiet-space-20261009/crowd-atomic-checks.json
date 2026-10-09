@@ -1,0 +1,126 @@
+{
+  "results": [
+    "Pond opens with a clear default viewpoint before any manual orbit",
+    "Imperative remapped NPC Space keycap retains visible padding without overflow",
+    "Nearby NPC control remains visible beside an open chat panel",
+    "Staged animal response and visitor message retain readable screen space",
+    "Staged NPC/animal/visitor bubbles and names do not overlap",
+    "Speech and names avoid actual visible chat, minimap and controls",
+    "All staged labels remain within the laptop viewport",
+    "No browser page errors: "
+  ],
+  "errors": [],
+  "mounted": null,
+  "pond": {
+    "goal": [
+      -23.9,
+      4.4,
+      -0.5999999999999996
+    ],
+    "look": [
+      -22,
+      0.5,
+      -10.1
+    ],
+    "orbit": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "distance": 10.443658362853506
+  },
+  "pondLayouts": [],
+  "arrivals": [],
+  "crowd": {
+    "width": 1366,
+    "height": 768,
+    "keycap": {
+      "label": "Space",
+      "wide": "true",
+      "padding": 16,
+      "scroll": 52,
+      "client": 52
+    },
+    "bubbles": [
+      {
+        "className": "v-bird-bubble v-animal-bubble",
+        "left": 619.8125,
+        "right": 796.03125,
+        "top": 283.34375,
+        "bottom": 336.34375
+      },
+      {
+        "className": "v-villager-bubble is-compact",
+        "left": 391.79998779296875,
+        "right": 579.8781127929688,
+        "top": 237.8000030517578,
+        "bottom": 291.79998779296875
+      },
+      {
+        "className": "v-visitor-name",
+        "left": 815.421875,
+        "right": 882.171875,
+        "top": 317.5625,
+        "bottom": 344.5625
+      },
+      {
+        "className": "v-visitor-chat",
+        "left": 854.2421875,
+        "right": 1033.9765625,
+        "top": 253.140625,
+        "bottom": 294.734375
+      }
+    ],
+    "hud": [
+      {
+        "className": "v-wordmark",
+        "left": 36,
+        "right": 269.0625,
+        "top": 28,
+        "bottom": 71.1875
+      },
+      {
+        "className": "v-minimap",
+        "left": 964,
+        "right": 1154,
+        "top": 28,
+        "bottom": 178
+      },
+      {
+        "className": "",
+        "left": 1162,
+        "right": 1242,
+        "top": 28,
+        "bottom": 72
+      },
+      {
+        "className": "",
+        "left": 1250,
+        "right": 1330,
+        "top": 28,
+        "bottom": 72
+      },
+      {
+        "className": "v-walk-hints",
+        "left": 36,
+        "right": 806.21875,
+        "top": 712,
+        "bottom": 738
+      },
+      {
+        "className": "v-shared-toggle",
+        "left": 30,
+        "right": 149.359375,
+        "top": 88,
+        "bottom": 130
+      },
+      {
+        "className": "v-shared-chat",
+        "left": 30,
+        "right": 350,
+        "top": 139,
+        "bottom": 529
+      }
+    ]
+  },
+  "limitations": "Crowd is explicitly staged visual geometry. Stable mount and short ride use the local Worker."
+}

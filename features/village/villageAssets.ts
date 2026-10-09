@@ -2,17 +2,17 @@ import * as T from "three";
 import { withBasePath } from "@/lib/basePath";
 import { projectWorldLayout, type AuthoredWorld } from "./worldLayout";
 import { loadAnimalRigs, type AnimalRigSlug } from "./animalRig";
+import { readVillageAsset } from "./assetLoading";
 
-export async function loadVillageLayout(): Promise<AuthoredWorld> {
-  const response = await fetch(withBasePath("/village/world-layout.json"));
-  if (!response.ok) throw Error("The playable village layout could not be loaded.");
-  return projectWorldLayout(await response.json());
+export function loadVillageLayout(signal?: AbortSignal): Promise<AuthoredWorld> {
+  return readVillageAsset(withBasePath("/village/world-layout.json"), "The village layout",
+    bytes => projectWorldLayout(JSON.parse(new TextDecoder().decode(bytes))), { signal });
 }
 
 /** Only placed breeds join the entry barrier; the editor retains the complete source kit. */
-export async function loadPlacedPuppies(layout: AuthoredWorld) {
+export async function loadPlacedPuppies(layout: AuthoredWorld, signal?: AbortSignal) {
   const breeds = [...new Set(layout.puppies.map(puppy => puppy.breed))];
-  await loadAnimalRigs(breeds.map(breed => `dog-${breed}` as AnimalRigSlug));
+  await loadAnimalRigs(breeds.map(breed => `dog-${breed}` as AnimalRigSlug), signal);
   // PuppyPack creates independent cached skeletons per placement. Keep the
   // existing kit shape for source-only previews that supply their own models.
   return { scene: new T.Group(), animations: [] as T.AnimationClip[] };

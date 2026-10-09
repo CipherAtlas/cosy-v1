@@ -1,11 +1,14 @@
 /// <reference path="./meshoptSimplifier.d.ts" />
 import * as T from "three";
 import { MeshoptSimplifier } from "three/addons/libs/meshopt_simplifier.module.js";
+import { waitForVillageLoad } from "./assetLoading";
 
 /** Collapse redundant static edges with bounded error; retain every original vertex attribute. */
-export async function optimizeGeometry(geometry: T.BufferGeometry, error = .0001) {
+export async function optimizeGeometry(geometry: T.BufferGeometry, error = .0001, signal?: AbortSignal) {
+  if (signal?.aborted) throw signal.reason;
   if (!MeshoptSimplifier.supported || !geometry.index || geometry.index.count < 600) return;
-  await MeshoptSimplifier.ready;
+  await waitForVillageLoad(MeshoptSimplifier.ready, signal);
+  if (signal?.aborted) throw signal.reason;
   const position = geometry.getAttribute("position");
   const positions = Float32Array.from(position.array);
   const fields = ["normal", "uv", "color"].flatMap(name => {
@@ -25,8 +28,8 @@ export async function optimizeGeometry(geometry: T.BufferGeometry, error = .0001
   geometry.setIndex(new T.BufferAttribute(indices, 1));
 }
 
-export async function optimizeGardenGeometry(root: T.Object3D) {
+export async function optimizeGardenGeometry(root: T.Object3D, signal?: AbortSignal) {
   const geometries = new Set<T.BufferGeometry>();
   root.traverse(object => { if (object instanceof T.InstancedMesh) geometries.add(object.geometry); });
-  await Promise.all([...geometries].map(geometry => optimizeGeometry(geometry, .002)));
+  await Promise.all([...geometries].map(geometry => optimizeGeometry(geometry, .002, signal)));
 }

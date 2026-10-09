@@ -62,6 +62,8 @@ let browser;
       return !!window.testConnection && !!window.testEngine && testEngine.sharedConnected;
     }, null, { timeout: 120000 });
     await page.evaluate(() => testEngine.setQuality('low'));
+    const openChat = page.getByRole('button', { name: /^Open Hearthwillow chat/ });
+    if (await openChat.count()) await openChat.click();
   }
   const [a, b] = pages;
   const send = async (page, text) => {

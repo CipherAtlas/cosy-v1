@@ -18,6 +18,7 @@ import {
   ArrowUp,
   ArrowUpRight,
   CaretDown,
+  ChatCircle,
   GearSix,
   Basket,
   Leaf,
@@ -54,7 +55,9 @@ import { HorseControls } from "./HorseControls";
 import { TownControls } from "./TownControls";
 import type { TownContext } from "./townInteractions";
 import type { NearbyHorse } from "./horses";
+import { VillageAssetLoadError } from "./assetLoading";
 
+const chatEntryKey = (entry: SharedChatEntry) => entry.messageId ?? JSON.stringify(entry);
 
 export function Village() {
   const [isPhone, setIsPhone] = useState<boolean | null>(null);
@@ -151,11 +154,14 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [sharedSelfId, setSharedSelfId] = useState("");
   const [sharedChat, setSharedChat] = useState<SharedChatEntry[]>([]);
   const [sharedChatHour, setSharedChatHour] = useState(0);
-  const [chatOpen, setChatOpen] = useState(() => navigator.maxTouchPoints === 0 && !window.matchMedia("(any-pointer: coarse)").matches);
+  const [chatOpen, setChatOpen] = useState(() => {
+    try { return localStorage.getItem("cosy-village-chat-open") === "true"; }
+    catch { return false; }
+  });
   const chatOpenRef = useRef(chatOpen);
   chatOpenRef.current = chatOpen;
   const [chatUnread, setChatUnread] = useState(false);
-  const [chatPulse, setChatPulse] = useState(0);
+  const unreadChatKeys = useRef(new Set<string>());
   const [chatDraft, setChatDraft] = useState("");
   const [chatCooldownUntil, setChatCooldownUntil] = useState(0);
   const [, setChatClock] = useState(0);
@@ -369,6 +375,9 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         const nextChatKey = `${snapshot.chatHour}:${JSON.stringify(snapshot.chat)}`;
         if (nextChatKey !== chatKey) {
           chatKey = nextChatKey;
+          const retainedChatKeys = new Set(snapshot.chat.map(chatEntryKey));
+          for (const key of unreadChatKeys.current) if (!retainedChatKeys.has(key)) unreadChatKeys.current.delete(key);
+          setChatUnread(unreadChatKeys.current.size > 0);
           setSharedChat(snapshot.chat);
           setSharedChatHour(snapshot.chatHour);
         }
@@ -379,7 +388,10 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         if (cancelled) return;
         const selfName = sharedPeopleRef.current.find(visitor => visitor.id === sharedSelfIdRef.current)?.name ?? "";
         engine.current?.showChatBubble(entry, sharedSelfIdRef.current, selfName);
-        if (!chatOpenRef.current) { setChatUnread(true); setChatPulse(value => value + 1); }
+        if (!chatOpenRef.current && entry.id !== sharedSelfIdRef.current) {
+          unreadChatKeys.current.add(chatEntryKey(entry));
+          setChatUnread(true);
+        }
       },
       onChatModerated: removedMessageIds => engine.current?.removeChatBubbles(removedMessageIds),
       onChatCooldown: until => { if (!cancelled) setChatCooldownUntil(until); },
@@ -546,7 +558,11 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
         if (!cancelled) {
           console.error("Village initialization failed", e);
           setError(
-            "The village could not load. Please retry the 3D village.",
+            e instanceof VillageAssetLoadError
+              ? e.kind === "stalled" ? "Loading stopped making progress. Check your connection, then retry the village."
+                : e.kind === "timeout" ? "Loading took too long. Check your connection, then retry the village."
+                  : "A village asset could not load. Check your connection, then retry the village."
+              : "The village could not load. Please retry the 3D village.",
           );
           setReady(false);
         }
@@ -603,8 +619,13 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   }, [notice]);
   useEffect(() => {
     if (!chatOpen) chatComposing.current = false;
+    else { unreadChatKeys.current.clear(); setChatUnread(false); }
     if (chatOpen && chatLog.current) chatLog.current.scrollTop = chatLog.current.scrollHeight;
   }, [sharedChat, chatOpen]);
+  useEffect(() => {
+    try { localStorage.setItem("cosy-village-chat-open", String(chatOpen)); }
+    catch { /* Chat remains usable when this browser cannot save preferences. */ }
+  }, [chatOpen]);
   useEffect(() => {
     if (!chatCooldownUntil) return;
     const timer = window.setInterval(() => {
@@ -785,6 +806,9 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
     ja
       ? japaneseNames[PLACES.findIndex((p) => p.id === id)]
       : PLACES.find((p) => p.id === id)!.name;
+  const chatToggleLabel = chatOpen ? t("Hide Hearthwillow chat", "村のチャットを隠す")
+    : chatUnread ? t("Open Hearthwillow chat, new message", "村のチャットを開く。新しいメッセージがあります")
+      : t("Open Hearthwillow chat", "村のチャットを開く");
   return (
     <KeybindingContext.Provider value={keybindings}><div
       className={`village ${entered ? "v-entered" : ""} ${place ? "v-settled" : ""} ${touchControls ? "v-touch-device" : ""}`}
@@ -1077,11 +1101,13 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
       </>}
       {gardenStorageError && !sharedTrialEnabled && <div className="v-save-warning" role="status">{t("Your garden works for this visit, but this browser couldn't save it.", "この訪問中は遊べますが、庭をブラウザに保存できませんでした。")}</div>}
       {sharedTrialEnabled && entered && <div className="v-shared-trial">
-        <button className={`v-shared-toggle${chatUnread && !chatOpen ? " has-new-message" : ""}`} onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-label={chatOpen ? t("Hide Hearthwillow chat", "村のチャットを隠す") : chatUnread ? t("Open Hearthwillow chat, new message", "村のチャットを開く。新しいメッセージがあります") : t("Open Hearthwillow chat", "村のチャットを開く")}>
-          <UsersThree size={18} /> {sharedStatus === "Connected" ? t(`${sharedPeople.length} ${sharedPeople.length === 1 ? "blob" : "blobs"} here`, `${sharedPeople.length}人が村にいます`) : villageNotice(sharedStatus, language)}
-          {chatUnread && !chatOpen && <span key={chatPulse} className="v-shared-unread" aria-hidden="true" />}
+        <button className="v-shared-toggle" onClick={() => { setChatOpen(open => !open); setChatUnread(false); }} aria-expanded={chatOpen} aria-controls={chatOpen ? "v-shared-chat" : undefined} title={chatToggleLabel} aria-label={chatToggleLabel}>
+          <span className="v-shared-chat-icon" aria-hidden="true"><ChatCircle size={20} />{chatUnread && !chatOpen && <span className="v-shared-unread" />}</span>
+          <span className="v-shared-chat-label">{t("Chat", "チャット")}</span>
+          <span className="v-shared-status">{sharedStatus === "Connected" ? <><UsersThree size={14} aria-hidden="true" />{t(`${sharedPeople.length} here`, `${sharedPeople.length}人`)}</> : villageNotice(sharedStatus, language)}</span>
+          <CaretDown className="v-shared-chevron" size={14} aria-hidden="true" />
         </button>
-        {chatOpen && <section className="v-shared-chat" aria-label={t("Hearthwillow chat", "村のチャット")}>
+        {chatOpen && <section id="v-shared-chat" className="v-shared-chat" aria-label={t("Hearthwillow chat", "村のチャット")}>
           <div className="v-shared-chat-header"><h2>{t("Hearthwillow chat", "村のチャット")}</h2><button onClick={() => setChatOpen(false)} aria-label={t("Close Hearthwillow chat", "村のチャットを閉じる")}><X size={18} /></button></div>
           {chatPeople.length > 0 && <div className="v-shared-people">
             {chatPeople.length > 3 && <details>

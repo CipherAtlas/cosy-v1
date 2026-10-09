@@ -34,7 +34,8 @@ const check = (ok, label) => { assert(ok, label); checks.push(label); console.lo
             }
         return !!window.testEngine && !!window.testConnection && testEngine.sharedConnected;
       }, null, { timeout: 120000 });
-      await page.getByRole('button', { name: 'Hide Hearthwillow chat', exact: true }).click();
+      const closeChat = page.getByRole('button', { name: 'Hide Hearthwillow chat', exact: true });
+      if (await closeChat.count()) await closeChat.click();
     }
     const [a, b, c] = pages;
     await a.waitForFunction(() => testEngine.remoteVisitors.size === 2);
@@ -153,7 +154,12 @@ const check = (ok, label) => { assert(ok, label); checks.push(label); console.lo
     }
     await a.setViewportSize({ width: 1366, height: 768 });
     for (const name of ['Village hearth', 'Willow pond', 'Tea garden', 'Writing nook', 'Kitchen garden', 'Bird clearing']) {
-      await travel(a, name); await a.locator('.v-activity-close').focus(); await a.keyboard.press('Escape');
+      await travel(a, name);
+      if (name === 'Bird clearing' && await a.locator('#v-bird-feed-help').count()) {
+        check(await a.locator('#v-bird-feed-help').innerText() === 'Ask Maple or Wren for crumbs first.'
+          && await a.locator('.v-bird-activity button').isDisabled(), 'Empty crumb pouch explains the disabled bird feeding action');
+      }
+      await a.locator('.v-activity-close').focus(); await a.keyboard.press('Escape');
       check(await a.evaluate(() => !testEngine.currentPlace), `${name} exits with Esc while a button has focus`);
     }
     await travel(a, 'Writing nook'); await a.locator('canvas').focus(); await a.keyboard.press('Tab');

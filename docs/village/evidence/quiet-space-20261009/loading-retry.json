@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "Failed GLB shows functional recovery copy and a real Retry button",
+    "Failed startup disposes its Engine, aborts sibling work and removes its canvas",
+    "Failed title-screen startup leaves no shared socket",
+    "Retry builds one fresh scene and one usable WebGL canvas",
+    "Retry actually reloads the failed GLB instead of accepting a cached failure",
+    "Entering after retry retains one live local shared connection and no stale scene",
+    "Expected loading failure and retry produce no uncaught page errors"
+  ],
+  "pageErrors": [],
+  "responses": [
+    503,
+    200
+  ]
+}

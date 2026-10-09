@@ -88,8 +88,9 @@ export function BirdActivity(p: GardenControls) {
   return <section className="v-activity v-bird-activity" aria-label={t("Feed the birds", "小鳥にパンくずをあげる")}>
     <h2>{t("Bird clearing", "小鳥の広場")}</h2>
     <p role="status">{status[p.birdStatus]}</p>
+    {!busy && !p.garden.crumbPouch && <p id="v-bird-feed-help">{t("Ask Maple or Wren for crumbs first.", "先にメープルかレンにパンくずをもらってください。")}</p>}
     <div className="v-garden-bed-actions">
-      <ShortcutButton className="v-button v-primary" aria-keyshortcuts="F" disabled={busy || !p.garden.crumbPouch} onClick={() => p.onGardenAction({ kind: "feedBirds" })}><Keycap aria-hidden="true">F</Keycap>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</ShortcutButton>
+      <ShortcutButton className="v-button v-primary" aria-keyshortcuts="F" aria-describedby={!busy && !p.garden.crumbPouch ? "v-bird-feed-help" : undefined} disabled={busy || !p.garden.crumbPouch} onClick={() => p.onGardenAction({ kind: "feedBirds" })}><Keycap aria-hidden="true">F</Keycap>{t("Scatter sourdough crumbs", "サワードウのパンくずを撒く")}</ShortcutButton>
     </div>
   </section>;
 }

@@ -1,0 +1,1033 @@
+{
+  "checks": [
+    "Stationary outdoor scene renders within the quiet 30 FPS budget",
+    "A steady outdoor camera uploads no repeated tree instance matrices",
+    "Keyboard input immediately restores a materially faster interactive rendering cadence",
+    "Idle and interactive samples use matching camera/player pose, scene tier and drawing buffer",
+    "The idle budget avoids at least 15 percent of matched interactive render submissions",
+    "A camera zoom invalidates cached tree classification",
+    "Visible Settings retains shared clock traffic while marking gameplay inactive",
+    "Idle private cottage retains 30 FPS interior and approximately 10 Hz living window",
+    "No captured page errors ()"
+  ],
+  "errors": [],
+  "measurements": {
+    "baseline": false,
+    "limits": [
+      "Short local Chrome samples with live shared actors.",
+      "Render counts establish budget reduction; they do not measure CPU/GPU watts, fan noise or physical iPad performance.",
+      "Interactive baseline holds Shift without movement to keep the same camera, assets and player pose.",
+      "Headless Chrome kept the background page visible; actual hidden-browser traffic was not established in this run."
+    ],
+    "outdoorIdle": {
+      "seconds": 6.001700000017881,
+      "refreshFps": 60.149624272943406,
+      "mainFps": 29.99150240756181,
+      "windowFps": 0,
+      "drawCallsPerSecond": 16401.519569406453,
+      "trianglesPerSecond": 63952176.216548055,
+      "treeUploads": 0,
+      "reportBefore": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "idle-30",
+        "treeVisibilityUploads": 34,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 6,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 69
+      },
+      "reportAfter": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "idle-30",
+        "treeVisibilityUploads": 34,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 6,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 69
+      },
+      "poseBefore": {
+        "player": [
+          0.3,
+          0.05,
+          18.5
+        ],
+        "camera": [
+          0.3,
+          2.147190662367996,
+          23.44385538968021
+        ],
+        "quaternion": [
+          -0.07492970727274235,
+          0,
+          0,
+          0.9971888181122076
+        ]
+      },
+      "poseAfter": {
+        "player": [
+          0.3,
+          0.05,
+          18.5
+        ],
+        "camera": [
+          0.3,
+          2.147190662367996,
+          23.44385538968021
+        ],
+        "quaternion": [
+          -0.07492970727274235,
+          0,
+          0,
+          0.9971888181122076
+        ]
+      },
+      "traffic": [
+        {
+          "at": 13105.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13224.800000011921,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13345.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13464.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13584.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13705,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13825,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 13944.700000017881,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14064.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14183.800000011921,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14305.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14425.300000011921,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14545.700000017881,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14664.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14783.800000011921,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 14905,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15024.800000011921,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15145.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15264.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15383.700000017881,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15504.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15625.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15745.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15865,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 15983.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16103.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16224.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16345.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16464.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16584.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16705.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16824.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 16945.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17064.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17183.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17305,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17424.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17545.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17664.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17784.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 17905,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18024.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18145.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18264.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18384.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18504.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18625.20000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18745.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18864.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 18984.5,
+          "type": "heartbeat",
+          "active": true
+        }
+      ]
+    },
+    "matchedInteractive": {
+      "seconds": 3.0045,
+      "refreshFps": 60.24296888001331,
+      "mainFps": 60.24296888001331,
+      "windowFps": 0,
+      "drawCallsPerSecond": 28564.486603428188,
+      "trianglesPerSecond": 105117280.41271426,
+      "treeUploads": 0,
+      "reportBefore": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "interactive",
+        "treeVisibilityUploads": 34,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 6,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 69
+      },
+      "reportAfter": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "interactive",
+        "treeVisibilityUploads": 34,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 6,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 69
+      },
+      "poseBefore": {
+        "player": [
+          0.3,
+          0.05,
+          18.5
+        ],
+        "camera": [
+          0.3,
+          2.147190662367996,
+          23.44385538968021
+        ],
+        "quaternion": [
+          -0.07492970727274235,
+          0,
+          0,
+          0.9971888181122076
+        ]
+      },
+      "poseAfter": {
+        "player": [
+          0.3,
+          0.05,
+          18.5
+        ],
+        "camera": [
+          0.3,
+          2.147190662367996,
+          23.44385538968021
+        ],
+        "quaternion": [
+          -0.07492970727274235,
+          0,
+          0,
+          0.9971888181122076
+        ]
+      },
+      "traffic": [
+        {
+          "at": 19105.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19225.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19345,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19465.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19583.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19704.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19824.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 19945.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20065.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20184.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20304.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20424.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20545.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20665.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20784.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 20905,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21025.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21145.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21266,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21383.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21504.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21625.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21744.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21865.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 21983.90000000596,
+          "type": "heartbeat",
+          "active": true
+        }
+      ]
+    },
+    "renderReduction": {
+      "fraction": 0.5021576299253068,
+      "callsFraction": 0.42580730411454293
+    },
+    "visibleModalTraffic": [
+      {
+        "at": 24025,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24144.5,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24265.59999999404,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24384.5,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24504.20000001788,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24624.90000000596,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24745.20000001788,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24867.20000001788,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 24984.30000001192,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 25104.30000001192,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 25224.80000001192,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 25344.5,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 25464.09999999404,
+        "type": "heartbeat",
+        "active": false
+      },
+      {
+        "at": 25583.90000000596,
+        "type": "heartbeat",
+        "active": false
+      }
+    ],
+    "cottageIdle": {
+      "seconds": 6.01659999999404,
+      "refreshFps": 60.00066482737054,
+      "mainFps": 30.083435827573595,
+      "windowFps": 8.975168699939085,
+      "drawCallsPerSecond": 5599.674234623105,
+      "trianglesPerSecond": 11437966.625680313,
+      "treeUploads": 0,
+      "reportBefore": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "idle-30",
+        "treeVisibilityUploads": 55,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 6,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 127
+      },
+      "reportAfter": {
+        "graphicsVersion": "static-detail-v3",
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+        "viewport": [
+          1280,
+          800
+        ],
+        "devicePixelRatio": 1,
+        "drawingBuffer": [
+          1088,
+          680
+        ],
+        "preference": "low",
+        "tier": "battery",
+        "detailedRenderScale": 1,
+        "shadows": true,
+        "antialias": true,
+        "contextLost": false,
+        "weather": "golden",
+        "renderCadence": "idle-30",
+        "treeVisibilityUploads": 55,
+        "lowestFps": 30,
+        "longestFrameMs": 34,
+        "longestRenderSubmitMs": 9,
+        "lastSceneryPrepareMs": 0,
+        "shaderPrograms": 127
+      },
+      "poseBefore": {
+        "player": [
+          108.65,
+          0.15,
+          -0.65
+        ],
+        "camera": [
+          110.3,
+          2.9,
+          3.45
+        ],
+        "quaternion": [
+          -0.15945446551384226,
+          0.043425555933984256,
+          0.007021116658619459,
+          0.9862247200513611
+        ]
+      },
+      "poseAfter": {
+        "player": [
+          108.65,
+          0.15,
+          -0.65
+        ],
+        "camera": [
+          110.3,
+          2.9,
+          3.45
+        ],
+        "quaternion": [
+          -0.15945446551384226,
+          0.043425555933984256,
+          0.007021116658619459,
+          0.9862247200513611
+        ]
+      },
+      "traffic": [
+        {
+          "at": 29905,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30024.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30145.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30264.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30384.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30505.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30625.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30745.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30864.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 30983.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31104.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31224.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31344.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31464.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31584,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31705,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31825.20000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 31945.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32064.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32184,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32304.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32424.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32545.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32664.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32784.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 32904.09999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33025.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33145.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33264.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33383.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33504.5,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33625.59999999404,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33744.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33864.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 33983.80000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34104.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34224.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34345.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34464.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34584.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34705,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34823.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 34944.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35064.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35183.70000001788,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35304.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35424.30000001192,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35544.40000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35664.90000000596,
+          "type": "heartbeat",
+          "active": true
+        },
+        {
+          "at": 35784.90000000596,
+          "type": "heartbeat",
+          "active": true
+        }
+      ]
+    }
+  }
+}

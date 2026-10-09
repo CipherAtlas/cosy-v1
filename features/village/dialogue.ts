@@ -3,6 +3,8 @@ import * as T from "three";
 import type { VillageLife } from "./life";
 import type { Collider } from "./environment";
 import type { Weather } from "./places";
+import { bubbleLayout } from "./bubbleLayout";
+import { SceneSight } from "./sceneSight";
 
 import { VILLAGERS, TOWN_RESIDENT_IDS, type Line } from "./villagers";
 export { VILLAGERS } from "./villagers";
@@ -24,13 +26,13 @@ export class VillagerDialogue {
   private anchor = new T.Vector3();
   private projected = new T.Vector3();
   private attentionProjected = new T.Vector3();
-  private ray = new T.Ray();
-  private hit = new T.Vector3();
-  private boxes: T.Box3[];
+  private sight = new SceneSight();
+  private layout;
   private bubbles;
 
   constructor(host: HTMLElement, private life: VillageLife, colliders: Collider[], private onTalk: () => void,
     private actions?: { companion: (id: string) => void; crumbs: (id: string) => void; visitTea?: () => void; talk?: (id: string) => void; race?: () => void }) {
+    this.layout = bubbleLayout(host);
     this.layer.className = "v-villager-dialogue";
     this.layer.hidden = true;
     this.layer.setAttribute("role", "group");
@@ -112,14 +114,11 @@ export class VillagerDialogue {
       this.layer.append(element);
       return { resident, profile, element, text, name, button, buttonLabel, companion, companionLabel, crumbs, crumbsLabel, tea, teaLabel, attention, actions, line: profile.greeting,
         greetingSeen: false, nextAmbient: index * 2, ambient: 0, chat: 0, until: 0, talkingUntil: 0, sharedSpeech: "",
-        visible: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "", actionState: "" };
+        visible: false, active: false, distance: Infinity, x: 0, y: 0, width: 0, height: 0, measured: "", actionState: "" };
     });
     this.layer.append(this.announcement);
     host.append(this.layer);
-    this.boxes = colliders.map(c => new T.Box3(
-      new T.Vector3(c.x - c.w / 2, c.bottom ?? 0, c.z - c.d / 2),
-      new T.Vector3(c.x + c.w / 2, c.top ?? 8, c.z + c.d / 2),
-    ));
+    this.sight.setColliders(colliders);
     this.setLanguage("en");
   }
 
@@ -140,7 +139,11 @@ export class VillagerDialogue {
       ([ [b.button, "F"], [b.companion, "C"], [b.crumbs, "B"], [b.tea, "E"] ] as const).forEach(([button, key]) => {
         if (!button) return;
         button.setAttribute("aria-keyshortcuts", shortcutKeys(bindings, key));
-        const cap = button.querySelector("kbd"); if (cap) cap.textContent = shortcutKeys(bindings, key);
+        const cap = button.querySelector("kbd");
+        if (cap) {
+          const label = shortcutKeys(bindings, key); cap.textContent = label;
+          if (label.length > 1) cap.dataset.wide = "true"; else delete cap.dataset.wide;
+        }
       });
       b.measured = "";
     });
@@ -274,6 +277,7 @@ export class VillagerDialogue {
   }
 
   update(delta: number, camera: T.Camera, player: T.Vector3, weather: Weather) {
+    this.layout.begin(this);
     if (!this.width || !this.height || !this.enabled && this.clock >= this.teaSpeechUntil) return;
     this.clock += delta;
     if (!this.enabled) {
@@ -290,10 +294,12 @@ export class VillagerDialogue {
       const width = b.element.offsetWidth, height = b.element.offsetHeight;
       const x = T.MathUtils.clamp((this.projected.x * .5 + .5) * this.width, 24, this.width - 24);
       const y = (-this.projected.y * .5 + .5) * this.height;
-      const left = T.MathUtils.clamp(x - width / 2, 12, this.width - width - 12);
-      const top = T.MathUtils.clamp(y - height - 14, 76, Math.max(76, this.height * (this.width < 700 ? .44 : .85) - height));
-      b.element.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0)`;
-      b.element.style.setProperty("--tail-x", `${T.MathUtils.clamp(x - left, 16, width - 16)}px`);
+      const rect = this.layout.place(x, y, width, height, this.width, this.height);
+      b.element.hidden = !rect;
+      if (rect) {
+        b.element.style.transform = `translate3d(${rect.left.toFixed(1)}px, ${rect.top.toFixed(1)}px, 0)`;
+        b.element.style.setProperty("--tail-x", `${T.MathUtils.clamp(x - rect.left, 16, width - 16)}px`);
+      }
       return;
     }
     this.nearest = -1;
@@ -302,6 +308,7 @@ export class VillagerDialogue {
       b.distance = b.resident.root.position.distanceTo(player);
       if (!this.life.shared) b.resident.chatting = b.distance <= 5.5 && this.clock < b.talkingUntil;
       const shared = this.life.sharedState(b.profile.id);
+      b.active = shared?.mode === "talk" || this.clock < b.talkingUntil;
       const speechKey = `${shared?.startedAt}:${shared?.speech?.en}`;
       if (shared?.speech && b.sharedSpeech !== speechKey) { b.sharedSpeech = speechKey; this.say(index, shared.speech, 6); }
       const available = this.life.available(b.profile.id);
@@ -310,10 +317,10 @@ export class VillagerDialogue {
       this.anchor.copy(b.resident.root.position);
       this.anchor.y += 2.12 * b.resident.root.scale.y;
       this.projected.copy(this.anchor).project(camera);
-      const distanceToCamera = this.anchor.distanceTo(camera.position);
-      this.ray.origin.copy(camera.position);
-      this.ray.direction.subVectors(this.anchor, camera.position).normalize();
-      const unobstructed = !this.boxes.some(box => this.ray.intersectBox(box, this.hit) && this.hit.distanceTo(camera.position) < distanceToCamera - .2);
+      const inView = this.projected.z > -1 && this.projected.z < 1
+        && Math.abs(this.projected.x) < 1 && Math.abs(this.projected.y) < 1;
+      const needsSight = inView && (b.distance < 15 || b.attention && this.mintAvailable && b.distance < 35);
+      const unobstructed = !!needsSight && this.sight.visible(camera.position, this.anchor);
       b.visible = b.distance < 15 && unobstructed && this.projected.z > -1 && this.projected.z < 1
         && Math.abs(this.projected.x) < 1 && Math.abs(this.projected.y) < 1;
       if (b.attention) {
@@ -343,8 +350,10 @@ export class VillagerDialogue {
       candidates.push(index);
     });
     // Keep at most two bubbles, preferring the nearest speaker; hide overlapping or clipped ones.
-    const placed: { left: number; right: number; top: number; bottom: number }[] = [];
-    candidates.sort((a, b) => this.bubbles[a].distance - this.bubbles[b].distance).forEach(index => {
+    let placed = 0;
+    candidates.sort((a, b) => Number(b === this.nearest) - Number(a === this.nearest)
+      || Number(this.bubbles[b].active) - Number(this.bubbles[a].active)
+      || this.bubbles[a].distance - this.bubbles[b].distance).forEach(index => {
       const b = this.bubbles[index];
       const canChat = index === this.nearest;
       if (b.resident.following && !canChat && this.clock >= b.until) {
@@ -361,20 +370,17 @@ export class VillagerDialogue {
       if (b.measured !== measureKey) {
         b.width = b.element.offsetWidth; b.height = b.element.offsetHeight; b.measured = measureKey;
       }
-      const left = T.MathUtils.clamp(b.x - b.width / 2, 12, this.width - b.width - 12);
-      const top = Math.max(76, b.y - b.height - 14);
-      const rect = { left, right: left + b.width, top, bottom: Math.max(b.y, top + b.height + 8) };
-      const overlaps = placed.some(p => rect.left < p.right + 12 && rect.right > p.left - 12 && rect.top < p.bottom + 12 && rect.bottom > p.top - 12);
-      b.visible = placed.length < 2 && !overlaps && b.y > 90 && b.y < this.height - 100
-        && (canChat || this.clock < b.until);
+      const rect = placed < 2 && b.y > 24 && b.y < this.height - 24 && (canChat || this.clock < b.until)
+        ? this.layout.place(b.x, b.y, b.width, b.height, this.width, this.height, canChat) : undefined;
+      b.visible = !!rect;
       b.element.hidden = !b.visible;
       if (!b.visible) {
         if (canChat) this.nearest = -1;
         return;
       }
-      b.element.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0)`;
-      b.element.style.setProperty("--tail-x", `${T.MathUtils.clamp(b.x - left, 16, b.width - 16)}px`);
-      placed.push(rect);
+      b.element.style.transform = `translate3d(${rect!.left.toFixed(1)}px, ${rect!.top.toFixed(1)}px, 0)`;
+      b.element.style.setProperty("--tail-x", `${T.MathUtils.clamp(b.x - rect!.left, 16, b.width - 16)}px`);
+      placed++;
     });
   }
 

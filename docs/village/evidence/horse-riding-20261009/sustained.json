@@ -1,0 +1,9 @@
+{
+  "frames": 30,
+  "frameMedianMs": 16.69999999999709,
+  "frameP95Ms": 33.39999999999418,
+  "solverMedianMs": 1.2999999821186066,
+  "solverP95Ms": 14.299999982118607,
+  "stalled": 2,
+  "backwards": 0
+}

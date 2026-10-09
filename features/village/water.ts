@@ -3,8 +3,8 @@ import * as T from "three";
 /** Stream-distance advection follows authored bends; ponds use a slower surface drift. */
 export function makeWater(time: { value: number }, gust: { value: number }, pond = false) {
   const material = new T.MeshPhysicalMaterial({
-    color: "#3b9d9e", roughness: .2, metalness: 0,
-    clearcoat: .35, clearcoatRoughness: .3, envMapIntensity: .45,
+    color: "#3b9d9e", roughness: .32, metalness: 0,
+    clearcoat: .22, clearcoatRoughness: .42, envMapIntensity: .34,
   });
   const weather = { value: new T.Vector2() };
   material.onBeforeCompile = shader => {
@@ -31,8 +31,8 @@ export function makeWater(time: { value: number }, gust: { value: number }, pond
         return p;
       }
       float waterHeight(vec2 p) {
-        return sin(p.y*9.0+waterNoise(vec2(p.x*1.8,p.y*.6))*2.0)*.012
-          + (waterNoise(p*vec2(4.0,3.0))-.5)*.022;
+        return sin(p.y*7.4+waterNoise(vec2(p.x*1.8,p.y*.6))*3.2)*.0065
+          + (waterNoise(p*vec2(4.0,3.0))-.5)*.014;
       }
       float waterFoam(vec2 p) {
         float thread=waterNoise(p*vec2(9.0,.85));
@@ -58,7 +58,7 @@ export function makeWater(time: { value: number }, gust: { value: number }, pond
       float foam=waterFoam(current);
       if(vWaterJoin>0.0)foam=mix(foam,waterFoam(waterCurrent(1.0)),vWaterJoin);
       float edge=smoothstep(.86,.98,bank);
-      diffuseColor.rgb=mix(waterColor,vec3(.84,.95,.91),foam*(.13+edge*.15));
+      diffuseColor.rgb=mix(waterColor,vec3(.84,.95,.91),foam*(.09+edge*.10));
     `);
     shader.fragmentShader = shader.fragmentShader.replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
       float h=waterHeight(waterCurrent(uPond));
@@ -73,6 +73,6 @@ export function makeWater(time: { value: number }, gust: { value: number }, pond
       normal=normalize((viewMatrix*vec4(rippleNormal,0.0)).xyz);
     `);
   };
-  material.customProgramCacheKey = () => `village-water-joined-${pond}`;
+  material.customProgramCacheKey = () => `village-water-soft-joined-${pond}`;
   return { material, setWeather: (rain: number, dusk: number) => { weather.value.set(rain,dusk); } };
 }

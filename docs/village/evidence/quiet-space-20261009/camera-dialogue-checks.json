@@ -1,0 +1,263 @@
+{
+  "results": [
+    "Pond opens with a clear default viewpoint before any manual orbit",
+    "Pond laptop keeps the complete avatar clear of the activity panel",
+    "Pond laptop keeps the complete projected avatar inside the viewport",
+    "Pond small-window keeps the complete avatar clear of the activity panel",
+    "Pond small-window keeps the complete projected avatar inside the viewport",
+    "Pond ipad-portrait keeps the complete avatar clear of the activity panel",
+    "Pond ipad-portrait keeps the complete projected avatar inside the viewport",
+    "Pond ipad-landscape keeps the complete avatar clear of the activity panel",
+    "Pond ipad-landscape keeps the complete projected avatar inside the viewport",
+    "Pond ipad-air-portrait keeps the complete avatar clear of the activity panel",
+    "Pond ipad-air-portrait keeps the complete projected avatar inside the viewport",
+    "Pond ipad-air-landscape keeps the complete avatar clear of the activity panel",
+    "Pond ipad-air-landscape keeps the complete projected avatar inside the viewport",
+    "Pond ipad-mini-portrait keeps the complete avatar clear of the activity panel",
+    "Pond ipad-mini-portrait keeps the complete projected avatar inside the viewport",
+    "Pond ipad-mini-landscape keeps the complete avatar clear of the activity panel",
+    "Pond ipad-mini-landscape keeps the complete projected avatar inside the viewport",
+    "Imperative remapped NPC Space keycap retains visible padding without overflow",
+    "Nearby NPC control remains visible beside an open chat panel",
+    "Staged animal response and visitor message retain readable screen space",
+    "Staged NPC/animal/visitor bubbles and names do not overlap",
+    "Speech and names avoid actual visible chat, minimap and controls",
+    "All staged labels remain within the laptop viewport",
+    "No browser page errors: "
+  ],
+  "errors": [],
+  "mounted": null,
+  "pond": {
+    "goal": [
+      -23.9,
+      4.4,
+      -0.5999999999999996
+    ],
+    "look": [
+      -22,
+      0.5,
+      -10.1
+    ],
+    "orbit": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "distance": 10.443658362853506
+  },
+  "pondLayouts": [
+    {
+      "size": "laptop",
+      "avatar": {
+        "left": 312.34342566312574,
+        "right": 442.5821422075302,
+        "top": 378.2357055881481,
+        "bottom": 514.7351244234738
+      },
+      "panel": {
+        "left": 998,
+        "right": 1338,
+        "top": 234.875,
+        "bottom": 690
+      }
+    },
+    {
+      "size": "small-window",
+      "avatar": {
+        "left": 179.25285471927145,
+        "right": 287.7851185062752,
+        "top": 315.1964213234568,
+        "bottom": 428.94593701956154
+      },
+      "panel": {
+        "left": 532,
+        "right": 872,
+        "top": 173,
+        "bottom": 562
+      }
+    },
+    {
+      "size": "ipad-portrait",
+      "avatar": {
+        "left": 61.514192338770656,
+        "right": 244.6623874793395,
+        "top": 531.8939609833333,
+        "bottom": 723.8462687205101
+      },
+      "panel": {
+        "left": 442,
+        "right": 782,
+        "top": 546.875,
+        "bottom": 1002
+      }
+    },
+    {
+      "size": "ipad-landscape",
+      "avatar": {
+        "left": 206.78564425407802,
+        "right": 344.14679060950465,
+        "top": 398.92047073749995,
+        "bottom": 542.8847015403826
+      },
+      "panel": {
+        "left": 712,
+        "right": 1052,
+        "top": 276.875,
+        "bottom": 732
+      }
+    },
+    {
+      "size": "ipad-air-portrait",
+      "avatar": {
+        "left": 45.10995088865688,
+        "right": 245.21631224594503,
+        "top": 581.1434018151234,
+        "bottom": 790.8690713798165
+      },
+      "panel": {
+        "left": 452,
+        "right": 792,
+        "top": 646.875,
+        "bottom": 1102
+      }
+    },
+    {
+      "size": "ipad-air-landscape",
+      "avatar": {
+        "left": 238.80522010906662,
+        "right": 377.86218308616515,
+        "top": 403.84541482067897,
+        "bottom": 549.5869818063132
+      },
+      "panel": {
+        "left": 812,
+        "right": 1152,
+        "top": 286.875,
+        "bottom": 742
+      }
+    },
+    {
+      "size": "ipad-mini-portrait",
+      "avatar": {
+        "left": 28.57794437021032,
+        "right": 220.7139676056404,
+        "top": 557.996164624182,
+        "bottom": 759.3683541299425
+      },
+      "panel": {
+        "left": 376,
+        "right": 716,
+        "top": 599.875,
+        "bottom": 1055
+      }
+    },
+    {
+      "size": "ipad-mini-landscape",
+      "avatar": {
+        "left": 237.87644361115315,
+        "right": 364.04520026354504,
+        "top": 366.4158397885185,
+        "bottom": 498.6496517852403
+      },
+      "panel": {
+        "left": 765,
+        "right": 1105,
+        "top": 210.875,
+        "bottom": 666
+      }
+    }
+  ],
+  "arrivals": [],
+  "crowd": {
+    "width": 1366,
+    "height": 768,
+    "keycap": {
+      "label": "Space",
+      "wide": "true",
+      "padding": 16,
+      "scroll": 52,
+      "client": 52
+    },
+    "bubbles": [
+      {
+        "className": "v-bird-bubble v-animal-bubble",
+        "left": 619.8125,
+        "right": 796.03125,
+        "top": 283.34375,
+        "bottom": 336.34375
+      },
+      {
+        "className": "v-villager-bubble is-compact",
+        "left": 391.79998779296875,
+        "right": 579.8781127929688,
+        "top": 237.8000030517578,
+        "bottom": 291.79998779296875
+      },
+      {
+        "className": "v-visitor-name",
+        "left": 815.421875,
+        "right": 882.171875,
+        "top": 317.5625,
+        "bottom": 344.5625
+      },
+      {
+        "className": "v-visitor-chat",
+        "left": 854.2421875,
+        "right": 1033.9765625,
+        "top": 253.140625,
+        "bottom": 294.734375
+      }
+    ],
+    "hud": [
+      {
+        "className": "v-wordmark",
+        "left": 36,
+        "right": 269.0625,
+        "top": 28,
+        "bottom": 71.1875
+      },
+      {
+        "className": "v-minimap",
+        "left": 964,
+        "right": 1154,
+        "top": 28,
+        "bottom": 178
+      },
+      {
+        "className": "",
+        "left": 1162,
+        "right": 1242,
+        "top": 28,
+        "bottom": 72
+      },
+      {
+        "className": "",
+        "left": 1250,
+        "right": 1330,
+        "top": 28,
+        "bottom": 72
+      },
+      {
+        "className": "v-walk-hints",
+        "left": 36,
+        "right": 806.21875,
+        "top": 712,
+        "bottom": 738
+      },
+      {
+        "className": "v-shared-toggle",
+        "left": 30,
+        "right": 149.359375,
+        "top": 88,
+        "bottom": 130
+      },
+      {
+        "className": "v-shared-chat",
+        "left": 30,
+        "right": 350,
+        "top": 139,
+        "bottom": 529
+      }
+    ]
+  },
+  "limitations": "Crowd is explicitly staged visual geometry. Stable mount and short ride use the local Worker."
+}

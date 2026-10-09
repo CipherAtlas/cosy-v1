@@ -1,0 +1,182 @@
+{
+  "variants": [
+    {
+      "name": "baseline",
+      "light": [
+        -23.5,
+        1.34,
+        -6.6
+      ],
+      "player": [
+        -23.5,
+        0.29,
+        -6.6
+      ],
+      "intensity": 2.8,
+      "range": 5,
+      "lights": 1,
+      "materials": [
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Peach cheeks",
+          "color": "fa9e99",
+          "emissive": "5f3937",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Warm ink smile",
+          "color": "242b36",
+          "emissive": "000000",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        }
+      ],
+      "bounds": {
+        "left": 312.34342566312574,
+        "right": 442.5821422075302,
+        "top": 378.2357055881481,
+        "bottom": 514.7351244234738
+      }
+    },
+    {
+      "name": "above",
+      "light": [
+        -23.5,
+        2.49,
+        -6.6
+      ],
+      "player": [
+        -23.5,
+        0.29,
+        -6.6
+      ],
+      "intensity": 2.8,
+      "range": 5,
+      "lights": 1,
+      "materials": [
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Peach cheeks",
+          "color": "fa9e99",
+          "emissive": "5f3937",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Warm ink smile",
+          "color": "242b36",
+          "emissive": "000000",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        }
+      ],
+      "bounds": {
+        "left": 312.34342566312574,
+        "right": 442.5821422075302,
+        "top": 378.2357055881481,
+        "bottom": 514.7351244234738
+      }
+    },
+    {
+      "name": "above-camera-side",
+      "light": [
+        -23.54988925789283,
+        2.49,
+        -5.851661131607543
+      ],
+      "player": [
+        -23.5,
+        0.29,
+        -6.6
+      ],
+      "intensity": 2.8,
+      "range": 5,
+      "lights": 1,
+      "materials": [
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Peach cheeks",
+          "color": "fa9e99",
+          "emissive": "5f3937",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Warm ink smile",
+          "color": "242b36",
+          "emissive": "000000",
+          "intensity": 1,
+          "roughness": 0.800000011920929
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        },
+        {
+          "name": "Pearl white spirit",
+          "color": "b4ddab",
+          "emissive": "ffd58e",
+          "intensity": 0.26,
+          "roughness": 0.4699999988079071
+        }
+      ],
+      "bounds": {
+        "left": 312.34342566312574,
+        "right": 442.5821422075302,
+        "top": 378.2357055881481,
+        "bottom": 514.7351244234738
+      }
+    }
+  ],
+  "errors": []
+}

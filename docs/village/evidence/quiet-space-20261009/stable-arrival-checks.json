@@ -1,0 +1,64 @@
+{
+  "status": "partial run; final crowd and full-avatar portrait viewport check pending",
+  "passed": [
+    "Worker-accepted stable rider",
+    "Accepted short reverse remains under authored roof",
+    "Mounted camera under roof at readable distance",
+    "Meadow Swings laptop: readable camera distance",
+    "Meadow Swings laptop: clear indexed target ray",
+    "Meadow Swings laptop: avatar inside scene projection",
+    "Meadow Swings ipad-mini-portrait: readable camera distance",
+    "Meadow Swings ipad-mini-portrait: clear indexed target ray",
+    "Meadow Swings ipad-mini-portrait: avatar inside scene projection",
+    "Owl grove laptop: readable camera distance",
+    "Owl grove laptop: clear indexed target ray",
+    "Owl grove laptop: avatar inside scene projection",
+    "Owl grove ipad-mini-portrait: readable camera distance",
+    "Owl grove ipad-mini-portrait: clear indexed target ray",
+    "Owl grove ipad-mini-portrait: avatar inside scene projection",
+    "Willow circuit laptop: readable camera distance",
+    "Willow circuit laptop: clear indexed target ray",
+    "Willow circuit laptop: avatar inside scene projection",
+    "Willow circuit ipad-mini-portrait: readable camera distance",
+    "Willow circuit ipad-mini-portrait: clear indexed target ray",
+    "Willow circuit ipad-mini-portrait: avatar inside scene projection",
+    "Pond default before orbit",
+    "Pond laptop avatar outside panel and inside viewport",
+    "Pond iPad mini portrait avatar outside panel"
+  ],
+  "failed": "Conservative portrait avatar box extended 3.31px past left viewport; source look offset adjusted4.8\u21924.5 afterward",
+  "mounted": {
+    "owner": "b6e602e0-d52b-4979-8ef7-dd8356cd2768",
+    "self": "b6e602e0-d52b-4979-8ef7-dd8356cd2768",
+    "rider": [
+      86.8638804952459,
+      1.060768871214882,
+      40.22137437695138
+    ],
+    "camera": [
+      86.8638804952459,
+      3.226289236278058,
+      44.40193158882369
+    ],
+    "look": [
+      86.8638804952459,
+      2.060768871214882,
+      40.22137437695138
+    ],
+    "distance": 4.3399880556419275,
+    "stable": {
+      "position": [
+        85,
+        0,
+        42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "roofBottom": 3.28
+  },
+  "remaining": "Fresh build POND_ONLY=1 must verify final pond and staged crowd. Unchanged stable/gate/owls/swings evidence reused from third run."
+}

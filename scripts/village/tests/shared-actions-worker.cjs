@@ -6,6 +6,7 @@ let now = 10000, current, interval, timerId = 0;
 const timers = new Map(), sent = [], worlds = [], tricks = [];
 let disconnected = 0, rejected = 0, crumbs = false, inventory;
 const privateStorage = new Map();
+const visibility = { hidden: false };
 const basketToken = "00000000-0000-0000-0000-000000000001";
 let pose = { x: 1, z: 2, heading: 0, active: true };
 class ClientSocket {
@@ -21,6 +22,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('features/village/sharedWo
 }).outputText, {
   exports: mod.exports, require: () => ({ readGarden: raw => JSON.parse(raw) }), process: { env: {} },
   localStorage: { getItem: key => privateStorage.get(key) ?? null, setItem: (key, value) => privateStorage.set(key, value) },
+  document: visibility,
   WebSocket: ClientSocket, Date: class extends Date { static now() { return now; } },
   window: { setInterval: callback => { interval = callback; return 1; }, clearInterval: () => {},
     setTimeout: (callback, delay) => { const id = ++timerId; timers.set(id, { callback, delay }); return id; }, clearTimeout: id => timers.delete(id) },
@@ -50,6 +52,20 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal(sent.filter(message => message.type === 'move').at(-1).bench.index, 0);
   pose = { ...pose, holdingPuppy: 'mochi', active: false }; interval();
   assert.equal(sent.at(-1).holdingPuppy, 'mochi'); assert.equal(sent.at(-1).active, false);
+  const modalCount = sent.filter(message => message.type === 'heartbeat').length;
+  interval(); interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, modalCount + 2, 'Visible modal clients preserve the shared simulation cadence');
+  visibility.hidden = true;
+  const inactiveCount = sent.filter(message => message.type === 'heartbeat').length;
+  now += 120; interval(); now += 120; interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount, 'Inactive unchanged presence avoids refresh-rate heartbeats');
+  now += 760; interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 1, 'Inactive claims still renew every second');
+  pose = { ...pose, bench: null, holdingPuppy: null }; interval();
+  assert.equal(sent.at(-1).bench, null, 'Inactive ownership changes are sent immediately');
+  pose = { ...pose, active: true }; interval(); interval();
+  visibility.hidden = false; interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, inactiveCount + 4, 'Visible sessions immediately restore the shared simulation cadence');
   const claim = connection.interact({ kind: 'bench', id: 'bench-1', index: 0 });
   const request = sent.at(-1);
   assert.equal(request.type, 'interaction');
@@ -68,6 +84,9 @@ const welcome = id => receive({ type: 'welcome', protocol: 2, selfId: id, visito
   assert.equal((await pending).ok, false); assert.equal(disconnected, 1);
   const retry = [...timers.values()].find(timer => timer.delay === 1000); retry.callback();
   welcome('rejoined');
+  const beforeReconnectHeartbeat = sent.filter(message => message.type === 'heartbeat').length;
+  pose = { ...pose, active: false }; interval();
+  assert.equal(sent.filter(message => message.type === 'heartbeat').length, beforeReconnectHeartbeat + 1, 'Reconnect immediately renews even an unchanged inactive claim');
   assert.equal(JSON.parse(privateStorage.get('cosy.village.inventory.v1')).inventory.mushrooms, 1, 'Disconnect preserves the accepted local cache while the Worker resumes the basket');
   receive({ type: 'forageInventory', token: basketToken, inventory: { apples: 0, mushrooms: 1 } });
   old.onmessage({ data: JSON.stringify({ type: 'crumbs', hasCrumbs: true }) });

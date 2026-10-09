@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { DEFAULT_KEYBINDINGS } from './modules/features/village/keybindings.js';
 import { VillagerDialogue, VILLAGERS } from './modules/features/village/dialogue.js';
 
 // Browser checks use real projection, DOM layout and the production dialogue controller.
@@ -6,16 +7,22 @@ export async function checkDialogue(engine) {
   const results = [];
   const check = (condition, name) => { if (!condition) throw Error(name); results.push(name); };
   const host = document.createElement('div');
+  host.className = 'village v-dialogue-fixture';
   host.style.cssText = 'position:absolute;left:-2000px;top:0;width:1280px;height:720px';
+  // QA loads village.css without the application's global border-box reset.
+  const sizing = document.createElement('style');
+  sizing.textContent = '.v-dialogue-fixture,.v-dialogue-fixture *{box-sizing:border-box}';
+  host.append(sizing);
   document.body.append(host);
   const residents = VILLAGERS.map(() => ({ root: new T.Group(), chatting: false }));
+  const life = { residents, sharedState: () => undefined, available: () => true };
   const camera = new T.PerspectiveCamera(55, 1280 / 720, .12, 100);
   const player = new T.Vector3(0, 0, 2.4);
   camera.position.set(0, 3, 7); camera.lookAt(0, 1.3, 0); camera.updateMatrixWorld();
   const reset = () => residents.forEach((r, i) => r.root.position.set(i ? 100 : 0, 0, 0));
   reset();
   let interactions = 0;
-  let dialogue = new VillagerDialogue(host, { residents }, [], () => interactions++);
+  let dialogue = new VillagerDialogue(host, life, [], () => interactions++);
   const update = (dt = .016, weather = 'golden') => dialogue.update(dt, camera, player, weather);
   const visible = () => [...host.querySelectorAll('.v-villager-bubble')].filter(b => !b.hidden);
   try {
@@ -24,7 +31,25 @@ export async function checkDialogue(engine) {
     check(visible().length === 0, 'Arrival hides speech and chat controls');
     dialogue.setEnabled(true); update();
     check(visible().length === 1 && visible()[0].textContent.includes(VILLAGERS[0].greeting.en), 'Nearby resident greets the player');
+    const original = visible()[0].getBoundingClientRect(), hostBounds = host.getBoundingClientRect();
+    const hud = document.createElement('section'); hud.className = 'v-shared-chat';
+    hud.style.cssText = `position:absolute;margin:0;min-width:0;min-height:0;left:${original.left-hostBounds.left}px;top:${original.top-hostBounds.top}px;width:${original.width}px;height:${original.height}px`;
+    host.append(hud); await new Promise(resolve => setTimeout(resolve, 180)); update();
+    check(visible().length === 1, 'Nearby Chat control relocates around an actual visible chat panel');
+    const moved = visible()[0].getBoundingClientRect(), blocked = hud.getBoundingClientRect();
+    check(moved.right <= blocked.left || moved.left >= blocked.right || moved.bottom <= blocked.top || moved.top >= blocked.bottom,
+      'Relocated dialogue does not overlap the chat panel');
+    hud.remove(); await new Promise(resolve => setTimeout(resolve, 180)); update();
+
     check(residents[0].chatting, 'Greeting pauses the resident');
+    dialogue.setKeybindings({ ...DEFAULT_KEYBINDINGS, talk: ' ', jump: 'f' }); update();
+    const remappedCap = visible()[0].querySelector('.v-villager-footer kbd');
+    const capStyle = getComputedStyle(remappedCap);
+    check(remappedCap.textContent === 'Space' && remappedCap.dataset.wide === 'true' && remappedCap.scrollWidth <= remappedCap.clientWidth
+      && parseFloat(capStyle.paddingLeft) >= 8 && parseFloat(capStyle.paddingRight) >= 8,
+      'Remapped NPC Space shortcut keeps its text inside a padded keycap');
+    dialogue.setKeybindings(DEFAULT_KEYBINDINGS); update();
+
     check(!host.querySelector('[aria-live]').textContent, 'Ambient speech does not announce repeatedly to screen readers');
     const lines = [];
     for (let i = 0; i < 5; i++) { dialogue.talk(); lines.push(visible()[0].querySelector('p').textContent); }
@@ -66,11 +91,11 @@ export async function checkDialogue(engine) {
     check(!host.querySelector('.v-villager-dialogue'), 'Disposal removes the overlay');
     host.style.width = '1280px'; host.style.height = '720px';
     camera.aspect = 1280 / 720; camera.updateProjectionMatrix(); player.set(0, 0, 3);
-    dialogue = new VillagerDialogue(host, { residents }, [{ x: 0, z: 3.5, w: 8, d: 1, top: 8 }], () => interactions++);
+    dialogue = new VillagerDialogue(host, life, [{ x: 0, z: 3.5, w: 8, d: 1, top: 8 }], () => interactions++);
     dialogue.resize(1280, 720); dialogue.setEnabled(true); update();
     check(!visible().length, 'Building collider occludes speech');
     dialogue.dispose();
-    dialogue = new VillagerDialogue(host, { residents }, [], () => interactions++);
+    dialogue = new VillagerDialogue(host, life, [], () => interactions++);
     dialogue.resize(1280, 720); dialogue.setEnabled(true);
     for (let i = 0; i < residents.length; i++) {
       residents.forEach((r, j) => r.root.position.set(j === i ? 0 : 100, 0, 0)); update(); dialogue.talk();
@@ -82,7 +107,7 @@ export async function checkDialogue(engine) {
     check(visible().length <= 2, 'At most two ambient bubbles appear together');
     dialogue.dispose();
     let teaVisits = 0;
-    dialogue = new VillagerDialogue(host, { residents }, [], () => interactions++, {
+    dialogue = new VillagerDialogue(host, life, [], () => interactions++, {
       companion: () => {}, crumbs: () => {}, visitTea: () => teaVisits++,
     });
     dialogue.resize(1280, 720); dialogue.setEnabled(true);

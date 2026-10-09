@@ -32,6 +32,21 @@ export { groundY, riverX } from "./environment";
 export type WorldLayoutCapture = (id: string, name: string, category: string, objects: T.Object3D[], pivot?: [number, number, number]) => void;
 export type VillageBench = { id: string; x: number; z: number; facing: number; seatHeight: number; seatSpacing?: number; seatCount?: number; birdClearing: boolean; hitBox: T.Box3 };
 
+function disposeWorldResources(roots: T.Object3D[], extra: Iterable<T.BufferGeometry | T.Material | T.Texture>) {
+  const resources = new Set<T.BufferGeometry | T.Material | T.Texture>(extra);
+  for (const root of roots) root.traverse(object => {
+    if (!(object instanceof T.Mesh || object instanceof T.Points || object instanceof T.Sprite)) return;
+    if (object instanceof T.BatchedMesh) object.dispose();
+    else if (!(object instanceof T.Sprite)) resources.add(object.geometry);
+    if (object instanceof T.InstancedMesh && object.userData.riverbankStones) object.dispose();
+    if (object instanceof T.Mesh && object.customDepthMaterial) resources.add(object.customDepthMaterial);
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) resources.add(material);
+  });
+  for (const resource of resources) if (resource instanceof T.Material)
+    for (const value of Object.values(resource)) if (value instanceof T.Texture) resources.add(value);
+  resources.forEach(resource => resource.dispose());
+}
+
 export type World = {
   group: T.Group;
   trees: {
@@ -76,9 +91,11 @@ export async function buildWorld(
   renderer: T.WebGLRenderer,
   capture?: WorldLayoutCapture,
   layout?: AuthoredWorld,
+  signal?: AbortSignal,
 ): Promise<World> {
+  if (signal?.aborted) throw signal.reason;
   seed = 62025;
-  const authored = layout ?? await loadVillageLayout();
+  const authored = layout ?? await loadVillageLayout(signal);
   setAuthoredWorld(authored);
   const group = new T.Group();
   const colliders: World["colliders"] = [],
@@ -276,7 +293,12 @@ export async function buildWorld(
   }
   terrain.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
   terrain.computeVertexNormals();
-  if (!capture) await optimizeGeometry(terrain, .00001);
+  try {
+    if (!capture) await optimizeGeometry(terrain, .00001, signal);
+  } catch (error) {
+    disposeWorldResources([group], [terrain, ...Object.values(mat), ...textures]);
+    throw error;
+  }
   const terrainMesh = add(terrain, mat.ground, 0, 0, 0);
   terrainMesh.castShadow = false;
   record("terrain", "Valley ground", "Landscape", [terrainMesh]);
@@ -1003,11 +1025,16 @@ export async function buildWorld(
     }
   });
   remove.forEach((o) => o.removeFromParent());
+  const pendingBatches = new Set([...batches.values()].flatMap(surfaces => [...surfaces.values()].flat()));
   for (const [m, surfaces] of batches) for (const [surface, gs] of surfaces) {
     const g = mergeGeometries(gs);
-    gs.forEach((g) => g.dispose());
+    gs.forEach(g => { g.dispose(); pendingBatches.delete(g); });
     if (g) {
-      await optimizeGeometry(g, .0001);
+      try { await optimizeGeometry(g, .0001, signal); }
+      catch (error) {
+        disposeWorldResources([group, ...remove], [g, ...pendingBatches, ...Object.values(mat), ...textures]);
+        throw error;
+      }
       if (surface) g.userData.plantingSurface = surface;
       const mesh = spatialBatch(g, m, 32); mesh.name = `Village architecture ${surface || m.name || m.type}`;
       mesh.receiveShadow = true; mesh.castShadow = m !== mat.ground && m !== mat.path && m !== pathMaterial; group.add(mesh); g.dispose();
@@ -1080,27 +1107,7 @@ export async function buildWorld(
       paths: pathSurfaces.map(path => ({ width: path.width, spine: path.spine.map(point => [point.x, point.z]) })) },
     gardenSurfaces: { paving: mat.path, wood: mat.wood, ground: mat.ground, stone: mat.stone },
     dispose() {
-      const geometries = new Set<T.BufferGeometry>(),
-        materials = new Set<T.Material>();
-      group.traverse((o) => {
-        if (o instanceof T.Mesh || o instanceof T.Points || o instanceof T.Sprite) {
-          if (o instanceof T.BatchedMesh) o.dispose();
-          else if (!(o instanceof T.Sprite)) geometries.add(o.geometry);
-          if (o instanceof T.InstancedMesh && o.userData.riverbankStones) o.dispose();
-          if (o instanceof T.Mesh && o.customDepthMaterial) materials.add(o.customDepthMaterial);
-          (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
-            materials.add(m),
-          );
-        }
-      });
-      geometries.forEach((g) => g.dispose());
-      materials.forEach((m) => {
-        Object.values(m).forEach((v) => {
-          if (v instanceof T.Texture) v.dispose();
-        });
-        m.dispose();
-      });
-      textures.forEach((t) => t.dispose());
+      disposeWorldResources([group], [...Object.values(mat), ...textures]);
     },
   };
 }

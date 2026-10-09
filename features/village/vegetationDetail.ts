@@ -3,15 +3,27 @@ import { optimizeGeometry } from "./geometryOptimization";
 
 const distantGeometry = new WeakMap<T.BufferGeometry, T.BufferGeometry>();
 
-export async function registerPlantDetail(meshes: T.InstancedMesh[]) {
+export async function registerPlantDetail(meshes: T.InstancedMesh[], signal?: AbortSignal) {
   const geometries = new Set(meshes.map(mesh => mesh.geometry));
-  await Promise.all([...geometries].map(async geometry => {
-    if (distantGeometry.has(geometry) || (geometry.index?.count ?? 0) < 600) return;
-    const distant = geometry.clone();
-    await optimizeGeometry(distant, .02);
-    if (distant.index!.count < geometry.index!.count) distantGeometry.set(geometry, distant);
-    else distant.dispose();
-  }));
+  const prepared: { geometry: T.BufferGeometry; distant: T.BufferGeometry }[] = [];
+  let failed = false;
+  try {
+    await Promise.all([...geometries].map(async geometry => {
+      if (signal?.aborted) throw signal.reason;
+      if (distantGeometry.has(geometry) || (geometry.index?.count ?? 0) < 600) return;
+      const distant = geometry.clone();
+      try { await optimizeGeometry(distant, .02, signal); }
+      catch (error) { distant.dispose(); throw error; }
+      if (failed || signal?.aborted || distant.index!.count >= geometry.index!.count) distant.dispose();
+      else prepared.push({ geometry, distant });
+    }));
+    if (signal?.aborted) throw signal.reason;
+    for (const { geometry, distant } of prepared) distantGeometry.set(geometry, distant);
+  } catch (error) {
+    failed = true;
+    for (const { distant } of prepared) distant.dispose();
+    throw error;
+  }
 }
 
 /** The same blade tips, colors and wind; distant blades need only their outer contour. */

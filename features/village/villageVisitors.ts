@@ -5,6 +5,9 @@ import { SWING_MAX_ANGLE, type VillageSwingSet } from "./swings";
 import type { SharedChatEntry, SharedVisitor, SharedSwingRide } from "./sharedWorld";
 import type { PlaceId } from "./places";
 import type { World } from "./world";
+import type { Collider } from "./environment";
+import { bubbleLayout } from "./bubbleLayout";
+import { SceneSight } from "./sceneSight";
 
 const spiritGlowColor = new T.Color("#ffd58e");
 export function tintSpirit(spirit: T.Object3D, color: string, copyMaterials: boolean) {
@@ -31,19 +34,25 @@ export function glowSpirit(spirit: T.Object3D, night: number) {
           material.userData.dayEmissive = material.emissive.getHex();
           material.userData.dayEmissiveIntensity = material.emissiveIntensity;
         }
-        material.color.setHex(material.userData.dayColor).lerp(spiritGlowColor, night * .72);
+        material.color.setHex(material.userData.dayColor).lerp(spiritGlowColor, night * .32);
         material.emissive.setHex(material.userData.dayEmissive).lerp(spiritGlowColor, night);
-        material.emissiveIntensity = material.userData.dayEmissiveIntensity + night * .65;
+        // glTF defaults to intensity 1; blend toward the night glow rather than
+        // adding to that baseline and washing out the body's lighting.
+        material.emissiveIntensity = T.MathUtils.lerp(material.userData.dayEmissiveIntensity, .26, night);
       }
     });
   }
 
 export class VillageVisitors {
   readonly entries = new Map<string, { name: string; slot: number; group: T.Group; spirit: T.Object3D; fins: T.Object3D[]; target: T.Vector3; heading: number; label: HTMLDivElement; swing: SharedSwingRide | null; swingReceivedAt: number; bench: { id: string; index: number } | null; activity: PlaceId | null; lookout: number | null }>();
-  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string }>();
+  private chatBubbles = new Map<string, { element: HTMLDivElement; timer: number; messageId?: string; width: number; height: number }>();
   private visitorLabelPoint = new T.Vector3();
   private temp = new T.Vector3();
-  constructor(private scene: T.Scene, private host: HTMLElement) {}
+  private layout;
+  private sight = new SceneSight();
+  private labelViewportWidth = 0;
+  private labelSizes = new WeakMap<HTMLElement, { text: string | null; width: number; height: number }>();
+  constructor(private scene: T.Scene, private host: HTMLElement) { this.layout = bubbleLayout(host); }
   showChatBubble(entry: SharedChatEntry, selfId: string, selfName: string) {
     const id = entry.id ?? (entry.name === selfName ? selfId : [...this.entries].find(([, remote]) => remote.name === entry.name)?.[0]);
     if (!id || (id !== selfId && !this.entries.has(id))) return;
@@ -57,7 +66,7 @@ export class VillageVisitors {
       element.remove();
       this.chatBubbles.delete(id);
     }, 6000);
-    this.chatBubbles.set(id, { element, timer, messageId: entry.messageId });
+    this.chatBubbles.set(id, { element, timer, messageId: entry.messageId, width: 0, height: 0 });
   }
   removeChatBubbles(messageIds: string[]) {
     const removed = new Set(messageIds);
@@ -141,26 +150,56 @@ export class VillageVisitors {
       remote.fins.forEach(fin => relaxBlobArm(fin, elapsed + remote.slot, remote.group.position.distanceTo(remote.target) > .05, reducedMotion));
     }
   }
-  projectLabels(camera: T.PerspectiveCamera, player: T.Vector3, focus: boolean) {
-    for (const remote of this.entries.values()) {
-      const point = this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0)).project(camera);
-      remote.label.hidden = point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || focus;
-      if (!remote.label.hidden) {
-        remote.label.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
-        remote.label.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
+  projectLabels(camera: T.PerspectiveCamera, player: T.Vector3, focus: boolean, colliders?: Collider[]) {
+    this.layout.begin(this);
+    if (colliders) this.sight.setColliders(colliders);
+    const width = this.host.clientWidth, height = this.host.clientHeight;
+    if (width !== this.labelViewportWidth) {
+      this.labelViewportWidth = width; this.labelSizes = new WeakMap();
+      for (const bubble of this.chatBubbles.values()) bubble.width = 0;
+    }
+    // Active speech has priority over passive names. Nearby visitors are placed first.
+    const chats = [...this.chatBubbles].sort(([a], [b]) =>
+      (this.entries.get(a)?.group.position ?? player).distanceToSquared(player)
+      - (this.entries.get(b)?.group.position ?? player).distanceToSquared(player));
+    for (const [id, bubble] of chats) {
+      const remote = this.entries.get(id), origin = remote?.group.position ?? player;
+      this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0));
+      const inWorld = !remote || !focus && remote.group.visible && origin.distanceToSquared(player) < 18 ** 2;
+      const point = this.temp.copy(this.visitorLabelPoint).project(camera);
+      bubble.element.hidden = !inWorld || point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
+      if (bubble.element.hidden || !this.sight.visible(camera.position, this.visitorLabelPoint)) { bubble.element.hidden = true; continue; }
+      if (!bubble.width) { bubble.width = bubble.element.offsetWidth; bubble.height = bubble.element.offsetHeight; }
+      const rect = this.layout.place((point.x * .5 + .5) * width, (-point.y * .5 + .5) * height,
+        bubble.width, bubble.height, width, height);
+      bubble.element.hidden = !rect;
+      if (rect) {
+        bubble.element.style.left = `${rect.left + bubble.width / 2}px`;
+        bubble.element.style.top = `${rect.top + bubble.height}px`;
       }
     }
-    for (const [id, bubble] of this.chatBubbles) {
-      const origin = this.entries.get(id)?.group.position ?? player;
-      const point = this.visitorLabelPoint.copy(origin).add(this.temp.set(0, 2.25, 0)).project(camera);
-      bubble.element.hidden = (focus && this.entries.has(id)) ||
-        point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
-      if (!bubble.element.hidden) {
-        bubble.element.style.left = `${(point.x * .5 + .5) * this.host.clientWidth}px`;
-        bubble.element.style.top = `${(-point.y * .5 + .5) * this.host.clientHeight}px`;
+    const visitors = [...this.entries.values()].sort((a, b) => a.group.position.distanceToSquared(player) - b.group.position.distanceToSquared(player));
+    for (const remote of visitors) {
+      this.visitorLabelPoint.copy(remote.group.position).add(this.temp.set(0, 1.65, 0));
+      const inWorld = !focus && remote.group.visible && remote.group.position.distanceToSquared(player) < 30 ** 2;
+      const point = this.temp.copy(this.visitorLabelPoint).project(camera);
+      remote.label.hidden = !inWorld || point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1;
+      if (remote.label.hidden || !this.sight.visible(camera.position, this.visitorLabelPoint)) { remote.label.hidden = true; continue; }
+      let size = this.labelSizes.get(remote.label);
+      if (!size || size.text !== remote.label.textContent) {
+        size = { text: remote.label.textContent, width: remote.label.offsetWidth, height: remote.label.offsetHeight };
+        this.labelSizes.set(remote.label, size);
+      }
+      const rect = this.layout.place((point.x * .5 + .5) * width, (-point.y * .5 + .5) * height,
+        size.width, size.height, width, height, false);
+      remote.label.hidden = !rect;
+      if (rect) {
+        remote.label.style.left = `${rect.left + size.width / 2}px`;
+        remote.label.style.top = `${rect.top + size.height}px`;
       }
     }
   }
+
   dispose() {
     for (const bubble of this.chatBubbles.values()) { clearTimeout(bubble.timer); bubble.element.remove(); }
     this.chatBubbles.clear();

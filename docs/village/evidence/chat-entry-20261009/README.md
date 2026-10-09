@@ -1,0 +1,11 @@
+# Explicit chat entry — local evidence, 2026-10-09
+
+The entry leads with a speech-bubble icon and **Chat / チャット**. The separated visitor count is secondary; a chevron indicates expansion. A steady amber dot on the chat icon replaces the boxed New label. The button retains saved visibility and accessible new-message naming with a 44 px target.
+
+All **28** focused exported Chrome checks pass with zero page errors: real two-client message delivery/unread, Enter/Space opening and closing, saved open/collapsed preference, and English/Japanese control geometry at 1280×800, 900×640 and all six prescribed iPad CSS orientations. Synthetic message events exercise partial/final moderation and hourly reset through the actual client/React path; real admin moderation/clock rollover is not claimed. The first trial waited for Send to enable with an empty draft; the corrected fixture fills the draft first. No product bug was inferred from that fixture timeout.
+
+Fresh `npm run check`, local-endpoint production build and `npm run check:export` pass. Existing unrelated lint/Browserslist/Three warnings remain. Only the fixture changed after the final product build; its syntax and actual browser checks pass. Earlier shared claims/seats/private-focus checks cover unchanged logic; no new simulation or delivery rules are introduced here.
+
+[English control](chat-control.png), [Japanese control](chat-control-ja.png), [iPad mini context](ipad-mini.png), [laptop-sized context](laptop-size.png), [checks](checks.json), [project log](project-check.log), [build](production-build.log), [export privacy](export-privacy.log), [source hashes](source-sha256.json).
+
+Reproduction uses the local export on port 3051 and isolated Worker on port 2577 with synthetic persistence. With the project's available Playwright installation set as `PLAYWRIGHT_PATH`, run `VILLAGE_URL=http://127.0.0.1:3051 WORKER_URL=ws://127.0.0.1:2577 CHAT_ONLY=1 OUTPUT_DIR=/tmp/cosy-chat-entry node scripts/village/tests/quiet-ui-browser.cjs`. Temporary Worker2577 is stopped afterward; retained preview on port 3051 and Worker on port 2567 remain available. No deployment or Git writes. CSS/touch emulation does not establish native Safari/Firefox or physical-device acceptance.

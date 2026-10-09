@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "Fresh visitor starts with collapsed chat and a visible entry",
+    "Fresh visitor starts with collapsed chat and a visible entry",
+    "Real remote chat produces a persistent unread dot beside the explicit Chat label without opening the panel",
+    "Unread indicator stays still",
+    "1280×800: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "900×640: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "810×1080: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "1080×810: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "820×1180: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "1180×820: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "744×1133: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "1133×744: Chat entry, secondary presence and unread dot are readable with a 44 px target",
+    "Opening chat shows the new message and clears unread",
+    "Explicit open chat preference survives reload",
+    "Explicit collapsed preference survives reload",
+    "Synthetic moderation retains the badge while another unread message remains",
+    "Synthetic moderation clears the final unread message even with retained history",
+    "Synthetic hourly reset clears unread without opening chat",
+    "1280×800: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "900×640: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "810×1080: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "1080×810: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "820×1180: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "1180×820: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "744×1133: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "1133×744: チャット entry, secondary presence and unread dot are readable with a 44 px target",
+    "Japanese Space activation opens the controlled chat panel and clears the unread dot",
+    "No captured page errors ()"
+  ],
+  "errors": []
+}

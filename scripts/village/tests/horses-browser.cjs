@@ -95,7 +95,8 @@ fs.mkdirSync(output, { recursive: true });
     });
     await page.locator('.v-horse-controls').waitFor();
     if (process.env.HAY_ONLY !== '1') await page.waitForFunction(id =>
-      e.sharedActors.actors.find(actor => actor.id === id)?.mode === 'idle', id);
+      e.sharedActors.actors.find(actor => actor.id === id)?.mode === 'idle'
+        && !e.sharedActors.town.hayFeeds.some(feed => feed.horseId === id && feed.until > Date.now() + e.sharedTimeOffset), id);
     // Mounts share the Worker's 80 ms interaction cooldown with the preceding dismount.
     await page.waitForTimeout(100);
   }
@@ -163,6 +164,8 @@ fs.mkdirSync(output, { recursive: true });
     }
     check(await rider.evaluate(() => e.sharedActors.actors.filter(a => a.kind === 'horse').length === 2), 'Both authored horses arrive through Worker snapshots');
     await approach(rider); await approach(observer);
+    // Joining/approaching the other client can overlap Rowan's next accepted hay clock.
+    await approach(rider);
     await rider.bringToFront();
     await rider.evaluate(() => e.mountHorse('horse-juniper'));
     await rider.waitForFunction(() => e.horseRiding.actor?.id === 'horse-juniper').catch(async error => {
@@ -250,6 +253,7 @@ fs.mkdirSync(output, { recursive: true });
       });
     }, course);
     await rider.waitForTimeout(450);
+    if (process.env.LATENCY_CHECK === '1') await rider.evaluate(() => { horseLatency.outbound = horseLatency.inbound = 100; });
     const start = await rider.evaluate(() => ({ x: e.horseRiding.actor.x, z: e.horseRiding.actor.z }));
     await rider.locator('canvas').focus();
     await rider.keyboard.down('w');
@@ -261,10 +265,44 @@ fs.mkdirSync(output, { recursive: true });
     await rider.keyboard.down('Shift');
     await rider.waitForFunction(() => e.horseRiding.actor.speed > 4.6);
     check(true, 'Actual W and Shift keys accelerate into canter');
+    if (process.env.LATENCY_CHECK === '1') {
+      const sustained = await rider.evaluate(() => new Promise(resolve => {
+        const frames = [], solver = [], motion = [], riding = e.horseRiding, original = riding.sample;
+        riding.sample = function (...args) {
+          const at = performance.now(), result = original.apply(this, args);
+          solver.push(performance.now() - at); return result;
+        };
+        const start = performance.now(); let previous = null;
+        function frame(now) {
+          const horse = e.horses.horses.find(h => h.id === riding.actor.id).actor;
+          if (previous) {
+            frames.push(now - previous.at);
+            motion.push((horse.position.x - previous.x) * Math.sin(horse.rotation.y)
+              + (horse.position.z - previous.z) * Math.cos(horse.rotation.y));
+          }
+          previous = { at: now, x: horse.position.x, z: horse.position.z };
+          if (now - start < 600) return requestAnimationFrame(frame);
+          riding.sample = original;
+          const percentile = (values, p) => values.sort((a, b) => a - b)[Math.floor((values.length - 1) * p)];
+          resolve({ frames: frames.length, frameMedianMs: percentile(frames, .5), frameP95Ms: percentile(frames, .95),
+            solverMedianMs: percentile(solver, .5), solverP95Ms: percentile(solver, .95),
+            stalled: motion.filter(distance => distance < .001).length, backwards: motion.filter(distance => distance < -.02).length });
+        }
+        requestAnimationFrame(frame);
+      }));
+      check(sustained.frames >= 8 && sustained.stalled / sustained.frames < .2 && sustained.backwards === 0,
+        'Sustained delayed-network cantering advances without repeated stalls or backwards corrections');
+      fs.writeFileSync(`${output}/sustained.json`, JSON.stringify(sustained, null, 2));
+      console.log('Sustained riding with added 200ms RTT:', sustained);
+    }
     await rider.keyboard.up('Shift'); await rider.keyboard.up('w');
     await rider.keyboard.down(' ');
     await rider.waitForFunction(() => e.horseRiding.actor.speed < .05);
     await rider.keyboard.up(' ');
+    if (process.env.LATENCY_CHECK === '1') {
+      await rider.evaluate(() => { horseLatency.outbound = horseLatency.inbound = 0; });
+      await rider.waitForTimeout(300);
+    }
     check(true, 'Space brakes the server-owned horse');
     const heading = await rider.evaluate(() => e.horseRiding.actor.heading);
     await rider.keyboard.down('a');
@@ -322,7 +360,7 @@ fs.mkdirSync(output, { recursive: true });
     check(true, 'Inactive visitor releases the shared horse');
     await approach(observer); await observer.getByRole('button', { name: 'Ride', exact: true }).click();
     await observer.waitForFunction(() => !!e.horseRiding.actor);
-    await observer.locator('.v-horse-controls .v-interact').last().focus();
+    await observer.locator('.v-horse-controls button.v-interact').filter({ hasText: 'Dismount' }).focus();
     await observer.keyboard.press('Space');
     await observer.waitForFunction(() => !e.horseRiding.actor);
     check(true, 'Space activates a focused Dismount button');

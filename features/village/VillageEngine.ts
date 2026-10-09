@@ -7,9 +7,9 @@ import { addSupplementalLayout } from "./placeableAssets";
 import { SceneLayout } from "./sceneLayout";
 import * as T from "three";
 import { VillageVisitors, tintSpirit, glowSpirit } from "./villageVisitors";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
-import { buildWorld, type VillageBench, type World } from "./world";
+import type { VillageBench, World } from "./world";
+import { VillageLoading } from "./assetLoading";
+import { loadVillageStartup } from "./startupLoading";
 import { VillageMovement } from "./movement";
 import { createAtmosphere } from "./atmosphere";
 import { BirdFlock, type BirdStatus } from "./birds";
@@ -28,17 +28,15 @@ import { skipDistantPointLights, softenShadowEdges } from "./shadows";
 import { GRAPHICS_TIERS, graphicsPixelRatio, initialGraphicsTier, slowerGraphicsTier, type GraphicsTier } from "./graphics";
 import { BIRD_CLEARING, BRIDGE, floorHeight, windAt, type MovementStatus, type WorldContact, type EnvironmentFrame } from "./environment";
 import { PLACES, type PlaceId, type Quality, type Weather } from "./places";
-import { withBasePath } from "@/lib/basePath";
 import { towerLookout } from "./towerLookout";
 import type { SharedChatEntry, SharedVisitor, SharedPuppyTrick } from "./sharedWorld";
-import { loadVillageLayout, loadPlacedPuppies } from "./villageAssets";
 import { registerPlantDetail, VegetationDetail } from "./vegetationDetail";
 import { instanceCells } from "./spatialRendering";
 import { optimizeGardenGeometry } from "./geometryOptimization";
 import { VillageCamera } from "./villageCamera";
 import { buildFocusCottage } from "./focusCottageScene";
 import { CottageCat, type CottageCatStatus } from "./cottageCat";
-import { animalRigSlugsForLayout, loadAnimalRigs, makeAnimalRig, disposeAnimalRig } from "./animalRig";
+import { loadAnimalRigs, makeAnimalRig, disposeAnimalRig } from "./animalRig";
 import { type SwingSeat } from "./swings";
 import type { SharedActors, SharedInteraction, InteractionResult } from "./sharedActors";
 import type { SharedHorseInput } from "./sharedActors";
@@ -47,13 +45,15 @@ import { VillageHorses, type NearbyHorse } from "./horses";
 import type { HorseSoundEvent } from "./horseAudio";
 import { TownInteractions, type TownContext } from "./townInteractions";
 import type { ForageInventory, TownAction } from "./townShared";
-import { loadTownAssetKit, TOWN_ASSET_IDS } from "./townAssets";
 import { TownAnimals } from "./townAnimals";
 import { TownScene } from "./townScene";
 import type { MapActor } from "./sharedActors";
 import { townActivityHUD, type TownActivityHUDState } from "./townProgress";
 import type { AnimalSoundSource, TownAnimalSoundEvent } from "./townAnimalAudio";
 import { RaceGuide } from "./raceGuide";
+import { VillageFrameBudget } from "./frameBudget";
+import { TreeVisibility } from "./treeVisibility";
+import { bubbleLayout } from "./bubbleLayout";
 
 export class VillageEngine {
   readonly renderer: T.WebGLRenderer;
@@ -99,6 +99,7 @@ export class VillageEngine {
   private walkingHeading = Math.PI;
   private language: "en" | "ja" = "en";
   private world?: World;
+  private loading?: VillageLoading;
   private environment?: T.WebGLRenderTarget;
   private skyTexture?: T.DataTexture;
   private player = new T.Group();
@@ -155,6 +156,8 @@ export class VillageEngine {
   private wantsMouseLook = false;
   private pointerLockPending = false;
   private lastTime = 0;
+  private frameBudget = new VillageFrameBudget();
+  private treeVisibility = new TreeVisibility();
   private elapsed = 0;
   private resizeObserver: ResizeObserver;
   private disposed = false;
@@ -212,12 +215,11 @@ export class VillageEngine {
   private bridgeWindowTime = -1000;
   private rain?: T.LineSegments;
   private weather: Weather = "golden";
-  private treeFrustum = new T.Frustum();
-  private viewProjection = new T.Matrix4();
   private indoorLight = new T.PointLight("#ffb569", 0, 12, 1.7);
   private spiritLights = [new T.PointLight("#ffd17d", 0, 5, 2)];
   private spiritGlowApplied = -1;
   private onKeyDown = (e: KeyboardEvent) => {
+    this.frameBudget.wake(performance.now());
     const key = gameKey(this.keybindings, e.key);
     if (e.key === "Escape") {
       if (e.defaultPrevented || e.repeat || e.isComposing) return;
@@ -333,6 +335,8 @@ export class VillageEngine {
     this.clearKeys();
     if (document.hidden) this.releaseMouseLook();
     this.lastTime = 0;
+    this.frameBudget.reset();
+    this.frameBudget.wake(performance.now());
     this.frameSum = this.frames = this.slowSamples = 0;
     this.statsTime = this.qualityChangedAt = performance.now();
   };
@@ -341,6 +345,7 @@ export class VillageEngine {
   };
   private onDown = (e: PointerEvent) => {
     if (this.blocked || e.button !== 0 || this.pointer) return;
+    this.frameBudget.wake(performance.now());
     this.renderer.domElement.focus({ preventScroll: true });
     const canvas = this.renderer.domElement;
     const locked = document.pointerLockElement === canvas;
@@ -383,6 +388,7 @@ export class VillageEngine {
     if (!this.place && e.pointerType === "mouse" && this.mouseLook !== "drag") return;
     const dx = e.clientX - this.pointer.x,
       dy = e.clientY - this.pointer.y;
+    this.frameBudget.wake(performance.now());
     const lookStep = .004 * (e.pointerType === "mouse" ? this.mouseSensitivity : 1);
     if (this.place) {
       this.teaPanHeld = true;
@@ -406,6 +412,7 @@ export class VillageEngine {
   };
   private onMouseMove = (e: MouseEvent) => {
     if (document.pointerLockElement !== this.renderer.domElement || this.blocked) return;
+    this.frameBudget.wake(performance.now());
     const step = .004 * this.mouseSensitivity;
     if (this.place) {
       this.teaPanHeld = true;
@@ -478,6 +485,7 @@ export class VillageEngine {
     this.setMouseLook("free");
   }
   private onWheel = (e: WheelEvent) => {
+    this.frameBudget.wake(performance.now());
     if (this.blocked || this.place) return;
     e.preventDefault();
     this.distance = T.MathUtils.clamp(this.distance + e.deltaY * 0.004, 2.2, 12);
@@ -612,28 +620,22 @@ export class VillageEngine {
     el.addEventListener("webglcontextlost", this.onLost);
   }
   async load() {
-    const layout = loadVillageLayout();
-    const animalRigs = layout.then(authored => loadAnimalRigs(animalRigSlugsForLayout(authored)));
-    const sky = new HDRLoader().loadAsync(withBasePath("/village/textures/sunset.hdr")).catch(() => undefined);
-    const [world, gltf, gardenKit, dove, puppyKit, placedCat, townKit] = await Promise.all([
-      layout.then(authored => buildWorld(this.callbacks.progress, this.renderer, undefined, authored)),
-      new GLTFLoader().loadAsync(
-        withBasePath("/village/models/spirit.glb?v=3"),
-      ),
-      new GLTFLoader().loadAsync(withBasePath("/village/models/garden-pond.glb?v=2")),
-      new GLTFLoader().loadAsync(withBasePath("/village/models/dove.glb?v=1")),
-      layout.then(loadPlacedPuppies),
-      animalRigs.then(() => layout).then(authored => authored.items?.some(item => item.visible && item.asset === "cottage-cat")
-        ? makeAnimalRig("cat") : undefined),
-      animalRigs.then(() => layout).then(authored => authored.items?.some(item => item.visible && TOWN_ASSET_IDS.includes(item.asset)) ? loadTownAssetKit() : undefined),
-      animalRigs,
-    ]);
-    if (this.disposed) {
-      world.dispose();
-      (await sky)?.dispose();
-      return;
+    if (this.disposed) throw new DOMException("Loading cancelled", "AbortError");
+    const loading = this.loading = new VillageLoading();
+    try {
+      await this.loadScene(loading);
+      loading.finish();
+    } catch (error) {
+      loading.cancel(error);
+      this.dispose();
+      throw error;
     }
+  }
+  private async loadScene(loading: VillageLoading) {
+    const { world, gltf, gardenKit, dove, puppyKit, placedCat, townKit, sky } = await loadVillageStartup(loading,
+      value => { if (!loading.signal.aborted) this.callbacks.progress(value); }, this.renderer);
     this.world = world;
+    loading.adopt(world);
     this.townInteractions = new TownInteractions(world.authored);
     this.raceGuide = new RaceGuide(world.authored);
     this.scene.add(this.raceGuide.group);
@@ -644,21 +646,19 @@ export class VillageEngine {
     });
     this.scene.add(world.group);
     try {
-      const texture = await sky;
+      const texture = await loading.wait(sky);
       if (!texture) throw Error("Environment map unavailable");
-      if (this.disposed) {
-        texture.dispose();
-        return;
-      }
       texture.mapping = T.EquirectangularReflectionMapping;
       this.skyTexture = texture;
+      loading.adopt(texture);
       const pmrem = new T.PMREMGenerator(this.renderer);
-      this.environment = pmrem.fromEquirectangular(texture);
-      pmrem.dispose();
+      try { this.environment = pmrem.fromEquirectangular(texture); }
+      finally { pmrem.dispose(); }
       this.scene.environment = this.environment.texture;
       this.scene.environmentIntensity = 0.26;
       this.scene.environmentRotation.set(0, 1.67, 0);
     } catch {
+      if (loading.signal.aborted) throw loading.signal.reason;
       /* Directional and hemisphere lighting also work without the environment map. */
     }
     this.scene.add(this.atmosphere.sky);
@@ -677,6 +677,7 @@ export class VillageEngine {
       }
     });
     this.player.add(root);
+    loading.adopt(gltf);
     this.character = root;
     if (this.sharedColor) tintSpirit(root, this.sharedColor, false);
     this.placeSharedSpawn();
@@ -684,7 +685,8 @@ export class VillageEngine {
     this.garden = new GardenScene(gardenKit.scene, world.colliders, (kind, position) => this.callbacks.gardenSound?.(kind, position), world.gardenSurfaces, this.sun.position.clone().sub(this.sun.target.position), world.authored);
     this.garden.setLanguage(this.language);
     this.garden.sync(this.gardenState); world.group.add(this.garden.group);
-    await optimizeGardenGeometry(this.garden.group);
+    loading.adopt(gardenKit);
+    await loading.wait(optimizeGardenGeometry(this.garden.group, loading.signal));
     activityLayout.capture("kitchen-garden", "Kitchen garden & pond life", "Furnishings", [this.garden.group], [24, 0, -6]);
     this.activities=new VillageActivities(this.world.colliders);
     this.world.group.add(this.activities.outdoor);this.scene.add(this.activities.indoor);
@@ -698,10 +700,11 @@ export class VillageEngine {
     this.garden.group.traverse(object => { if (object instanceof T.InstancedMesh && object.userData.gardenPlant) {
       object.computeBoundingSphere(); gardenPlants.push(object);
     } });
-    await registerPlantDetail(gardenPlants);
+    await loading.wait(registerPlantDetail(gardenPlants, loading.signal));
     this.vegetationDetail = new VegetationDetail([...world.vegetation, ...gardenPlants]);
     configureLayoutInteractions(world.authored);
-    await addSupplementalLayout(world, gardenKit.scene, placedCat, townKit);
+    await loading.wait(addSupplementalLayout(world, gardenKit.scene, placedCat, townKit));
+    loading.release(placedCat);
     this.picnicScene = new PicnicScene(world.authored); world.group.add(this.picnicScene.group);
     this.picnicScene.sync(this.sharedActors?.picnic);
     this.life = new VillageLife(root, world.colliders, gardenKit.scene, world.authored);
@@ -709,7 +712,7 @@ export class VillageEngine {
       this.townAnimals = new TownAnimals(world.authored, townKit, root, event => this.callbacks.townAnimalSound?.(event), this.life.residents.find(resident => resident.root.name === "Rowan")?.spirit);
       this.townScene = new TownScene(world.authored, gardenKit.scene, townKit, event => this.callbacks.townAnimalSound?.(event));
       this.scene.add(this.townAnimals.group, this.townScene.group);
-      await this.townScene.prepareCrops();
+      await loading.wait(this.townScene.prepareCrops(loading.signal));
     }
     this.life.setCompanions(this.companions);
     this.scene.add(this.life.group);
@@ -721,6 +724,7 @@ export class VillageEngine {
       this.callbacks.gardenSound?.("crumbs", [BIRD_CLEARING.x, .4, BIRD_CLEARING.z]);
     }, world.authored);
     this.scene.add(this.birds.group);
+    loading.adopt(dove);
     this.animalDialogue = new AnimalDialogue(this.host);
     this.animalDialogue.setLanguage(this.language);
     this.puppies = new PuppyPack(puppyKit.scene, puppyKit.animations, world.authored.puppies, world.colliders, world.authored,
@@ -779,7 +783,7 @@ export class VillageEngine {
   private async loadCottageCat() {
     if (this.cottageCat || this.disposed) return;
     if (this.cottageCatLoading) return this.cottageCatLoading;
-    this.cottageCatLoading = loadAnimalRigs(["cat"]).then(() => {
+    this.cottageCatLoading = loadAnimalRigs(["cat"], this.loading?.signal).then(() => {
       const model = makeAnimalRig("cat");
       if (this.disposed) { disposeAnimalRig(model); return; }
       this.cottageCat = new CottageCat(model, status => {
@@ -798,7 +802,7 @@ export class VillageEngine {
     return this.cottageCatLoading;
   }
   private renderBridgeWindow(now: number, time: number) {
-    const interval = this.graphicsTier === "minimal" ? 50 : 33;
+    const interval = this.frameBudget.idle ? 100 : this.graphicsTier === "minimal" ? 50 : 33;
     if (this.place !== "focus" || !this.bridgeWindow || !this.world || now - this.bridgeWindowTime < interval) return;
     this.bridgeWindowTime = now;
     const windowCamera = this.bridgeCamera;
@@ -850,6 +854,7 @@ export class VillageEngine {
     this.renderer.domElement.tabIndex = value ? -1 : 0;
   }
   setBlocked(v: boolean) {
+    this.frameBudget.wake(performance.now());
     this.blocked = v;
     this.dialogue?.setEnabled(!v && !this.place && !this.horseRiding.actor);
     if (v) {
@@ -926,6 +931,8 @@ export class VillageEngine {
       antialias: gl.getContextAttributes()?.antialias,
       contextLost: gl.isContextLost(),
       weather: this.weather,
+      renderCadence: this.frameBudget.idle ? "idle-30" : "interactive",
+      treeVisibilityUploads: this.treeVisibility.uploads,
       lowestFps: Number.isFinite(this.lowestFps) ? this.lowestFps : null,
       longestFrameMs: Math.round(this.longestFrameMs),
       longestRenderSubmitMs: Math.round(this.longestRenderSubmitMs),
@@ -1082,6 +1089,7 @@ export class VillageEngine {
     this.forageInventory = { ...inventory };
   }
   private requestShared(request: SharedInteraction, accepted: (result: InteractionResult) => void, finished?: () => void) {
+    this.frameBudget.wake(performance.now());
     if (!this.sharedMode) return false;
     const key = JSON.stringify(request);
     if (this.pendingInteractions.has(key)) return true;
@@ -1090,6 +1098,7 @@ export class VillageEngine {
     const selfId = this.sharedSelfId;
     void this.sharedInteraction(request).then(result => {
       if (this.disposed || !this.sharedConnected || selfId !== this.sharedSelfId) return;
+      this.frameBudget.wake(performance.now());
       if (result.ok) accepted(result);
       else this.callbacks.sharedNotice?.(result.reason ?? "That interaction is busy. Try again in a moment.");
     }).catch(() => { if (!this.disposed) this.callbacks.sharedNotice?.("The village didn't respond. Try again."); })
@@ -1262,7 +1271,14 @@ export class VillageEngine {
     const light = this.spiritLights[0];
     light.visible = night >= .01;
     if (light.visible) {
-      light.position.copy(this.player.position); light.position.y += 1.05;
+      // Keep the existing glow outside the body so it can shade the visible curved surface.
+      light.position.copy(this.player.position); light.position.y += 2.2;
+      const dx = this.camera.position.x - this.player.position.x, dz = this.camera.position.z - this.player.position.z;
+      const distance = Math.hypot(dx, dz);
+      if (distance > .001) {
+        light.position.x += dx / distance * .75;
+        light.position.z += dz / distance * .75;
+      }
       light.intensity = night * 2.8;
     }
   }
@@ -1700,17 +1716,18 @@ export class VillageEngine {
   }
   private updateSwingCamera() {
     const swing = this.world?.swings.find(value => value.placement.id === this.ridingSwing?.id);
-    if (swing) this.view.swing(swing, this.yaw, this.pitch, this.compactView);
+    if (swing) this.view.swing(swing, this.yaw, this.pitch, this.compactView, this.world?.colliders);
   }
   private updateActivityCamera(place: PlaceId) {
     if (place === "mood" && !this.teaPanHeld)
       this.teaPan = this.reducedMotion ? 1 : T.MathUtils.smoothstep(this.elapsed - this.teaPanAt, 0, 4);
     this.view.activity(place, { teaPan: this.teaPan, companionCount: this.companions.length,
-      compactView: this.compactView, activityOrbit: this.activityOrbit, colliders: this.world?.colliders ?? [] });
+      compactView: this.compactView, activityOrbit: this.activityOrbit, colliders: this.world?.colliders ?? [], items: this.world?.authored.items });
   }
   private updateWalkingCamera() {
     this.view.walking({ player: this.player, yaw: this.yaw, pitch: this.pitch, distance: this.horseRiding.actor ? Math.max(6.5, this.distance) : this.distance,
-      seated: !!this.seatedBench, puppies: this.horseRiding.actor ? undefined : this.puppies, colliders: this.world?.colliders ?? [] });
+      seated: !!this.seatedBench, mounted: !!this.horseRiding.actor, items: this.world?.authored.items,
+      puppies: this.horseRiding.actor ? undefined : this.puppies, colliders: this.world?.colliders ?? [] });
   }
   private reportMovement(force = false) {
     const m = this.movement;
@@ -1724,6 +1741,14 @@ export class VillageEngine {
   }
   private frame(now: number) {
     if (this.disposed || document.hidden) return;
+    const active = !this.blocked && (this.keys.size > 0 || this.touchMove.lengthSq() > 0 || !!this.pointer
+      || (this.movement?.speed ?? 0) > .05 || this.movement?.grounded === false
+      || !!this.horseRiding.actor || !!this.ridingSwing);
+    if (!this.frameBudget.accept(now, active)) return;
+    if (this.frameBudget.cadenceChanged) {
+      this.frameSum = this.frames = this.slowSamples = 0;
+      this.statsTime = now;
+    }
     const frameDelta = this.lastTime ? (now - this.lastTime) / 1000 : 0.016;
     if (now - this.qualityChangedAt > 4000)
       this.longestFrameMs = Math.max(this.longestFrameMs, frameDelta * 1000);
@@ -2034,31 +2059,10 @@ export class VillageEngine {
     });
     if (this.place !== "focus") {
       this.camera.updateMatrixWorld();
-      this.viewProjection.multiplyMatrices(
-        this.camera.projectionMatrix,
-        this.camera.matrixWorldInverse,
-      );
-      this.treeFrustum.setFromProjectionMatrix(this.viewProjection);
-      const nearTrees: number[] = [], farTrees: number[] = [];
-      const treeSource = this.world.trees[0];
-      treeSource?.bounds.forEach((bounds, index) => {
-        const distance = Math.hypot(bounds.center.x - this.player.position.x, bounds.center.z - this.player.position.z);
-        if (distance < GRAPHICS_TIERS[this.graphicsTier].trees) nearTrees.push(index);
-        else if (this.treeFrustum.intersectsSphere(bounds)) farTrees.push(index);
-      });
-      for (const batch of this.world.trees) {
-        nearTrees.forEach((index, i) => batch.mesh.setMatrixAt(i, batch.transforms[index]));
-        batch.mesh.count = nearTrees.length;
-        batch.mesh.instanceMatrix.needsUpdate = true;
-      }
-      if (treeSource) {
-        farTrees.forEach((index, i) => this.world!.treeLod.setMatrixAt(i, treeSource.transforms[index]));
-        this.world.treeLod.count = farTrees.length;
-        this.world.treeLod.instanceMatrix.needsUpdate = true;
-      }
+      this.treeVisibility.update(this.world, this.camera, this.player.position, GRAPHICS_TIERS[this.graphicsTier].trees);
     }
     // A stale shadow can fall onto the moving blob's back between battery refreshes.
-    // Keep movement in sync with rendering; idle battery scenes retain the 30 Hz cap.
+    // Moving shadows follow the frame; idle shadow updates retain their separate budget.
     const horsesMoving = this.sharedActors?.actors.some(actor => actor.kind === "horse" && actor.speed > .05);
     const shadowInterval = this.graphicsTier === "detailed" || moving || horsesMoving || !movement.grounded ? 0 : 32;
     if (this.place !== "focus" && this.renderer.shadowMap.enabled && now - this.shadowTime > shadowInterval && (!this.reducedMotion || moving || horsesMoving || !movement.grounded)) {
@@ -2107,13 +2111,14 @@ export class VillageEngine {
     this.renderer.render(this.scene, this.camera);
     if (now - this.qualityChangedAt > 4000)
       this.longestRenderSubmitMs = Math.max(this.longestRenderSubmitMs, performance.now() - renderStart);
-    this.visitors.projectLabels(this.camera, this.player.position, this.place === "focus");
+    bubbleLayout(this.host).beginFrame();
     this.dialogue?.update(dt, this.camera, this.player.position, this.weather);
     this.animalDialogueCues.length = 0;
     if (this.place === "focus") this.animalDialogueCues.push(...this.cottageCat?.dialogueCues ?? []);
     else for (const animals of [this.townAnimals, this.townScene, this.garden, this.puppies, this.horses])
       this.animalDialogueCues.push(...animals?.dialogueCues ?? []);
-    this.animalDialogue?.update(this.animalDialogueCues, this.camera, this.place === "focus" ? this.camera.position : this.player.position, dt, this.reducedMotion, !this.blocked);
+    this.animalDialogue?.update(this.animalDialogueCues, this.camera, this.place === "focus" ? this.camera.position : this.player.position, dt, this.reducedMotion, !this.blocked, this.world.colliders);
+    this.visitors.projectLabels(this.camera, this.player.position, this.place === "focus", this.world.colliders);
     this.frameSum += frameDelta;
     this.frames++;
     if (now - this.statsTime > 2000) {
@@ -2124,7 +2129,7 @@ export class VillageEngine {
         this.renderer.info.render.calls,
         this.renderer.info.render.triangles,
       );
-      this.slowSamples = fps < 45 ? this.slowSamples + 1 : 0;
+      this.slowSamples = fps < (this.frameBudget.idle ? 24 : 45) ? this.slowSamples + 1 : 0;
       if (this.quality === "high" && this.graphicsTier === "detailed" &&
           this.slowSamples >= 2 && now - this.qualityChangedAt > 4000 && this.detailedRenderScale > .67) {
         this.detailedRenderScale = Math.max(.67, Math.round((this.detailedRenderScale - .16) * 100) / 100);
@@ -2143,7 +2148,9 @@ export class VillageEngine {
     }
   }
   dispose() {
+    if (this.disposed) return;
     this.disposed = true;
+    this.loading?.cancel();
     this.visitors.dispose();
     this.releaseMouseLook();
     this.renderer.setAnimationLoop(null);

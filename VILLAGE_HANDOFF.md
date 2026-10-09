@@ -1,5 +1,25 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-09 — authorized integrated release
+
+Audit essentials, visual/performance/loading fixes, explicit Chat entry and the completed horse repair are being released together with the matching Worker. Current local evidence is retained; publication/live results will be recorded after deployment completes. See the newest VILLAGE_BUILD.md entry.
+
+## 2026-10-09 — explicit chat entry (local)
+
+Chat discovery is refined: speech-bubble icon, visible Chat / チャット action, secondary visitor count, expand/collapse chevron and a steady amber unread dot replace the presence-only pill/New badge. Saved visibility, unread pruning, keyboard access and shared behavior remain. Fresh check/build/export privacy and all 28 focused two-client English/Japanese chat/keyboard/layout checks pass with zero page errors, including all six iPad CSS orientations. [Evidence](docs/village/evidence/chat-entry-20261009/README.md). Preview3051 serves the latest root export; no deployment or Git writes. Native/physical-device acceptance remains open.
+
+## 2026-10-09 — quiet-space audit fixes verified locally
+
+The audit essentials and approved annotations are implemented locally: 30 FPS idle rendering with immediate input wake/static tree cache and 10 Hz cottage window, clear obstruction-aware cameras and pond staging, padded long keycaps, visible crumb prerequisite, smaller translucent activity panels, saved collapsed chat with an accessible unread indicator (now the explicit Chat entry above), HUD-aware shared bubble placement, bounded loading/retry cleanup, settings scroll reset and subtle water/stone/night shading. Activities, shared authority, saved layout/editor parity and the concurrent horse repair are preserved. Visible heartbeats keep their 120 ms shared clock; only unchanged hidden-page renewal is slowed.
+
+Full check/build/export privacy pass. Actual Chrome evidence includes 94 broad UI plus 18 final focused UI, 31 Japanese two-client, nine performance, seven failed-load/retry and 27 three-client shared checks; laptop/small-window/all six iPad CSS orientations are covered. Matched idle main renders fall about 50%, without repeated stationary tree uploads. Pond/crowd placement has 24 fresh assertions; stable/swings/owl/circuit evidence is reused for unchanged paths. Crowd geometry is staged; accepted stable mounting/shared claims are tested separately. Physical/native devices, hidden-tab traffic, thermals, long sessions and live acceptance remain open. Listening remains with the user.
+
+Preview3051 serves the current local root `out` against retained Worker2567. [Evidence and limitations](docs/village/evidence/quiet-space-20261009/README.md) and VILLAGE_BUILD.md. No Git writes or deployment.
+
+## 2026-10-09 — horse riding repair (local)
+
+Horse riding now has stronger acceleration/braking, tighter canter steering, walking-compatible moderate slopes and sustained collision-edge sliding. Snapshot easing no longer removes a frame of forward movement, including after slow frames. Shared collision indexing removes repeated 3,323-solid scans from actors advanced by horse input; matched local simulation median improves 46.26 → 6.96 ms. Final build/lint/types/full contracts/export privacy, 9,975 exact collision comparisons and 31 real three-client Chrome checks pass. Added 200 ms network delay yields 62.5 ms visual steering; the brief canter sample has 16.7 ms median frame intervals and no backwards corrections. Laptop/all six iPad CSS layouts, contention, full seats, reconnect and private focus pass. Preview3051 serves root `out` with Worker2567 and separate synthetic persistence. [Evidence and native/physical/live limits](docs/village/evidence/horse-riding-20261009/README.md). No Git writes or deployment.
+
 ## 2026-10-08 — radish-bank repair published
 
 Release `da23d2d` is pushed and published. Solid riverside/pond stones have matching 3,323-collider Worker physics; refined stream terrain, narrow-bank edging and paving joins correct the radish-bank scene. Local editor support and bridge side access are preserved. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37670619730) succeeded after one unchanged Google-font build retry. Worker version `b2844b37-1245-46fc-85f2-edb44d57c286` is healthy. Local full contracts/build/export, 498 layout/physics, 56 rendered bridge/water, 23 editor and 27 real three-client checks remain applicable to unchanged source. Nine fresh live Chrome checks pass for shared entry, rock bounds, farm travel, private cottage/cat, button exit and accepted farmer speech, with no page errors or failed resource responses. Live layout bytes match and editor/admin/save routes stay private. See [evidence](docs/village/evidence/riverbank-repair-20261008/README.md) and the newest build ledger entry for fresh browser checks and native/physical-device limits.

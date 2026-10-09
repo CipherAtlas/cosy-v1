@@ -160,6 +160,10 @@ slopeRiding.step(slope, 1, .75, 20000, () => false); // Approach the slope at a 
 slope.state.x = 130.8;
 environment.setAuthoredWorld({ ...full.authored, terrain: slopeTerrain });
 slopeRiding.step(slope, 1, 1 / 60, 20000, () => false);
+check(slope.state.x > 130.8, 'Horse riding accepts the same moderate terrain grade as walking');
+slope.state.x = 130.8;
+environment.setAuthoredWorld({ ...full.authored, terrain: { ...slopeTerrain, samples: slopeTerrain.samples.map(([x, z, y]) => [x, z, y * 4 / 3]) } });
+slopeRiding.step(slope, 1, 1 / 60, 20000, () => false);
 check(slope.state.x === 130.8 && slope.state.speed === 0, 'The small paving allowance does not permit a steep sculpted slope');
 environment.setAuthoredWorld({ ...full.authored, terrain: { ...slopeTerrain, samples: slopeTerrain.samples.map(([x, z, y]) => [x, z, y * 4]) } });
 const cliff = { state: { id: 'cliff-probe', x: 130.2, z: 120.8, y: .6, heading: Math.PI / 2, speed: 0 }, movement: new VillageMovement([], () => {}) };

@@ -1,5 +1,17 @@
 # Movement, camera, and a living world
 
+## Quiet-space rendering and camera — 2026-10-09 local
+
+Stationary visible sessions render at 30 FPS; keyboard, pointer, touch movement, riding and swinging restore interactive cadence immediately. Static tree instance classification/uploads are cached until the camera, player or projection changes. The private cottage's outdoor window renders at 10 Hz while idle. Intentional idle cadence does not trigger graphics fallback; genuinely slow frames still can. Visible 120 ms heartbeats retain the shared actor clock beneath menus. Unchanged hidden-page heartbeats renew at one second, while ownership/visibility changes bypass the throttle.
+
+Camera obstruction uses indexed layout solids and camera-only stable roof/willow bounds. Near rails or roofs it tries a clear side or lower view before compressing the camera into the visitor. Pond staging follows the authored dock transform from the open bank. A shared screen-space allocator reserves NPC conversation first, then animal responses, visitor speech and names, avoiding visible HUD/panels, screen edges and other bubbles. Distance/frustum checks precede indexed scenery visibility. Worker collision, saved world geometry and interaction authority are unchanged. [Verification and remaining limits](../../VILLAGE_BUILD.md#2026-10-09--quiet-space-audit-fixes-local).
+
+## Horse riding and shared collision latency — 2026-10-09 local
+
+Rider corrections compare positions at the same frame time. Horse acceleration/braking are 8/18 m/s², coasting deceleration is 9 m/s², and steering ranges from 2.4 rad/s at rest to 1.5 rad/s at 9 m/s canter. The solver accepts moderate .85 terrain grades and shallow .12 m × scale paving steps without allowing cliffs or water. Collision-edge sliding retains forward speed. The full body, shared occupancy and countdown rules still apply to both Worker and bounded rider prediction.
+
+Movement controllers share an 8 m spatial index of fixed layout colliders, including rotated bounds and footprint margins. Public actors advanced by horse controls no longer scan every solid for every movement probe; walking, jump supports and ceilings use the same exact tests on nearby candidates. [Verification and local/live limits](../../VILLAGE_BUILD.md#2026-10-09--horse-riding-physics-and-collision-latency-local).
+
 ## Multiplayer horse response — 2026-10-07 local
 
 The accepted rider sees keyboard/thumbstick steering and braking on display frames, with at most 350 ms of motion projected from the latest Worker snapshot. Newer rapid controls replace the held input without a 50 ms rejection window. The same horse footprint, terrain, acceleration and braking rules apply to prediction and authority; snapshots reconcile small positional errors. Prediction clears on dismount/ownership loss, cannot move during race countdowns, and stops on stale delivery. Other visitors keep the accepted shared path and saddle attachment; predicted poses cannot grant ownership, move the shared horse or advance race checkpoints. Older Worker snapshots retain accepted-path rendering. [Checks and limits](../../VILLAGE_BUILD.md#2026-10-07--responsive-multiplayer-horse-controls-local).

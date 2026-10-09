@@ -1,25 +1,26 @@
 import * as T from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { Collider } from "./environment";
 import type { WorldItem } from "./worldLayout";
 import { withBasePath } from "@/lib/basePath";
 import { fantasyTreeGeometry } from "./fantasyTrees";
 import { isAnimalRigLoaded, makeAnimalRig, type AnimalRigSlug } from "./animalRig";
+import { disposeAssetModel, loadVillageModel } from "./assetModels";
+import { sharedVillageAsset } from "./assetLoading";
 
 export type TownAsset = { id: string; name: string; category: string; template: T.Object3D; shelf: boolean; solid: boolean; localColliders: Collider[] };
 export const TOWN_ASSET_IDS = ["horse-racetrack", "horse-stable", "farm-row", "owl-feeding-perch", "owl-brown", "hay-bale", "cow-highland", "cow-highland-girl", "sheep", "lamb", "hedgehog", "forage-apple", "forage-mushroom", "apple-tree", "mushroom-patch"];
 export const TOWN_ANIMAL_ASSETS = ["cow-highland", "cow-highland-girl", "sheep", "lamb", "hedgehog"];
-let kitPromise: Promise<T.Group> | undefined;
 
 /** One original Blender kit shared by game life and rendered studio previews. */
-export function loadTownAssetKit(): Promise<T.Group> {
-  if (!kitPromise) {
+export const loadTownAssetKit = sharedVillageAsset(async signal => {
     const nativeAnimals = ["highland-copper", "highland-flower", "sheep", "lamb", "owl"] as const;
     const farmFile = nativeAnimals.every(isAnimalRigLoaded) ? "farm-props" : "farm-animals";
-    kitPromise = Promise.all([
-      new GLTFLoader().loadAsync(withBasePath("/village/models/town-kit.glb?v=2")),
-      new GLTFLoader().loadAsync(withBasePath(`/village/models/${farmFile}.glb?v=2`)),
-    ]).then(([town, life]) => {
+    const requests = [
+      loadVillageModel(withBasePath("/village/models/town-kit.glb?v=2"), "The village buildings", signal),
+      loadVillageModel(withBasePath(`/village/models/${farmFile}.glb?v=2`), "The farm", signal),
+    ];
+    return Promise.all(requests).then(([town, life]) => {
+      if (signal.aborted) throw signal.reason;
       const root = new T.Group(); root.name = "Original Blender town kit"; root.add(town.scene, life.scene);
       for (const [slug, name] of [["highland-copper", "CowHighland"], ["highland-flower", "CowHighlandGirl"], ["sheep", "Sheep"], ["lamb", "Lamb"], ["owl", "OwlBrown"]] as const) {
         if (!isAnimalRigLoaded(slug)) continue;
@@ -28,10 +29,13 @@ export function loadTownAssetKit(): Promise<T.Group> {
       }
       root.traverse(object => { if (object instanceof T.Mesh) object.castShadow = object.receiveShadow = true; });
       return root;
-    }).catch(error => { kitPromise = undefined; throw error; });
-  }
-  return kitPromise;
-}
+    }).catch(error => {
+      void Promise.allSettled(requests).then(results => results.forEach(result => {
+        if (result.status === "fulfilled") disposeAssetModel(result.value);
+      }));
+      throw error;
+    });
+});
 
 export function townAssets(source: T.Object3D): Map<string, TownAsset> {
   const assets = new Map<string, TownAsset>();

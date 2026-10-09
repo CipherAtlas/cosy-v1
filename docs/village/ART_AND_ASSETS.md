@@ -1,5 +1,11 @@
 # Art direction, lighting, and asset production
 
+## Quiet-space presentation and loading — 2026-10-09 local
+
+Non-paper activity panels use compact translucent forest-green surfaces, cream text and 44 px controls. Journal/postbox paper treatments remain. Multi-character shortcut keycaps use intrinsic width with padding. The chat entry shows a speech-bubble icon and Chat / チャット action before a secondary visitor count, with a chevron indicating expansion. Chat visibility saves on this device; incoming messages while closed add a steady amber dot to the chat icon, with accessible new-message text. The translucent green entry has a 44 px target. Settings sections reset to their top; empty bird-feed pouches explain where to get crumbs.
+
+Water highlights/foam are softer and less regular, bank stones have subtle warm/cool tint variation, and nighttime spirits retain more body shading with reduced emission; the existing player light sits outside the body above and toward the camera. Shared runtime/editor builders retain original geometry, placements and collisions. Model/layout loads have a 45-second request deadline and a 20-second no-progress limit, plus a 90-second startup barrier. Optional HDR lighting has shorter deadlines and can fall back to existing lights. Failed caches can retry; cancellation disposes abandoned results and prevents stale scene mounting. The private cottage cat stays deferred until entry. Required outdoor actors remain available at startup. [Checks and remaining limits](../../VILLAGE_BUILD.md#2026-10-09--quiet-space-audit-fixes-local).
+
 ## Detailed rendering budgets — 2026-10-04 local
 
 Runtime architecture keeps its original triangles/materials in independently culled material batches. Ground and garden meshes receive bounded simplification using Three's bundled meshoptimizer; original vertex normals, UVs/colors and borders are retained. Nearby grass stays fully curved; distant cells retain their three blade silhouettes, density, color and wind with fewer segments. Detailed keeps 2048 px moving shadows with a nine-sample weighted PCF filter at the same radius. The local editor still edits the full authored geometry and saved transforms. [Measurements and limits](../../VILLAGE_BUILD.md#2026-10-04--detailed-rendering-budgets-local).

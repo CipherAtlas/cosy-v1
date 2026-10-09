@@ -85,7 +85,8 @@ const finishCapture = async (page, name) => {
         return !!window.testEngine && !!window.testConnection && testEngine.sharedConnected;
       }, null, { timeout: 120000 });
       await page.evaluate(() => testEngine.setQuality('low'));
-      await page.getByRole('button', { name: 'Hide Hearthwillow chat', exact: true }).click();
+      const closeChat = page.getByRole('button', { name: 'Hide Hearthwillow chat', exact: true });
+      if (await closeChat.count()) await closeChat.click();
       console.log(`Client ${index + 1} connected`);
     }
     const [owner, observer, other] = pages;

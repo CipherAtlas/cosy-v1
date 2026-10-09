@@ -1,8 +1,9 @@
 import * as T from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { withBasePath } from "../../lib/basePath";
 import type { AuthoredWorld } from "./worldLayout";
+import { disposeAssetModel, loadVillageModel } from "./assetModels";
+import { sharedVillageAsset, VillageAssetLoadError } from "./assetLoading";
 
 export const ANIMAL_RIG_SLUGS = ["horse-bay", "horse-grey", "highland-copper", "highland-flower", "dog-corgi", "dog-shiba", "dog-beagle", "dog-samoyed", "dog-collie", "dog-shepherd", "sheep", "lamb", "cat", "swan", "owl", "duck", "duckling"] as const;
 export type AnimalRigSlug = typeof ANIMAL_RIG_SLUGS[number];
@@ -26,24 +27,33 @@ export function animalRigSlugsForLayout(authored: AuthoredWorld): Set<AnimalRigS
 }
 
 const templates = new Map<AnimalRigSlug, { scene: T.Group; clips: T.AnimationClip[] }>();
-const loading = new Map<AnimalRigSlug, Promise<void>>();
+const loading = new Map<AnimalRigSlug, (signal?: AbortSignal) => Promise<void>>();
 const rigs = new WeakMap<T.Object3D, { mixer: T.AnimationMixer; actions: Map<string, T.AnimationAction>; clips: T.AnimationClip[]; action: string; time: number }>();
 
 /** Load only the authored animals; the same templates serve gameplay and the local editor. */
-export async function loadAnimalRigs(slugs: Iterable<AnimalRigSlug>) {
+export async function loadAnimalRigs(slugs: Iterable<AnimalRigSlug>, signal?: AbortSignal) {
   await Promise.all([...new Set(slugs)].map(slug => {
+    if (signal?.aborted) return Promise.reject(signal.reason);
     if (templates.has(slug)) return Promise.resolve();
-    const pending = loading.get(slug); if (pending) return pending;
-    const promise = new GLTFLoader().loadAsync(withBasePath(`/village/models/animals-v2/${slug}.glb?v=${slug === "owl" ? "owl2" : "rig1"}`)).then(kit => {
-      let skinned = false;
-      kit.scene.traverse(object => {
-        if (object instanceof T.Mesh) object.castShadow = object.receiveShadow = true;
-        if (object instanceof T.SkinnedMesh) skinned = true;
+    let load = loading.get(slug);
+    if (!load) {
+      load = sharedVillageAsset(async requestSignal => {
+        const kit = await loadVillageModel(withBasePath(`/village/models/animals-v2/${slug}.glb?v=${slug === "owl" ? "owl2" : "rig1"}`), "The village animals", requestSignal);
+        if (requestSignal.aborted) { disposeAssetModel(kit); throw requestSignal.reason; }
+        let skinned = false;
+        kit.scene.traverse(object => {
+          if (object instanceof T.Mesh) object.castShadow = object.receiveShadow = true;
+          if (object instanceof T.SkinnedMesh) skinned = true;
+        });
+        if (!skinned || !kit.animations.some(clip => clip.name === "idle")) {
+          disposeAssetModel(kit);
+          throw new VillageAssetLoadError("unavailable", "The village animals");
+        }
+        templates.set(slug, { scene: kit.scene, clips: kit.animations });
       });
-      if (!skinned || !kit.animations.some(clip => clip.name === "idle")) throw Error(`Animal rig is missing its skin or idle clip: ${slug}`);
-      templates.set(slug, { scene: kit.scene, clips: kit.animations });
-    }).finally(() => loading.delete(slug));
-    loading.set(slug, promise); return promise;
+      loading.set(slug, load);
+    }
+    return load(signal);
   }));
 }
 

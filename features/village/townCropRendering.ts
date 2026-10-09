@@ -36,10 +36,11 @@ export class TownCropRendering {
     }
   }
 
-  async prepare() {
-    await Promise.all([...this.geometry].map(geometry => optimizeGeometry(geometry, .002)));
+  async prepare(signal?: AbortSignal) {
+    await Promise.all([...this.geometry].map(geometry => optimizeGeometry(geometry, .002, signal)));
     const meshes = this.plants.map(plant => plant.mesh);
-    await registerPlantDetail(meshes);
+    await registerPlantDetail(meshes, signal);
+    if (signal?.aborted) throw signal.reason;
     meshes.forEach(mesh => mesh.computeBoundingSphere());
     this.detail = new VegetationDetail(meshes);
   }

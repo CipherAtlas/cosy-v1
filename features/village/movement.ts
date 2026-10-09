@@ -1,5 +1,6 @@
 import { bridgeBarriers, floorHeight, hasEditedTerrain, inWalkableWorld, inRiver, onBridge, onPondDock, pondDistance, riverX, surfaceAt } from "./environment";
 import type { Collider, MovementStatus, WorldContact } from "./environment";
+import { collisionLookup, nearbyColliders } from "./collisionLookup";
 
 const STEP = 1 / 120;
 export const MOVEMENT = { walk: 2.6, run: 4.5, sprint: 6, gravity: 12, jump: 5, radius: 0.32, height: 1.8 };
@@ -48,15 +49,18 @@ export class VillageMovement {
     }
     return true;
   }
-  clear(x: number, z: number, y = floorHeight(x, z)) {
+  nearby(x: number, z: number, radius: number) {
+    return new VillageMovement(nearbyColliders(collisionLookup(this.colliders, MOVEMENT.radius), x, z, radius), () => {});
+  }
+  clear(x: number, z: number, y = floorHeight(x, z), height = MOVEMENT.height) {
     if (!inWalkableWorld(x, z)) return false;
     if (inRiver(x, z) && !onBridge(x, z)) return false;
     if (pondDistance(x, z) < 1.035 && !onPondDock(x, z)) return false;
     // Rails stay solid during jumps; one rounded footprint also covers every stone seam.
     if (bridgeBarriers().some(c => this.overlaps(c, x, z))) return false;
-    return !this.colliders.some(c => {
+    return !nearbyColliders(collisionLookup(this.colliders, MOVEMENT.radius), x, z).some(c => {
       if (c.bridgeRail) return false; // The continuous oriented rails above own walking collision.
-      if (y >= (c.top ?? 8) || y + MOVEMENT.height <= (c.bottom ?? -1)) return false;
+      if (y >= (c.top ?? 8) || y + height <= (c.bottom ?? -1)) return false;
       return this.overlaps(c, x, z);
     });
   }
@@ -181,7 +185,8 @@ export class VillageMovement {
     const travelled = Math.hypot(this.position.x - oldX, this.position.z - oldZ);
     this.speed = travelled / dt;
     let floor = floorHeight(this.position.x, this.position.z);
-    for (const c of this.colliders) {
+    const solids = nearbyColliders(collisionLookup(this.colliders, MOVEMENT.radius), this.position.x, this.position.z);
+    for (const c of solids) {
       if (!c.bridgeRail && c.top !== undefined && this.position.y >= c.top - .025 && Math.abs(this.position.x - c.x) < c.w / 2 && Math.abs(this.position.z - c.z) < c.d / 2)
         floor = Math.max(floor, c.top);
     }
@@ -191,7 +196,7 @@ export class VillageMovement {
       this.velocity.y -= MOVEMENT.gravity * dt;
       this.position.y += this.velocity.y * dt;
       // Undersides stop ascent. Building sides stay solid at every jump height.
-      if (this.velocity.y > 0) for (const c of this.colliders) {
+      if (this.velocity.y > 0) for (const c of solids) {
         if (c.bridgeRail) continue;
         if (c.bottom === undefined || c.bottom <= previousY) continue;
         if (Math.abs(this.position.x - c.x) < c.w / 2 + MOVEMENT.radius && Math.abs(this.position.z - c.z) < c.d / 2 + MOVEMENT.radius && this.position.y + MOVEMENT.height >= c.bottom) {

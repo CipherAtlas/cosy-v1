@@ -134,7 +134,10 @@ export function buildRiverbankStones(group: T.Object3D, material: T.Material, he
             const center = bounds.getCenter(new T.Vector3()), boundsSize = bounds.getSize(new T.Vector3());
             // Never grant collision to a stone completely below the visible water surface.
             if (bounds.max.y > waterHeight) colliders.push({ x: center.x, z: center.z, w: boundsSize.x, d: boundsSize.z, bottom: bounds.min.y, top: bounds.max.y });
-            colors.push(new T.Color().setScalar(.92 + random() * .12));
+            // Position-derived warm/cool tint breaks repeated rows without changing the seeded geometry/collisions.
+            const tone = .92 + random() * .12;
+            const warmth = Math.sin(point.x * 12.9898 + point.z * 78.233) * .045;
+            colors.push(new T.Color(tone * (1 + warmth), tone, tone * (1 - warmth)));
             const cell = occupied.get(key) ?? []; cell.push(point); occupied.set(key, cell);
           }
           next += .72 + random() * .32;

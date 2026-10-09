@@ -1,0 +1,11 @@
+# Horse riding repair: local evidence, October 9, 2026
+
+The fix addresses same-frame snapshot hitches, repeated full-map solid scans during shared-world advancement, weak canter turning and collision-edge speed loss. Worker authority, body/occupancy collision, countdowns and the bounded 350 ms rider display remain intact. See the [build ledger](../../../../VILLAGE_BUILD.md#2026-10-09--horse-riding-physics-and-collision-latency-local) for code scope, physics values and the matched CPU benchmark.
+
+- Final `npm run build` with the local Worker endpoint passes lint/types. `npm test` passes Worker types and current contracts; `npm run check:export` confirms no editor/save/admin routes. The focused horse regression includes slow render frames and 9,975 indexed/full-scan collision comparisons.
+- [31 actual three-client Chrome checks](checks.json) pass with no page errors. They cover accepted riding, contention, observer attachment, late joining, dismount, disconnection/reconnection, full seats and private focus, plus laptop and six iPad CSS orientations with touch capability enabled.
+- [Delayed steering](latency.json): 62.5 ms visual response versus 536 ms accepted heading response. The fixture adds 100 ms to outgoing horse input and 100 ms to incoming actor snapshots; this is local evidence, not a live network benchmark.
+- [Brief canter sample](sustained.json): 600 ms, 30 frame intervals, 16.7 ms median/33.4 ms p95; rider solver 1.3 ms median/14.3 ms p95; two near-still intervals, zero backwards corrections. Battery quality and concurrent synthetic clients were used. This does not establish sustained FPS or native-device comfort.
+- [1133×744 riding capture](riding-1133x744.png) is nonblank and keeps the horse and touch controls visible. Native iPad gestures, physical devices, native Safari/Firefox and live riding acceptance remain open.
+
+The preview runs at `http://127.0.0.1:3051/?sharedTrial=1` from root `out`, with local Worker2567 and separate test persistence at `/tmp/cosy-horse-fix-worker-20261009`. Earlier attempts exposed Worker delays and a legitimate caretaker meal refusal; the final fixture waits for the real shared meal to end. No Git writes, dependencies, layout/assets or deployment were changed.

@@ -6,7 +6,8 @@ export const KeybindingContext = createContext<Keybindings>(DEFAULT_KEYBINDINGS)
 
 export function Keycap({ children, ...props }: ComponentProps<"kbd">) {
   const bindings = useContext(KeybindingContext);
-  return <kbd {...props}>{typeof children === "string" || typeof children === "number" ? shortcutKeys(bindings, String(children)) : children}</kbd>;
+  const label = typeof children === "string" || typeof children === "number" ? shortcutKeys(bindings, String(children)) : children;
+  return <kbd {...props} data-wide={typeof label === "string" && label.length > 1 ? "true" : undefined}>{label}</kbd>;
 }
 
 export function ShortcutButton({ "aria-keyshortcuts": shortcuts, ...props }: ComponentProps<"button">) {

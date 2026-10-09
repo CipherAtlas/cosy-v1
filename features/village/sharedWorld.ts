@@ -79,6 +79,8 @@ export function connectSharedWorld(options: {
     let connectedOnce = false;
     let closed = false;
     let lastPose: ReturnType<typeof options.getPose> = null;
+    let lastHeartbeat = "";
+    let lastHeartbeatAt = -Infinity;
     let nextChatAt = 0;
     let nextTrickAt = 0;
     let trickTimer = 0;
@@ -159,6 +161,8 @@ export function connectSharedWorld(options: {
           joined = true;
           retryDelay = 1000;
           lastPose = null;
+          lastHeartbeat = "";
+          lastHeartbeatAt = -Infinity;
           nextChatAt = 0;
           nextTrickAt = 0;
           options.onChatCooldown(0);
@@ -190,9 +194,17 @@ export function connectSharedWorld(options: {
               lastPose = pose;
               active.send(JSON.stringify({ type: "move", ...pose }));
             }
-            if (pose && active.readyState === WebSocket.OPEN) active.send(JSON.stringify({ type: "heartbeat", active: pose.active !== false,
-              lookout: pose.lookout ?? null, holdingPuppy: pose.holdingPuppy ?? null, activity: pose.activity ?? null, bench: pose.bench ?? null, horse: pose.horse ?? null,
-              swing: pose.swing ? { id: pose.swing.id, index: pose.swing.index } : null }));
+            if (pose && active.readyState === WebSocket.OPEN) {
+              const heartbeat = JSON.stringify({ type: "heartbeat", active: pose.active !== false,
+                lookout: pose.lookout ?? null, holdingPuppy: pose.holdingPuppy ?? null, activity: pose.activity ?? null, bench: pose.bench ?? null, horse: pose.horse ?? null,
+                swing: pose.swing ? { id: pose.swing.id, index: pose.swing.index } : null });
+              // Visible clients drive the shared actor clock, including beneath menus.
+              // Ownership/visibility changes bypass the slower renewal so claims cannot linger.
+              const now = Date.now();
+              if (typeof document === "undefined" || !document.hidden || heartbeat !== lastHeartbeat || now - lastHeartbeatAt >= 1000) {
+                active.send(heartbeat); lastHeartbeat = heartbeat; lastHeartbeatAt = now;
+              }
+            }
           }, 120);
           if (!connectedOnce) { connectedOnce = true; resolve(connection); }
         } else if (message.type === "join") {
