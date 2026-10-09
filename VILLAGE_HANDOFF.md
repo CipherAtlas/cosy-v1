@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-09 — remaining horse network lag (local)
+
+The fixed 350 ms rider projection budget reproduced repeated freezes at 600 ms round trip. At the user's direction, local source now runs the rider's solver continuously from current controls and treats replies as secondary reconciliation targets. The bounded replay adapts to acknowledgement delay, small corrections ease in, and outdated targets cannot freeze the local clock. Collisions, ownership and race/resource outcomes remain Worker-authoritative. Deterministic 12-second rides at 200/600/900/1,400 ms and varying delay/repeated turns pass with zero repeated freezes/backwards corrections/heading snaps. Fresh final check/build/export privacy and 32 real three-client Chrome checks pass, including contention/reconnect/full seats/private focus and laptop/all six iPad CSS layouts. With 600 ms added round trip, steering responds in 8.2 ms; six seconds of canter have zero stalls/backwards corrections and 16.7 ms median/p95 frames. Preview3051 serves the final root export against unchanged Worker2567 code/fresh synthetic state; five final served smoke checks pass. This follow-up is not deployed. [Evidence and native/physical/live limits](docs/village/evidence/horse-local-simulation-20261009/README.md).
+
 ## 2026-10-09 — quiet-space, chat and horse repair published
 
 Release `1e469f1` is pushed and published. [Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/37918668381) both succeeded. Matching Worker version `0e3cbb07-302f-44e1-a998-6540cfa8f98f` is deployed with healthy `/health`. The separate production-endpoint build/export privacy checks pass; the local preview retains its local Worker endpoint.

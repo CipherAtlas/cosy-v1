@@ -1,0 +1,10 @@
+{
+  "durationMs": 6005.799999994037,
+  "frames": 360,
+  "frameMedianMs": 16.69999999999709,
+  "frameP95Ms": 16.700000000004366,
+  "solverMedianMs": 0.19999998807907104,
+  "solverP95Ms": 3.7000000178813934,
+  "stalled": 0,
+  "backwards": 0
+}

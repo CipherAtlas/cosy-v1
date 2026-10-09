@@ -67,7 +67,10 @@ const bounded = new ClientRiding(); bounded.connect(() => {});
 bounded.sync([{ ...accepted, ride: { ...accepted.ride, velocity: 9, input: { ...forward, sprint: true } } }], 'rider', 1000, 0);
 const limit = bounded.sample(.016, 1, horse.movement, () => false, 350).z;
 assert(limit <= accepted.z + 9 * .35 + 1e-8, 'Visual motion stays within the 350ms projection horizon');
-assert.equal(bounded.sample(.016, 1, horse.movement, () => false, 390).z, limit, 'A stalled stream cannot advance beyond the horizon');
+assert(bounded.sample(.016, 1, horse.movement, () => false, 390).z > limit,
+  'The local ride clock continues independently of the snapshot replay horizon');
+assert.equal(bounded.sample(.016, 1, horse.movement, () => false, 401).z, accepted.z,
+  'Missing snapshots still stop the local ride at the delivery safety cutoff');
 const legacy = new ClientRiding(); legacy.connect(() => {});
 const { ride: _ride, ...oldActor } = accepted;
 legacy.sync([oldActor], 'rider', 1000, 0);
@@ -75,6 +78,63 @@ assert.equal(legacy.sample(.016, 1, horse.movement, () => false, 16), null, 'Old
 assert.equal(worker.snapshot(horse, 2000, false).input, null, 'Expired accepted input is not replayed from snapshots');
 worker.stop(horse);
 assert.equal(worker.snapshot(horse, 2000, false).sequence, 0, 'Releasing a ride clears its acknowledgement and velocity');
+
+// Drive the real Worker and rider controller on independent clocks. Delaying only one
+// turn or sampling for 600ms misses a prediction horizon that expires on every reply.
+function delayedRide(oneWayMs, jitterMs = 0, repeatedTurns = false) {
+  const authority = new WorkerRiding(), rider = new ClientRiding();
+  const shared = { state: { ...accepted, ride: undefined }, movement: new VillageMovement([], () => {}) };
+  const inputs = [], replies = [], frames = [];
+  let now = 0, sequence = 0;
+  rider.connect(input => inputs.push({ at: Math.max(inputs.at(-1)?.at ?? 0,
+    now + oneWayMs + Math.sin(now / 300) * jitterMs), input }));
+  rider.sync([accepted], 'rider', 10000, 0);
+  for (let frame = 1; frame <= 720; frame++) {
+    now = frame * 1000 / 60;
+    authority.step(shared, 1, 1 / 60, 10000 + now, () => false);
+    while (inputs[0]?.at <= now) {
+      const input = inputs.shift().input;
+      authority.input(shared, input, 10000 + now); sequence = input.sequence;
+    }
+    if (frame % 6 === 0) replies.push({ at: Math.max(replies.at(-1)?.at ?? 0,
+      now + oneWayMs + Math.cos(now / 400) * jitterMs), time: 10000 + now,
+      actor: { ...shared.state, ride: authority.snapshot(shared, 10000 + now, false) } });
+    while (replies[0]?.at <= now) {
+      const reply = replies.shift(); rider.sync([reply.actor], 'rider', reply.time, now);
+    }
+    const keys = new Set(['w', 'shift']);
+    if (now >= 5000 && now < 5500) keys.add('a');
+    if (now >= 5500 && now < 6000) keys.add('d');
+    if (repeatedTurns && now >= 3000) {
+      keys.delete('a'); keys.delete('d');
+      keys.add(Math.floor(now / 500) % 2 ? 'a' : 'd');
+    }
+    rider.update(keys, true, now / 1000);
+    const pose = rider.sample(1 / 60, 1, shared.movement, () => false, now);
+    if (now > 2000) frames.push({ ...pose, at: now });
+  }
+  assert(sequence > 80, 'The authority keeps accepting inputs throughout the delayed ride');
+  let stalls = 0, backwards = 0, headingJumps = 0, travel = 0;
+  for (let i = 1; i < frames.length; i++) {
+    const before = frames[i - 1], after = frames[i];
+    const distance = (after.x - before.x) * Math.sin(before.heading) + (after.z - before.z) * Math.cos(before.heading);
+    travel += distance;
+    if (distance < .001) stalls++;
+    if (distance < -.02) backwards++;
+    if (Math.abs(Math.atan2(Math.sin(after.heading - before.heading), Math.cos(after.heading - before.heading))) > .06) headingJumps++;
+  }
+  console.log('Delayed ride', { oneWayMs, jitterMs, repeatedTurns, frames: frames.length, stalls, backwards, headingJumps, travel });
+  assert(stalls / frames.length < .05, `${oneWayMs * 2}ms RTT must not repeatedly exhaust rider prediction`);
+  assert.equal(backwards, 0, 'Steady riding must not jump backwards on acknowledgements');
+  assert.equal(headingJumps, 0, 'Delayed steering replies must not snap the rendered heading');
+  assert(travel > 80, 'Ten seconds of clear cantering must retain useful forward speed');
+}
+delayedRide(100);
+delayedRide(300);
+delayedRide(300, 80);
+delayedRide(450);
+delayedRide(300, 80, true);
+delayedRide(700);
 
 // A fresh snapshot must not ease away the distance travelled since the last rendered frame.
 const steady = new ClientRiding(); steady.connect(() => {});

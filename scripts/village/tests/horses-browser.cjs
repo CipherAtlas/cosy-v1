@@ -4,6 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const output = process.env.OUTPUT_DIR || '/tmp/cosy-horses-browser';
+const oneWayMs = Number(process.env.HORSE_ONE_WAY_MS || 100);
+const sampleMs = Number(process.env.HORSE_SAMPLE_MS || 600);
+assert(oneWayMs >= 0 && oneWayMs <= 1000 && sampleMs >= 600 && sampleMs <= 10000);
 fs.mkdirSync(output, { recursive: true });
 
 (async () => {
@@ -100,6 +103,22 @@ fs.mkdirSync(output, { recursive: true });
     // Mounts share the Worker's 80 ms interaction cooldown with the preceding dismount.
     await page.waitForTimeout(100);
   }
+  async function aim(page, heading) {
+    await page.bringToFront(); await page.locator('canvas').focus();
+    await page.evaluate(async heading => {
+      await new Promise(resolve => {
+        function steer() {
+          const current = e.horses.heading(e.horseRiding.actor.id);
+          const error = Math.atan2(Math.sin(heading - current), Math.cos(heading - current));
+          // Use the real analog control to settle precisely on long, narrow routes.
+          if (Math.abs(error) < .008) { e.touchMove.x = 0; resolve(); }
+          else { e.touchMove.x = -Math.max(-.7, Math.min(.7, error * 3)); requestAnimationFrame(steer); }
+        }
+        requestAnimationFrame(steer);
+      });
+    }, heading);
+    await page.waitForTimeout(450);
+  }
   try {
     const rider = await join();
     if (process.env.SMOKE_ONLY === '1') {
@@ -180,8 +199,8 @@ fs.mkdirSync(output, { recursive: true });
     check(await observer.evaluate(() => !e.horseRiding.actor), 'Competing programmatic mount is also rejected');
     if (process.env.LATENCY_CHECK === '1') {
       await rider.bringToFront(); await rider.locator('canvas').focus();
-      await rider.evaluate(() => { horseLatency.outbound = horseLatency.inbound = 100; });
-      await rider.waitForTimeout(350);
+      await rider.evaluate(delay => { horseLatency.outbound = horseLatency.inbound = delay; }, oneWayMs);
+      await rider.waitForTimeout(oneWayMs * 2 + 200);
       await rider.evaluate(() => {
         window.turnResponse = new Promise(resolve => {
           document.addEventListener('keydown', function record(event) {
@@ -205,13 +224,35 @@ fs.mkdirSync(output, { recursive: true });
       await rider.keyboard.down('a');
       const response = await rider.evaluate(() => turnResponse);
       await rider.keyboard.up('a');
-      console.log('Horse response under added 200ms RTT:', response);
-      check(response.visualMs !== null && response.visualMs < 100, 'Rider steering responds within 100ms with added 200ms network RTT');
+      console.log(`Horse response under added ${oneWayMs * 2}ms RTT:`, response);
+      check(response.visualMs !== null && response.visualMs < 100, `Rider steering responds within 100ms with added ${oneWayMs * 2}ms network RTT`);
       check(response.authoritativeMs > response.visualMs + 80, 'The visual response precedes the accepted Worker reply');
       check(await rider.evaluate(() => e.horseRiding.actor.owner === e.sharedSelfId), 'Prediction retains the accepted Worker ownership');
       fs.writeFileSync(`${output}/latency.json`, JSON.stringify(response, null, 2));
       await rider.evaluate(() => { horseLatency.outbound = horseLatency.inbound = 0; });
-      await rider.waitForTimeout(500);
+      await rider.waitForTimeout(oneWayMs * 2 + 300);
+    }
+    if (process.env.LATENCY_CHECK === '1' && sampleMs >= 3000) {
+      // The second horse blocks the long eastern route. Move it through a real
+      // accepted ride rather than deleting occupancy or teleporting shared actors.
+      await approach(observer, 'horse-willow');
+      await observer.evaluate(() => e.mountHorse('horse-willow'));
+      await observer.waitForFunction(() => e.horseRiding.actor?.id === 'horse-willow');
+      check(await rider.evaluate(() => e.sharedActors.actors.filter(a => a.kind === 'horse' && a.mode === 'ride').length === 2),
+        'Both clients can ride distinct Worker-owned horses simultaneously');
+      const start = await observer.evaluate(() => e.horseRiding.actor.z);
+      await observer.locator('canvas').focus(); await observer.keyboard.down('w');
+      await observer.waitForFunction(z => e.horseRiding.actor.z < z - 5, start);
+      await observer.keyboard.up('w'); await observer.keyboard.down(' ');
+      await observer.waitForFunction(() => e.horseRiding.actor.speed < .05);
+      await observer.keyboard.up(' '); await observer.evaluate(() => e.leaveHorse());
+      await observer.waitForFunction(() => !e.horseRiding.actor);
+      // Let the caretaker finish crossing the checked route towards Willow.
+      await rider.waitForFunction(() => {
+        const rowan = e.sharedActors.actors.find(a => a.id === 'rowan');
+        const willow = e.sharedActors.actors.find(a => a.id === 'horse-willow');
+        return rowan.z < willow.z + 1.3;
+      }, null, { timeout: 15000 });
     }
     // Move the synthetic spectator out of the riding route after checking nearby contention.
     await observer.evaluate(() => {
@@ -222,38 +263,37 @@ fs.mkdirSync(output, { recursive: true });
       e.movement.settle(point.x, point.z);
     });
     await observer.waitForTimeout(300);
-    // Twelve metres covers acceleration, the canter threshold and braking without requiring an empty pasture.
-    const course = await rider.evaluate(() => {
+    // Include acceleration, delayed braking and the full sample in the checked route.
+    const courseLength = process.env.LATENCY_CHECK === '1' ? Math.max(12, Math.ceil(9 * (sampleMs / 1000 + 2))) : 12;
+    const course = await rider.evaluate(courseLength => {
       const horse = e.horseRiding.actor;
       const scale = e.world.authored.horses.find(placement => placement.id === horse.id).scale[0];
-      return Array.from({ length: 32 }, (_, i) => i * Math.PI / 16).find(heading =>
-        Array.from({ length: 24 }, (_, i) => (i + 1) / 2).every(distance => {
+      const headings = Array.from({ length: 256 }, (_, i) => i * Math.PI / 128).filter(heading =>
+        Array.from({ length: courseLength * 2 }, (_, i) => (i + 1) / 2).every(distance => {
           const x = horse.x + Math.sin(heading) * distance, z = horse.z + Math.cos(heading) * distance;
           return [-.65, 0, .65].every(along => [-.25, .25].every(side =>
             e.movement.clear(x + (Math.sin(heading) * along + Math.cos(heading) * side) * scale,
-              z + (Math.cos(heading) * along - Math.sin(heading) * side) * scale)))
+              z + (Math.cos(heading) * along - Math.sin(heading) * side) * scale, undefined, 1.8 + scale)))
             && e.sharedActors.actors.every(actor => actor.id === horse.id || actor.activity === 'focus'
               || Math.hypot(actor.x - x, actor.z - z) > (actor.kind === 'horse' ? 1.4 : .8))
             && [...e.remoteVisitors.values()].every(visitor => visitor.activity === 'focus'
               || Math.hypot(visitor.target.x - x, visitor.target.z - z) > 1);
         }));
-    });
-    assert.notEqual(course, undefined, 'The horse test needs a clear 12 m acceleration/braking course');
-    await rider.bringToFront(); await rider.locator('canvas').focus();
-    // Aim from the rendered horse: its rider display responds before server snapshots arrive.
-    await rider.evaluate(async course => {
-      e.horseKey('d', true);
-      await new Promise(resolve => {
-        function steer() {
-          const heading = e.horses.heading(e.horseRiding.actor.id);
-          if (Math.abs(Math.atan2(Math.sin(heading - course), Math.cos(heading - course))) < .035) { e.horseKey('d', false); resolve(); }
-          else requestAnimationFrame(steer);
-        }
-        requestAnimationFrame(steer);
-      });
-    }, course);
-    await rider.waitForTimeout(450);
-    if (process.env.LATENCY_CHECK === '1') await rider.evaluate(() => { horseLatency.outbound = horseLatency.inbound = 100; });
+      // Aim inside the first continuous clear corridor, away from its fence edge.
+      let end = 0;
+      while (end + 1 < headings.length && headings[end + 1] - headings[end] < Math.PI / 128 + 1e-8) end++;
+      return headings[Math.floor(end / 2)];
+    }, courseLength);
+    if (course === undefined) console.log('Course obstruction', await rider.evaluate(() => {
+      const h = e.horseRiding.actor;
+      return { horse: h, nearby: e.sharedActors.actors.filter(a => a.id !== h.id && Math.hypot(a.x - h.x, a.z - h.z) < 10),
+        visitors: [...e.remoteVisitors.values()].map(v => ({ id: v.id, x: v.target.x, z: v.target.z })) };
+    }));
+    assert.notEqual(course, undefined, `The horse test needs a clear ${courseLength} m acceleration/braking course`);
+    await aim(rider, course);
+    console.log('Riding route', await rider.evaluate(course => ({ course, horse: e.horseRiding.actor,
+      display: e.horses.heading(e.horseRiding.actor.id) }), course));
+    if (process.env.LATENCY_CHECK === '1') await rider.evaluate(delay => { horseLatency.outbound = horseLatency.inbound = delay; }, oneWayMs);
     const start = await rider.evaluate(() => ({ x: e.horseRiding.actor.x, z: e.horseRiding.actor.z }));
     await rider.locator('canvas').focus();
     await rider.keyboard.down('w');
@@ -263,10 +303,14 @@ fs.mkdirSync(output, { recursive: true });
       throw error;
     });
     await rider.keyboard.down('Shift');
-    await rider.waitForFunction(() => e.horseRiding.actor.speed > 4.6);
+    await rider.waitForFunction(() => e.horseRiding.actor.speed > 4.6).catch(async error => {
+      console.log('Canter state', await rider.evaluate(() => ({ horse: e.horseRiding.actor, display: e.horseRiding.simulation?.pose,
+        keys: [...e.keys], nearby: e.sharedActors.actors.filter(a => Math.hypot(a.x - e.player.position.x, a.z - e.player.position.z) < 8) })));
+      throw error;
+    });
     check(true, 'Actual W and Shift keys accelerate into canter');
     if (process.env.LATENCY_CHECK === '1') {
-      const sustained = await rider.evaluate(() => new Promise(resolve => {
+      const sustained = await rider.evaluate(sampleMs => new Promise(resolve => {
         const frames = [], solver = [], motion = [], riding = e.horseRiding, original = riding.sample;
         riding.sample = function (...args) {
           const at = performance.now(), result = original.apply(this, args);
@@ -281,19 +325,19 @@ fs.mkdirSync(output, { recursive: true });
               + (horse.position.z - previous.z) * Math.cos(horse.rotation.y));
           }
           previous = { at: now, x: horse.position.x, z: horse.position.z };
-          if (now - start < 600) return requestAnimationFrame(frame);
+          if (now - start < sampleMs) return requestAnimationFrame(frame);
           riding.sample = original;
           const percentile = (values, p) => values.sort((a, b) => a - b)[Math.floor((values.length - 1) * p)];
-          resolve({ frames: frames.length, frameMedianMs: percentile(frames, .5), frameP95Ms: percentile(frames, .95),
+          resolve({ durationMs: now - start, frames: frames.length, frameMedianMs: percentile(frames, .5), frameP95Ms: percentile(frames, .95),
             solverMedianMs: percentile(solver, .5), solverP95Ms: percentile(solver, .95),
             stalled: motion.filter(distance => distance < .001).length, backwards: motion.filter(distance => distance < -.02).length });
         }
         requestAnimationFrame(frame);
-      }));
+      }), sampleMs);
       check(sustained.frames >= 8 && sustained.stalled / sustained.frames < .2 && sustained.backwards === 0,
         'Sustained delayed-network cantering advances without repeated stalls or backwards corrections');
       fs.writeFileSync(`${output}/sustained.json`, JSON.stringify(sustained, null, 2));
-      console.log('Sustained riding with added 200ms RTT:', sustained);
+      console.log(`Sustained riding with added ${oneWayMs * 2}ms RTT:`, sustained);
     }
     await rider.keyboard.up('Shift'); await rider.keyboard.up('w');
     await rider.keyboard.down(' ');

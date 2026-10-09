@@ -14,10 +14,10 @@ export class HorseRiding {
   private pending: { input: SharedHorseInput; at: number }[] = [];
   private receivedAt = -Infinity;
   private baseAt = 0;
-  private predicted: SharedActor | null = null;
+  private horizon = 350;
+  private controls: SharedHorseInput | null = null;
   private acknowledged: { sequence: number; at: number } | null = null;
   private reconcile = false;
-  private correction = { x: 0, y: 0, z: 0 };
   private colliders: Collider[] | null = null;
   private probe: VillageMovement | null = null;
   private simulation: { pose: SharedActor; at: number; velocity: number; input: SharedHorseInput } | null = null;
@@ -30,13 +30,19 @@ export class HorseRiding {
     this.actor = actors.find(actor => actor.kind === "horse" && actor.owner === selfId && actor.mode === "ride") ?? null;
     const changed = previous !== this.actor?.id;
     if (changed) {
-      this.sentAt = -Infinity; this.lastInput = ""; this.pending = []; this.predicted = null;
-      this.acknowledged = null; this.correction = { x: 0, y: 0, z: 0 };
+      this.sentAt = -Infinity; this.lastInput = ""; this.pending = [];
+      this.acknowledged = null; this.controls = null; this.horizon = 350;
       this.simulation = null;
     }
     const ride = this.actor?.ride;
     const ack = this.pending.find(packet => packet.input.sequence === ride?.sequence);
-    if (ack && ride) this.acknowledged = { sequence: ride.sequence, at: ack.at };
+    if (ack && ride) {
+      this.acknowledged = { sequence: ride.sequence, at: ack.at };
+      // The acknowledged pose is anchored to the original send clock. Its age
+      // includes both network legs; a fixed 350ms budget stalls on slower routes.
+      const delay = Math.max(0, now - ack.at - Math.max(0, time - ride.at));
+      this.horizon = Math.max(this.horizon, Math.min(1000, delay + 200));
+    }
     this.baseAt = ride && this.acknowledged?.sequence === ride.sequence
       ? Math.min(now, this.acknowledged.at + Math.max(0, time - ride.at)) : now;
     if (ride) this.pending = this.pending.filter(packet => (packet.input.sequence ?? 0) > ride.sequence);
@@ -54,6 +60,7 @@ export class HorseRiding {
       brake: !enabled || keys.has(" ") || touch.brake,
     };
     const signature = JSON.stringify(input);
+    this.controls = input;
     if (signature !== this.lastInput || time - this.sentAt >= .1) {
       this.transmit(input, time * 1000); this.lastInput = signature; this.sentAt = time;
     }
@@ -66,65 +73,73 @@ export class HorseRiding {
     if (this.pending.length > 64) this.pending.shift();
   }
 
-  /** Only the accepted rider predicts a bounded display pose; the Worker still owns every outcome. */
+  /** The accepted rider runs continuously; snapshots correct the display, never drive its clock. */
   sample(dt: number, scale: number, movement: VillageMovement, occupied: (x: number, z: number) => boolean,
     now: number): SharedActor | null {
     const actor = this.actor, ride = actor?.ride;
     if (!actor) return null;
     if (!ride) return null;
-    if (!ride || ride.blocked || now - this.receivedAt > 400) {
-      this.predicted = null; this.correction = { x: 0, y: 0, z: 0 };
+    if (ride.blocked || now - this.receivedAt > 400) {
       this.simulation = null;
       return actor;
     }
     if (this.colliders && (this.reconcile || !this.probe)) {
       // A conservative broad phase covers maximum projection, body probes and correction easing.
-      const radius = 9 * .35 + 2 * scale + 2;
+      const radius = 9 * this.horizon / 1000 + 2 * scale + 2;
+      const center = this.simulation?.pose ?? actor;
       this.probe = new VillageMovement(this.colliders.filter(collider =>
-        Math.hypot(collider.x - actor.x, collider.z - actor.z) <= radius + Math.hypot(collider.w, collider.d) / 2), () => {});
+        Math.min(Math.hypot(collider.x - actor.x, collider.z - actor.z),
+          Math.hypot(collider.x - center.x, collider.z - center.z)) <= radius + Math.hypot(collider.w, collider.d) / 2), () => {});
     }
     const probe = this.probe ?? movement;
-    const expected = this.reconcile && this.predicted && this.simulation ? { ...this.predicted } : null;
-    if (expected && this.simulation) {
-      // Compare poses at the same frame time, otherwise each snapshot erases one frame of travel.
-      stepHorse(expected, this.simulation.velocity, this.simulation.input, scale,
-        Math.max(0, Math.min(.35, (now - this.simulation.at) / 1000)), probe, occupied);
-    }
-    const previous = !this.reconcile && this.simulation;
-    const pose = { ...(previous ? previous.pose : actor) };
-    let cursor = previous ? previous.at : Math.max(this.baseAt, now - 350);
-    let velocity = previous ? previous.velocity : ride.velocity, input = previous ? previous.input : ride.input ?? STOP;
-    const until = Math.min(now, this.baseAt + 350);
-    for (const packet of this.pending) {
-      if ((packet.input.sequence ?? 0) <= (input.sequence ?? 0)) continue;
-      const at = Math.max(cursor, Math.min(until, packet.at));
-      if (at > cursor) velocity = stepHorse(pose, velocity, input, scale, (at - cursor) / 1000, probe, occupied);
-      input = packet.input; cursor = at;
-    }
-    if (until > cursor) velocity = stepHorse(pose, velocity, input, scale, (until - cursor) / 1000, probe, occupied);
-    this.simulation = { pose: { ...pose }, at: until, velocity, input };
-    if (this.reconcile) {
-      this.correction = expected && Math.hypot(expected.x - pose.x, expected.z - pose.z) < 2
-        ? { x: expected.x - pose.x, y: expected.y - pose.y, z: expected.z - pose.z }
-        : { x: 0, y: 0, z: 0 };
+    let reference: { pose: SharedActor; velocity: number; input: SharedHorseInput; at: number } | null = null;
+    if (this.reconcile || !this.simulation) {
+      const pose = { ...actor };
+      let cursor = Math.max(this.baseAt, now - this.horizon);
+      let velocity = ride.velocity, input = ride.input ?? STOP;
+      const until = Math.min(now, this.baseAt + this.horizon);
+      for (const packet of this.pending) {
+        if ((packet.input.sequence ?? 0) <= (input.sequence ?? 0)) continue;
+        const at = Math.max(cursor, Math.min(until, packet.at));
+        if (at > cursor) velocity = stepHorse(pose, velocity, input, scale, (at - cursor) / 1000, probe, occupied);
+        input = packet.input; cursor = at;
+      }
+      if (until > cursor) velocity = stepHorse(pose, velocity, input, scale, (until - cursor) / 1000, probe, occupied);
+      reference = { pose, velocity, input, at: until };
       this.reconcile = false;
     }
-    // Ease only positional corrections; steering must respond on this frame.
-    const decay = Math.exp(-dt * 18);
-    for (const key of ["x", "y", "z"] as const) this.correction[key] *= decay;
-    // Do not smooth through a newly accepted collision correction.
-    const x = pose.x + this.correction.x, z = pose.z + this.correction.z;
-    if (horseClear(probe, x, z, pose.heading, scale) && !occupied(x, z)) {
-      pose.x = x; pose.y += this.correction.y; pose.z = z;
+    const previous = this.simulation;
+    const pose = { ...(previous?.pose ?? reference!.pose) };
+    const input = this.controls ?? previous?.input ?? reference!.input;
+    let velocity = previous?.velocity ?? reference!.velocity;
+    if (previous) velocity = stepHorse(pose, velocity, input, scale,
+      Math.max(0, Math.min(.4, (now - previous.at) / 1000)), probe, occupied);
+    // Compare the accepted replay at the same display time. An exhausted replay
+    // budget cannot freeze the local simulation or pull it towards an old pose.
+    if (previous && reference && reference.at === now) {
+      const gap = Math.hypot(reference.pose.x - pose.x, reference.pose.z - pose.z);
+      if (gap >= 2) { Object.assign(pose, reference.pose); velocity = reference.velocity; }
+      else {
+        const blend = 1 - Math.exp(-dt * 6);
+        const x = pose.x + (reference.pose.x - pose.x) * blend;
+        const z = pose.z + (reference.pose.z - pose.z) * blend;
+        const turn = Math.atan2(Math.sin(reference.pose.heading - pose.heading), Math.cos(reference.pose.heading - pose.heading));
+        const heading = pose.heading + turn * blend;
+        if (horseClear(probe, x, z, heading, scale) && !occupied(x, z)) {
+          pose.x = x; pose.z = z; pose.y += (reference.pose.y - pose.y) * blend; pose.heading = heading;
+          velocity += (reference.velocity - velocity) * blend;
+        }
+      }
     }
-    this.predicted = pose;
+    this.simulation = { pose: { ...pose }, at: now, velocity, input };
     return pose;
   }
 
   stop() {
+    this.controls = STOP;
     if (this.actor) this.transmit(STOP, performance.now());
     this.lastInput = "";
   }
 
-  clear() { this.stop(); this.actor = null; this.pending = []; this.predicted = null; this.simulation = null; }
+  clear() { this.stop(); this.actor = null; this.pending = []; this.simulation = null; }
 }

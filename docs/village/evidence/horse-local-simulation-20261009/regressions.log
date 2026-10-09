@@ -1,0 +1,65 @@
+Delayed ride {
+  oneWayMs: 100,
+  jitterMs: 0,
+  repeatedTurns: false,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 89.84376156924058
+}
+Delayed ride {
+  oneWayMs: 300,
+  jitterMs: 0,
+  repeatedTurns: false,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 90.03909975285788
+}
+Delayed ride {
+  oneWayMs: 300,
+  jitterMs: 80,
+  repeatedTurns: false,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 89.54621041805244
+}
+Delayed ride {
+  oneWayMs: 450,
+  jitterMs: 0,
+  repeatedTurns: false,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 89.79954181320461
+}
+Delayed ride {
+  oneWayMs: 300,
+  jitterMs: 80,
+  repeatedTurns: true,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 89.3661026086827
+}
+Delayed ride {
+  oneWayMs: 700,
+  jitterMs: 0,
+  repeatedTurns: false,
+  frames: 600,
+  stalls: 0,
+  backwards: 0,
+  headingJumps: 0,
+  travel: 89.82669332483276
+}
+9975 indexed/full-scan collision comparisons pass.
+Horse rapid-input, next-frame keyboard/touch response, reconciliation, countdown, collision, stall and ownership checks pass.
+(node:47565) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
