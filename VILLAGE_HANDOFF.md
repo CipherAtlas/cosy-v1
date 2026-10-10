@@ -1,8 +1,8 @@
 # Cosy Village — canonical handoff
 
-## 2026-10-10 — Hearthwillow branding release preparation
+## 2026-10-10 — Hearthwillow branding release published
 
-Commit/push/deploy authorized without local test reruns. The reviewed branding/startup change reuses the preceding evidence and will publish through the existing Pages workflow, including its automatic checks. Worker and world/editor data remain unchanged; publication is pending.
+Application `f0d0a45` is committed, pushed and published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38040113688): white-background favicon, Hearthwillow tab title, opaque first-paint logo and breathing/rotation with flame-first color reveal. Local/browser test reruns were skipped as requested; prior unchanged-source evidence is reused. Existing CI contracts, production build and export checks passed, and a fresh live availability HEAD request returns HTTP 200. Worker/world/editor data remain unchanged. Live animation/interaction and native/physical devices were not tested in this release turn. Reload tabs. The docs-only receipt uses `[skip ci]` and leaves application source unchanged.
 
 ## 2026-10-10 — Hearthwillow branding and loading reveal (local)
 

@@ -21,7 +21,9 @@ All 69 final focused Chrome checks pass: pre-JavaScript first paint, deliberatel
 
 Visual comparisons: [unlit](staged-fill-0.png), [flame filling](staged-fill-15.png), [flame lit](staged-fill-30.png), [willow starting](staged-fill-35.png), [willow filling](staged-fill-70.png), [fully lit](staged-fill-100.png). These deliberately stage SVG clipping and freeze motion for comparison; they do not represent measured loading speed. Actual loader frames are separate in `results.json`. [Before JavaScript](first-paint-before-javascript.png) and [iPad mini](loading-ipad-mini.png) capture the initial screen.
 
-The dim bitmap preloads the same URL used by the SVG color layers. The loading artwork remains transparent, with no surrounding image tile. Native Safari/iPad, physical devices, browser-tab screenshot appearance and live deployment remain unverified. No deployment or Git writes.
+The dim bitmap preloads the same URL used by the SVG color layers. The loading artwork remains transparent, with no surrounding image tile. Native Safari/iPad, physical devices and browser-tab screenshot appearance remain unverified.
+
+Published as application `f0d0a45` through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38040113688). At the user's request, no local/browser tests were rerun during release; the evidence above is reused. The existing CI checks passed, and a fresh live availability HEAD request returns HTTP 200. Live animation/interaction and physical-device acceptance were not tested in this release turn.
 
 ## Built-in imagegen prompts
 

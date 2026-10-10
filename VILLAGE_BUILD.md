@@ -1,8 +1,10 @@
 # Cosy Village — implementation and evidence ledger
 
-## 2026-10-10 — Hearthwillow branding release preparation
+## 2026-10-10 — Hearthwillow branding release published
 
-The user authorized commit, push and deployment without rerunning tests. The reviewed change contains the approved white-background tab favicon, Hearthwillow metadata, opaque first-paint loader and breathing/rotation with flame-first color reveal, plus its documentation and existing regression fixtures. No Worker, world/editor, dependency or deployment-configuration changes. Prior unchanged-source check/build/export and browser evidence below is reused; this release turn runs no local tests. Publication will use the existing Pages workflow and its automatic checks, with completion recorded separately.
+Application `f0d0a45` is committed, pushed and published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38040113688). The release includes the approved white-background tab favicon, Hearthwillow metadata, opaque first-paint loader and breathing/rotation with flame-first color reveal, plus documentation and existing regression fixtures. No Worker, world/editor, dependency or deployment-configuration changes. Reload existing tabs.
+
+Local and browser tests were not rerun at the user's request; the preceding unchanged-source evidence below is reused. The existing workflow automatically passed its contracts, production build and export-boundary checks. A fresh deployment-availability HEAD request to [the live village](https://cosy.sabarg.com/) returns HTTP 200. Live animation/interaction, native browsers and physical-device acceptance were not tested in this release turn. The docs-only receipt uses the existing `[skip ci]` convention and leaves the deployed application unchanged.
 
 ## 2026-10-10 — Hearthwillow identity and loading reveal (local)
 
