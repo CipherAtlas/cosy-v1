@@ -1,0 +1,1265 @@
+{
+  "checks": [
+    "Before JavaScript: opaque logo loader without outer page entrance",
+    "Before JavaScript: no canvas, faded or blurred loader ancestors",
+    "no-preference: first paint remains opaque with scripts delayed",
+    "en/no-preference: tab title is Hearthwillow",
+    "en/no-preference: loading shows only the symbol",
+    "en/no-preference: localized accessible loading status",
+    "no-preference: native real progress is screen-reader-only with no visible bar",
+    "no-preference: unlit silhouette stays dim",
+    "no-preference: .v-loading-logo motion preference",
+    "no-preference: .v-loading-flame motion preference",
+    "no-preference: five new icon declarations",
+    "no-preference: /favicon.ico returns 200",
+    "no-preference: /favicon.ico returns 200",
+    "no-preference: /hearthwillow-icon-32.png returns 200",
+    "no-preference: tab PNG retains transparent pixels",
+    "no-preference: /hearthwillow-icon-192.png returns 200",
+    "no-preference: tab PNG retains transparent pixels",
+    "no-preference: /hearthwillow-apple-icon.png returns 200",
+    "no-preference: 1366x768 animated logo contained",
+    "no-preference: 1280x800 animated logo contained",
+    "no-preference: 900x640 animated logo contained",
+    "no-preference: 500x640 animated logo contained",
+    "no-preference: 810x1080 animated logo contained",
+    "no-preference: 1080x810 animated logo contained",
+    "no-preference: 820x1180 animated logo contained",
+    "no-preference: 1180x820 animated logo contained",
+    "no-preference: 744x1133 animated logo contained",
+    "no-preference: 1133x744 animated logo contained",
+    "Fade keeps menu inert",
+    "en/no-preference: existing menu becomes usable",
+    "no-preference: no gray/transparent gap across first paint, hydration and asset loading",
+    "no-preference: flame completes before any willow color",
+    "Both colors complete before the animated menu reveal",
+    "Real progress jumps produce sequential flame and willow frames",
+    "reduce: first paint remains opaque with scripts delayed",
+    "ja/reduce: tab title is Hearthwillow",
+    "ja/reduce: loading shows only the symbol",
+    "ja/reduce: localized accessible loading status",
+    "reduce: native real progress is screen-reader-only with no visible bar",
+    "reduce: unlit silhouette stays dim",
+    "reduce: .v-loading-logo motion preference",
+    "reduce: .v-loading-flame motion preference",
+    "reduce: five new icon declarations",
+    "reduce: /favicon.ico returns 200",
+    "reduce: /favicon.ico returns 200",
+    "reduce: /hearthwillow-icon-32.png returns 200",
+    "reduce: tab PNG retains transparent pixels",
+    "reduce: /hearthwillow-icon-192.png returns 200",
+    "reduce: tab PNG retains transparent pixels",
+    "reduce: /hearthwillow-apple-icon.png returns 200",
+    "reduce: 1366x768 animated logo contained",
+    "reduce: 1280x800 animated logo contained",
+    "reduce: 900x640 animated logo contained",
+    "reduce: 500x640 animated logo contained",
+    "reduce: 810x1080 animated logo contained",
+    "reduce: 1080x810 animated logo contained",
+    "reduce: 820x1180 animated logo contained",
+    "reduce: 1180x820 animated logo contained",
+    "reduce: 744x1133 animated logo contained",
+    "reduce: 1133x744 animated logo contained",
+    "ja/reduce: existing menu becomes usable",
+    "reduce: no gray/transparent gap across first paint, hydration and asset loading",
+    "reduce: flame completes before any willow color",
+    "Reduced motion skips intermediate flame animation",
+    "Phone remains blocked before scene/world assets",
+    "16px ICO image retains transparency",
+    "32px ICO image retains transparency",
+    "48px ICO image retains transparency",
+    "No uncaught page errors"
+  ],
+  "errors": [],
+  "progressSamples": {
+    "no-preference": [
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0.03740740738533162,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0.09925925923718616,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0.16111111108903398,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 0.22296296294088852,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.7122619047760963,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.7321428571570495,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.7520238095380006,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.771785714299906,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.791547619061811,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.8114285714427621,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.8313095238237154,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.8510714285856206,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.8709523809665717,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.8908333333475249,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.9107142857284781,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.9304761904903811,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.9503571428713345,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.9702380952522877,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.9901190476332387,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.983248,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.956576,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.918779,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.870242,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.811279,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.746029,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.677019,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.608565,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.542088,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.480724,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.424337,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.372761,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.326174,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.284251,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.246827,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.213078,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.183054,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.15607,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.132026,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.110661,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0918528,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.075171,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0605558,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0479176,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0369623,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0276957,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0198925,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.0135455,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.00845993,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.00467434,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 1,
+        "opacity": 0.00204641,
+        "background": "rgb(255, 253, 243)",
+        "fading": true
+      }
+    ],
+    "reduce": [
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 0,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 0,
+        "willow": 0,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 80,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      },
+      {
+        "progress": 100,
+        "flame": 1,
+        "willow": 0.7142857142857143,
+        "opacity": 1,
+        "background": "rgb(255, 253, 243)",
+        "fading": false
+      }
+    ]
+  },
+  "stagedScreenshots": "0/15/30/35/70/100 percent images stage SVG clipping only; real first-paint and sequential progress frames are recorded separately"
+}

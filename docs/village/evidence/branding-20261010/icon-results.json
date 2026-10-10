@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "Five final icon declarations",
+    "Tab icons use the new white-background cache revision",
+    "/favicon.ico returns 200",
+    "/favicon.ico returns 200",
+    "/hearthwillow-icon-32.png returns 200",
+    "32px tab PNG has an opaque warm-white background",
+    "/hearthwillow-icon-192.png returns 200",
+    "192px tab PNG has an opaque warm-white background",
+    "/hearthwillow-apple-icon.png returns 200",
+    "16px ICO image has an opaque warm-white background",
+    "32px ICO image has an opaque warm-white background",
+    "48px ICO image has an opaque warm-white background",
+    "Loading artwork retains alpha for its separate animation layers"
+  ],
+  "errors": []
+}

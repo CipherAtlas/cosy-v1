@@ -1,5 +1,6 @@
 import { ArrowRight, GearSix, Translate } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
+import { VillageLoadingScreen, useVillageLoadingProgress } from "./VillageLoadingScreen";
 import { Keycap } from "./KeybindingControls";
 import { useVillageMenuNavigation } from "./useVillageMenuNavigation";
 import { villageNotice } from "./localization";
@@ -11,23 +12,22 @@ export function VillageStartScreen({ language, ready, progress, error, touch, en
   const t = (en: string, ja: string) => language === "ja" ? ja : en;
   const menu = useRef<HTMLElement>(null);
   const [phase, setPhase] = useState<"loading" | "fading" | "menu">("loading");
+  const displayed = useVillageLoadingProgress(ready ? 100 : progress);
+  const revealReady = ready && displayed === 100;
   useEffect(() => {
-    if (!ready && !error) { setPhase("loading"); return; }
+    if (!revealReady && !error) { setPhase("loading"); return; }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setPhase(reduced || error ? "menu" : "fading");
     if (reduced || error) return;
     const timer = window.setTimeout(() => setPhase("menu"), 550);
     return () => window.clearTimeout(timer);
-  }, [ready, error]);
+  }, [revealReady, error]);
   useEffect(() => {
     if (phase === "menu") menu.current?.querySelector<HTMLButtonElement>("button")?.focus();
   }, [phase]);
   useVillageMenuNavigation(phase === "menu", menu);
   return <main className={`v-start v-start-phase-${phase}`} lang={language}>
-    {phase !== "menu" && <div className="v-title-loading" role="status" aria-label={t("Loading Hearthwillow", "ハースウィローを準備しています")}>
-      <h1>{t("Hearthwillow", "ハースウィロー")}</h1>
-      <progress max={100} value={progress} aria-label={t("Loading", "読み込み中")} />
-    </div>}
+    {phase !== "menu" && <VillageLoadingScreen language={language} progress={progress} displayed={displayed} />}
     <div className="v-start-reveal" inert={phase !== "menu"} aria-hidden={phase !== "menu"}>
       <div className="v-start-content">
         <h1>{t("Hearthwillow", "ハースウィロー")}</h1>

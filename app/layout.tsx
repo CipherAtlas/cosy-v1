@@ -16,12 +16,16 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cosy — a quiet village",
+  title: "Hearthwillow",
   description: "A quiet village for focus, music, breathing, and a little time for yourself.",
   icons: {
-    icon: withBasePath("/icon.svg"),
-    shortcut: withBasePath("/icon.svg"),
-    apple: withBasePath("/icon.svg")
+    icon: [
+      { url: withBasePath("/favicon.ico?v=20261010-white"), sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+      { url: withBasePath("/hearthwillow-icon-32.png?v=20261010-white"), sizes: "32x32", type: "image/png" },
+      { url: withBasePath("/hearthwillow-icon-192.png?v=20261010-white"), sizes: "192x192", type: "image/png" }
+    ],
+    shortcut: withBasePath("/favicon.ico?v=20261010-white"),
+    apple: { url: withBasePath("/hearthwillow-apple-icon.png"), sizes: "180x180", type: "image/png" }
   }
 };
 

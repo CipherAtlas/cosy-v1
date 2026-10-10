@@ -56,14 +56,24 @@ fs.mkdirSync(output, { recursive: true });
   const tab = (page, name) => page.locator('.v-settings-tabs').getByRole('button', { name, exact: true });
   const prefs = page => page.evaluate(() => JSON.parse(localStorage.getItem('cosy-village-preferences')));
   try {
+    const firstPaint = await visit({ javaScriptEnabled: false });
+    check(await firstPaint.locator('.v-title-loading').isVisible() && await firstPaint.locator('.page-transition').count() === 0,
+      'The server-rendered logo loader is visible before JavaScript without the page fade/blur');
+    check(await firstPaint.locator('canvas').count() === 0 && await firstPaint.locator('.v-title-loading progress').getAttribute('value') === '0',
+      'Device detection begins at zero progress without mounting a village canvas');
+    await firstPaint.screenshot({ path: path.join(output, 'first-paint-before-javascript.png') });
+    await firstPaint.context().close();
     const a = await visit({}, () => {
       if (!localStorage.getItem('cosy-village-preferences')) localStorage.setItem('cosy-village-preferences', JSON.stringify({ weather: 'golden', weatherMode: 'manual' }));
     }, true);
-    await a.locator('.v-title-loading').waitFor();
+    await a.locator('.v-start-phase-loading .v-title-loading').waitFor();
+    await a.waitForFunction(() => [...document.querySelectorAll('.v-loading-logo img')].every(image => image.complete && image.naturalWidth > 0));
     check(await a.locator('.v-title-loading').evaluate(element => {
       const r = element.getBoundingClientRect();
-      return Math.abs(r.width - innerWidth) < 1 && Math.abs(r.height - innerHeight) < 1 && !/\d|%/.test(element.innerText);
-    }), 'Loading fills the screen with only Hearthwillow and a number-free progress bar');
+      const logo = element.querySelector('.v-loading-logo-dim');
+      return Math.abs(r.width - innerWidth) < 1 && Math.abs(r.height - innerHeight) < 1
+        && logo?.complete && logo.naturalWidth > 0 && element.innerText.trim() === '';
+    }), 'Loading fills the screen with the Hearthwillow logo and no visible text or progress bar');
     check(await a.locator('.v-start-reveal').getAttribute('inert') !== null && await a.evaluate(() => socketCount === 0), 'Menu is inaccessible during loading and no shared connection starts');
     await a.screenshot({ path: path.join(output, 'fullscreen-loading.png') });
     for (const [width, height] of [[810,1080], [1080,810], [820,1180], [1180,820], [744,1133], [1133,744]]) {

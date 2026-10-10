@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { TouchControls } from "./TouchControls";
 import { VillageMenus, type VillagePanel } from "./VillageMenus";
 import { VillageStartScreen } from "./VillageStartScreen";
+import { VillageLoadingScreen } from "./VillageLoadingScreen";
 import { TownActivityHUD } from "./TownActivityHUD";
 import { CookingHUD } from "./PicnicControls";
 import type { TownActivityHUDState } from "./townProgress";
@@ -75,9 +76,10 @@ export function Village() {
       (browser.userAgentData?.mobile === true && !tablet));
   }, []);
   if (isPhone === false) return kicked ? <KickedScreen /> : <VillageScene onKicked={onKicked} />;
-  return <main className="v-device-gate" lang={gateLanguage} aria-busy={isPhone === null}>
+  if (isPhone === null) return <main lang={gateLanguage} aria-busy="true"><VillageLoadingScreen language={gateLanguage} progress={0} /></main>;
+  return <main className="v-device-gate" lang={gateLanguage}>
     <h1>{gateLanguage === "ja" ? "ハースウィロー" : "Hearthwillow"}</h1>
-    <p role="status">{gateLanguage === "ja" ? isPhone ? "iPad・タブレット・ノートパソコン・PCで村を開いてください。" : "村を準備しています…" : isPhone ? "Please open the village on an iPad, tablet, laptop or PC." : "Opening the village…"}</p>
+    <p role="status">{gateLanguage === "ja" ? "iPad・タブレット・ノートパソコン・PCで村を開いてください。" : "Please open the village on an iPad, tablet, laptop or PC."}</p>
   </main>;
 }
 

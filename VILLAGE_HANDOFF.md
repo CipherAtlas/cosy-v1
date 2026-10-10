@@ -1,5 +1,15 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-10 — Hearthwillow branding release preparation
+
+Commit/push/deploy authorized without local test reruns. The reviewed branding/startup change reuses the preceding evidence and will publish through the existing Pages workflow, including its automatic checks. Worker and world/editor data remain unchanged; publication is pending.
+
+## 2026-10-10 — Hearthwillow branding and loading reveal (local)
+
+The approved willow-and-hearth emblem on white is the favicon; the browser tab is named **Hearthwillow**. The opaque cream logo loader appears from server-rendered first paint, bypassing the old page entrance fade/blur. Its dim silhouette breathes and gently rotates; the amber flame fills first with flicker/glow, then the green willow fills upward. A bounded catch-up of real asset progress preserves that sequence across jumps, and the menu waits for completion. There is no visible bar. Localized native real progress/status, menu fade, reduced motion, phone refusal and existing menu/error/retry controls remain.
+
+Fresh final check/build/export privacy and 69 focused Chrome first-paint/hydration/sequential-progress/laptop/all-six-iPad-CSS/English/Japanese/reduced-motion/phone-gate checks, three failure/retry checks and 13 final white-background icon checks pass with no uncaught page errors. Preview3051 serves the local export. No deployment, Git writes, world/editor or Worker changes; native/physical-device and live acceptance remain open. [Assets, prompts, evidence and staged visual comparisons](docs/village/evidence/branding-20261010/README.md).
+
 ## 2026-10-10 — chat scrolling release published
 
 Application `33311fe` is published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38036071905). Open chat always returns to the bottom, including while idle/unfocused or after upward scrolling. No Worker or deployment configuration changes. Local/browser test reruns were skipped as requested; prior unchanged-source checks and 52 two-client Chrome results remain local evidence. The existing CI contracts, production build and export privacy checks pass, and a fresh live availability request returns HTTP 200. Live chat behavior and native/physical devices remain unverified. Reload existing tabs. The docs-only receipt uses `[skip ci]` and leaves application source unchanged.

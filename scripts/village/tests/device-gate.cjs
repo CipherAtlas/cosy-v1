@@ -44,12 +44,13 @@ for (const [name, userAgent, mobile, phone, maxTouchPoints = 0] of cases) {
     useCallback: callback => callback,
     useEffect: effect => effects.push(effect),
     VillageScene: props => { mounts++; onKick = props.onKicked; return jsx('div', { children: 'scene sentinel' }); },
+    VillageLoadingScreen: () => jsx('div', { children: 'loading sentinel' }),
     KickedScreen: () => jsx('div', { children: 'kick screen sentinel' }),
   };
   vm.runInNewContext(compiled, context, { filename: sourcePath });
   const render = () => { hookIndex = 0; return renderToStaticMarkup(context.exports.Village()); };
   const initial = render();
-  check(initial.includes('Opening the village') && mounts === 0, `${name}: no scene mounts before device detection`);
+  check(initial.includes('loading sentinel') && mounts === 0, `${name}: logo loading screen precedes device detection without mounting the scene`);
   effects[0]();
   const result = render();
   check(states[0] === phone, `${name}: correct device decision`);

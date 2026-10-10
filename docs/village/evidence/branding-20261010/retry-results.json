@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "Graphics failure reveals an accessible retry menu",
+    "Retry restores the opaque animated loader",
+    "Retry finishes the reveal and recovers the usable village menu"
+  ],
+  "errors": []
+}

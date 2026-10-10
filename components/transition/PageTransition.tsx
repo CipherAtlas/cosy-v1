@@ -12,6 +12,9 @@ export const PageTransition = ({ children }: PropsWithChildren) => {
 
   const origin = useMemo(() => consumeTransitionOrigin(pathname), [pathname]);
 
+  // The village renders its own opaque startup screen and ready-state reveal.
+  if (pathname === "/") return <>{children}</>;
+
   return (
     <AnimatePresence mode="wait">
       <motion.main
