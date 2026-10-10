@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-10 — chat always at the bottom (local)
+
+The open chat always stays at the newest message, including when idle/unfocused or after upward scrolling. The scroll lifecycle uses a passive scroll listener plus log/content resize observation, before-paint updates and stable current message IDs. Fresh check/build/export privacy and 52 two-client Chrome checks pass with zero page errors, including idle/unfocused and actual wheel-scroll recovery, real messages during drafting, rollover, resizing/reflow, saved visibility, keyboard entry and laptop/all six iPad CSS orientations. No deployment or Git writes; native/physical-device and live acceptance remain open. See the latest `VILLAGE_BUILD.md` entry for reproduction and limits.
+
 ## 2026-10-10 — Durable Object traffic release published
 
 Unchanged visitor presence now renews every five seconds instead of every 120 ms. Ownership/visibility changes still bypass the renewal delay. `worker/worldClock.js` owns one roughly 100 ms simulation timer per public world; it continues beneath visible menus and stops when every visitor is hidden, in private focus or gone. This keeps accepted actor/rider snapshots smooth without per-visitor clock-driving requests. Movement and riding inputs retain their existing responsiveness.

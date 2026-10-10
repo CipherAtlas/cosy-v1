@@ -37,6 +37,69 @@ const checkChatLayouts = async (page, label, prefix) => {
   }
   await resize(page, 1280, 800);
 };
+const checkChatScrolling = async (page, sender) => {
+  await page.evaluate(() => {
+    const socket = quietSockets.at(-1), hour = Math.floor(Date.now() / 3_600_000);
+    window.scrollChatFixture = (type, extra) => socket.dispatchEvent(new MessageEvent('message', { data: JSON.stringify({ type, chatHour: hour, ...extra }) }));
+    window.scrollChatEntries = Array.from({ length: 80 }, (_, index) => ({ id: 'synthetic-scroll-visitor', messageId: `scroll-${index}`, name: 'Scroll visitor', message: `Message ${index}: ${'Long chat text '.repeat(index % 4 + 1)}`, sentAt: Date.now() + index }));
+    scrollChatFixture('chat_sync', { chat: scrollChatEntries, removedMessageIds: [] });
+  });
+  const log = page.locator('.v-shared-chat-log');
+  const atBottom = async label => {
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.waitForFunction(() => {
+      const log = document.querySelector('.v-shared-chat-log');
+      return log && log.scrollHeight > log.clientHeight && Math.abs(log.scrollHeight - log.clientHeight - log.scrollTop) <= 1;
+    }, null, { timeout: 5000 });
+    check(true, label);
+  };
+  await atBottom('Long history opens at the newest message');
+  await page.locator('.v-shared-chat').evaluate(panel => panel.style.height = '330px');
+  await atBottom('Shrinking the chat panel keeps the newest message visible');
+  await log.evaluate(log => log.scrollTop -= 100);
+  await page.getByLabel('Message', { exact: true }).focus();
+  await atBottom('Focusing the composer returns displaced history to the newest message');
+  await log.evaluate(log => log.scrollTop -= 100);
+  await page.getByLabel('Message', { exact: true }).pressSequentially('typing');
+  await atBottom('Typing restores the newest message while the composer is already focused');
+  await sender.getByLabel('Message', { exact: true }).fill('Remote message during typing');
+  await sender.getByRole('button', { name: 'Send message', exact: true }).click();
+  await log.getByText('Remote message during typing', { exact: true }).waitFor();
+  await atBottom('A real remote message stays visible while a draft is being typed');
+  check(await page.getByLabel('Message', { exact: true }).inputValue() === 'typing', 'Incoming messages preserve the current draft');
+  await page.locator('.v-shared-chat-log p').evaluateAll(rows => rows.forEach(row => row.style.fontSize = '17px'));
+  await atBottom('Late message-content reflow keeps the newest message visible');
+  for (const [width, height] of [[1366,768], ...viewports]) {
+    await resize(page, width, height);
+    await page.locator('.v-shared-chat').evaluate(panel => panel.style.width = '290px');
+    await atBottom(`${width}×${height}: wrapping and viewport changes keep chat at the bottom`);
+  }
+  await page.evaluate(() => {
+    window.scrollRetainedRow = [...document.querySelectorAll('.v-shared-chat-log p')].find(row => row.textContent.includes('Message 79:'));
+    scrollChatFixture('chat', { entry: { ...scrollChatEntries[79], messageId: 'scroll-80', message: 'Newest rolling message' } });
+  });
+  await atBottom('The eighty-message rolling history follows new messages');
+  check(await page.evaluate(() => [...document.querySelectorAll('.v-shared-chat-log p')].find(row => row.textContent.includes('Message 79:')) === scrollRetainedRow),
+    'Retained message rows keep their identity when old history is pruned');
+  await log.evaluate(log => log.scrollTop = 0);
+  await page.getByLabel('Message', { exact: true }).evaluate(input => input.blur());
+  await atBottom('Chat returns to the bottom while idle with the composer unfocused');
+  check(await page.getByLabel('Message', { exact: true }).evaluate(input => document.activeElement !== input), 'Idle scrolling recovery does not focus the composer');
+  await log.hover();
+  await page.mouse.wheel(0, -400);
+  await atBottom('Wheel scrolling always returns to the newest message without typing');
+  await page.waitForTimeout(300);
+  await atBottom('Chat remains at the bottom after wheel scrolling settles');
+  await page.getByRole('button', { name: 'Close Hearthwillow chat', exact: true }).click();
+  await page.getByRole('button', { name: 'Open Hearthwillow chat', exact: true }).click();
+  await atBottom('Reopening chat follows the newest message');
+  await page.evaluate(() => scrollChatFixture('hour', {}));
+  await page.getByText('No messages yet.', { exact: true }).waitFor();
+  check(await log.evaluate(log => log.scrollTop === 0), 'Hourly clearing resets the empty chat position');
+  await page.getByLabel('Message', { exact: true }).fill('');
+  await page.locator('.v-shared-chat').evaluate(panel => { panel.style.width = ''; panel.style.height = ''; });
+  await resize(page, 1280, 800);
+};
 const engine = async page => page.waitForFunction(() => {
   for (let element = document.querySelector('canvas'); element; element = element.parentElement)
     for (let fiber = element[Object.keys(element).find(key => key.startsWith('__reactFiber'))]; fiber; fiber = fiber.return)
@@ -92,6 +155,7 @@ const leave = async page => {
       await unreadToggle.focus(); await receiver.keyboard.press('Enter');
     } else await unreadToggle.click();
     check(await receiver.locator('.v-shared-chat-log p').count() > 0 && await receiver.locator('.v-shared-unread').count() === 0, 'Opening chat shows the new message and clears unread');
+    if (chatOnly) await checkChatScrolling(receiver, sender);
     await receiver.reload(); await enter(receiver);
     check(await receiver.locator('.v-shared-chat').isVisible(), 'Explicit open chat preference survives reload');
     if (chatOnly) {

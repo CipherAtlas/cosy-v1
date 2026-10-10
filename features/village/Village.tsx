@@ -41,6 +41,7 @@ import { useVillageRadio } from "./useVillageRadio";
 import { VillageAudio } from "./audio";
 import { PUPPY_INFO, PUPPY_TRICKS, puppyCommandForKey, type NearbyPuppy } from "./puppies";
 import { useSession } from "./useSession";
+import { useChatScroll } from "./useChatScroll";
 import type { ActivityMoment, MovementStatus } from "./environment";
 import type { CottageCatStatus } from "./cottageCat";
 import type { VillageEngine } from "./VillageEngine";
@@ -167,7 +168,6 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [, setChatClock] = useState(0);
   const chatComposing = useRef(false);
   const chatInput = useRef<HTMLInputElement>(null);
-  const chatLog = useRef<HTMLDivElement>(null);
   const [companions, setCompanions] = useState<string[]>([]);
   const companionsRef = useRef(companions);
   const [activityCompact,setActivityCompact]=useState(false);
@@ -179,6 +179,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   const [soundLoading, setSoundLoading] = useState(false);
   const settings = useVillagePreferences();
   const { mix, setMix, quality, weather, language, mouseSensitivity, keybindings } = settings;
+  const { chatLog, chatMessages, scrollToLatest } = useChatScroll(chatOpen && sharedTrialEnabled && entered, sharedChat, chatDraft, language);
   const [sound, setSound] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [stats, setStats] = useState({ fps: 0, draws: 0, triangles: 0 });
@@ -620,7 +621,6 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
   useEffect(() => {
     if (!chatOpen) chatComposing.current = false;
     else { unreadChatKeys.current.clear(); setChatUnread(false); }
-    if (chatOpen && chatLog.current) chatLog.current.scrollTop = chatLog.current.scrollHeight;
   }, [sharedChat, chatOpen]);
   useEffect(() => {
     try { localStorage.setItem("cosy-village-chat-open", String(chatOpen)); }
@@ -1117,10 +1117,10 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             {chatPeople.length <= 3 && chatPeopleList}
           </div>}
           <p className="v-shared-chat-note">{t(`Everyone is in Hearthwillow. Messages clear each hour${sharedChatHour ? `, next at ${chatTime((sharedChatHour + 1) * 3_600_000)} your time` : ""}.`, `みんな同じ村にいます。メッセージは毎時消去されます。${sharedChatHour ? `次は端末の時刻で${chatTime((sharedChatHour + 1) * 3_600_000)}です。` : ""}`)}</p>
-          <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite">{sharedChat.length ? sharedChat.map((entry, index) => {
+          <div className="v-shared-chat-log" ref={chatLog} role="log" aria-live="polite"><div className="v-shared-chat-messages" ref={chatMessages}>{sharedChat.length ? sharedChat.map((entry, index) => {
             const sentAt = typeof entry.sentAt === "number" && Number.isFinite(entry.sentAt) ? new Date(entry.sentAt) : null;
-            return <p key={index}><strong><bdi>{entry.name}</bdi></strong> <bdi>{entry.message}</bdi>{sentAt && Number.isFinite(sentAt.getTime()) && <time className="v-shared-chat-time" dateTime={sentAt.toISOString()}>{chatTime(sentAt.getTime())}</time>}</p>;
-          }) : <p className="v-shared-chat-empty">{t("No messages yet.", "まだメッセージはありません。")}</p>}</div>
+            return <p key={entry.messageId ?? `${index}:${chatEntryKey(entry)}`}><strong><bdi>{entry.name}</bdi></strong> <bdi>{entry.message}</bdi>{sentAt && Number.isFinite(sentAt.getTime()) && <time className="v-shared-chat-time" dateTime={sentAt.toISOString()}>{chatTime(sentAt.getTime())}</time>}</p>;
+          }) : <p className="v-shared-chat-empty">{t("No messages yet.", "まだメッセージはありません。")}</p>}</div></div>
           <form onSubmit={event => {
             event.preventDefault();
             const message = chatDraft.trim();
@@ -1128,7 +1128,7 @@ function VillageScene({ onKicked }: { onKicked: () => void }) {
             if (sharedTrialRef.current?.sendChat(message)) setChatDraft("");
             else setNotice(t("Chat isn't ready yet. Your message is still here.", "チャットの準備ができていません。メッセージは入力欄に残っています。"));
           }}>
-            <input ref={chatInput} aria-label={t("Message", "メッセージ")} value={chatDraft} onCompositionStart={() => { chatComposing.current = true; }} onCompositionEnd={() => { chatComposing.current = false; }} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => {
+            <input ref={chatInput} aria-label={t("Message", "メッセージ")} value={chatDraft} onFocus={scrollToLatest} onCompositionStart={() => { chatComposing.current = true; }} onCompositionEnd={() => { chatComposing.current = false; }} onChange={event => setChatDraft(event.target.value)} onKeyDown={event => {
               event.stopPropagation();
               // IME confirmation must not submit or close chat (Safari also uses keyCode 229).
               if (chatComposing.current || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) {
