@@ -1,5 +1,9 @@
 # Cosy Village — canonical handoff
 
+## 2026-10-10 — chat scrolling release published
+
+Application `33311fe` is published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38036071905). Open chat always returns to the bottom, including while idle/unfocused or after upward scrolling. No Worker or deployment configuration changes. Local/browser test reruns were skipped as requested; prior unchanged-source checks and 52 two-client Chrome results remain local evidence. The existing CI contracts, production build and export privacy checks pass, and a fresh live availability request returns HTTP 200. Live chat behavior and native/physical devices remain unverified. Reload existing tabs. The docs-only receipt uses `[skip ci]` and leaves application source unchanged.
+
 ## 2026-10-10 — chat always at the bottom (local)
 
 The open chat always stays at the newest message, including when idle/unfocused or after upward scrolling. The scroll lifecycle uses a passive scroll listener plus log/content resize observation, before-paint updates and stable current message IDs. Fresh check/build/export privacy and 52 two-client Chrome checks pass with zero page errors, including idle/unfocused and actual wheel-scroll recovery, real messages during drafting, rollover, resizing/reflow, saved visibility, keyboard entry and laptop/all six iPad CSS orientations. No deployment or Git writes; native/physical-device and live acceptance remain open. See the latest `VILLAGE_BUILD.md` entry for reproduction and limits.

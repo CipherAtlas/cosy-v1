@@ -1,5 +1,11 @@
 # Cosy Village — implementation and evidence ledger
 
+## 2026-10-10 — chat scrolling release published
+
+Release `33311fe` is pushed and published through [successful Pages build and deploy](https://github.com/CipherAtlas/cosy-v1/actions/runs/38036071905). Open chat always returns to the latest message, including while idle/unfocused and after upward scrolling. The Worker and deployment configuration are unchanged. Reload existing village tabs.
+
+Local tests and browser suites were not rerun for this release at the user's request; the preceding unchanged source's check/build/export privacy and 52 two-client Chrome results are reused. The existing deployment workflow automatically ran and passed its contracts, production-endpoint build and export privacy checks. A fresh deployment-availability request to `https://cosy.sabarg.com/` returns HTTP 200. Live chat behavior, native browsers and physical devices were not tested in this release turn. The documentation receipt uses the existing `[skip ci]` convention and does not change the deployed application.
+
 ## 2026-10-10 — chat always at the bottom (local)
 
 The open chat always stays at the newest message, including while idle or with the composer unfocused. Opening, composer focus, draft edits and message/language updates scroll before paint. A dedicated `useChatScroll` hook observes log and message-content size changes, including panel resizing, participant-list expansion and late font layout. Browser scroll anchoring is disabled inside the log, and current message IDs preserve row identity as the eighty-message history rolls over. Every scroll event returns the log to the bottom, including wheel or programmatic scrolling. This uses a passive event listener rather than continuous polling. Delivery, cooldown, IME handling and Worker rules are unchanged.
